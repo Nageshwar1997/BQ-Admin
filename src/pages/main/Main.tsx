@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../../components/navbar/Navbar";
-import Footer from "../../components/footer/Footer";
+// import Footer from "../../components/footer/Footer";
 import { RefObject } from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
 import { VerticalScrollType } from "../../types";
@@ -25,7 +25,7 @@ const Main = () => {
             <main className="w-full py-3">
               <Outlet />
             </main>
-            <Footer />
+            {/* <Footer /> */}
           </div>
         </div>
         {(showGradient as VerticalScrollType).bottom && (
