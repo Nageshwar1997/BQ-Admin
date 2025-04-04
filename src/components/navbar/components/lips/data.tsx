@@ -259,12 +259,3 @@ export const lipstick_sets_and_combos: LevelTwoCategoryType = {
     },
   ],
 };
-
-export const highlightedLipsOptions = [
-  "lip_gloss",
-  "liquid_lipstick",
-  "lip_tint_and_stain",
-  "lipstick_fixer_and_remover",
-  "lip_glitter",
-  "lip_palette",
-];

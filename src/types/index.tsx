@@ -15,15 +15,6 @@ export type ThemeStoreType = {
   toggleTheme: () => void;
 };
 
-export interface ProfilePicInputProps {
-  previewUrl?: string;
-  previewImage?: string;
-  name?: string;
-  className?: string;
-  errorText?: string;
-  onChange: (file: File | null) => void;
-}
-
 export interface InputProps {
   type?: string;
   name?: string;
@@ -57,25 +48,6 @@ export interface TextDisplayProps {
   content: TextItem[];
   className?: string;
   contentClassName?: string;
-}
-
-export interface RegisterFormInputProps {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-  confirmPassword: string;
-  profilePic?: File; // Correctly type the file input
-  remember?: boolean;
-}
-
-export interface RegisterInputMapDataProps {
-  name: keyof RegisterFormInputProps;
-  label?: string;
-  type?: string;
-  placeholder?: string;
-  autoComplete?: string;
 }
 
 export type LoginTypes = "email" | "phoneNumber";

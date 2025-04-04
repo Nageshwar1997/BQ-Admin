@@ -1,9 +1,3 @@
-export interface SocialCommunityItem {
-  id: number;
-  label: string;
-  link: string;
-}
-
 export interface LevelOneCategoryType {
   id: number;
   path: string;
@@ -33,12 +27,4 @@ export interface LevelThreeCategoryType {
   label: string;
   category: string;
   description: string;
-}
-
-export interface Testimonial {
-  id: number;
-  content: string;
-  name: string;
-  role: string;
-  image: string;
 }

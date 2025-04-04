@@ -15,7 +15,7 @@ const Sidebar = () => {
       <div className="h-16 w-full px-2">
         <div className="w-full h-full border-b border-primary-50 flex justify-center">
           <img
-            src="/images/logo/B_Q.png"
+            src="/images/logo/BQ_gradient_logo.webp"
             alt="Logo"
             className="object-cover w-fit h-full"
             draggable={false}
@@ -27,7 +27,7 @@ const Sidebar = () => {
         <div className="w-full flex justify-center items-center gap-1 px-2 py-3">
           <div className="min-h-14 min-w-14 max-w-16 max-h-16 overflow-hidden p-px bg-accent-duo rounded-full shadow-primary-btn">
             <img
-              src="/images/sidebar/user.png"
+              src="/images/logo/BQ_white_logo.webp"
               alt="Logo"
               className="object-cover w-full h-full rounded-full"
               draggable={false}
@@ -47,7 +47,7 @@ const Sidebar = () => {
             <TopGradient className="!w-full h-8 from-secondary-inverted rounded-t-lg" />
           )}
           <div
-            className="w-full h-full overflow-y-scroll p-2 flex flex-col gap-3 pb-10"
+            className="w-full h-full overflow-y-scroll p-2 flex flex-col gap-3 pb-5"
             ref={containerRef as RefObject<HTMLDivElement>}
           >
             {sidebarData.map((item, index) => {
@@ -56,7 +56,9 @@ const Sidebar = () => {
                 <div
                   key={index}
                   onClick={() => navigate(item.path)}
-                  className={`w-full flex items-center justify-between gap-2 group cursor-pointer p-2 border border-primary-10 rounded-lg hover:bg-primary-inverted-10 shadow-lg hover:shadow-primary-inverted-50 light:hover:shadow-primary-50 hover:scale-[1.02] duration-300 ${item.disable ? "pointer-events-none opacity-60" : ""}`}
+                  className={`w-full flex items-center justify-between gap-2 group cursor-pointer p-2 border border-primary-10 rounded-lg hover:bg-primary-inverted-10 shadow-lg hover:shadow-primary-inverted-50 light:hover:shadow-primary-50 hover:scale-[1.02] duration-300 ${
+                    item.disable ? "pointer-events-none opacity-60" : ""
+                  }`}
                 >
                   <div className="flex items-center gap-2">
                     <Icon className="w-5 h-5 [&>path]:stroke-tertiary group-hover:[&>path]:stroke-primary" />

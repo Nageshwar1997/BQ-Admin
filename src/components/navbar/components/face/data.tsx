@@ -334,13 +334,3 @@ export const concealers_and_correctors: LevelTwoCategoryType = {
     },
   ],
 };
-
-export const highlightedFaceOptions: string[] = [
-  "color_corrector",
-  "compact",
-  "makeup_remover",
-  "matte_foundation",
-  "cheek_stain",
-  "sindoor",
-  "compact_powder",
-];

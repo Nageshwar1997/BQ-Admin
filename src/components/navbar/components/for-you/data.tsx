@@ -1,4 +1,4 @@
-import { LevelTwoCategoryType, SocialCommunityItem } from "../../types";
+import { LevelTwoCategoryType } from "../../types";
 
 const basePath = "/for_you";
 const levelTwoCategoryPath = {
@@ -97,16 +97,3 @@ export const blogs: LevelTwoCategoryType = {
     },
   ],
 };
-
-export const socialCommunity: SocialCommunityItem[] = [
-  {
-    id: 1,
-    label: "Founder's Story: Watch Now",
-    link: "https://www.youtube.com/watch?v=92kcChL74ZE",
-  },
-  {
-    id: 2,
-    label: "Chat with our team",
-    link: "/contact-us",
-  },
-];

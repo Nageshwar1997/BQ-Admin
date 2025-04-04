@@ -7,7 +7,6 @@ const Main = lazy(() => import("../pages/main/Main"));
 import Home from "../pages/home/Home";
 import LoginRedirect from "./LoginRedirect";
 import NotFound from "../pages/error/NotFound";
-import SomethingWentWrong from "../pages/error/SomethingWentWrong";
 import LoadingScreen from "../components/loaders/LoadingScreen";
 
 const router = createBrowserRouter([
@@ -28,10 +27,6 @@ const router = createBrowserRouter([
   {
     path: "login",
     element: <LoginRedirect />,
-  },
-  {
-    path: "error",
-    element: <SomethingWentWrong />,
   },
   {
     path: "*",

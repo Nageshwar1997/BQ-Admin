@@ -1,8 +1,5 @@
 import CryptoJS from "crypto-js";
-import {
-  dummyFeedbacks,
-  highlightedCategoryOptions,
-} from "../components/navbar/data";
+
 import { ENCRYPTION_SECRET_KEY } from "../envs/index.env";
 
 export const encryptData = (data: string): string => {
@@ -41,22 +38,3 @@ export const getUserToken = () => {
     )
   );
 };
-
-export const getTodaysFeedback = (
-  forwardIndex: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0
-) => {
-  // Get the current date
-  const today = new Date();
-  // Get the day of the month (1 to 31)
-  const day = today.getDate();
-  // Calculate the feedback index for today
-  const feedbackIndex = (day + forwardIndex) % dummyFeedbacks.length;
-  // Get the feedback for today
-  const todayFeedback = dummyFeedbacks[feedbackIndex];
-
-  return todayFeedback;
-};
-
-// It return a boolean value is level 3 category option is highlighted or not
-export const isHighlightedOption = (option: string) =>
-  highlightedCategoryOptions.includes(option);
