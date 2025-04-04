@@ -25,6 +25,7 @@ const Select = ({
   errorText = "",
   readOnly = false,
   successText = "",
+  onChange,
   placeholder = "",
   containerClassName = "",
 }: SelectInputProps) => {
@@ -59,7 +60,7 @@ const Select = ({
             }`}
           />
           {isOpen && (
-            <div className="absolute left-0 top-full w-full z-[1] mt-1 rounded-lg border border-primary-10 bg-smoke-eerie shadow-md overflow-hidden py-2">
+            <div className="absolute left-0 top-full w-full z-[2] mt-1 rounded-lg border border-primary-10 bg-smoke-eerie shadow-md overflow-hidden py-2">
               <ul className="max-h-60 overflow-auto px-1">
                 {categoriesData.map((option) => (
                   <li
@@ -69,6 +70,7 @@ const Select = ({
                       e.stopPropagation(); // Prevent toggle from parent
                       setSelectedOption(option.value);
                       setIsOpen(false); // Directly close instead of toggling
+                      onChange?.(option.value);
                     }}
                   >
                     {option.label}
