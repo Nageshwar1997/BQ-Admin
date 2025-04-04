@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "bq-admin",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
