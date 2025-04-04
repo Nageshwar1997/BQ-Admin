@@ -5,7 +5,6 @@ import { UseFormRegisterReturn } from "react-hook-form";
 import { categoriesData } from "../../pages/products/data/categoriesData";
 
 export interface SelectInputProps {
-  name?: string;
   value?: string;
   label?: string;
   readOnly?: boolean;
@@ -19,7 +18,6 @@ export interface SelectInputProps {
   onChange?: (val: string) => void;
 }
 const Select = ({
-  name = "",
   label = "",
   className = "",
   errorText = "",
@@ -39,16 +37,17 @@ const Select = ({
   return (
     <div className={`w-full space-y-1.5 ${containerClassName}`}>
       <div className="relative min-h-10 max-h-10 lg:min-h-12 lg:max-h-12">
-        {label && (
-          <label
-            htmlFor={name}
+        {label && !readOnly && (
+          <button
+            type="button"
+            onClick={() => setIsOpen((prev) => !prev)}
             className={`text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded cursor-pointer z-[1]`}
           >
             {label}
-          </label>
+          </button>
         )}
         <div
-          className={`relative w-full h-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 font-normal text-sm bg-smoke-eerie rounded-lg border border-primary-10 p-3 2xl:py-4 text-primary flex justify-between items-center autofill-effect ${className}`}
+          className={`relative w-full h-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 font-normal text-sm bg-smoke-eerie rounded-lg border border-primary-10 p-3 2xl:py-4 text-primary flex justify-between items-center autofill-effect cursor-pointer ${className}`}
           onClick={() => !readOnly && setIsOpen((prev) => !prev)}
         >
           <span className={`${selected ? "" : "text-primary-50"}`}>
