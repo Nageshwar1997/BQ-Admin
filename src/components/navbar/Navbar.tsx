@@ -5,7 +5,7 @@ import DarkMode from "../DarkMode";
 const Navbar = () => {
   const { logout } = useUserStore();
   return (
-    <div className="h-16 w-full px-2 flex items-center justify-between bg-tertiary-inverted text-tertiary shadow-lg shadow-tertiary-inverted rounded-lg">
+    <div className="h-16 w-full px-4 flex items-center justify-between bg-tertiary-inverted text-tertiary rounded-lg">
       <p>Hello, Nageshwar</p>
       <div className="flex items-center gap-8">
         <DarkMode />

@@ -22,7 +22,7 @@ const Main = () => {
             <Navbar />
           </div>
           <div className="w-full">
-            <main className="w-full py-3">
+            <main className="w-full bg-primary-inverted">
               <Outlet />
             </main>
             {/* <Footer /> */}
