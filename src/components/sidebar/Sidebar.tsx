@@ -5,9 +5,12 @@ import { VerticalScrollType } from "../../types";
 import { BottomGradient, TopGradient } from "../Gradients";
 import { sidebarData } from "./data";
 import { useNavigate } from "react-router-dom";
+import { useUserStore } from "../../store/user.store";
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const { user } = useUserStore();
+
   const [showGradient, containerRef] = useVerticalScrollable();
 
   return (
@@ -27,18 +30,18 @@ const Sidebar = () => {
         <div className="w-full flex justify-center items-center gap-1 px-2 py-3">
           <div className="min-h-14 min-w-14 max-w-16 max-h-16 overflow-hidden p-px bg-accent-duo rounded-full shadow-primary-btn">
             <img
-              src="/images/logo/BQ_white_logo.webp"
+              src={user?.profilePic || "/images/sidebar/user-placeholder.webp"}
               alt="Logo"
               className="object-cover w-full h-full rounded-full"
               draggable={false}
             />
           </div>
           <div className="text-center grow">
-            <p className="text-xl font-bold line-clamp-1 text-transparent bg-accent-duo bg-clip-text">
-              Nageshwar
+            <p className="text-xl font-bold line-clamp-1 text-transparent bg-accent-duo bg-clip-text capitalize">
+              {user?.firstName}
             </p>
-            <p className="text-xl font-bold line-clamp-1 text-transparent bg-accent-duo bg-clip-text">
-              Pawar
+            <p className="text-xl font-bold line-clamp-1 text-transparent bg-accent-duo bg-clip-text capitalize">
+              {user?.lastName}
             </p>
           </div>
         </div>
