@@ -108,3 +108,26 @@ export interface UserStoreType {
   setUser: (user: UserTypes) => void;
   logout: () => void;
 }
+
+export interface LevelOneCategoryType {
+  id: number;
+  level: number;
+  label: string;
+  value: string;
+  subCategories: LevelTwoCategoryType[];
+}
+
+export interface LevelTwoCategoryType {
+  id: number;
+  level: number;
+  label: string;
+  value: string;
+  subCategories: LevelThreeCategoryType[];
+}
+
+export interface LevelThreeCategoryType {
+  id: number;
+  level: number;
+  label: string;
+  value: string;
+}
