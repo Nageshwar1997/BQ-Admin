@@ -18,7 +18,7 @@ const UploadProduct = () => {
 
   return (
     <div className="w-full space-y-3">
-      <div className="w-full px-4 py-2 border-b border-primary-50 flex justify-between items-center sticky top-16 bg-primary-inverted z-[1] shadow-lg shadow-primary-inverted">
+      <div className="w-full px-4 py-2 border-b border-primary-50 flex justify-between items-center sticky top-16 bg-primary-inverted z-10 shadow-lg shadow-primary-inverted">
         <PathNavigation />
         <Button
           pattern="secondary"
@@ -34,9 +34,31 @@ const UploadProduct = () => {
         <div className="w-full h-full flex flex-col lg:flex-row gap-5">
           <form className="w-full p-4 flex flex-col gap-7 border h-[1000px]">
             <FormTitle title="Product Details" />
-            <Input name="title" label="Title" />
-            <Input name="brand" label="Brand" />
-            <Select name="category-1" label="Category One"  />
+            <Input
+              name="title"
+              label="Title"
+              placeholder="Enter Product title"
+            />
+            <Input
+              name="brand"
+              label="Brand"
+              placeholder="Enter Product brand"
+            />
+            <Select
+              name="category-1"
+              label="Category One"
+              placeholder="Select a level one category"
+            />
+            <Select
+              name="category-2"
+              label="Category Two"
+              placeholder="Select a level two category"
+            />
+            <Select
+              name="category-3"
+              label="Category Three"
+              placeholder="Select a level three category"
+            />
           </form>
           <form className="w-full flex flex-col gap-7 border h-[400px] sticky top-[141px]"></form>
         </div>

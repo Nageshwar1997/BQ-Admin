@@ -1,17 +1,17 @@
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 
 import { InfoIcon, CheckMark, DropdownIcon } from "../../icons";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { categoriesData } from "../../pages/products/data/categoriesData";
 
-export interface InputProps {
-  icon?: ReactNode;
+export interface SelectInputProps {
   name?: string;
   value?: string;
   label?: string;
   readOnly?: boolean;
   errorText?: string;
   className?: string;
+  placeholder?: string;
   successText?: string;
   containerClassName?: string;
   register?: UseFormRegisterReturn;
@@ -19,17 +19,15 @@ export interface InputProps {
   onChange?: (val: string) => void;
 }
 const Select = ({
-  icon,
   name = "",
   label = "",
-  iconClick,
   className = "",
   errorText = "",
   readOnly = false,
   successText = "",
-
+  placeholder = "",
   containerClassName = "",
-}: InputProps & { options?: { label: string; value: string }[] }) => {
+}: SelectInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
 
@@ -50,9 +48,11 @@ const Select = ({
         )}
         <div
           className={`relative w-full h-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 font-normal text-sm bg-smoke-eerie rounded-lg border border-primary-10 p-3 2xl:py-4 text-primary flex justify-between items-center autofill-effect ${className}`}
-          onClick={() => setIsOpen((prev) => !prev)}
+          onClick={() => !readOnly && setIsOpen((prev) => !prev)}
         >
-          <span>{selected?.label || ""}</span>
+          <span className={`${selected ? "" : "text-primary-50"}`}>
+            {selected?.label || placeholder}
+          </span>
           <DropdownIcon
             className={`w-4 h-4 transition-transform ${
               isOpen ? "rotate-180" : ""
@@ -78,14 +78,6 @@ const Select = ({
             </div>
           )}
         </div>
-        {icon && (
-          <span
-            onClick={iconClick && iconClick}
-            className="h-full absolute top-0 right-0 pr-2 flex justify-center items-center cursor-pointer"
-          >
-            {icon}
-          </span>
-        )}
       </div>
       {!readOnly && (isError || isSuccess) && (
         <p
