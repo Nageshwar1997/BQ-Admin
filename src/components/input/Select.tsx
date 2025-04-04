@@ -1,6 +1,6 @@
-import { ChangeEvent, ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
-import { InfoIcon, CheckMark } from "../../icons";
+import { InfoIcon, CheckMark, DropdownIcon } from "../../icons";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { navbarCategoriesData } from "../navbar/data";
 
@@ -16,14 +16,12 @@ export interface InputProps {
   containerClassName?: string;
   register?: UseFormRegisterReturn;
   iconClick?: () => void;
-  onChange?: (event: ChangeEvent<HTMLSelectElement>) => void;
+  onChange?: (val: string) => void;
 }
 const Select = ({
   icon,
   name = "",
   label = "",
-  register,
-  onChange,
   iconClick,
   className = "",
   errorText = "",
@@ -32,10 +30,12 @@ const Select = ({
 
   containerClassName = "",
 }: InputProps & { options?: { label: string; value: string }[] }) => {
-  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    onChange?.(event);
-    register?.onChange?.(event);
-  };
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("");
+
+  const selected = navbarCategoriesData.find(
+    (opt) => opt.category === selectedOption
+  );
 
   const isError = errorText && !successText;
   const isSuccess = successText && !errorText;
@@ -45,14 +45,40 @@ const Select = ({
         {label && (
           <label
             htmlFor={name}
-            className={`text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded cursor-pointer`}
+            className={`text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded cursor-pointer z-[1]`}
           >
             {label}
           </label>
         )}
         <div
-          className={`relative w-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 font-normal text-sm overflow-hidden bg-smoke-eerie rounded-lg border border-primary-10 p-3 2xl:py-4 text-primary autofill-effect ${className}`}
-        ></div>
+          className={`relative w-full h-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 font-normal text-sm bg-smoke-eerie rounded-lg border border-primary-10 p-3 2xl:py-4 text-primary flex justify-between items-center autofill-effect ${className}`}
+          onClick={() => setIsOpen((prev) => !prev)}
+        >
+          <span>{selected?.label || "Select an option"}</span>
+          <DropdownIcon
+            className={`w-4 h-4 transition-transform ${
+              isOpen ? "rotate-180" : ""
+            }`}
+          />
+          {isOpen && (
+            <div className="absolute left-0 top-full w-full z-[1] mt-1 rounded-lg border border-primary-10 bg-smoke-eerie shadow-md overflow-hidden py-2">
+              <ul className="max-h-60 overflow-auto px-1">
+                {navbarCategoriesData.map((option) => (
+                  <li
+                    key={option.category}
+                    className="p-2 hover:bg-primary-10 text-primary cursor-pointer text-sm rounded-[4px]"
+                    onClick={() => {
+                      setSelectedOption(option.category);
+                      setIsOpen((prev) => !prev);
+                    }}
+                  >
+                    {option.label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
         {icon && (
           <span
             onClick={iconClick && iconClick}
@@ -61,19 +87,6 @@ const Select = ({
             {icon}
           </span>
         )}
-        {/* <select
-          name={name}
-          id={name}
-          value={value}
-          disabled={readOnly}
-          onChange={handleChange}
-          {...register}
-        >
-          <option value=""></option>
-          {navbarCategoriesData.map((category) => (
-            <option value="">{category.label}</option>
-          ))}
-        </select> */}
       </div>
       {!readOnly && (isError || isSuccess) && (
         <p
