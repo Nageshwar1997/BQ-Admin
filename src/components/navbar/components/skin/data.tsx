@@ -1,20 +1,4 @@
 import { LevelTwoCategoryType } from "../../types";
-import {
-  NightCreamIcon,
-  EyeCreamIcon,
-  SerumIcon,
-  SkinCareKitIcon,
-  CleanserIcon,
-  FaceWashIcon,
-  ExfoliatorIcon,
-  SunscreenIcon,
-  AquaholicIcon,
-  CoffeeCultureIcon,
-  CitrusIcon,
-  AllIcon,
-  SheetMaskIcon,
-  FacePackIcon,
-} from "../icons";
 
 const basePath = "/skin";
 
@@ -31,7 +15,6 @@ export const moisturizers: LevelTwoCategoryType = {
       label: "Night Cream",
       category: "night_cream",
       path: `${basePath}/moisturizers/night-cream`,
-      icon: NightCreamIcon,
       description: "Deeply hydrates and repairs tired skin while you sleep.",
     },
     {
@@ -40,7 +23,6 @@ export const moisturizers: LevelTwoCategoryType = {
       label: "Eye Cream",
       category: "eye_cream",
       path: `${basePath}/moisturizers/eye-cream`,
-      icon: EyeCreamIcon,
       description: "Reduces puffiness, dark circles, and fine lines quickly.",
     },
     {
@@ -49,7 +31,6 @@ export const moisturizers: LevelTwoCategoryType = {
       label: "Serum",
       category: "serum",
       path: `${basePath}/moisturizers/serum`,
-      icon: SerumIcon,
       description: "Nourishes skin with essential vitamins for a radiant glow.",
     },
     {
@@ -58,7 +39,6 @@ export const moisturizers: LevelTwoCategoryType = {
       label: "Skincare Kit",
       category: "skincare_kit",
       path: `${basePath}/moisturizers/skincare-kit`,
-      icon: SkinCareKitIcon,
       description: "Complete care sets for all skin types and beauty concerns.",
     },
   ],
@@ -77,7 +57,6 @@ export const cleansing_and_exfoliation: LevelTwoCategoryType = {
       label: "Cleanser",
       category: "cleanser",
       path: `${basePath}/cleansing-and-exfoliation/cleanser`,
-      icon: CleanserIcon,
       description:
         "Gently removes dirt, excess oil, and makeup for clean skin.",
     },
@@ -87,7 +66,6 @@ export const cleansing_and_exfoliation: LevelTwoCategoryType = {
       label: "Face Wash",
       category: "face_wash",
       path: `${basePath}/cleansing-and-exfoliation/face-wash`,
-      icon: FaceWashIcon,
       description:
         "Refreshing daily wash for soft and healthy-looking skin tone.",
     },
@@ -97,7 +75,6 @@ export const cleansing_and_exfoliation: LevelTwoCategoryType = {
       label: "Exfoliator & Scrub",
       category: "exfoliator_and_scrub",
       path: `${basePath}/cleansing-and-exfoliation/exfoliator-and-scrub`,
-      icon: ExfoliatorIcon,
       description: "Removes dead skin cells to reveal a fresh and smooth glow.",
     },
     {
@@ -106,7 +83,6 @@ export const cleansing_and_exfoliation: LevelTwoCategoryType = {
       label: "Sunscreen",
       category: "sunscreen",
       path: `${basePath}/cleansing-and-exfoliation/sunscreen`,
-      icon: SunscreenIcon,
       description: "Shields skin from harmful UV rays and sun damage daily.",
     },
   ],
@@ -125,7 +101,6 @@ export const natures_blend: LevelTwoCategoryType = {
       label: "Aquaholic",
       category: "aquaholic",
       path: `${basePath}/natures-blend/aquaholic`,
-      icon: AquaholicIcon,
       description: "Hydration-rich formulas to deeply quench dry, dull skin.",
     },
     {
@@ -134,7 +109,6 @@ export const natures_blend: LevelTwoCategoryType = {
       label: "Coffee Culture",
       category: "coffee_culture",
       path: `${basePath}/natures-blend/coffee-culture`,
-      icon: CoffeeCultureIcon,
       description:
         "Energizing coffee extracts for a firm, smooth, youthful feel.",
     },
@@ -144,7 +118,6 @@ export const natures_blend: LevelTwoCategoryType = {
       label: "Citrus Got Real",
       category: "citrus_got_real",
       path: `${basePath}/natures-blend/citrus-got-real`,
-      icon: CitrusIcon,
       description:
         "Vitamin C boost for brighter, fresher, healthier-looking skin.",
     },
@@ -154,7 +127,6 @@ export const natures_blend: LevelTwoCategoryType = {
       label: "View All",
       category: "view_all",
       path: `${basePath}/natures-blend/view-all`,
-      icon: AllIcon,
       description:
         "Explore all skincare essentials, perfectly tailored for you.",
     },
@@ -174,7 +146,6 @@ export const face_mask: LevelTwoCategoryType = {
       label: "Sheet Mask",
       category: "sheet_mask",
       path: `${basePath}/face-mask/sheet-mask`,
-      icon: SheetMaskIcon,
       description:
         "Instant hydration and glowing effect in just a few minutes.",
     },
@@ -184,7 +155,6 @@ export const face_mask: LevelTwoCategoryType = {
       label: "Face Pack",
       category: "face_pack",
       path: `${basePath}/face-mask/face-pack`,
-      icon: FacePackIcon,
       description:
         "Detox and refresh your skin naturally with herbal extracts.",
     },
@@ -194,7 +164,6 @@ export const face_mask: LevelTwoCategoryType = {
       label: "View All",
       category: "view_all",
       path: `${basePath}/face-mask/view-all`,
-      icon: AllIcon,
       description:
         "Browse all skincare must-haves for a flawless glowing look.",
     },

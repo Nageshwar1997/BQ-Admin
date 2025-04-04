@@ -1,33 +1,4 @@
 import { LevelTwoCategoryType } from "../../types";
-import {
-  BananaPowderIcon,
-  BBCreamIcon,
-  BestForDrySkinIcon,
-  BestForOilySkinIcon,
-  BlushIcon,
-  BronzerIcon,
-  CheekStainIcon,
-  ColorConcealerIcon,
-  ColorCorrectorIcon,
-  CompactIcon,
-  CompactPowderIcon,
-  ContourIcon,
-  FixerIcon,
-  FoundationIcon,
-  HighCoverageFoundationIcon,
-  HighlighterIcon,
-  LiquidFoundationIcon,
-  LiquidHighlighterIcon,
-  LoosePowderIcon,
-  MakeupRemoverIcon,
-  MatteFoundationIcon,
-  PrimerIcon,
-  SettingSprayIcon,
-  SindoorIcon,
-  SPFFoundationIcon,
-  StickFoundationIcon,
-  WaterResistantFoundationIcon,
-} from "../icons";
 
 const basePath = "/face";
 
@@ -44,7 +15,6 @@ export const face_makeup: LevelTwoCategoryType = {
       label: "Foundation",
       category: "foundation",
       path: `${basePath}/face-makeup/foundation`,
-      icon: FoundationIcon,
       description:
         "Provides coverage for a flawless base with a natural, smooth finish.",
     },
@@ -54,7 +24,6 @@ export const face_makeup: LevelTwoCategoryType = {
       label: "BB Cream",
       category: "bb_cream",
       path: `${basePath}/face-makeup/bb-cream`,
-      icon: BBCreamIcon,
       description:
         "Lightweight formula that hydrates, evens skin tone, and protects skin.",
     },
@@ -64,7 +33,6 @@ export const face_makeup: LevelTwoCategoryType = {
       label: "Compact Powder",
       category: "compact_powder",
       path: `${basePath}/face-makeup/compact-powder`,
-      icon: CompactPowderIcon,
       description:
         "Sets makeup, reduces shine, and ensures a long-lasting matte finish.",
     },
@@ -74,7 +42,6 @@ export const face_makeup: LevelTwoCategoryType = {
       label: "Loose Powder",
       category: "loose_powder",
       path: `${basePath}/face-makeup/loose-powder`,
-      icon: LoosePowderIcon,
       description:
         "Finely milled powder for a smooth, shine-free finish that lasts all day.",
     },
@@ -84,7 +51,6 @@ export const face_makeup: LevelTwoCategoryType = {
       label: "Banana Powder",
       category: "banana_powder",
       path: `${basePath}/face-makeup/banana-powder`,
-      icon: BananaPowderIcon,
       description:
         "Brightens the complexion, reduces shine, and sets makeup beautifully.",
     },
@@ -94,7 +60,6 @@ export const face_makeup: LevelTwoCategoryType = {
       label: "SPF Foundation",
       category: "spf_foundation",
       path: `${basePath}/face-makeup/spf-foundation`,
-      icon: SPFFoundationIcon,
       description:
         "Combines sun protection, coverage for a flawless, radiant look.",
     },
@@ -114,7 +79,6 @@ export const traditional_and_essentials: LevelTwoCategoryType = {
       label: "Sindoor",
       category: "sindoor",
       path: `${basePath}/traditional-and-essentials/sindoor`,
-      icon: SindoorIcon,
       description:
         "Symbolic powder for the hairline, enhancing traditional elegance.",
     },
@@ -134,7 +98,6 @@ export const cheeks_and_glow: LevelTwoCategoryType = {
       label: "Highlighter",
       category: "highlighter",
       path: `${basePath}/cheeks-and-glow/highlighter`,
-      icon: HighlighterIcon,
       description:
         "Adds a radiant, enhancing features with a luminous, dewy look.",
     },
@@ -144,7 +107,6 @@ export const cheeks_and_glow: LevelTwoCategoryType = {
       label: "Liquid Highlighter",
       category: "liquid_highlighter",
       path: `${basePath}/cheeks-and-glow/liquid-highlighter`,
-      icon: LiquidHighlighterIcon,
       description:
         "Blendable liquid formula for a glowing, buildable, natural look.",
     },
@@ -154,7 +116,6 @@ export const cheeks_and_glow: LevelTwoCategoryType = {
       label: "Blush",
       category: "blush",
       path: `${basePath}/cheeks-and-glow/blush`,
-      icon: BlushIcon,
       description:
         "Adds a pop of color to cheeks, creating a youthful, healthy look.",
     },
@@ -164,7 +125,6 @@ export const cheeks_and_glow: LevelTwoCategoryType = {
       label: "Cheek Stain",
       category: "cheek_stain",
       path: `${basePath}/cheeks-and-glow/cheek-stain`,
-      icon: CheekStainIcon,
       description:
         "Long-lasting tint for a natural, flushed look that stays vibrant.",
     },
@@ -184,7 +144,6 @@ export const setting_and_finishing: LevelTwoCategoryType = {
       label: "Setting Spray",
       category: "setting_spray",
       path: `${basePath}/setting-and-finishing/setting-spray`,
-      icon: SettingSprayIcon,
       description:
         "Locks makeup for long wear, maintaining a fresh look without.",
     },
@@ -194,7 +153,6 @@ export const setting_and_finishing: LevelTwoCategoryType = {
       label: "Compact",
       category: "compact",
       path: `${basePath}/setting-and-finishing/compact`,
-      icon: CompactIcon,
       description:
         "Portable powder for touch-ups, controls shine, sets makeup place.",
     },
@@ -204,7 +162,6 @@ export const setting_and_finishing: LevelTwoCategoryType = {
       label: "Fixer",
       category: "fixer",
       path: `${basePath}/setting-and-finishing/fixer`,
-      icon: FixerIcon,
       description:
         "Enhances makeup longevity, ensuring a smudge-proof, flawless.",
     },
@@ -224,7 +181,6 @@ export const foundations_by_finish: LevelTwoCategoryType = {
       label: "Liquid Foundation",
       category: "liquid_foundation",
       path: `${basePath}/foundations-by-finish/liquid-foundation`,
-      icon: LiquidFoundationIcon,
       description:
         "Buildable coverage with a natural finish that blends seamlessly skin.",
     },
@@ -234,7 +190,6 @@ export const foundations_by_finish: LevelTwoCategoryType = {
       label: "Matte Foundation",
       category: "matte_foundation",
       path: `${basePath}/foundations-by-finish/matte-foundation`,
-      icon: MatteFoundationIcon,
       description:
         "Oil-absorbing formula for a shine-free, velvety matte look lasts.",
     },
@@ -244,7 +199,6 @@ export const foundations_by_finish: LevelTwoCategoryType = {
       label: "Water Resistant Foundation",
       category: "water_resistant_foundation",
       path: `${basePath}/foundations-by-finish/water-resistant-foundation`,
-      icon: WaterResistantFoundationIcon,
       description:
         "Long-wearing, water-resistant foundation that stays flawless day.",
     },
@@ -254,7 +208,6 @@ export const foundations_by_finish: LevelTwoCategoryType = {
       label: "High Coverage Foundation",
       category: "high_coverage_foundation",
       path: `${basePath}/foundations-by-finish/high-coverage-foundation`,
-      icon: HighCoverageFoundationIcon,
       description:
         "Conceals imperfections with full coverage, ensuring flawless look.",
     },
@@ -264,7 +217,6 @@ export const foundations_by_finish: LevelTwoCategoryType = {
       label: "Stick Foundation",
       category: "stick_foundation",
       path: `${basePath}/foundations-by-finish/stick-foundation`,
-      icon: StickFoundationIcon,
       description:
         "Convenient stick format for easy application and buildable coverage.",
     },
@@ -284,7 +236,6 @@ export const foundations_by_skin_type: LevelTwoCategoryType = {
       label: "Best for Dry Skin",
       category: "best_for_dry_skin",
       path: `${basePath}/foundations-by-skin-type/best-for-dry-skin`,
-      icon: BestForDrySkinIcon,
       description:
         "Hydrating formula that nourishes and enhances radiance for dry skin.",
     },
@@ -294,7 +245,6 @@ export const foundations_by_skin_type: LevelTwoCategoryType = {
       label: "Best for Oily Skin",
       category: "best_for_oily_skin",
       path: `${basePath}/foundations-by-skin-type/best-for-oily-skin`,
-      icon: BestForOilySkinIcon,
       description:
         "Oil-controlling foundation that reduces shine, prevents breakouts.",
     },
@@ -314,7 +264,6 @@ export const primers_and_removers: LevelTwoCategoryType = {
       label: "Makeup Remover",
       category: "makeup_remover",
       path: `${basePath}/primers-and-removers/makeup-remover`,
-      icon: MakeupRemoverIcon,
       description:
         "Gently removes makeup while hydrating and refreshing the skin.",
     },
@@ -324,7 +273,6 @@ export const primers_and_removers: LevelTwoCategoryType = {
       label: "Primer",
       category: "primer",
       path: `${basePath}/primers-and-removers/primer`,
-      icon: PrimerIcon,
       description:
         "Prepares skin, creating a smooth base for long-lasting makeup.",
     },
@@ -344,7 +292,6 @@ export const bronzers_and_contours: LevelTwoCategoryType = {
       label: "Bronzer",
       category: "bronzer",
       path: `${basePath}/bronzers-and-contours/bronzer`,
-      icon: BronzerIcon,
       description:
         "Adds warmth and a sun-kissed glow for a radiant complexion.",
     },
@@ -354,7 +301,6 @@ export const bronzers_and_contours: LevelTwoCategoryType = {
       label: "Contour",
       category: "contour",
       path: `${basePath}/bronzers-and-contours/contour`,
-      icon: ContourIcon,
       description:
         "Defines features with shadows, enhancing structure and depth.",
     },
@@ -374,7 +320,6 @@ export const concealers_and_correctors: LevelTwoCategoryType = {
       label: "Color Concealer",
       category: "color_concealer",
       path: `${basePath}/concealers-and-correctors/color-concealer`,
-      icon: ColorConcealerIcon,
       description:
         "It covers flaws with precision, delivering a flawless, airbrushed.",
     },
@@ -384,7 +329,6 @@ export const concealers_and_correctors: LevelTwoCategoryType = {
       label: "Color Corrector",
       category: "color_corrector",
       path: `${basePath}/concealers-and-correctors/color-corrector`,
-      icon: ColorCorrectorIcon,
       description:
         "Neutralizes discoloration, balancing skin tone for a radiant finish.",
     },

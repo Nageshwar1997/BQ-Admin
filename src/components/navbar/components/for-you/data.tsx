@@ -1,4 +1,3 @@
-import { PlayIcon, ChatIcon } from "../../../../icons";
 import { LevelTwoCategoryType, SocialCommunityItem } from "../../types";
 
 const basePath = "/for_you";
@@ -29,7 +28,6 @@ export const new_new: LevelTwoCategoryType = {
       label: "",
       category: "",
       description: "",
-      icon: () => <svg />, // not in use only for typescript warning
     },
   ],
 };
@@ -52,7 +50,6 @@ export const sugar_play: LevelTwoCategoryType = {
       path: "",
       category: "",
       description: "",
-      icon: () => <svg />, // not in use only for typescript warning
     },
   ],
 };
@@ -75,7 +72,6 @@ export const offers: LevelTwoCategoryType = {
       path: "",
       category: "",
       description: "",
-      icon: () => <svg />, // not in use only for typescript warning
     },
   ],
 };
@@ -98,7 +94,6 @@ export const blogs: LevelTwoCategoryType = {
       label: "",
       category: "",
       description: "",
-      icon: () => <svg />, // not in use only for typescript warning
     },
   ],
 };
@@ -106,13 +101,11 @@ export const blogs: LevelTwoCategoryType = {
 export const socialCommunity: SocialCommunityItem[] = [
   {
     id: 1,
-    icon: PlayIcon,
     label: "Founder's Story: Watch Now",
     link: "https://www.youtube.com/watch?v=92kcChL74ZE",
   },
   {
     id: 2,
-    icon: ChatIcon,
     label: "Chat with our team",
     link: "/contact-us",
   },

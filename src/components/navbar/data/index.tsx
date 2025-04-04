@@ -1,11 +1,4 @@
 import { LevelOneCategoryType } from "../types";
-import About from "../components/about/About";
-import Collections from "../components/collections/Collections";
-import Eyes from "../components/eyes/Eyes";
-import Face from "../components/face/Face";
-import ForYou from "../components/for-you/ForYou";
-import Lips from "../components/lips/Lips";
-import Skin from "../components/skin/Skin";
 import { TextItem } from "../../../types";
 import {
   bronzers_and_contours,
@@ -66,7 +59,6 @@ export const for_you: LevelOneCategoryType = {
   label: "For You",
   category: "for_you",
   path: "/for_you",
-  component: ForYou,
   subCategories: [
     new_new, // only new is reserved keyword we can't use new
     sugar_play,
@@ -81,7 +73,6 @@ export const lips: LevelOneCategoryType = {
   label: "Lips",
   category: "lips",
   path: "/lips",
-  component: Lips,
   subCategories: [
     finish_types,
     lipstick_forms,
@@ -98,7 +89,6 @@ export const eyes: LevelOneCategoryType = {
   label: "Eyes",
   category: "eyes",
   path: "/eyes",
-  component: Eyes,
   subCategories: [
     kohl_and_kajal,
     mascaras,
@@ -115,7 +105,6 @@ export const face: LevelOneCategoryType = {
   label: "Face",
   category: "face",
   path: "/face",
-  component: Face,
   subCategories: [
     face_makeup,
     traditional_and_essentials,
@@ -135,7 +124,6 @@ export const skin: LevelOneCategoryType = {
   label: "Skin",
   category: "skin",
   path: "/skin",
-  component: Skin,
   subCategories: [
     moisturizers,
     cleansing_and_exfoliation,
@@ -150,7 +138,6 @@ export const collections: LevelOneCategoryType = {
   label: "Collections",
   category: "collections",
   path: "/collections",
-  component: Collections,
   subCategories: [bath_and_body, sugar_pop, hair_care, gifting],
 };
 
@@ -160,7 +147,6 @@ export const about: LevelOneCategoryType = {
   label: "About",
   category: "about",
   path: "/about",
-  component: About,
   subCategories: [company, careers, press, trust_center],
 };
 
