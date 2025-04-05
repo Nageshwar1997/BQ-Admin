@@ -9,6 +9,7 @@ import Select from "../../../components/input/Select";
 import { productSchema } from "./product.schema";
 import { categoriesData } from "../data/categoriesData";
 import PhoneInput from "../../../components/input/PhoneInput";
+import ColorPickerInput from "../../../components/input/ColorPickerInput";
 
 const FormTitle = ({ title }: { title: string }) => {
   return (
@@ -138,7 +139,9 @@ const UploadProduct = () => {
             />
             <Button pattern="primary" type="submit" content="Upload" />
           </form>
-          <form className="w-full flex flex-col gap-7 border h-[400px] sticky top-[141px]"></form>
+          <form className="w-full flex flex-col gap-7 border h-[400px] sticky top-[141px]">
+            <ColorPickerInput />
+          </form>
         </div>
       </div>
     </div>
