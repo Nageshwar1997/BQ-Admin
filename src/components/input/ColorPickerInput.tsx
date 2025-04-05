@@ -53,14 +53,28 @@ const ColorPickerInput = ({
             {label}
           </button>
         )}
-        {/* Input */}
-        <div className="w-full h-10 lg:h-12 items-center justify-between text-sm flex bg-smoke-eerie rounded-lg border border-primary-10 text-primary">
-          <p className="uppercase ml-2">{color}</p>
+        <div
+          className="w-full h-10 lg:h-12 items-center justify-between text-sm flex bg-smoke-eerie rounded-lg border border-primary-10 text-primary cursor-pointer"
+          onClick={() => setIsOpen((prev) => !prev)}
+        >
+          <p
+            className={`uppercase p-3 2xl:py-4 text-sm ${
+              color.toLowerCase() !== value.toLowerCase()
+                ? "text-primary"
+                : "text-primary-50"
+            }`}
+          >
+            {color}
+          </p>
+
           <div className="min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 min-w-10 max-w-10 lg:min-w-12 lg:max-w-12 w-full h-full p-1 relative overflow-hidden">
             <div className="bg-[url(/images/transparent-background-image.webp)] bg-cover bg-center bg-no-repeat absolute inset-1 rounded-sm z-0" />
             <button
               type="button"
-              onClick={() => setIsOpen((prev) => !prev)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsOpen((prev) => !prev);
+              }}
               className="absolute inset-1 text-primary-50 rounded-sm z-[1] outline-none flex items-center justify-center"
               style={{
                 backgroundColor: color,
