@@ -30,6 +30,7 @@ const ColorPickerInput = ({
 }: ColorPickerInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [hexCode, setHexCode] = useState<Color | string>(value);
+
   const color = useMemo(
     () =>
       typeof hexCode === "string"
@@ -49,14 +50,44 @@ const ColorPickerInput = ({
     return rgba;
   };
 
+  // useEffect(() => {
+  //   if (!value) return;
+
+  //   const hexFromState =
+  //     typeof hexCode === "string" ? hexCode : hexCode.toHexString();
+
+  //   if (value !== hexFromState) {
+  //     setHexCode(value);
+  //   }
+  // }, [value]);
+
+  useEffect(() => {
+    const hexFromState =
+      typeof hexCode === "string" ? hexCode : hexCode.toHexString();
+
+    // If value is empty, reset hexCode
+    if (!value && hexCode !== "") {
+      setHexCode("");
+      return;
+    }
+
+    // Update only if external value changes
+    if (value && value !== hexFromState) {
+      setHexCode(value);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  // Notify parent when hexCode changes
   useEffect(() => {
     const hexValue =
       typeof hexCode === "string" ? hexCode : hexCode.toHexString();
 
     if (hexValue !== value) {
-      onChange(hexValue);
+      onChange(hexValue); // only if changed
     }
-  }, [hexCode, onChange, value]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hexCode]);
 
   const isError = errorText && !successText;
   const isSuccess = successText && !errorText;
@@ -65,13 +96,13 @@ const ColorPickerInput = ({
     <div className={`w-full space-y-1.5 ${containerClassName}`}>
       <div className="relative min-h-10 max-h-10 lg:min-h-12 lg:max-h-12">
         {label && (
-          <label
-            htmlFor={name}
+          <button
+            type="button"
             onClick={() => setIsOpen((prev) => !prev)}
-            className={`text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded cursor-pointer z-[3]`}
+            className={`text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded cursor-pointer outline-none focus:outline-none z-[3]`}
           >
             {label}
-          </label>
+          </button>
         )}
         <div
           className="w-full h-10 lg:h-12 items-center justify-between text-sm flex bg-smoke-eerie rounded-lg border border-primary-10 text-primary cursor-pointer"
@@ -87,20 +118,20 @@ const ColorPickerInput = ({
 
           <div className="min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 min-w-10 max-w-10 lg:min-w-12 lg:max-w-12 w-full h-full p-1 relative overflow-hidden">
             <div className="bg-[url(/images/transparent-background-image.webp)] bg-cover bg-center bg-no-repeat absolute inset-1 rounded-sm z-0" />
-            <label
-              htmlFor={name}
+            <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsOpen((prev) => !prev);
               }}
               className="absolute inset-1 text-primary-50 rounded-sm z-[1] flex items-center justify-center cursor-pointer"
               style={{
-                backgroundColor: color || "var(--primary)",
+                backgroundColor: hexCode.toString() || "var(--primary)",
                 border: `1px solid ${extractRGB(hexCode.toString())}`,
               }}
             >
               <ColorPickerPulseIcon className="w-5 h-5" />
-            </label>
+            </button>
           </div>
         </div>
         {isOpen && (
