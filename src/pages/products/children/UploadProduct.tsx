@@ -140,7 +140,7 @@ const UploadProduct = () => {
             <Button pattern="primary" type="submit" content="Upload" />
           </form>
           <form className="w-full flex flex-col gap-7 border h-[400px] sticky top-[141px]">
-            <ColorPickerInput />
+            <ColorPickerInput label="Pic Shade Color" />
           </form>
         </div>
       </div>
