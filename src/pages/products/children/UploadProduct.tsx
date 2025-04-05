@@ -139,8 +139,19 @@ const UploadProduct = () => {
             />
             <Button pattern="primary" type="submit" content="Upload" />
           </form>
-          <form className="w-full flex flex-col gap-7 border h-[400px] sticky top-[141px]">
-            <ColorPickerInput />
+          <form className="w-full p-4 flex flex-col gap-7 border h-[400px] sticky top-[141px]">
+            <FormTitle title="Product Details" />
+            <div className="flex flex-col md:flex-row gap-4">
+              <ColorPickerInput label="Select Color" />
+              <Input
+                name="shadeName"
+                label="Shade Name"
+                placeholder="Enter shade name"
+                register={register("brand")}
+                errorText={errors.brand?.message}
+              />
+            </div>
+            <Button pattern="primary" type="submit" content="Add Shade" />
           </form>
         </div>
       </div>

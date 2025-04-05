@@ -3,22 +3,21 @@ import ColorPicker from "@rc-component/color-picker";
 import { useMemo, useState } from "react";
 import "@rc-component/color-picker/assets/index.css";
 import { InputProps } from "../../types";
-import { CheckMark, InfoIcon } from "../../icons";
+import { CheckMark, ColorPickerPulseIcon, InfoIcon } from "../../icons";
 
 const toHexFormat = (value?: string) =>
   value?.replace(/[^0-9a-fA-F#]/g, "").slice(0, 9) || "";
 
 const ColorPickerInput = ({
-  icon,
   value = "#000000",
-  name = "",
+  // name = "",
   label = "",
-  iconClick,
   errorText = "",
   readOnly = false,
   successText = "",
   containerClassName = "",
 }: InputProps) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [hexCode, setHexCode] = useState<Color | string>(value);
   const color = useMemo(
     () =>
@@ -30,6 +29,15 @@ const ColorPickerInput = ({
     [hexCode]
   );
 
+  const extractRGB = (rgba: string): string => {
+    const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+    if (match) {
+      const [, r, g, b] = match;
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+    return rgba;
+  };
+
   const isError = errorText && !successText;
   const isSuccess = successText && !errorText;
 
@@ -37,54 +45,58 @@ const ColorPickerInput = ({
     <div className={`w-full space-y-1.5 ${containerClassName}`}>
       <div className="relative min-h-10 max-h-10 lg:min-h-12 lg:max-h-12">
         {label && (
-          <label
-            htmlFor={name}
-            className={`text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded cursor-pointer`}
+          <button
+            type="button"
+            onClick={() => setIsOpen((prev) => !prev)}
+            className={`text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded cursor-pointer outline-none focus:outline-none z-[3]`}
           >
             {label}
-          </label>
+          </button>
         )}
         {/* Input */}
-        <div className="w-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 fle items-center text-sm flex bg-smoke-eerie rounded-lg border border-primary-10 text-primary">
-          <p className="w-[16%] min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 h-full text-primary-50 content-center text-center border-r border-primary-10 p-3 2xl:py-4">
-            +91
-          </p>
-          <p>{value}</p>
+        <div className="w-full h-10 lg:h-12 items-center justify-between text-sm flex bg-smoke-eerie rounded-lg border border-primary-10 text-primary">
+          <p className="uppercase ml-2">{color}</p>
+          <div className="min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 min-w-10 max-w-10 lg:min-w-12 lg:max-w-12 w-full h-full p-1 relative overflow-hidden">
+            <div className="bg-[url(/images/transparent-background-image.webp)] bg-cover bg-center bg-no-repeat absolute inset-1 rounded-sm z-0" />
+            <button
+              type="button"
+              onClick={() => setIsOpen((prev) => !prev)}
+              className="absolute inset-1 text-primary-50 rounded-sm z-[1] outline-none flex items-center justify-center"
+              style={{
+                backgroundColor: color,
+                border: `1px solid ${extractRGB(hexCode.toString())}`,
+              }}
+            >
+              <ColorPickerPulseIcon className="w-5 h-5" />
+            </button>
+          </div>
         </div>
-
-        {/* Icon */}
-        {icon && (
-          <span
-            onClick={iconClick && iconClick}
-            className="h-full absolute top-0 right-0 pr-2 flex justify-center items-center cursor-pointer"
-          >
-            {icon}
-          </span>
+        {isOpen && (
+          <div className="absolute top-12 md:top-[50px] z-10">
+            <ColorPicker
+              value={hexCode}
+              onChange={setHexCode}
+              panelRender={(panel) => (
+                <>
+                  {panel}
+                  <div className="space-y-1 mt-2">
+                    <label className="block text-xs font-medium text-gray-600">
+                      HEX
+                    </label>
+                    <input
+                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm text-black"
+                      value={color}
+                      onChange={(e) => {
+                        const originValue = e.target.value;
+                        setHexCode(toHexFormat(originValue));
+                      }}
+                    />
+                  </div>
+                </>
+              )}
+            />
+          </div>
         )}
-      </div>
-      <div style={{ width: 600 }} className="absolute top-12">
-        <ColorPicker
-          value={hexCode}
-          onChange={setHexCode}
-          panelRender={(panel) => (
-            <>
-              {panel}
-              <div className="space-y-1 mt-2">
-                <label className="block text-xs font-medium text-gray-600">
-                  HEX
-                </label>
-                <input
-                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm text-black"
-                  value={color}
-                  onChange={(e) => {
-                    const originValue = e.target.value;
-                    setHexCode(toHexFormat(originValue));
-                  }}
-                />
-              </div>
-            </>
-          )}
-        />
       </div>
 
       {!readOnly && (isError || isSuccess) && (

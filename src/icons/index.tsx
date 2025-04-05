@@ -1,5 +1,3 @@
-import { IconType } from "../types";
-
 export type IconProps = {
   className?: string;
   onClick?: () => void;
@@ -115,7 +113,7 @@ export const DropdownIcon = ({ className }: IconProps) => (
   </svg>
 );
 
-export const UploadCloudIcon = ({ className }: IconType) => (
+export const UploadCloudIcon = ({ className }: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -130,6 +128,37 @@ export const UploadCloudIcon = ({ className }: IconType) => (
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const ColorPickerPulseIcon = ({ className }: IconProps) => (
+  <svg
+    height="24"
+    width="24"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    <style>
+      {`
+        @keyframes fillPulse {
+          0% { fill: var(--primary); }
+          50% { fill: var(--primary-inverted); }
+          100% { fill: var(--primary); }
+        }
+        .animated-fill {
+          animation: fillPulse 3s infinite ease-in-out;
+        }
+      `}
+    </style>
+    <path
+      className="animated-fill"
+      d="m22.99 1.51c-1.37-1.36-3.59-1.36-4.95 0l-3.48 3.48-.71-.71c-.39-.39-1.02-.39-1.41 0s-.39 1.03 0 1.42l.71.71-7 6.99c-.18.18-.28.42-.29.67l-.14 3.67c-.01.28.1.55.29.75.19.18.45.29.71.29h.04l3.67-.14c.25-.01.49-.11.67-.29l6.99-7 .71.72c.19.19.45.29.7.29s.52-.1.71-.29c.39-.39.39-1.03 0-1.42l-.71-.71 3.49-3.48c1.36-1.36 1.36-3.58 0-4.95zm-13.02 15.15-2.21.08.08-2.21 6.64-6.63 2.12 2.12zm11.6-11.61-3.48 3.48-2.12-2.12 3.48-3.48c.58-.59 1.54-.59 2.12 0 .59.58.59 1.54 0 2.12z"
+    />
+    <path
+      className="animated-fill"
+      d="m14.87 24h-11.74c-1.73 0-3.13-1.41-3.13-3.13v-11.74c0-1.73 1.41-3.13 3.13-3.13h2.13c.55 0 1 .45 1 1s-.45 1-1 1h-2.13c-.62 0-1.13.51-1.13 1.13v11.73c0 .62.51 1.13 1.13 1.13h11.74c.62 0 1.13-.51 1.13-1.13v-2.13c0-.55.45-1 1-1s1 .45 1 1v2.13c0 1.73-1.41 3.13-3.13 3.13z"
     />
   </svg>
 );
