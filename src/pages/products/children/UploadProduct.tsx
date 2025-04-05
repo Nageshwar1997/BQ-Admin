@@ -7,6 +7,7 @@ import { InfoIcon, UploadCloudIcon } from "../../../icons";
 import Input from "../../../components/input/Input";
 import Select from "../../../components/input/Select";
 import { productSchema } from "./product.schema";
+import { categoriesData } from "../data/categoriesData";
 
 const FormTitle = ({ title }: { title: string }) => {
   return (
@@ -19,14 +20,30 @@ const FormTitle = ({ title }: { title: string }) => {
 
 const UploadProduct = () => {
   const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(productSchema),
   });
+
+  // Watch selected categories
+  const selectedCategory1 = watch("category1");
+  const selectedCategory2 = watch("category2");
+
+  const level1Data = categoriesData.find(
+    (cat) => cat.value === selectedCategory1
+  );
+  const level2Options = level1Data?.subCategories || [];
+
+  const level2Data = level2Options.find(
+    (cat) => cat.value === selectedCategory2
+  );
+  const level3Options = level2Data?.subCategories || [];
 
   const onSubmit = (data: unknown) => {
     console.log("Form Submitted", data);
@@ -67,26 +84,36 @@ const UploadProduct = () => {
               register={register("brand")}
               errorText={errors.brand?.message}
             />
+
             <Select
+              value={selectedCategory1}
               label="Category One"
               placeholder="Select a level one category"
-              onChange={(val) =>
-                setValue("category1", val, { shouldValidate: true })
-              }
+              categories={categoriesData}
+              onChange={(val) => {
+                setValue("category1", val, { shouldValidate: true });
+                setValue("category2", "");
+                setValue("category3", "");
+              }}
               errorText={errors.category1?.message}
-            />
-            <Select
-              label="Category Two"
-              placeholder="Select a level two category"
-              onChange={(val) =>
-                setValue("category2", val, { shouldValidate: true })
-              }
-              errorText={errors.category2?.message}
             />
 
             <Select
+              value={selectedCategory2}
+              label="Category Two"
+              placeholder="Select a level two category"
+              categories={level2Options}
+              onChange={(val) => {
+                setValue("category2", val, { shouldValidate: true });
+                setValue("category3", "");
+              }}
+              errorText={errors.category2?.message}
+            />
+            <Select
+              value={watch("category3")}
               label="Category Three"
               placeholder="Select a level three category"
+              categories={level3Options}
               onChange={(val) =>
                 setValue("category3", val, { shouldValidate: true })
               }
