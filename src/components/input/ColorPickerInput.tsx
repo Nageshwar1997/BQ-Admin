@@ -50,17 +50,6 @@ const ColorPickerInput = ({
     return rgba;
   };
 
-  // useEffect(() => {
-  //   if (!value) return;
-
-  //   const hexFromState =
-  //     typeof hexCode === "string" ? hexCode : hexCode.toHexString();
-
-  //   if (value !== hexFromState) {
-  //     setHexCode(value);
-  //   }
-  // }, [value]);
-
   useEffect(() => {
     const hexFromState =
       typeof hexCode === "string" ? hexCode : hexCode.toHexString();

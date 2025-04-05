@@ -26,7 +26,6 @@ const UploadProduct = () => {
     register,
     handleSubmit,
     setValue,
-    watch,
     reset,
     control,
     formState: { errors },
@@ -37,19 +36,6 @@ const UploadProduct = () => {
   const [shadeImages, setShadeImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [shades, setShades] = useState<any[]>([]);
-
-  const handleShadeImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-
-    const previews = files.map((file) => URL.createObjectURL(file));
-
-    setShadeImages((prev) => [...prev, ...files]);
-    setImagePreviews((prev) => [...prev, ...previews]);
-
-    setValue("images", [...shadeImages, ...files], {
-      shouldValidate: true,
-    });
-  };
 
   const onSubmitShade = (data: any) => {
     alert("Clicked");
@@ -120,46 +106,51 @@ const UploadProduct = () => {
             </div>
 
             {/* Image Upload */}
-            <div className="flex flex-col gap-2">
-              <label htmlFor="shadeImages" className="text-sm font-medium">
-                Shade Images
-              </label>
-              <input
-                id="shadeImages"
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  const previews = files.map((file) =>
-                    URL.createObjectURL(file)
-                  );
+            <Controller
+              control={control}
+              name="images"
+              defaultValue={[]}
+              render={({ field }) => (
+                <>
+                  <label htmlFor="shadeImages" className="text-sm font-medium">
+                    Shade Images
+                  </label>
+                  <input
+                    id="shadeImages"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      const previews = files.map((file) =>
+                        URL.createObjectURL(file)
+                      );
 
-                  setShadeImages((prev) => [...prev, ...files]);
-                  setImagePreviews((prev) => [...prev, ...previews]);
+                      setShadeImages((prev) => [...prev, ...files]);
+                      setImagePreviews((prev) => [...prev, ...previews]);
 
-                  // ✅ Important: manually set this for yup validation
-                  setValue("images", [...shadeImages, ...files], {
-                    shouldValidate: true,
-                  });
-                }}
-              />
-
-              <p>{errors.images?.message}</p>
-              {imagePreviews.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {imagePreviews.map((src, idx) => (
-                    <img
-                      key={idx}
-                      src={src}
-                      alt={`shade-img-${idx}`}
-                      className="w-16 h-16 object-cover rounded border"
-                    />
-                  ))}
-                </div>
+                      // ✅ Update form field
+                      field.onChange([...shadeImages, ...files]);
+                    }}
+                  />
+                  <p className="text-red-500 text-xs">
+                    {errors.images?.message}
+                  </p>
+                  {imagePreviews.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {imagePreviews.map((src, idx) => (
+                        <img
+                          key={idx}
+                          src={src}
+                          alt={`shade-img-${idx}`}
+                          className="w-16 h-16 object-cover rounded border"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
-            </div>
-
+            />
             <Button pattern="primary" type="submit" content="Add Shade" />
           </form>
         </div>
