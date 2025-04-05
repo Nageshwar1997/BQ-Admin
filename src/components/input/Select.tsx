@@ -1,8 +1,6 @@
-import { useState } from "react";
-
 import { InfoIcon, CheckMark, DropdownIcon } from "../../icons";
 import { UseFormRegisterReturn } from "react-hook-form";
-import { categoriesData } from "../../pages/products/data/categoriesData";
+import { useState } from "react";
 
 export interface SelectInputProps {
   value?: string;
@@ -16,8 +14,11 @@ export interface SelectInputProps {
   register?: UseFormRegisterReturn;
   iconClick?: () => void;
   onChange?: (val: string) => void;
+  categories: { label: string; value: string }[];
 }
+
 const Select = ({
+  value = "",
   label = "",
   className = "",
   errorText = "",
@@ -26,14 +27,14 @@ const Select = ({
   onChange,
   placeholder = "",
   containerClassName = "",
+  categories,
 }: SelectInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("");
 
-  const selected = categoriesData.find((opt) => opt.value === selectedOption);
-
+  const selected = categories.find((opt) => opt.value === value);
   const isError = errorText && !successText;
   const isSuccess = successText && !errorText;
+
   return (
     <div className={`w-full space-y-1.5 ${containerClassName}`}>
       <div className="relative min-h-10 max-h-10 lg:min-h-12 lg:max-h-12">
@@ -41,7 +42,7 @@ const Select = ({
           <button
             type="button"
             onClick={() => setIsOpen((prev) => !prev)}
-            className={`text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded cursor-pointer z-[1]`}
+            className="text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded cursor-pointer z-[1]"
           >
             {label}
           </button>
@@ -54,22 +55,21 @@ const Select = ({
             {selected?.label || placeholder}
           </span>
           <DropdownIcon
-            className={`w-4 h-4 transition-transform ${
+            className={`w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 transition-transform ${
               isOpen ? "rotate-180" : ""
             }`}
           />
           {isOpen && (
             <div className="absolute left-0 top-full w-full z-[2] mt-1 rounded-lg border border-primary-10 bg-smoke-eerie shadow-md overflow-hidden py-2">
               <ul className="max-h-60 overflow-auto px-1">
-                {categoriesData.map((option) => (
+                {categories.map((option) => (
                   <li
                     key={option.value}
                     className="p-2 hover:bg-primary-10 text-primary cursor-pointer text-sm rounded-[4px]"
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent toggle from parent
-                      setSelectedOption(option.value);
-                      setIsOpen(false); // Directly close instead of toggling
+                      e.stopPropagation();
                       onChange?.(option.value);
+                      setIsOpen(false);
                     }}
                   >
                     {option.label}
@@ -81,9 +81,7 @@ const Select = ({
         </div>
       </div>
       {!readOnly && (isError || isSuccess) && (
-        <p
-          className={`w-full text-start flex gap-1 items-center text-[11px] leading-tight mt-2 text-red-500`}
-        >
+        <p className="w-full text-start flex gap-1 items-center text-[11px] leading-tight mt-2 text-red-500">
           {isError ? (
             <InfoIcon className="w-3 h-3 md:w-4 md:h-4 fill-red-500" />
           ) : (

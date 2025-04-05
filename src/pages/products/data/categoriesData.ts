@@ -31,13 +31,6 @@ const sugar_play: LevelTwoCategoryType = {
   ],
 };
 
-const for_you: LevelOneCategoryType = {
-  id: 1,
-  level: 1,
-  label: "For You",
-  value: "for_you",
-  subCategories: [new_new, sugar_play], // only new is reserved keyword we can't use new
-};
 /* ============= For You End ============= */
 
 /* ============= Lips Start ============= */
@@ -226,21 +219,6 @@ const lipstick_sets_and_combos: LevelTwoCategoryType = {
     },
   ],
 };
-
-const lips: LevelOneCategoryType = {
-  id: 2,
-  level: 1,
-  label: "Lips",
-  value: "lips",
-  subCategories: [
-    finish_types,
-    lipstick_forms,
-    long_lasting_lipsticks,
-    lip_care,
-    lip_enhancers_and_other,
-    lipstick_sets_and_combos,
-  ],
-};
 /* ============= Lips End ============= */
 
 /* ============= Eyes Start ============= */
@@ -407,20 +385,6 @@ const eye_value_set: LevelTwoCategoryType = {
   ],
 };
 
-const eyes: LevelOneCategoryType = {
-  id: 3,
-  level: 1,
-  label: "Eyes",
-  value: "eyes",
-  subCategories: [
-    kohl_and_kajal,
-    mascaras,
-    eyeliners,
-    eyeshadow,
-    eyebrows,
-    eye_value_set,
-  ],
-};
 /* ============= Eyes End ============= */
 
 /* ============= Face Start ============= */
@@ -667,23 +631,6 @@ const concealers_and_correctors: LevelTwoCategoryType = {
   ],
 };
 
-const face: LevelOneCategoryType = {
-  id: 4,
-  level: 1,
-  label: "Face",
-  value: "face",
-  subCategories: [
-    face_makeup,
-    traditional_and_essentials,
-    cheeks_and_glow,
-    setting_and_finishing,
-    primers_and_removers,
-    bronzers_and_contours,
-    concealers_and_correctors,
-    foundations_by_skin_type,
-    foundations_by_finish,
-  ],
-};
 /* ============= Face End ============= */
 
 /* ============= Skin Start ============= */
@@ -813,18 +760,6 @@ const face_mask: LevelTwoCategoryType = {
   ],
 };
 
-const skin: LevelOneCategoryType = {
-  id: 5,
-  level: 1,
-  label: "Skin",
-  value: "skin",
-  subCategories: [
-    moisturizers,
-    cleansing_and_exfoliation,
-    natures_blend,
-    face_mask,
-  ],
-};
 /* ============= Skin End ============= */
 
 /* ============= Collections Start ============= */
@@ -1026,20 +961,78 @@ const gifting: LevelTwoCategoryType = {
   ],
 };
 
-const collections: LevelOneCategoryType = {
-  id: 6,
-  level: 1,
-  label: "Collections",
-  value: "collections",
-  subCategories: [bath_and_body, sugar_pop, hair_care, gifting],
-};
 /* ============= Collections End ============= */
 
 export const categoriesData: LevelOneCategoryType[] = [
-  for_you,
-  lips,
-  eyes,
-  face,
-  skin,
-  collections,
+  {
+    id: 1,
+    level: 1,
+    label: "For You",
+    value: "for_you",
+    subCategories: [new_new, sugar_play], // only new is reserved keyword we can't use new
+  },
+  {
+    id: 2,
+    level: 1,
+    label: "Lips",
+    value: "lips",
+    subCategories: [
+      finish_types,
+      lipstick_forms,
+      long_lasting_lipsticks,
+      lip_care,
+      lip_enhancers_and_other,
+      lipstick_sets_and_combos,
+    ],
+  },
+  {
+    id: 3,
+    level: 1,
+    label: "Eyes",
+    value: "eyes",
+    subCategories: [
+      kohl_and_kajal,
+      mascaras,
+      eyeliners,
+      eyeshadow,
+      eyebrows,
+      eye_value_set,
+    ],
+  },
+  {
+    id: 4,
+    level: 1,
+    label: "Face",
+    value: "face",
+    subCategories: [
+      face_makeup,
+      traditional_and_essentials,
+      cheeks_and_glow,
+      setting_and_finishing,
+      primers_and_removers,
+      bronzers_and_contours,
+      concealers_and_correctors,
+      foundations_by_skin_type,
+      foundations_by_finish,
+    ],
+  },
+  {
+    id: 5,
+    level: 1,
+    label: "Skin",
+    value: "skin",
+    subCategories: [
+      moisturizers,
+      cleansing_and_exfoliation,
+      natures_blend,
+      face_mask,
+    ],
+  },
+  {
+    id: 6,
+    level: 1,
+    label: "Collections",
+    value: "collections",
+    subCategories: [bath_and_body, sugar_pop, hair_care, gifting],
+  },
 ];
