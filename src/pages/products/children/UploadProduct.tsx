@@ -8,6 +8,7 @@ import Input from "../../../components/input/Input";
 import Select from "../../../components/input/Select";
 import { productSchema } from "./product.schema";
 import { categoriesData } from "../data/categoriesData";
+import PhoneInput from "../../../components/input/PhoneInput";
 
 const FormTitle = ({ title }: { title: string }) => {
   return (
@@ -84,7 +85,6 @@ const UploadProduct = () => {
               register={register("brand")}
               errorText={errors.brand?.message}
             />
-
             <Select
               value={selectedCategory1}
               label="Category One"
@@ -97,7 +97,6 @@ const UploadProduct = () => {
               }}
               errorText={errors.category1?.message}
             />
-
             <Select
               value={selectedCategory2}
               label="Category Two"
@@ -118,6 +117,24 @@ const UploadProduct = () => {
                 setValue("category3", val, { shouldValidate: true })
               }
               errorText={errors.category3?.message}
+            />
+            <PhoneInput
+              name="originalPrice"
+              label="Original Price"
+              type="number"
+              placeholder="Enter Original Price"
+              register={register("originalPrice")}
+              errorText={errors.originalPrice?.message}
+              containerClassName="[&>div>div>p]:!hidden"
+            />
+            <PhoneInput
+              name="sellingPrice"
+              label="Selling Price"
+              type="number"
+              placeholder="Enter Selling Price"
+              register={register("sellingPrice")}
+              errorText={errors.sellingPrice?.message}
+              containerClassName="[&>div>div>p]:!hidden"
             />
             <Button pattern="primary" type="submit" content="Upload" />
           </form>
