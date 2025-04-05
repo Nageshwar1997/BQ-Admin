@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/Nageshwar1997/BQ-Admin#readme",
   "dependencies": {
-    "@ctrl/tinycolor": "^4.1.0",
     "@hookform/resolvers": "^4.0.0",
     "@rc-component/color-picker": "^3.0.1",
     "@splinetool/react-spline": "^4.0.0",
