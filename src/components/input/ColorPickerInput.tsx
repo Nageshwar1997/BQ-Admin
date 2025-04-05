@@ -1,13 +1,13 @@
 import type { Color } from "@rc-component/color-picker";
 import ColorPicker from "@rc-component/color-picker";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "@rc-component/color-picker/assets/index.css";
 import { CheckMark, ColorPickerPulseIcon, InfoIcon } from "../../icons";
 
 export interface ColorPickerInputProps {
   value: string;
   name: string;
-  onChange: (value: Color | string) => void;
+  onChange: (value: string) => void;
   label?: string;
   errorText?: string;
   readOnly?: boolean;
@@ -19,8 +19,9 @@ const toHexFormat = (value?: string) =>
   value?.replace(/[^0-9a-fA-F#]/g, "").slice(0, 9) || "";
 
 const ColorPickerInput = ({
-  value = "#000000",
-  // name = "",
+  value = "",
+  name = "",
+  onChange,
   label = "",
   errorText = "",
   readOnly = false,
@@ -48,6 +49,15 @@ const ColorPickerInput = ({
     return rgba;
   };
 
+  useEffect(() => {
+    const hexValue =
+      typeof hexCode === "string" ? hexCode : hexCode.toHexString();
+
+    if (hexValue !== value) {
+      onChange(hexValue);
+    }
+  }, [hexCode, onChange, value]);
+
   const isError = errorText && !successText;
   const isSuccess = successText && !errorText;
 
@@ -55,44 +65,42 @@ const ColorPickerInput = ({
     <div className={`w-full space-y-1.5 ${containerClassName}`}>
       <div className="relative min-h-10 max-h-10 lg:min-h-12 lg:max-h-12">
         {label && (
-          <button
-            type="button"
+          <label
+            htmlFor={name}
             onClick={() => setIsOpen((prev) => !prev)}
-            className={`text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded cursor-pointer outline-none focus:outline-none z-[3]`}
+            className={`text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded cursor-pointer z-[3]`}
           >
             {label}
-          </button>
+          </label>
         )}
         <div
           className="w-full h-10 lg:h-12 items-center justify-between text-sm flex bg-smoke-eerie rounded-lg border border-primary-10 text-primary cursor-pointer"
           onClick={() => setIsOpen((prev) => !prev)}
         >
           <p
-            className={`uppercase p-3 2xl:py-4 text-sm ${
-              color.toLowerCase() !== value.toLowerCase()
-                ? "text-primary"
-                : "text-primary-50"
+            className={`p-3 2xl:py-4 text-sm ${
+              value ? "text-primary uppercase" : "text-primary-50"
             }`}
           >
-            {color}
+            {value ? color : "Select Color"}
           </p>
 
           <div className="min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 min-w-10 max-w-10 lg:min-w-12 lg:max-w-12 w-full h-full p-1 relative overflow-hidden">
             <div className="bg-[url(/images/transparent-background-image.webp)] bg-cover bg-center bg-no-repeat absolute inset-1 rounded-sm z-0" />
-            <button
-              type="button"
+            <label
+              htmlFor={name}
               onClick={(e) => {
                 e.stopPropagation();
                 setIsOpen((prev) => !prev);
               }}
-              className="absolute inset-1 text-primary-50 rounded-sm z-[1] outline-none flex items-center justify-center"
+              className="absolute inset-1 text-primary-50 rounded-sm z-[1] flex items-center justify-center cursor-pointer"
               style={{
-                backgroundColor: color,
+                backgroundColor: color || "var(--primary)",
                 border: `1px solid ${extractRGB(hexCode.toString())}`,
               }}
             >
               <ColorPickerPulseIcon className="w-5 h-5" />
-            </button>
+            </label>
           </div>
         </div>
         {isOpen && (
@@ -104,17 +112,37 @@ const ColorPickerInput = ({
                 <>
                   {panel}
                   <div className="space-y-1 mt-2">
-                    <label className="block text-xs font-medium text-gray-600">
+                    <label
+                      htmlFor={name}
+                      className="block text-xs font-medium text-gray-600"
+                    >
                       HEX
                     </label>
-                    <input
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm text-black"
-                      value={color}
-                      onChange={(e) => {
-                        const originValue = e.target.value;
-                        setHexCode(toHexFormat(originValue));
-                      }}
-                    />
+                    <div className="relative">
+                      <input
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm text-black"
+                        value={color}
+                        name={name}
+                        id={name}
+                        onChange={(e) => {
+                          const originValue = e.target.value;
+                          setHexCode(toHexFormat(originValue));
+                        }}
+                      />
+                      <CheckMark
+                        className={`absolute right-1 top-1/2 transform -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 fill-primary-inverted cursor-pointer ${
+                          /^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(
+                            hexCode.toString()
+                          ) ||
+                          /^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(
+                            value
+                          )
+                            ? ""
+                            : "hidden"
+                        }`}
+                        onClick={() => setIsOpen(false)}
+                      />
+                    </div>
                   </div>
                 </>
               )}

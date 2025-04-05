@@ -6,7 +6,7 @@ import PathNavigation from "../../../components/PathNavigation";
 import { InfoIcon, UploadCloudIcon } from "../../../icons";
 import Input from "../../../components/input/Input";
 import Select from "../../../components/input/Select";
-import { productSchema } from "./product.schema";
+import { productSchema, shadeSchema } from "./product.schema";
 import { categoriesData } from "../data/categoriesData";
 import PhoneInput from "../../../components/input/PhoneInput";
 import ColorPickerInput from "../../../components/input/ColorPickerInput";
@@ -33,6 +33,16 @@ const UploadProduct = () => {
     resolver: yupResolver(productSchema),
   });
 
+  const {
+    register: registerShade,
+    handleSubmit: handleSubmitShade,
+    setValue: setValueShade,
+    watch: watchShade,
+    formState: { errors: shadeErrors },
+  } = useForm({
+    resolver: yupResolver(shadeSchema),
+  });
+
   // Watch selected categories
   const selectedCategory1 = watch("category1");
   const selectedCategory2 = watch("category2");
@@ -47,8 +57,12 @@ const UploadProduct = () => {
   );
   const level3Options = level2Data?.subCategories || [];
 
-  const onSubmit = (data: unknown) => {
-    console.log("Form Submitted", data);
+  const onSubmitProduct = (data: unknown) => {
+    console.log("Product Form Submitted:", data);
+  };
+
+  const onSubmitShade = (data: unknown) => {
+    console.log("Shade Form Submitted:", data);
   };
 
   return (
@@ -67,9 +81,10 @@ const UploadProduct = () => {
       </div>
       <div className="mx-auto rounded-lg shadow-light-dark-soft bg-platinum-black">
         <div className="w-full h-full flex flex-col lg:flex-row gap-5">
+          {/* Form 1 */}
           <form
             className="w-full p-4 flex flex-col gap-7 border h-[1000px]"
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(onSubmitProduct)}
           >
             <FormTitle title="Product Details" />
             <Input
@@ -142,23 +157,35 @@ const UploadProduct = () => {
             />
             <Button pattern="primary" type="submit" content="Upload" />
           </form>
-          <form className="w-full p-4 flex flex-col gap-7 border h-[400px] sticky top-[141px]">
-            <FormTitle title="Product Details" />
+          {/* Form 2 */}
+          <form
+            className="w-full p-4 flex flex-col gap-7 border h-[400px] sticky top-[141px]"
+            onSubmit={handleSubmitShade(onSubmitShade)}
+          >
+            <FormTitle title="Add a Shade" />
             <Input
               name="shadeName"
               label="Shade Name"
               placeholder="Enter shade name"
-              register={register("brand")}
-              errorText={errors.brand?.message}
+              register={registerShade("shadeName")}
+              errorText={shadeErrors.shadeName?.message}
             />
             <div className="flex flex-col base:flex-row gap-4">
-              <ColorPickerInput label="Select Color" />
+              <ColorPickerInput
+                label="Select Color"
+                value={watchShade("colorCode")}
+                name="colorCode"
+                onChange={(val: string) =>
+                  setValueShade("colorCode", val, { shouldValidate: true })
+                }
+                errorText={shadeErrors.colorCode?.message}
+              />
               <PhoneInput
                 name="stock"
                 label="Stock"
                 placeholder="Enter stock"
-                register={register("brand")}
-                errorText={errors.brand?.message}
+                register={registerShade("stock")}
+                errorText={shadeErrors.stock?.message}
                 containerClassName="[&>div>div>p]:!hidden"
               />
             </div>
