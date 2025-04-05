@@ -141,14 +141,22 @@ const UploadProduct = () => {
           </form>
           <form className="w-full p-4 flex flex-col gap-7 border h-[400px] sticky top-[141px]">
             <FormTitle title="Product Details" />
+            <Input
+              name="shadeName"
+              label="Shade Name"
+              placeholder="Enter shade name"
+              register={register("brand")}
+              errorText={errors.brand?.message}
+            />
             <div className="flex flex-col base:flex-row gap-4">
               <ColorPickerInput label="Select Color" />
-              <Input
-                name="shadeName"
-                label="Shade Name"
-                placeholder="Enter shade name"
+              <PhoneInput
+                name="stock"
+                label="Stock"
+                placeholder="Enter stock"
                 register={register("brand")}
                 errorText={errors.brand?.message}
+                containerClassName="[&>div>div>p]:!hidden"
               />
             </div>
             <Button pattern="primary" type="submit" content="Add Shade" />
