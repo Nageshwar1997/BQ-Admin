@@ -1,13 +1,13 @@
 import type { Color } from "@rc-component/color-picker";
 import ColorPicker from "@rc-component/color-picker";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import "@rc-component/color-picker/assets/index.css";
 
 const toHexFormat = (value?: string) =>
   value?.replace(/[^0-9a-fA-F#]/g, "").slice(0, 9) || "";
 
 const ColorPickerInput = () => {
-  const [value, setValue] = useState<Color | string>("#163cff");
+  const [value, setValue] = useState<Color | string>("#000000");
   const color = useMemo(
     () =>
       typeof value === "string"
