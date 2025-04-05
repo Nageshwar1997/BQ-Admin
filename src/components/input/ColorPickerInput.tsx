@@ -26,50 +26,66 @@ const ColorPickerInput = ({
   className?: string;
   containerClassName?: string;
 }) => {
-  const [value, setValue] = useState<Color | string>("#000000");
+const [colorObj, setColorObj] = useState<Color>(
+  new TinyColor("#000000") as unknown as Color
+);
 
-  const [hexInput, setHexInput] = useState("#000000");
-  const [rgbInput, setRgbInput] = useState("rgb(0, 0, 0)");
-  const [rgbaInput, setRgbaInput] = useState("rgba(0, 0, 0, 1)");
+// Keep string versions for inputs
+const [hexInput, setHexInput] = useState("#000000");
+const [rgbInput, setRgbInput] = useState("rgb(0, 0, 0)");
+const [rgbaInput, setRgbaInput] = useState("rgba(0, 0, 0, 1)");
 
-  const syncInputs = (val: string | Color) => {
-    const tiny = new TinyColor(val);
-    setHexInput(tiny.toHex8String()); // ✅ includes alpha
-    setRgbInput(tiny.toRgbString().replace(/, [\d.]+\)/, ")")); // RGB only
-    setRgbaInput(tiny.toRgbString()); // RGBA includes alpha
-  };
+const syncInputs = (val: Color) => {
+  const tiny = new TinyColor(val);
+  setHexInput(tiny.toHex8String());
+  setRgbInput(tiny.toRgbString().replace(/, [\d.]+\)/, ")"));
+  setRgbaInput(tiny.toRgbString());
+};
 
-  const handleColorChange = (val: string) => {
-    const color = new TinyColor(val);
-    if (color.isValid) {
-      const finalColor =
-        color.getAlpha() < 1 ? color.toRgbString() : color.toHexString();
-      setValue(finalColor); // ✅ use string instead of TinyColor instance
-      syncInputs(finalColor);
-    }
-  };
+// Handle color picker changes
+const handleColorChange = (val: Color) => {
+  setColorObj(val);
+  syncInputs(val);
+};
 
-  const handleHexChange = (val: string) => {
-    setHexInput(val);
-    handleColorChange(val);
-  };
+// Manual inputs
+const handleHexChange = (val: string) => {
+  setHexInput(val);
+  const tiny = new TinyColor(val);
+  if (tiny.isValid) {
+    const newColor = tiny as unknown as Color;
+    setColorObj(newColor);
+    syncInputs(newColor);
+  }
+};
 
-  const handleRgbChange = (val: string) => {
-    setRgbInput(val);
-    handleColorChange(val);
-  };
+const handleRgbChange = (val: string) => {
+  setRgbInput(val);
+  const tiny = new TinyColor(val);
+  if (tiny.isValid) {
+    const newColor = tiny as unknown as Color;
+    setColorObj(newColor);
+    syncInputs(newColor);
+  }
+};
 
-  const handleRgbaChange = (val: string) => {
-    setRgbaInput(val);
-    handleColorChange(val);
-  };
+const handleRgbaChange = (val: string) => {
+  setRgbaInput(val);
+  const tiny = new TinyColor(val);
+  if (tiny.isValid) {
+    const newColor = tiny as unknown as Color;
+    setColorObj(newColor);
+    syncInputs(newColor);
+  }
+};
+
 
   useEffect(() => {
-    const tiny = new TinyColor(value);
+    const tiny = new TinyColor(colorObj);
     setHexInput(tiny.toHex8String());
     setRgbInput(tiny.toRgbString().replace(/, [\d.]+\)/, ")")); // RGB only
     setRgbaInput(tiny.toRgbString());
-  }, [value]);
+  }, [colorObj]);
 
   const isError = errorText && !successText;
   const isSuccess = successText && !errorText;
@@ -93,20 +109,17 @@ const ColorPickerInput = ({
             <div
               className="min-w-full min-h-full border py-3.5 lg:py-[18px] rounded-sm shadow-lg"
               style={{
-                backgroundColor: value as string,
+                backgroundColor: hexInput,
               }}
             />
           </div>
-          <p>{value as string}</p>
+          <p>{hexInput}</p>
         </div>
         <div className="w-60 absolute top-12 left-0">
           <ColorPicker
             className=""
-            value={value}
-            onChange={(val) => {
-              setValue(val);
-              syncInputs(val);
-            }}
+            value={colorObj}
+            onChange={handleColorChange}
             defaultValue="#000000"
             panelRender={(panel) => (
               <div className="space-y-2">
@@ -116,7 +129,7 @@ const ColorPickerInput = ({
                     HEX
                   </label>
                   <input
-                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm text-black"
                     value={hexInput}
                     onChange={(e) => handleHexChange(e.target.value)}
                   />
@@ -126,7 +139,7 @@ const ColorPickerInput = ({
                     RGB
                   </label>
                   <input
-                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm text-black"
                     value={rgbInput}
                     onChange={(e) => handleRgbChange(e.target.value)}
                   />
@@ -136,7 +149,7 @@ const ColorPickerInput = ({
                     RGBA
                   </label>
                   <input
-                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm text-black"
                     value={rgbaInput}
                     onChange={(e) => handleRgbaChange(e.target.value)}
                   />
