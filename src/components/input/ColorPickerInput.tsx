@@ -2,8 +2,18 @@ import type { Color } from "@rc-component/color-picker";
 import ColorPicker from "@rc-component/color-picker";
 import { useMemo, useState } from "react";
 import "@rc-component/color-picker/assets/index.css";
-import { InputProps } from "../../types";
 import { CheckMark, ColorPickerPulseIcon, InfoIcon } from "../../icons";
+
+export interface ColorPickerInputProps {
+  value: string;
+  name: string;
+  onChange: (value: Color | string) => void;
+  label?: string;
+  errorText?: string;
+  readOnly?: boolean;
+  successText?: string;
+  containerClassName?: string;
+}
 
 const toHexFormat = (value?: string) =>
   value?.replace(/[^0-9a-fA-F#]/g, "").slice(0, 9) || "";
@@ -16,7 +26,7 @@ const ColorPickerInput = ({
   readOnly = false,
   successText = "",
   containerClassName = "",
-}: InputProps) => {
+}: ColorPickerInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [hexCode, setHexCode] = useState<Color | string>(value);
   const color = useMemo(
