@@ -98,8 +98,10 @@ const UploadProduct = () => {
               }}
               errorText={errors.category1?.message}
             />
+
             <Select
               value={selectedCategory2}
+              readOnly={!selectedCategory1}
               label="Category Two"
               placeholder="Select a level two category"
               categories={level2Options}
@@ -111,6 +113,7 @@ const UploadProduct = () => {
             />
             <Select
               value={watch("category3")}
+              readOnly={!selectedCategory2}
               label="Category Three"
               placeholder="Select a level three category"
               categories={level3Options}
