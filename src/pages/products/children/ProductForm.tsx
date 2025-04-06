@@ -20,17 +20,17 @@ const ProductForm = () => {
   const [shades, setShades] = useState<any[]>([]);
 
   const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
+    register: productRegister,
+    handleSubmit: productHandleSubmit,
+    setValue: productSetValue,
+    watch: productWatch,
+    formState: { errors: productErrors },
   } = useForm({
     resolver: yupResolver(productSchema),
   });
 
-  const selectedCategory1 = watch("category1");
-  const selectedCategory2 = watch("category2");
+  const selectedCategory1 = productWatch("category1");
+  const selectedCategory2 = productWatch("category2");
 
   const level1Data = categoriesData.find(
     (cat) => cat.value === selectedCategory1
@@ -61,22 +61,22 @@ const ProductForm = () => {
   return (
     <form
       className="w-full p-4 flex flex-col gap-7 border"
-      onSubmit={handleSubmit(onSubmitProduct)}
+      onSubmit={productHandleSubmit(onSubmitProduct)}
     >
       <FormTitle title="Product Details" />
       <Input
         name="title"
         label="Title"
         placeholder="Enter Product title"
-        register={register("title")}
-        errorText={errors.title?.message}
+        register={productRegister("title")}
+        errorText={productErrors.title?.message}
       />
       <Input
         name="brand"
         label="Brand"
         placeholder="Enter Product brand"
-        register={register("brand")}
-        errorText={errors.brand?.message}
+        register={productRegister("brand")}
+        errorText={productErrors.brand?.message}
       />
       <Select
         value={selectedCategory1}
@@ -84,11 +84,11 @@ const ProductForm = () => {
         placeholder="Select a level one category"
         categories={categoriesData}
         onChange={(val) => {
-          setValue("category1", val, { shouldValidate: true });
-          setValue("category2", "");
-          setValue("category3", "");
+          productSetValue("category1", val, { shouldValidate: true });
+          productSetValue("category2", "");
+          productSetValue("category3", "");
         }}
-        errorText={errors.category1?.message}
+        errorText={productErrors.category1?.message}
       />
       <Select
         value={selectedCategory2}
@@ -97,35 +97,37 @@ const ProductForm = () => {
         placeholder="Select a level two category"
         categories={level2Options}
         onChange={(val) => {
-          setValue("category2", val, { shouldValidate: true });
-          setValue("category3", "");
+          productSetValue("category2", val, { shouldValidate: true });
+          productSetValue("category3", "");
         }}
-        errorText={errors.category2?.message}
+        errorText={productErrors.category2?.message}
       />
       <Select
-        value={watch("category3")}
+        value={productWatch("category3")}
         readOnly={!selectedCategory2}
         label="Category Three"
         placeholder="Select a level three category"
         categories={level3Options}
-        onChange={(val) => setValue("category3", val, { shouldValidate: true })}
-        errorText={errors.category3?.message}
+        onChange={(val) =>
+          productSetValue("category3", val, { shouldValidate: true })
+        }
+        errorText={productErrors.category3?.message}
       />
       <PhoneInput
         name="originalPrice"
         label="Original Price"
         type="number"
         placeholder="Enter Original Price"
-        register={register("originalPrice")}
-        errorText={errors.originalPrice?.message}
+        register={productRegister("originalPrice")}
+        errorText={productErrors.originalPrice?.message}
       />
       <PhoneInput
         name="sellingPrice"
         label="Selling Price"
         type="number"
         placeholder="Enter Selling Price"
-        register={register("sellingPrice")}
-        errorText={errors.sellingPrice?.message}
+        register={productRegister("sellingPrice")}
+        errorText={productErrors.sellingPrice?.message}
       />
       <Button pattern="primary" type="submit" content="Upload" />
     </form>
