@@ -31,8 +31,8 @@ const UploadProduct = () => {
     resolver: yupResolver(productSchema),
   });
 
-  const selectedCategory1 = productWatch("category1");
-  const selectedCategory2 = productWatch("category2");
+  const selectedCategory1 = productWatch("categoryLevelOne");
+  const selectedCategory2 = productWatch("categoryLevelTwo");
 
   const level1Data = categoriesData.find(
     (cat) => cat.value === selectedCategory1
@@ -43,7 +43,7 @@ const UploadProduct = () => {
   );
   const level3Options = level2Data?.subCategories || [];
 
-  const onSubmitProduct = (data: ProductType) => {
+  const onSubmitProduct = async (data: ProductType) => {
     console.log("✅ Product submitted", data);
 
     const finalData: ProductType = {
@@ -56,14 +56,14 @@ const UploadProduct = () => {
     // Append simple fields
     formData.append("title", finalData.title);
     formData.append("brand", finalData.brand);
-    formData.append("category1", finalData.category1);
-    formData.append("category2", finalData.category2);
-    formData.append("category3", finalData.category3);
+    formData.append("categoryLevelOne", finalData.categoryLevelOne);
+    formData.append("categoryLevelTwo", finalData.categoryLevelTwo);
+    formData.append("categoryLevelThree", finalData.categoryLevelThree);
     formData.append("originalPrice", finalData.originalPrice.toString());
     formData.append("sellingPrice", finalData.sellingPrice.toString());
 
     // Append shades with nested images
-    if (finalData.shades) {
+    if (finalData.shades && finalData.shades.length > 0) {
       finalData.shades.forEach((shade, shadeIndex) => {
         formData.append(`shades[${shadeIndex}][shadeName]`, shade.shadeName);
         formData.append(`shades[${shadeIndex}][colorCode]`, shade.colorCode);
@@ -86,8 +86,21 @@ const UploadProduct = () => {
     }
 
     // For debugging
-    for (const pair of formData.entries()) {
-      console.log(`${pair[0]}:`, pair[1]);
+    // for (const pair of formData.entries()) {
+    //   console.log(`${pair[0]}:`, pair[1]);
+    // }
+
+    try {
+      const res = await fetch("http://localhost:8080/api/products/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const respData = await res.json();
+
+      console.log("respData", respData);
+    } catch (error) {
+      console.log("Error", error);
     }
 
     // Now you can post it to your API
@@ -136,11 +149,13 @@ const UploadProduct = () => {
                 placeholder="Select a level one category"
                 categories={categoriesData}
                 onChange={(val) => {
-                  productSetValue("category1", val, { shouldValidate: true });
-                  productSetValue("category2", "");
-                  productSetValue("category3", "");
+                  productSetValue("categoryLevelOne", val, {
+                    shouldValidate: true,
+                  });
+                  productSetValue("categoryLevelTwo", "");
+                  productSetValue("categoryLevelThree", "");
                 }}
-                errorText={productErrors.category1?.message}
+                errorText={productErrors.categoryLevelOne?.message}
               />
               <Select
                 value={selectedCategory2}
@@ -149,21 +164,25 @@ const UploadProduct = () => {
                 placeholder="Select a level two category"
                 categories={level2Options}
                 onChange={(val) => {
-                  productSetValue("category2", val, { shouldValidate: true });
-                  productSetValue("category3", "");
+                  productSetValue("categoryLevelTwo", val, {
+                    shouldValidate: true,
+                  });
+                  productSetValue("categoryLevelThree", "");
                 }}
-                errorText={productErrors.category2?.message}
+                errorText={productErrors.categoryLevelTwo?.message}
               />
               <Select
-                value={productWatch("category3")}
+                value={productWatch("categoryLevelThree")}
                 readOnly={!selectedCategory2}
                 label="Category Three"
                 placeholder="Select a level three category"
                 categories={level3Options}
                 onChange={(val) =>
-                  productSetValue("category3", val, { shouldValidate: true })
+                  productSetValue("categoryLevelThree", val, {
+                    shouldValidate: true,
+                  })
                 }
-                errorText={productErrors.category3?.message}
+                errorText={productErrors.categoryLevelThree?.message}
               />
               <PhoneInput
                 name="originalPrice"

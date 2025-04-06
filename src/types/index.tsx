@@ -146,9 +146,9 @@ export interface ShadeType {
 export interface ProductType {
   title: string;
   brand: string;
-  category1: string;
-  category2: string;
-  category3: string;
+  categoryLevelOne: string;
+  categoryLevelTwo: string;
+  categoryLevelThree: string;
   originalPrice: number;
   sellingPrice: number;
   commonImages?: File[];

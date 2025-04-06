@@ -62,9 +62,9 @@ export const shadeSchema: yup.ObjectSchema<ShadeType> = yup.object({
 export const productSchema = yup.object({
   title: yup.string().required("Title is required"),
   brand: yup.string().required("Brand is required"),
-  category1: yup.string().required("Category 1 is required"),
-  category2: yup.string().required("Category 2 is required"),
-  category3: yup.string().required("Category 3 is required"),
+  categoryLevelOne: yup.string().required("Category 1 is required"),
+  categoryLevelTwo: yup.string().required("Category 2 is required"),
+  categoryLevelThree: yup.string().required("Category 3 is required"),
   originalPrice: yup
     .number()
     .typeError("Original price must be a number")
