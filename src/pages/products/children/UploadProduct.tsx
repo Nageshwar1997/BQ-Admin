@@ -3,7 +3,7 @@ import Button from "../../../components/button/Button";
 import PathNavigation from "../../../components/PathNavigation";
 import { UploadCloudIcon } from "../../../icons";
 import useQueryParams from "../../../hooks/useQueryParams";
-import ShadeForm from "./ShadeForm";
+import AddShade from "./AddShade";
 import { DevTool } from "@hookform/devtools";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
@@ -43,25 +43,18 @@ const UploadProduct = () => {
   );
   const level3Options = level2Data?.subCategories || [];
 
-  const onSubmitProduct = (data: any) => {
+  const onSubmitProduct = (data: ProductType) => {
     console.log("✅ Product submitted", data);
-    // const finalProductData = {
-    //   ...data,
-    //   shades,
-    // };
-    // console.log("✅ Final Product Upload Data:", {
-    //   ...finalProductData,
-    //   shades: shades.map(({ images, ...rest }) => ({
-    //     ...rest,
-    //     images: images.map((img: File) => img.name),
-    //   })),
-    // });
-    // TODO: Submit to backend
+    const finalData: ProductType = {
+      ...data,
+      shades: shades, // from useState
+    };
+    console.log("Final Data", finalData);
   };
 
   return (
     <div className="w-full space-y-3">
-      {queryParams.shade && <ShadeForm />}
+      {queryParams.shade && <AddShade setShades={setShades} />}
       <div className="w-full px-4 py-2 border-b border-primary-50 flex justify-between items-center sticky top-16 bg-primary-inverted z-10 shadow-lg">
         <PathNavigation />
         <Button
@@ -135,6 +128,7 @@ const UploadProduct = () => {
               placeholder="Enter Original Price"
               register={productRegister("originalPrice")}
               errorText={productErrors.originalPrice?.message}
+              containerClassName="[&>div>div>p]:hidden"
             />
             <PhoneInput
               name="sellingPrice"
@@ -143,6 +137,7 @@ const UploadProduct = () => {
               placeholder="Enter Selling Price"
               register={productRegister("sellingPrice")}
               errorText={productErrors.sellingPrice?.message}
+              containerClassName="[&>div>div>p]:hidden"
             />
             <Controller
               control={productControl}

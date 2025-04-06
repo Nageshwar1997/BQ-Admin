@@ -151,5 +151,5 @@ export interface ProductType {
   category3: string;
   originalPrice: number;
   sellingPrice: number;
-  shades: ShadeType[];
+  shades?: ShadeType[];
 }

@@ -11,6 +11,10 @@ import { InfoIcon } from "../../../icons";
 import { CloseIcon } from "../../../components/sidebar/icons";
 import useQueryParams from "../../../hooks/useQueryParams";
 
+interface ShadeFormProps {
+  setShades: React.Dispatch<React.SetStateAction<ShadeType[]>>;
+}
+
 const shadeInitialValue: ShadeType = {
   shadeName: "",
   colorCode: "",
@@ -18,7 +22,7 @@ const shadeInitialValue: ShadeType = {
   images: [],
 };
 
-const ShadeForm = () => {
+const AddShade = ({ setShades }: ShadeFormProps) => {
   const { removeParam } = useQueryParams();
 
   const {
@@ -38,20 +42,22 @@ const ShadeForm = () => {
 
   const onSubmitShade = (data: ShadeType) => {
     console.log("✅ Shade submitted", data);
+    setShades((prevShades) => [...prevShades, data]);
     shadeReset();
     setShadeImages([]);
     setImagePreviews([]);
+    removeParam("shade");
   };
   return (
-    <div className="border z-[100] fixed inset-0 w-full h-full flex justify-center items-center bg-primary-inverted-50 backdrop-blur-sm p-5">
+    <div className="border z-[100] fixed inset-0 w-full h-full flex justify-center items-center bg-primary-inverted-50 backdrop-blur-[2px] p-5">
       <form
         className="max-w-xl w-full p-4 flex flex-col gap-7 rounded-lg border border-secondary-battleship-davys-gray shadow-light-dark-soft bg-platinum-black"
         onSubmit={shadeHandleSubmit(onSubmitShade)}
       >
         <div className="flex items-center justify-between mb-2 border-b border-primary-50 pb-2">
-          <div className="flex items-center gap-1">
-            <h3 className="text-lg text-tertiary">Add Shade</h3>
-            <InfoIcon className="cursor-pointer fill-tertiary" />
+          <div className="flex items-center gap-1 group">
+            <h3 className="text-lg text-tertiary group-hover:text-primary">Add Shade</h3>
+            <InfoIcon className="cursor-pointer fill-tertiary group-hover:fill-primary" />
           </div>
           <CloseIcon
             onClick={() => {
@@ -60,7 +66,7 @@ const ShadeForm = () => {
               setImagePreviews([]);
               removeParam("shade");
             }}
-            className="[&>path]:stroke-tertiary"
+            className="[&>path]:stroke-tertiary [&>path]:hover:stroke-primary cursor-pointer"
           />
         </div>
 
@@ -160,4 +166,4 @@ const ShadeForm = () => {
   );
 };
 
-export default ShadeForm;
+export default AddShade;
