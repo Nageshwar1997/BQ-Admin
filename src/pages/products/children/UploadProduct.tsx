@@ -71,7 +71,7 @@ const UploadProduct = () => {
           <div className="w-full h-full flex flex-col lg:flex-row gap-5">
             {/* Product Form */}
             <form
-              className="w-full p-4 flex flex-col gap-7 border"
+              className="w-full p-4 flex flex-col gap-7"
               onSubmit={productHandleSubmit(onSubmitProduct)}
             >
               <Input

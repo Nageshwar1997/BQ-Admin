@@ -38,10 +38,10 @@ const Sidebar = () => {
           </div>
           <div className="text-center grow">
             <p className="text-xl font-bold line-clamp-1 text-transparent bg-accent-duo bg-clip-text capitalize">
-              {user?.firstName}
+              {user?.firstName ?? "John"}
             </p>
             <p className="text-xl font-bold line-clamp-1 text-transparent bg-accent-duo bg-clip-text capitalize">
-              {user?.lastName}
+              {user?.lastName ?? "Doe"}
             </p>
           </div>
         </div>
