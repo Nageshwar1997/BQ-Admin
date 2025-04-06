@@ -1,47 +1,60 @@
 import * as yup from "yup";
+import { ShadeType } from "../../../types";
 
-// export const shadeSchema = yup.object({
-//   shadeName: yup.string().required("Shade name is required"),
-//   colorCode: yup
-//     .string()
-//     .matches(
-//       /^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/,
-//       "Enter a valid hex color"
-//     )
-//     .required("Color code is required"),
-//   stock: yup
-//     .number()
-//     .typeError("Stock must be a number")
-//     .min(5, "Stock must be at least 5")
-//     .max(100, "Stock cannot exceed 100")
-//     .integer("Stock must be an integer")
-//     .required("Stock is required"),
-//   images: yup
-//     .array()
-//     .of(
-//       yup
-//         .mixed<File>()
-//         .test("fileType", "Only image files are allowed", (value) =>
-//           value
-//             ? ["image/jpeg", "image/png", "image/webp"].includes(value.type)
-//             : false
-//         )
-//     )
-//     .min(1, "At least one image is required")
-//     .required("Images are required"),
-// });
-
-export const shadeSchema = yup.object().shape({
-  shadeName: yup.string().required("Shade name is required"),
-  colorCode: yup.string().required("Color is required"),
+export const shadeSchema: yup.ObjectSchema<ShadeType> = yup.object({
+  shadeName: yup
+    .string()
+    .required("Shade name is required")
+    .matches(/^(?!.*\s{2,}).*$/, "Only one space is allowed between words"),
+  colorCode: yup
+    .string()
+    .matches(
+      /^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/,
+      "Invalid HEX color code"
+    )
+    .matches(/^[^\s]*$/, "Spaces are not allowed")
+    .required("Color code is required"),
   stock: yup
     .number()
     .typeError("Stock must be a number")
+    .required("Stock is required")
     .min(0, "Stock cannot be negative")
-    .required("Stock is required"),
+    .max(100, "Stock cannot exceed 100"),
   images: yup
     .array()
-    .of(yup.mixed())
+    .of(
+      yup
+        .mixed<File>()
+        .required("File is required")
+        .test("file-size", function (value, context) {
+          if (value instanceof File && value.size > 2 * 1024 * 1024) {
+            const match = context.path?.match(/\d+/);
+            const index = match ? parseInt(match[0]) + 1 : null;
+            const sizeInMB = (value.size / 1024 / 1024).toFixed(1);
+
+            return this.createError({
+              message: index
+                ? `Image ${index} is too large (${sizeInMB} MB). Max allowed is 2 MB.`
+                : `Image "${value.name}" is too large (${sizeInMB} MB). Max allowed is 2 MB.`,
+            });
+          }
+          return true;
+        })
+        .test("file-type", function (value, context) {
+          if (
+            value instanceof File &&
+            !["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(
+              value.type
+            )
+          ) {
+            const index = context.path?.match(/\d+/)?.[0] ?? "?";
+            return this.createError({
+              message: `Image ${index} invalid format (jpeg, png, webp, jpg).`,
+            });
+          }
+          return true;
+        })
+    )
     .min(1, "At least one image is required")
     .required("Images are required"),
 });
