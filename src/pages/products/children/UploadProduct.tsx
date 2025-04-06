@@ -45,11 +45,53 @@ const UploadProduct = () => {
 
   const onSubmitProduct = (data: ProductType) => {
     console.log("✅ Product submitted", data);
+
     const finalData: ProductType = {
       ...data,
-      shades: shades, // from useState
+      shades: shades, // shades from useState
     };
-    console.log("Final Data", finalData);
+
+    const formData = new FormData();
+
+    // Append simple fields
+    formData.append("title", finalData.title);
+    formData.append("brand", finalData.brand);
+    formData.append("category1", finalData.category1);
+    formData.append("category2", finalData.category2);
+    formData.append("category3", finalData.category3);
+    formData.append("originalPrice", finalData.originalPrice.toString());
+    formData.append("sellingPrice", finalData.sellingPrice.toString());
+
+    // Append shades with nested images
+    if (finalData.shades) {
+      finalData.shades.forEach((shade, shadeIndex) => {
+        formData.append(`shades[${shadeIndex}][shadeName]`, shade.shadeName);
+        formData.append(`shades[${shadeIndex}][colorCode]`, shade.colorCode);
+        formData.append(
+          `shades[${shadeIndex}][stock]`,
+          String(shade.stock ?? "")
+        );
+
+        shade.images.forEach((image, imgIndex) => {
+          formData.append(`shades[${shadeIndex}][images][${imgIndex}]`, image);
+        });
+      });
+    }
+
+    // If you also have common product images (optional)
+    if (data?.commonImages && data.commonImages.length > 0) {
+      data.commonImages.forEach((img: File, index: number) => {
+        formData.append(`commonImages[${index}]`, img);
+      });
+    }
+
+    // For debugging
+    for (const pair of formData.entries()) {
+      console.log(`${pair[0]}:`, pair[1]);
+    }
+
+    // Now you can post it to your API
+    // await axios.post("/your-endpoint", formData);
   };
 
   return (

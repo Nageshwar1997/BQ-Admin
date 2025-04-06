@@ -151,5 +151,6 @@ export interface ProductType {
   category3: string;
   originalPrice: number;
   sellingPrice: number;
+  commonImages?: File[];
   shades?: ShadeType[];
 }
