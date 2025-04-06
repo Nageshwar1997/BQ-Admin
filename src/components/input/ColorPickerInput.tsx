@@ -3,7 +3,8 @@ import ColorPicker from "@rc-component/color-picker";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "@rc-component/color-picker/assets/index.css";
 import { CheckMark, ColorPickerPulseIcon, InfoIcon } from "../../icons";
-// import useClickOutside from "../../hooks/useClickOutside";
+import useClickOutside from "../../hooks/useClickOutside";
+import { debounce } from "../../utils";
 
 export interface ColorPickerInputProps {
   value: string;
@@ -33,17 +34,7 @@ const ColorPickerInput = ({
   const [hexCode, setHexCode] = useState<Color | string>(value);
 
   const lastEmittedRef = useRef<string | null>(null);
-  // const { containerRef, setHandler } = useClickOutside();
-  const debounce = <Args extends unknown[]>(
-    fn: (...args: Args) => void,
-    delay = 300
-  ): ((...args: Args) => void) => {
-    let timer: ReturnType<typeof setTimeout>;
-    return (...args: Args) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn(...args), delay);
-    };
-  };
+  const { containerRef, setHandler } = useClickOutside<HTMLDivElement>();
 
   const debouncedOnChange = useMemo(() => {
     return debounce((newHex: string) => {
@@ -86,11 +77,21 @@ const ColorPickerInput = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hexCode]);
 
+  useEffect(() => {
+    if (isOpen) {
+      setHandler(() => setIsOpen(false));
+    }
+    return () => setHandler(null); // Clear handler
+  }, [isOpen, setHandler]);
+
   const isError = errorText && !successText;
   const isSuccess = successText && !errorText;
 
   return (
-    <div className={`w-full space-y-1.5 ${containerClassName}`}>
+    <div
+      className={`w-full space-y-1.5 ${containerClassName}`}
+      ref={containerRef}
+    >
       <div className="relative min-h-10 max-h-10 lg:min-h-12 lg:max-h-12">
         {label && (
           <button

@@ -12,23 +12,14 @@ export const shadeSchema: yup.ObjectSchema<ShadeType> = yup.object({
       /^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/,
       "Invalid HEX color code"
     )
-    .matches(/^[^\s]*$/, "Spaces are not allowed")
     .required("Color code is required"),
-  // stock: yup
-  //   .number()
-  //   .typeError("Stock must be a number")
-  //   .required("Stock is required")
-  //   .min(0, "Stock cannot be negative")
-  //   .max(100, "Stock cannot exceed 100"),
   stock: yup
     .number()
-    .transform((value, originalValue) =>
-      originalValue === "" ? null : value
-    )
+    .transform((value, originalValue) => (originalValue === "" ? null : value))
     .typeError("Stock must be a number")
     .required("Stock is required")
-    .min(0, "Stock cannot be negative")
-    .max(100, "Stock cannot exceed 100"),
+    .min(5, "Stock cannot be less than 5")
+    .max(100, "Stock cannot be more than 100"),
   images: yup
     .array()
     .of(

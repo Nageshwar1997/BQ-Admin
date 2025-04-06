@@ -103,6 +103,7 @@ const UploadProduct = () => {
                 placeholder="Enter stock"
                 register={register("stock")}
                 errorText={errors.stock?.message}
+                containerClassName="[&>div>div>p]:hidden"
               />
             </div>
 
