@@ -49,7 +49,7 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
     removeParam("shade");
   };
   return (
-    <div className="border z-[100] fixed inset-0 w-full h-full flex justify-center items-center bg-primary-inverted-50 backdrop-blur-[2px] p-5">
+    <div className="z-[100] fixed inset-0 w-full h-full flex justify-center items-center bg-primary-inverted-50 backdrop-blur-[2px] p-5">
       <form
         className="max-w-xl w-full p-4 flex flex-col gap-7 rounded-lg border border-secondary-battleship-davys-gray shadow-light-dark-soft bg-platinum-black"
         onSubmit={shadeHandleSubmit(onSubmitShade)}
