@@ -1,8 +1,9 @@
 import type { Color } from "@rc-component/color-picker";
 import ColorPicker from "@rc-component/color-picker";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "@rc-component/color-picker/assets/index.css";
 import { CheckMark, ColorPickerPulseIcon, InfoIcon } from "../../icons";
+// import useClickOutside from "../../hooks/useClickOutside";
 
 export interface ColorPickerInputProps {
   value: string;
@@ -31,15 +32,32 @@ const ColorPickerInput = ({
   const [isOpen, setIsOpen] = useState(false);
   const [hexCode, setHexCode] = useState<Color | string>(value);
 
-  const color = useMemo(
-    () =>
-      typeof hexCode === "string"
-        ? hexCode
-        : hexCode.a < 1
-        ? hexCode.toHexString()
-        : hexCode.toHexString(),
-    [hexCode]
-  );
+  const lastEmittedRef = useRef<string | null>(null);
+  // const { containerRef, setHandler } = useClickOutside();
+  const debounce = <Args extends unknown[]>(
+    fn: (...args: Args) => void,
+    delay = 300
+  ): ((...args: Args) => void) => {
+    let timer: ReturnType<typeof setTimeout>;
+    return (...args: Args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), delay);
+    };
+  };
+
+  const debouncedOnChange = useMemo(() => {
+    return debounce((newHex: string) => {
+      if (newHex !== value && newHex !== lastEmittedRef.current) {
+        lastEmittedRef.current = newHex;
+        onChange(newHex);
+      }
+    }, 500);
+  }, [onChange, value]);
+
+  const color = useMemo(() => {
+    if (typeof hexCode === "string") return hexCode;
+    return hexCode.a < 1 ? hexCode.toHexString() : hexCode.toHexString();
+  }, [hexCode]);
 
   const extractRGB = (rgba: string): string => {
     const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
@@ -50,31 +68,21 @@ const ColorPickerInput = ({
     return rgba;
   };
 
+  // Sync internal state with external value
   useEffect(() => {
-    const hexFromState =
+    const currentHex =
       typeof hexCode === "string" ? hexCode : hexCode.toHexString();
-
-    // If value is empty, reset hexCode
-    if (!value && hexCode !== "") {
-      setHexCode("");
-      return;
-    }
-
-    // Update only if external value changes
-    if (value && value !== hexFromState) {
-      setHexCode(value);
+    if (value !== currentHex) {
+      setHexCode(value || "");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  // Notify parent when hexCode changes
+  // Debounced change emitter
   useEffect(() => {
     const hexValue =
       typeof hexCode === "string" ? hexCode : hexCode.toHexString();
-
-    if (hexValue !== value) {
-      onChange(hexValue); // only if changed
-    }
+    debouncedOnChange(hexValue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hexCode]);
 
@@ -123,6 +131,7 @@ const ColorPickerInput = ({
             </button>
           </div>
         </div>
+
         {isOpen && (
           <div className="absolute top-12 md:top-[50px] z-10">
             <ColorPicker
