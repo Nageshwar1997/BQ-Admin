@@ -30,11 +30,11 @@ const UploadProduct = () => {
   const navigate = useNavigate();
 
   const {
-    register,
-    handleSubmit,
-    reset,
-    control,
-    formState: { errors },
+    register: shadeRegister,
+    handleSubmit: shadeHandleSubmit,
+    reset: shadeReset,
+    control: shadeControl,
+    formState: { errors: shadeErrors },
   } = useForm<ShadeType>({
     resolver: yupResolver(shadeSchema),
     defaultValues: shadeInitialValue,
@@ -46,12 +46,10 @@ const UploadProduct = () => {
 
   const onSubmitShade = (data: ShadeType) => {
     console.log("✅ Shade submitted", data);
-    reset();
+    shadeReset();
     setShadeImages([]);
     setImagePreviews([]);
   };
-
-  console.log("errors.images.message", errors);
 
   return (
     <div className="w-full space-y-3">
@@ -72,19 +70,19 @@ const UploadProduct = () => {
           {/* Shade Form */}
           <form
             className="w-full p-4 flex flex-col gap-7 border sticky top-[141px]"
-            onSubmit={handleSubmit(onSubmitShade)}
+            onSubmit={shadeHandleSubmit(onSubmitShade)}
           >
             <FormTitle title="Add a Shade" />
             <Input
               name="shadeName"
               label="Shade Name"
               placeholder="Enter shade name"
-              register={register("shadeName")}
-              errorText={errors.shadeName?.message}
+              register={shadeRegister("shadeName")}
+              errorText={shadeErrors.shadeName?.message}
             />
             <div className="flex flex-col base:flex-row gap-4">
               <Controller
-                control={control}
+                control={shadeControl}
                 name="colorCode"
                 render={({ field }) => (
                   <ColorPickerInput
@@ -92,7 +90,7 @@ const UploadProduct = () => {
                     label="Select Color"
                     value={field.value}
                     onChange={field.onChange}
-                    errorText={errors.colorCode?.message}
+                    errorText={shadeErrors.colorCode?.message}
                   />
                 )}
               />
@@ -101,15 +99,15 @@ const UploadProduct = () => {
                 name="stock"
                 label="Stock"
                 placeholder="Enter stock"
-                register={register("stock")}
-                errorText={errors.stock?.message}
+                register={shadeRegister("stock")}
+                errorText={shadeErrors.stock?.message}
                 containerClassName="[&>div>div>p]:hidden"
               />
             </div>
 
             {/* Image Upload */}
             <Controller
-              control={control}
+              control={shadeControl}
               name="images"
               defaultValue={[]}
               render={({ field }) => (
@@ -135,8 +133,8 @@ const UploadProduct = () => {
                       field.onChange([...shadeImages, ...files]);
                     }}
                   />
-                  {Array.isArray(errors.images) &&
-                    errors.images.map(
+                  {Array.isArray(shadeErrors.images) &&
+                    shadeErrors.images.map(
                       (error, index) =>
                         error && (
                           <p key={index} className="text-red-500 text-sm">
@@ -145,9 +143,9 @@ const UploadProduct = () => {
                         )
                     )}
 
-                  {errors.images?.message && (
+                  {shadeErrors.images?.message && (
                     <p className="text-red-500 text-sm">
-                      {errors.images.message}
+                      {shadeErrors.images.message}
                     </p>
                   )}
 
@@ -168,7 +166,7 @@ const UploadProduct = () => {
             />
             <Button pattern="primary" type="submit" content="Add Shade" />
           </form>
-          <DevTool control={control} />
+          <DevTool control={shadeControl} />
         </div>
       </div>
     </div>
