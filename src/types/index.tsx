@@ -15,6 +15,10 @@ export type ThemeStoreType = {
   toggleTheme: () => void;
 };
 
+export interface QueryParams {
+  [key: string]: string;
+}
+
 export interface InputProps {
   type?: string;
   name?: string;
@@ -138,7 +142,6 @@ export interface ShadeType {
   stock: number | null;
   images: File[];
 }
-
 
 export interface ProductType {
   title: string;
