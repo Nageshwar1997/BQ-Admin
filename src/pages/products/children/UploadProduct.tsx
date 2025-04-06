@@ -11,6 +11,7 @@ import { shadeSchema } from "./product.schema";
 import PhoneInput from "../../../components/input/PhoneInput";
 import ColorPickerInput from "../../../components/input/ColorPickerInput";
 import { ShadeType } from "../../../types";
+import ProductForm from "./ProductForm";
 
 const FormTitle = ({ title }: { title: string }) => (
   <div className="flex items-center gap-1">
@@ -66,6 +67,7 @@ const UploadProduct = () => {
       <div className="mx-auto rounded-lg shadow-light-dark-soft bg-platinum-black">
         <div className="w-full h-full flex flex-col lg:flex-row gap-5">
           {/* Product Form */}
+          <ProductForm />
 
           {/* Shade Form */}
           <form
@@ -166,7 +168,7 @@ const UploadProduct = () => {
             />
             <Button pattern="primary" type="submit" content="Add Shade" />
           </form>
-          <DevTool control={shadeControl} />
+          {/* <DevTool control={shadeControl} /> */}
         </div>
       </div>
     </div>

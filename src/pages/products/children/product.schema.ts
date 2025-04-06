@@ -74,4 +74,41 @@ export const productSchema = yup.object({
     .typeError("Selling price must be a number")
     .required("Selling price is required"),
   shades: yup.array().of(shadeSchema).min(1, "At least one shade is required"),
+  commonImages: yup
+    .array()
+    .of(
+      yup
+        .mixed<File>()
+        .required("File is required")
+        .test("file-size", function (value, context) {
+          if (value instanceof File && value.size > 2 * 1024 * 1024) {
+            const match = context.path?.match(/\d+/);
+            const index = match ? parseInt(match[0]) + 1 : null;
+            const sizeInMB = (value.size / 1024 / 1024).toFixed(1);
+
+            return this.createError({
+              message: index
+                ? `Image ${index} is too large (${sizeInMB} MB). Max allowed is 2 MB.`
+                : `Image "${value.name}" is too large (${sizeInMB} MB). Max allowed is 2 MB.`,
+            });
+          }
+          return true;
+        })
+        .test("file-type", function (value, context) {
+          if (
+            value instanceof File &&
+            !["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(
+              value.type
+            )
+          ) {
+            const index = context.path?.match(/\d+/)?.[0] ?? "?";
+            return this.createError({
+              message: `Image ${index} invalid format (jpeg, png, webp, jpg).`,
+            });
+          }
+          return true;
+        })
+    )
+    .min(1, "At least one image is required")
+    .required("Images are required"),
 });

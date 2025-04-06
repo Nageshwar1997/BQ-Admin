@@ -138,3 +138,15 @@ export interface ShadeType {
   stock: number | null;
   images: File[];
 }
+
+
+export interface ProductType {
+  title: string;
+  brand: string;
+  category1: string;
+  category2: string;
+  category3: string;
+  originalPrice: number;
+  sellingPrice: number;
+  shades: ShadeType[];
+}

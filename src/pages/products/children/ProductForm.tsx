@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import Button from "../../../components/button/Button";
 import Input from "../../../components/input/Input";
 import PhoneInput from "../../../components/input/PhoneInput";
@@ -8,6 +8,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { productSchema } from "./product.schema";
 import { InfoIcon } from "../../../icons";
 import { useState } from "react";
+import { DevTool } from "@hookform/devtools";
 
 const FormTitle = ({ title }: { title: string }) => (
   <div className="flex items-center gap-1">
@@ -18,12 +19,15 @@ const FormTitle = ({ title }: { title: string }) => (
 
 const ProductForm = () => {
   const [shades, setShades] = useState<any[]>([]);
+  const [commonImages, setCommonImages] = useState<File[]>([]);
+  const [commonImagePreviews, setCommonImagePreviews] = useState<string[]>([]);
 
   const {
     register: productRegister,
     handleSubmit: productHandleSubmit,
     setValue: productSetValue,
     watch: productWatch,
+    control: productControl,
     formState: { errors: productErrors },
   } = useForm({
     resolver: yupResolver(productSchema),
@@ -42,19 +46,18 @@ const ProductForm = () => {
   const level3Options = level2Data?.subCategories || [];
 
   const onSubmitProduct = (data: any) => {
-    const finalProductData = {
-      ...data,
-      shades,
-    };
-
-    console.log("✅ Final Product Upload Data:", {
-      ...finalProductData,
-      shades: shades.map(({ images, ...rest }) => ({
-        ...rest,
-        images: images.map((img: File) => img.name),
-      })),
-    });
-
+    console.log("✅ Product submitted", data);
+    // const finalProductData = {
+    //   ...data,
+    //   shades,
+    // };
+    // console.log("✅ Final Product Upload Data:", {
+    //   ...finalProductData,
+    //   shades: shades.map(({ images, ...rest }) => ({
+    //     ...rest,
+    //     images: images.map((img: File) => img.name),
+    //   })),
+    // });
     // TODO: Submit to backend
   };
 
@@ -129,7 +132,64 @@ const ProductForm = () => {
         register={productRegister("sellingPrice")}
         errorText={productErrors.sellingPrice?.message}
       />
+      <Controller
+        control={productControl}
+        name="commonImages"
+        defaultValue={[]}
+        render={({ field }) => (
+          <>
+            <label htmlFor="commonImages" className="text-sm font-medium">
+              Shade Images
+            </label>
+            <input
+              id="commonImages"
+              type="file"
+              multiple
+              // accept="image/*"
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []);
+                const previews = files.map((file) => URL.createObjectURL(file));
+
+                setCommonImages((prev) => [...prev, ...files]);
+                setCommonImagePreviews((prev) => [...prev, ...previews]);
+
+                // ✅ Update form field
+                field.onChange([...commonImages, ...files]);
+              }}
+            />
+            {Array.isArray(productErrors.commonImages) &&
+              productErrors.commonImages.map(
+                (error, index) =>
+                  error && (
+                    <p key={index} className="text-red-500 text-sm">
+                      {error.message}
+                    </p>
+                  )
+              )}
+
+            {productErrors.commonImages?.message && (
+              <p className="text-red-500 text-sm">
+                {productErrors.commonImages.message}
+              </p>
+            )}
+
+            {commonImagePreviews.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {commonImagePreviews.map((src, idx) => (
+                  <img
+                    key={idx}
+                    src={src}
+                    alt={`shade-img-${idx}`}
+                    className="w-16 h-16 object-cover rounded border"
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      />
       <Button pattern="primary" type="submit" content="Upload" />
+      <DevTool control={productControl} />
     </form>
   );
 };
