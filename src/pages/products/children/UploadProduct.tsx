@@ -1,16 +1,16 @@
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { DevTool } from "@hookform/devtools";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Button from "../../../components/button/Button";
 import PathNavigation from "../../../components/PathNavigation";
 import { InfoIcon, UploadCloudIcon } from "../../../icons";
 import Input from "../../../components/input/Input";
-// import Select from "../../../components/input/Select";
 import { shadeSchema } from "./product.schema";
-// import { categoriesData } from "../data/categoriesData";
 import PhoneInput from "../../../components/input/PhoneInput";
 import ColorPickerInput from "../../../components/input/ColorPickerInput";
+import { ShadeType } from "../../../types";
 
 const FormTitle = ({ title }: { title: string }) => (
   <div className="flex items-center gap-1">
@@ -19,38 +19,39 @@ const FormTitle = ({ title }: { title: string }) => (
   </div>
 );
 
+const shadeInitialValue: ShadeType = {
+  shadeName: "",
+  colorCode: "",
+  stock: null,
+  images: [],
+};
+
 const UploadProduct = () => {
   const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
-    setValue,
     reset,
     control,
     formState: { errors },
-  } = useForm({
+  } = useForm<ShadeType>({
     resolver: yupResolver(shadeSchema),
+    defaultValues: shadeInitialValue,
   });
 
   const [shadeImages, setShadeImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [shades, setShades] = useState<any[]>([]);
+  // const [shades, setShades] = useState<any[]>([]);
 
-  const onSubmitShade = (data: any) => {
-    alert("Clicked");
-    console.log("✅ Shade form submitted with:", data);
-
-    const shadeWithImages = {
-      ...data,
-      images: shadeImages,
-    };
-
-    setShades((prev) => [...prev, shadeWithImages]);
+  const onSubmitShade = (data: ShadeType) => {
+    console.log("✅ Shade submitted", data);
     reset();
     setShadeImages([]);
     setImagePreviews([]);
   };
+
+  console.log("errors.images.message", errors);
 
   return (
     <div className="w-full space-y-3">
@@ -112,14 +113,14 @@ const UploadProduct = () => {
               defaultValue={[]}
               render={({ field }) => (
                 <>
-                  <label htmlFor="shadeImages" className="text-sm font-medium">
+                  <label htmlFor="images" className="text-sm font-medium">
                     Shade Images
                   </label>
                   <input
-                    id="shadeImages"
+                    id="images"
                     type="file"
                     multiple
-                    accept="image/*"
+                    // accept="image/*"
                     onChange={(e) => {
                       const files = Array.from(e.target.files || []);
                       const previews = files.map((file) =>
@@ -133,9 +134,22 @@ const UploadProduct = () => {
                       field.onChange([...shadeImages, ...files]);
                     }}
                   />
-                  <p className="text-red-500 text-xs">
-                    {errors.images?.message}
-                  </p>
+                  {Array.isArray(errors.images) &&
+                    errors.images.map(
+                      (error, index) =>
+                        error && (
+                          <p key={index} className="text-red-500 text-sm">
+                            {error.message}
+                          </p>
+                        )
+                    )}
+
+                  {errors.images?.message && (
+                    <p className="text-red-500 text-sm">
+                      {errors.images.message}
+                    </p>
+                  )}
+
                   {imagePreviews.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
                       {imagePreviews.map((src, idx) => (
@@ -153,6 +167,7 @@ const UploadProduct = () => {
             />
             <Button pattern="primary" type="submit" content="Add Shade" />
           </form>
+          <DevTool control={control} />
         </div>
       </div>
     </div>

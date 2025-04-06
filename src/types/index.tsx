@@ -131,3 +131,10 @@ export interface LevelThreeCategoryType {
   label: string;
   value: string;
 }
+
+export interface ShadeType {
+  shadeName: string;
+  colorCode: string;
+  stock: number | null;
+  images: File[];
+}

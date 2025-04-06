@@ -14,8 +14,17 @@ export const shadeSchema: yup.ObjectSchema<ShadeType> = yup.object({
     )
     .matches(/^[^\s]*$/, "Spaces are not allowed")
     .required("Color code is required"),
+  // stock: yup
+  //   .number()
+  //   .typeError("Stock must be a number")
+  //   .required("Stock is required")
+  //   .min(0, "Stock cannot be negative")
+  //   .max(100, "Stock cannot exceed 100"),
   stock: yup
     .number()
+    .transform((value, originalValue) =>
+      originalValue === "" ? null : value
+    )
     .typeError("Stock must be a number")
     .required("Stock is required")
     .min(0, "Stock cannot be negative")
