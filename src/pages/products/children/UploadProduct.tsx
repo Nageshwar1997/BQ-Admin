@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import Button from "../../../components/button/Button";
 import PathNavigation from "../../../components/PathNavigation";
 import { UploadCloudIcon } from "../../../icons";
@@ -13,8 +13,34 @@ import Select from "../../../components/input/Select";
 import { categoriesData } from "../data/categoriesData";
 import { productSchema } from "./product.schema";
 import { ProductType, ShadeType } from "../../../types";
+import QuillMarkupEditor from "../../../components/QuillMarkupEditor/QuillMarkupEditor";
+import Quill from "quill";
+
+const productInitialValues: ProductType = {
+  title: "",
+  brand: "",
+  description: "",
+  howToUse: "",
+  ingredients: "",
+  additionalDetails: "",
+  categoryLevelOne: "",
+  categoryLevelTwo: "",
+  categoryLevelThree: "",
+  originalPrice: null,
+  sellingPrice: null,
+  shades: [],
+};
 
 const UploadProduct = () => {
+  const quillDescriptionRef = useRef<Quill | null>(null);
+  const quillHowToUseRef = useRef<Quill | null>(null);
+  const quillIngredientsUseRef = useRef<Quill | null>(null);
+  const quillAdditionalDetailsUseRef = useRef<Quill | null>(null);
+
+  const descriptionBlobUrlsRef = useRef<string[]>([]);
+  const howToUseBlobUrlsRef = useRef<string[]>([]);
+  const ingredientsBlobUrlsRef = useRef<string[]>([]);
+  const additionalDetailsBlobUrlsRef = useRef<string[]>([]);
   const [shades, setShades] = useState<ShadeType[]>([]);
   const [commonImages, setCommonImages] = useState<File[]>([]);
   const [commonImagePreviews, setCommonImagePreviews] = useState<string[]>([]);
@@ -27,8 +53,9 @@ const UploadProduct = () => {
     watch: productWatch,
     control: productControl,
     formState: { errors: productErrors },
-  } = useForm({
+  } = useForm<ProductType>({
     resolver: yupResolver(productSchema),
+    defaultValues: productInitialValues,
   });
 
   const selectedCategory1 = productWatch("categoryLevelOne");
@@ -43,6 +70,35 @@ const UploadProduct = () => {
   );
   const level3Options = level2Data?.subCategories || [];
 
+  const handleDescriptionTextChange = () => {
+    if (quillDescriptionRef.current) {
+      const description = quillDescriptionRef.current.root.innerHTML;
+      productSetValue("description", description, { shouldValidate: true });
+    }
+  };
+  const handleHowToUseTextChange = () => {
+    if (quillHowToUseRef.current) {
+      const howToUse = quillHowToUseRef.current.root.innerHTML;
+      productSetValue("howToUse", howToUse, { shouldValidate: true });
+    }
+  };
+  const handleIngredientsTextChange = () => {
+    if (quillIngredientsUseRef.current) {
+      const ingredients = quillIngredientsUseRef.current.root.innerHTML;
+      productSetValue("ingredients", ingredients, { shouldValidate: true });
+    }
+  };
+
+  const handleAdditionalDetailsTextChange = () => {
+    if (quillAdditionalDetailsUseRef.current) {
+      const additionalDetails =
+        quillAdditionalDetailsUseRef.current.root.innerHTML;
+      productSetValue("additionalDetails", additionalDetails, {
+        shouldValidate: true,
+      });
+    }
+  };
+
   const onSubmitProduct = async (data: ProductType) => {
     console.log("✅ Product submitted", data);
 
@@ -56,11 +112,21 @@ const UploadProduct = () => {
     // Append simple fields
     formData.append("title", finalData.title);
     formData.append("brand", finalData.brand);
+    formData.append("description", finalData.description);
+    formData.append("howToUse", finalData.howToUse ?? "");
+    formData.append("ingredients", finalData.ingredients ?? "");
+    formData.append("additionalDetails", finalData.additionalDetails ?? "");
     formData.append("categoryLevelOne", finalData.categoryLevelOne);
     formData.append("categoryLevelTwo", finalData.categoryLevelTwo);
     formData.append("categoryLevelThree", finalData.categoryLevelThree);
-    formData.append("originalPrice", finalData.originalPrice.toString());
-    formData.append("sellingPrice", finalData.sellingPrice.toString());
+
+    if (finalData.sellingPrice) {
+      formData.append("sellingPrice", finalData.sellingPrice.toString());
+    }
+
+    if (finalData.originalPrice) {
+      formData.append("originalPrice", finalData.originalPrice.toString());
+    }
 
     // Append shades with nested images
     if (finalData.shades && finalData.shades.length > 0) {
@@ -86,9 +152,9 @@ const UploadProduct = () => {
     }
 
     // For debugging
-    // for (const pair of formData.entries()) {
-    //   console.log(`${pair[0]}:`, pair[1]);
-    // }
+    for (const pair of formData.entries()) {
+      console.log(`${pair[0]}:`, pair[1]);
+    }
 
     try {
       const res = await fetch("http://localhost:8080/api/products/upload", {
@@ -266,6 +332,42 @@ const UploadProduct = () => {
                   </>
                 )}
               />
+              <div className="w-full">
+                <QuillMarkupEditor
+                  label="Product Description"
+                  ref={quillDescriptionRef}
+                  blobUrlsRef={descriptionBlobUrlsRef}
+                  onTextChange={handleDescriptionTextChange}
+                  errorText={productErrors?.description?.message}
+                />
+              </div>
+              <div className="w-full">
+                <QuillMarkupEditor
+                  label="How to use"
+                  ref={quillHowToUseRef}
+                  blobUrlsRef={howToUseBlobUrlsRef}
+                  onTextChange={handleHowToUseTextChange}
+                  errorText={productErrors?.howToUse?.message}
+                />
+              </div>
+              <div className="w-full">
+                <QuillMarkupEditor
+                  label="Ingredients"
+                  ref={quillIngredientsUseRef}
+                  blobUrlsRef={ingredientsBlobUrlsRef}
+                  onTextChange={handleIngredientsTextChange}
+                  errorText={productErrors?.ingredients?.message}
+                />
+              </div>
+              <div className="w-full">
+                <QuillMarkupEditor
+                  label="Additional Details"
+                  ref={quillAdditionalDetailsUseRef}
+                  blobUrlsRef={additionalDetailsBlobUrlsRef}
+                  onTextChange={handleAdditionalDetailsTextChange}
+                  errorText={productErrors?.additionalDetails?.message}
+                />
+              </div>
               <Button pattern="primary" type="submit" content="Upload" />
               <DevTool control={productControl} />
             </form>

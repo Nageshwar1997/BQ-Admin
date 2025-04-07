@@ -146,11 +146,15 @@ export interface ShadeType {
 export interface ProductType {
   title: string;
   brand: string;
+  description: string;
+  howToUse?: string;
+  ingredients?: string;
+  additionalDetails?: string;
   categoryLevelOne: string;
   categoryLevelTwo: string;
   categoryLevelThree: string;
-  originalPrice: number;
-  sellingPrice: number;
+  originalPrice: number | null;
+  sellingPrice: number | null;
   commonImages?: File[];
   shades?: ShadeType[];
 }
