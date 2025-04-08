@@ -64,15 +64,15 @@ const Login = () => {
   };
 
   const onSubmit = (bodyData: LoginFormInputProps) => {
-    const formData = new FormData();
+    const formData: Partial<LoginFormInputProps> = {};
 
     if (bodyData.loginMethod === "email" && bodyData.email) {
-      formData.append("email", bodyData.email);
+      formData.email = bodyData.email;
     } else if (bodyData.loginMethod === "phoneNumber" && bodyData.phoneNumber) {
-      formData.append("phoneNumber", bodyData.phoneNumber);
+      formData.phoneNumber = bodyData.phoneNumber;
     }
 
-    formData.append("password", bodyData.password);
+    formData.password = bodyData.password;
 
     userLoginMutation.mutate(formData, {
       onSettled(data, error) {

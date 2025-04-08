@@ -1,8 +1,9 @@
 import { AxiosError } from "axios";
 import api from "../../configs/axios.instance.config";
+import { LoginFormInputProps } from "../../types";
 
 // Using Email Id or Phone Number & Password (Type Manually)
-export const login_user = async (bodyData: FormData) => {
+export const login_user = async (bodyData: Partial<LoginFormInputProps>) => {
   try {
     const response = await api.post("/auth/login", bodyData);
     return response.data;
