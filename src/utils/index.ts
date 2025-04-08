@@ -10,32 +10,33 @@ export const encryptData = (data: string): string => {
 
 export const saveUserLocal = (data: string) => {
   removeUserSession();
-  localStorage.setItem("token", encryptData(JSON.stringify(data)));
+  localStorage.setItem("admin_token", encryptData(JSON.stringify(data)));
 };
 
 export const saveUserSession = (data: string) => {
   removeUserLocal();
-  sessionStorage.setItem("token", encryptData(JSON.stringify(data)));
+  sessionStorage.setItem("admin_token", encryptData(JSON.stringify(data)));
 };
 
 export const removeUserLocal = () => {
-  localStorage.removeItem("token");
+  localStorage.removeItem("admin_token");
 };
 
 export const removeUserSession = () => {
-  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("admin_token");
 };
 
-export const getUserToken = () => {
-  const token =
-    localStorage.getItem("token") || sessionStorage.getItem("token");
+export const getAdminToken = () => {
+  const admin_token =
+    localStorage.getItem("admin_token") ||
+    sessionStorage.getItem("admin_token");
 
-  if (!token) {
+  if (!admin_token) {
     throw new Error("No Token found");
   }
 
   return JSON.parse(
-    CryptoJS.AES.decrypt(token, ENCRYPTION_SECRET_KEY).toString(
+    CryptoJS.AES.decrypt(admin_token, ENCRYPTION_SECRET_KEY).toString(
       CryptoJS.enc.Utf8
     )
   );

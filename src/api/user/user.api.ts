@@ -1,16 +1,16 @@
 import { AxiosError } from "axios";
 import api from "../../configs/axios.instance.config";
-import { getUserToken } from "../../utils";
+import { getAdminToken } from "../../utils";
 import { userRoutes } from "../api.routes";
 
 export const get_user_details = async () => {
   try {
-    const token = getUserToken();
+    const admin_token = getAdminToken();
     const { method, url } = userRoutes.getUser;
     const response = await api.request({
       method,
       url,
-      headers: { Authorization: token },
+      headers: { Authorization: admin_token },
     });
 
     console.log("response", response);

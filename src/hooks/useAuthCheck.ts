@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useGetUserDetails } from "../api/user/user.service";
 import { useUserStore } from "../store/user.store";
-import { getUserToken } from "../utils";
+import { getAdminToken } from "../utils";
 import { useNavigate } from "react-router-dom";
 
 export const useAuthCheck = () => {
@@ -11,7 +11,7 @@ export const useAuthCheck = () => {
 
   useEffect(() => {
     try {
-      if (getUserToken() && !isAuthenticated && !user && data?.user) {
+      if (getAdminToken() && !isAuthenticated && !user && data?.user) {
         setUser(data.user);
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
