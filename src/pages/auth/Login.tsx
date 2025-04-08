@@ -20,7 +20,7 @@ import Radio from "../../components/input/Radio";
 import Button from "../../components/button/Button";
 import Checkbox from "../../components/input/Checkbox";
 import { saveUserLocal, saveUserSession } from "../../utils";
-import { useLoginUser } from "../../api/user/auth.service";
+import { useLoginUser } from "../../api/auth/auth.service";
 import LoadingPage from "../../components/loaders/LoadingPage";
 import DarkMode from "../../components/DarkMode";
 
