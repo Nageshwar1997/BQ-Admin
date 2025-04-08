@@ -8,7 +8,7 @@ import Home from "../pages/home/Home";
 import LoginRedirect from "./LoginRedirect";
 import NotFound from "../pages/error/NotFound";
 import LoadingScreen from "../components/loaders/LoadingScreen";
-// import PrivateRoute from "./PrivateRoute";
+import PrivateRoute from "./PrivateRoute";
 import AllProducts from "../pages/products/children/AllProducts";
 import UploadProduct from "../pages/products/children/UploadProduct";
 import Products from "../pages/products/Products";
@@ -18,9 +18,9 @@ const router = createBrowserRouter([
     path: "/",
     element: (
       <Suspense fallback={<LoadingScreen />}>
-        {/* <PrivateRoute> */}
-        <Main />
-        {/* </PrivateRoute> */}
+        <PrivateRoute>
+          <Main />
+        </PrivateRoute>
       </Suspense>
     ),
     children: [
