@@ -12,7 +12,7 @@ const Navbar = () => {
         <Button
           pattern="secondary"
           content={"Logout"}
-          onClick={logout}
+          onClick={() => logout()}
           className="max-w-[180px] !rounded-[10px] !py-2"
         />
         <Button
