@@ -15,6 +15,8 @@ import { productSchema } from "./product.schema";
 import { ProductType, ShadeType } from "../../../types";
 import QuillMarkupEditor from "../../../components/QuillMarkupEditor/QuillMarkupEditor";
 import Quill from "quill";
+import { useUploadProduct } from "../../../api/product/product.service";
+import LoadingPage from "../../../components/loaders/LoadingPage";
 
 const productInitialValues: ProductType = {
   title: "",
@@ -41,10 +43,13 @@ const UploadProduct = () => {
   const howToUseBlobUrlsRef = useRef<string[]>([]);
   const ingredientsBlobUrlsRef = useRef<string[]>([]);
   const additionalDetailsBlobUrlsRef = useRef<string[]>([]);
+
   const [shades, setShades] = useState<ShadeType[]>([]);
   const [commonImages, setCommonImages] = useState<File[]>([]);
   const [commonImagePreviews, setCommonImagePreviews] = useState<string[]>([]);
+
   const { setParams, queryParams } = useQueryParams();
+  const uploadProduct = useUploadProduct();
 
   const {
     register: productRegister,
@@ -100,12 +105,7 @@ const UploadProduct = () => {
   };
 
   const onSubmitProduct = async (data: ProductType) => {
-    console.log("✅ Product submitted", data);
-
-    const finalData: ProductType = {
-      ...data,
-      shades: shades, // shades from useState
-    };
+    const finalData: ProductType = { ...data, shades };
 
     const formData = new FormData();
 
@@ -156,25 +156,12 @@ const UploadProduct = () => {
       console.log(`${pair[0]}:`, pair[1]);
     }
 
-    try {
-      const res = await fetch("http://localhost:8080/api/products/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const respData = await res.json();
-
-      console.log("respData", respData);
-    } catch (error) {
-      console.log("Error", error);
-    }
-
-    // Now you can post it to your API
-    // await axios.post("/your-endpoint", formData);
+    uploadProduct.mutate(formData);
   };
 
   return (
     <Fragment>
+      {uploadProduct.isPending && <LoadingPage />}
       <div className="w-full space-y-3">
         <div className="w-full px-4 py-3 border-b border-primary-50 flex justify-end base:justify-between items-center sticky top-16 bg-primary-inverted z-10 shadow-lg">
           <PathNavigation className="hidden base:flex" />
