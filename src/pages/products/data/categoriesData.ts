@@ -1,4 +1,8 @@
-import { LevelTwoCategoryType, LevelOneCategoryType } from "../../../types";
+import {
+  LevelTwoCategoryType,
+  LevelOneCategoryType,
+  ProductType,
+} from "../../../types";
 
 /* ============= For You Start ============= */
 const new_new: LevelTwoCategoryType = {
@@ -1034,5 +1038,37 @@ export const categoriesData: LevelOneCategoryType[] = [
     label: "Collections",
     value: "collections",
     subCategories: [bath_and_body, sugar_pop, hair_care, gifting],
+  },
+];
+
+interface InputDataProps {
+  name: keyof ProductType;
+  label: string;
+  placeholder: string;
+}
+
+export const INPUTS_DATA: InputDataProps[] = [
+  {
+    name: "title",
+    label: "Title",
+    placeholder: "Enter Product title",
+  },
+  {
+    name: "brand",
+    label: "Brand",
+    placeholder: "Enter Product brand",
+  },
+];
+
+export const PRICE_DATA: InputDataProps[] = [
+  {
+    name: "originalPrice",
+    label: "Original Price",
+    placeholder: "Enter Original Price",
+  },
+  {
+    name: "sellingPrice",
+    label: "Selling Price",
+    placeholder: "Enter Selling Price",
   },
 ];

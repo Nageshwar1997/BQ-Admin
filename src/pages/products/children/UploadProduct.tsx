@@ -10,7 +10,11 @@ import { useForm, Controller } from "react-hook-form";
 import Input from "../../../components/input/Input";
 import PhoneInput from "../../../components/input/PhoneInput";
 import Select from "../../../components/input/Select";
-import { categoriesData } from "../data/categoriesData";
+import {
+  categoriesData,
+  INPUTS_DATA,
+  PRICE_DATA,
+} from "../data/categoriesData";
 import { productSchema } from "./product.schema";
 import { ProductType, ShadeType } from "../../../types";
 import QuillMarkupEditor from "../../../components/QuillMarkupEditor/QuillMarkupEditor";
@@ -182,20 +186,19 @@ const UploadProduct = () => {
               className="w-full p-4 flex flex-col gap-7"
               onSubmit={productHandleSubmit(onSubmitProduct)}
             >
-              <Input
-                name="title"
-                label="Title"
-                placeholder="Enter Product title"
-                register={productRegister("title")}
-                errorText={productErrors.title?.message}
-              />
-              <Input
-                name="brand"
-                label="Brand"
-                placeholder="Enter Product brand"
-                register={productRegister("brand")}
-                errorText={productErrors.brand?.message}
-              />
+              {INPUTS_DATA.map((input, index) => {
+                return (
+                  <div key={index} className="">
+                    <Input
+                      name={input.name}
+                      label={input.label}
+                      placeholder={input.placeholder}
+                      register={productRegister(input.name)}
+                      errorText={productErrors[input.name]?.message}
+                    />
+                  </div>
+                );
+              })}
               <Select
                 value={selectedCategory1}
                 label="Category One"
@@ -247,24 +250,21 @@ const UploadProduct = () => {
                 }
                 errorText={productErrors.categoryLevelThree?.message}
               />
-              <PhoneInput
-                name="originalPrice"
-                label="Original Price"
-                type="number"
-                placeholder="Enter Original Price"
-                register={productRegister("originalPrice")}
-                errorText={productErrors.originalPrice?.message}
-                containerClassName="[&>div>div>p]:hidden"
-              />
-              <PhoneInput
-                name="sellingPrice"
-                label="Selling Price"
-                type="number"
-                placeholder="Enter Selling Price"
-                register={productRegister("sellingPrice")}
-                errorText={productErrors.sellingPrice?.message}
-                containerClassName="[&>div>div>p]:hidden"
-              />
+              {PRICE_DATA.map((input, index) => {
+                return (
+                  <div key={index} className="">
+                    <PhoneInput
+                      name={input.name}
+                      label={input.label}
+                      type="number"
+                      placeholder={input.placeholder}
+                      register={productRegister(input.name)}
+                      errorText={productErrors[input.name]?.message}
+                      containerClassName="[&>div>div>p]:hidden"
+                    />
+                  </div>
+                );
+              })}
               <Controller
                 control={productControl}
                 name="commonImages"
