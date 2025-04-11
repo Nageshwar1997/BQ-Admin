@@ -51,7 +51,7 @@ const Select = ({
           className={`relative w-full h-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 font-normal text-sm bg-smoke-eerie rounded-lg border border-primary-10 p-3 2xl:py-4 text-primary flex justify-between items-center autofill-effect cursor-pointer ${className}`}
           onClick={() => !readOnly && setIsOpen((prev) => !prev)}
         >
-          <span className={`${selected ? "" : "text-primary-50"}`}>
+          <span className={`text-nowrap ${selected ? "" : "text-primary-50"}`}>
             {selected?.label || placeholder}
           </span>
           <DropdownIcon

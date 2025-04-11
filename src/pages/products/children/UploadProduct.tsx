@@ -186,9 +186,16 @@ const UploadProduct = () => {
               className="w-full p-4 flex flex-col gap-7"
               onSubmit={productHandleSubmit(onSubmitProduct)}
             >
-              {INPUTS_DATA.map((input, index) => {
-                return (
-                  <div key={index} className="">
+              <div className="flex flex-col sm:flex-row gap-7 sm:gap-4">
+                {INPUTS_DATA.map((input, index) => (
+                  <div
+                    key={index}
+                    className={`${
+                      input.name === "title"
+                        ? "w-full sm:w-2/3"
+                        : "w-full sm:w-1/3"
+                    }`}
+                  >
                     <Input
                       name={input.name}
                       label={input.label}
@@ -197,8 +204,8 @@ const UploadProduct = () => {
                       errorText={productErrors[input.name]?.message}
                     />
                   </div>
-                );
-              })}
+                ))}
+              </div>
               <Select
                 value={selectedCategory1}
                 label="Category One"
@@ -236,8 +243,8 @@ const UploadProduct = () => {
                 readOnly={!selectedCategory2}
                 label="Category Three"
                 placeholder={
-                  !selectedCategory1 && !selectedCategory2
-                    ? "Select a level one level two category first"
+                  !selectedCategory1
+                    ? "Select a level one category first"
                     : !selectedCategory2
                     ? "Select a level two category first"
                     : "Select a level three category"
@@ -250,21 +257,20 @@ const UploadProduct = () => {
                 }
                 errorText={productErrors.categoryLevelThree?.message}
               />
-              {PRICE_DATA.map((input, index) => {
-                return (
-                  <div key={index} className="">
-                    <PhoneInput
-                      name={input.name}
-                      label={input.label}
-                      type="number"
-                      placeholder={input.placeholder}
-                      register={productRegister(input.name)}
-                      errorText={productErrors[input.name]?.message}
-                      containerClassName="[&>div>div>p]:hidden"
-                    />
-                  </div>
-                );
-              })}
+              <div className="flex flex-col base:flex-row gap-7 base:gap-4">
+                {PRICE_DATA.map((input, index) => (
+                  <PhoneInput
+                    key={index}
+                    name={input.name}
+                    label={input.label}
+                    type="number"
+                    placeholder={input.placeholder}
+                    register={productRegister(input.name)}
+                    errorText={productErrors[input.name]?.message}
+                    containerClassName="[&>div>div>p]:hidden"
+                  />
+                ))}
+              </div>
               <Controller
                 control={productControl}
                 name="commonImages"
