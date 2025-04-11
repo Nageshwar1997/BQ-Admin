@@ -214,7 +214,11 @@ const UploadProduct = () => {
                 value={selectedCategory2}
                 readOnly={!selectedCategory1}
                 label="Category Two"
-                placeholder="Select a level two category"
+                placeholder={
+                  !selectedCategory1
+                    ? "Select a level one category first"
+                    : "Select a level two category"
+                }
                 categories={level2Options}
                 onChange={(val) => {
                   productSetValue("categoryLevelTwo", val, {
@@ -228,7 +232,13 @@ const UploadProduct = () => {
                 value={productWatch("categoryLevelThree")}
                 readOnly={!selectedCategory2}
                 label="Category Three"
-                placeholder="Select a level three category"
+                placeholder={
+                  !selectedCategory1 && !selectedCategory2
+                    ? "Select a level one level two category first"
+                    : !selectedCategory2
+                    ? "Select a level two category first"
+                    : "Select a level three category"
+                }
                 categories={level3Options}
                 onChange={(val) =>
                   productSetValue("categoryLevelThree", val, {
