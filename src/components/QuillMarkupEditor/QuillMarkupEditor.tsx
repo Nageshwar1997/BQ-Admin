@@ -41,6 +41,7 @@ interface EditorProps {
   className?: string;
   onTextChange?: (delta: Delta, oldDelta: Delta, source: string) => void;
   blobUrlsRef: RefObject<string[]>;
+  placeholder?: string;
   // onSelectionChange?: (
   //   range: Range | null,
   //   oldRange: Range | null,
@@ -56,6 +57,7 @@ const QuillMarkupEditor = forwardRef<Quill | null, EditorProps>(
       errorText,
       className,
       onTextChange,
+      placeholder = "Write your content here...",
       // onSelectionChange,
       blobUrlsRef,
     },
@@ -73,7 +75,7 @@ const QuillMarkupEditor = forwardRef<Quill | null, EditorProps>(
 
       const quill = new Quill(editorContainer, {
         theme: "snow",
-        placeholder: "Write your content here...",
+        placeholder,
         modules: {
           toolbar: {
             container: [

@@ -12,8 +12,10 @@ import PhoneInput from "../../../components/input/PhoneInput";
 import Select from "../../../components/input/Select";
 import {
   categoriesData,
+  CATEGORY_DATA,
   INPUTS_DATA,
   PRICE_DATA,
+  QUILL_DATA,
 } from "../data/categoriesData";
 import { productSchema } from "./product.schema";
 import { ProductType, ShadeType } from "../../../types";
@@ -206,57 +208,82 @@ const UploadProduct = () => {
                   </div>
                 ))}
               </div>
-              <Select
-                value={selectedCategory1}
-                label="Category One"
-                placeholder="Select a level one category"
-                categories={categoriesData}
-                onChange={(val) => {
-                  productSetValue("categoryLevelOne", val, {
-                    shouldValidate: true,
-                  });
-                  productSetValue("categoryLevelTwo", "");
-                  productSetValue("categoryLevelThree", "");
-                }}
-                errorText={productErrors.categoryLevelOne?.message}
-              />
-              <Select
-                value={selectedCategory2}
-                readOnly={!selectedCategory1}
-                label="Category Two"
-                placeholder={
-                  !selectedCategory1
-                    ? "Select a level one category first"
-                    : "Select a level two category"
-                }
-                categories={level2Options}
-                onChange={(val) => {
-                  productSetValue("categoryLevelTwo", val, {
-                    shouldValidate: true,
-                  });
-                  productSetValue("categoryLevelThree", "");
-                }}
-                errorText={productErrors.categoryLevelTwo?.message}
-              />
-              <Select
-                value={productWatch("categoryLevelThree")}
-                readOnly={!selectedCategory2}
-                label="Category Three"
-                placeholder={
-                  !selectedCategory1
-                    ? "Select a level one category first"
-                    : !selectedCategory2
-                    ? "Select a level two category first"
-                    : "Select a level three category"
-                }
-                categories={level3Options}
-                onChange={(val) =>
-                  productSetValue("categoryLevelThree", val, {
-                    shouldValidate: true,
-                  })
-                }
-                errorText={productErrors.categoryLevelThree?.message}
-              />
+              <div className="grid gap-y-7 gap-x-4 sm:grid-cols-2 md:grid-cols-3">
+                {CATEGORY_DATA.map((input, index) => {
+                  const value =
+                    input.name === "categoryLevelOne"
+                      ? selectedCategory1
+                      : input.name === "categoryLevelTwo"
+                      ? selectedCategory2
+                      : productWatch("categoryLevelThree");
+
+                  const categories =
+                    input.name === "categoryLevelOne"
+                      ? categoriesData
+                      : input.name === "categoryLevelTwo"
+                      ? level2Options
+                      : level3Options;
+
+                  const readOnly =
+                    (input.name === "categoryLevelTwo" && !selectedCategory1) ||
+                    (input.name === "categoryLevelThree" && !selectedCategory2);
+
+                  const placeholder =
+                    input.name === "categoryLevelOne"
+                      ? "Select a level one category"
+                      : input.name === "categoryLevelTwo"
+                      ? !selectedCategory1
+                        ? "Select a level one category first"
+                        : "Select a level two category"
+                      : !selectedCategory1
+                      ? "Select a level one category first"
+                      : !selectedCategory2
+                      ? "Select a level two category first"
+                      : "Select a level three category";
+
+                  const onChange =
+                    input.name === "categoryLevelOne"
+                      ? (val: string) => {
+                          productSetValue("categoryLevelOne", val, {
+                            shouldValidate: true,
+                          });
+                          productSetValue("categoryLevelTwo", "");
+                          productSetValue("categoryLevelThree", "");
+                        }
+                      : input.name === "categoryLevelTwo"
+                      ? (val: string) => {
+                          productSetValue("categoryLevelTwo", val, {
+                            shouldValidate: true,
+                          });
+                          productSetValue("categoryLevelThree", "");
+                        }
+                      : (val: string) => {
+                          productSetValue("categoryLevelThree", val, {
+                            shouldValidate: true,
+                          });
+                        };
+                  return (
+                    <div
+                      key={index}
+                      className={`${
+                        input.name === "categoryLevelThree"
+                          ? "sm:col-span-2 md:col-span-1"
+                          : "col-span-1"
+                      }`}
+                    >
+                      <Select
+                        value={value}
+                        readOnly={readOnly}
+                        label={input.label}
+                        placeholder={placeholder}
+                        categories={categories}
+                        onChange={onChange}
+                        errorText={productErrors[input.name]?.message}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
               <div className="flex flex-col base:flex-row gap-7 base:gap-4">
                 {PRICE_DATA.map((input, index) => (
                   <PhoneInput
@@ -335,41 +362,48 @@ const UploadProduct = () => {
                   </>
                 )}
               />
-              <div className="w-full">
-                <QuillMarkupEditor
-                  label="Product Description"
-                  ref={quillDescriptionRef}
-                  blobUrlsRef={descriptionBlobUrlsRef}
-                  onTextChange={handleDescriptionTextChange}
-                  errorText={productErrors?.description?.message}
-                />
-              </div>
-              <div className="w-full">
-                <QuillMarkupEditor
-                  label="How to use"
-                  ref={quillHowToUseRef}
-                  blobUrlsRef={howToUseBlobUrlsRef}
-                  onTextChange={handleHowToUseTextChange}
-                  errorText={productErrors?.howToUse?.message}
-                />
-              </div>
-              <div className="w-full">
-                <QuillMarkupEditor
-                  label="Ingredients"
-                  ref={quillIngredientsUseRef}
-                  blobUrlsRef={ingredientsBlobUrlsRef}
-                  onTextChange={handleIngredientsTextChange}
-                  errorText={productErrors?.ingredients?.message}
-                />
-              </div>
-              <div className="w-full">
-                <QuillMarkupEditor
-                  label="Additional Details"
-                  ref={quillAdditionalDetailsUseRef}
-                  blobUrlsRef={additionalDetailsBlobUrlsRef}
-                  onTextChange={handleAdditionalDetailsTextChange}
-                  errorText={productErrors?.additionalDetails?.message}
-                />
+              <div className="w-full grid gap-y-7 gap-x-4 lg:grid-cols-2">
+                {QUILL_DATA.map((input, index) => {
+                  const ref =
+                    input.name === "description"
+                      ? quillDescriptionRef
+                      : input.name === "howToUse"
+                      ? quillHowToUseRef
+                      : input.name === "ingredients"
+                      ? quillIngredientsUseRef
+                      : quillAdditionalDetailsUseRef;
+
+                  const blobUrlsRef =
+                    input.name === "description"
+                      ? descriptionBlobUrlsRef
+                      : input.name === "howToUse"
+                      ? howToUseBlobUrlsRef
+                      : input.name === "ingredients"
+                      ? ingredientsBlobUrlsRef
+                      : additionalDetailsBlobUrlsRef;
+
+                  const handleTextChange =
+                    input.name === "description"
+                      ? handleDescriptionTextChange
+                      : input.name === "howToUse"
+                      ? handleHowToUseTextChange
+                      : input.name === "ingredients"
+                      ? handleIngredientsTextChange
+                      : handleAdditionalDetailsTextChange;
+
+                  return (
+                    <div key={index} className="w-full">
+                      <QuillMarkupEditor
+                        label={input.label}
+                        ref={ref}
+                        blobUrlsRef={blobUrlsRef}
+                        placeholder={input.placeholder}
+                        onTextChange={handleTextChange}
+                        errorText={productErrors[input.name]?.message}
+                      />
+                    </div>
+                  );
+                })}
               </div>
               <Button pattern="primary" type="submit" content="Upload" />
               <DevTool control={productControl} />

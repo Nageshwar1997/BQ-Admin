@@ -1072,3 +1072,44 @@ export const PRICE_DATA: InputDataProps[] = [
     placeholder: "Enter Selling Price",
   },
 ];
+
+export const CATEGORY_DATA: InputDataProps[] = [
+  {
+    name: "categoryLevelOne",
+    label: "Category One",
+    placeholder: "Select a level one category",
+  },
+  {
+    name: "categoryLevelTwo",
+    label: "Category Two",
+    placeholder: "Select a level two category",
+  },
+  {
+    name: "categoryLevelThree",
+    label: "Category Three",
+    placeholder: "Select a level three category",
+  },
+];
+
+export const QUILL_DATA: InputDataProps[] = [
+  {
+    name: "description",
+    label: "Description",
+    placeholder: "Write a description content of the product...",
+  },
+  {
+    name: "howToUse",
+    label: "How to use",
+    placeholder: "Write a how to use content of the product...",
+  },
+  {
+    name: "ingredients",
+    label: "Ingredients",
+    placeholder: "Write a ingredients content of the product...",
+  },
+  {
+    name: "additionalDetails",
+    label: "Additional Details",
+    placeholder: "Write a additional details content of the product...",
+  },
+];
