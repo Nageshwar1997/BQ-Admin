@@ -216,17 +216,6 @@ const Login = () => {
                   className="!text-base"
                 />
               </div>
-              <div className="flex items-center justify-center gap-2">
-                <p className="bg-clip-text text-transparent bg-silver-duo text-xs md:text-sm">
-                  Don't have an account?
-                </p>
-                <Link
-                  to={"/register"}
-                  className={`bg-clip-text text-transparent bg-accent-duo hover:font-extrabold text-sm md:text-base`}
-                >
-                  Register
-                </Link>
-              </div>
             </div>
           </div>
         </form>
