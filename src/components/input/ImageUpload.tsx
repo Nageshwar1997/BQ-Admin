@@ -1,6 +1,7 @@
 import { ChangeEvent, ReactNode } from "react";
 import { InfoIcon } from "../../icons";
 import { UseFormRegisterReturn } from "react-hook-form";
+import { CloseIcon } from "../sidebar/icons";
 
 const ImageUpload = ({
   icon,
@@ -65,7 +66,6 @@ const ImageUpload = ({
           )}
         </label>
       </div>
-
       {errors && errors?.length > 0 && (
         <div className="space-y-1">
           {errors.map((error, index) => (
@@ -80,24 +80,24 @@ const ImageUpload = ({
         </div>
       )}
       {previewUrls.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-4 border">
+        <div className="border border-primary-10 bg-smoke-eerie rounded-lg p-2 !mt-4 flex flex-wrap items-center gap-4">
           {previewUrls.map((url, index) => (
             <div
               key={index}
-              className="w-20 h-20 relative group rounded overflow-hidden border shadow-sm"
+              className="w-24 h-24 relative group rounded overflow-hidden border border-primary-30 shadow-sm"
             >
               <img
                 src={url}
                 alt={`preview-${index}`}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
               />
               {handleRemoveImage && (
                 <button
                   onClick={() => handleRemoveImage(index)}
                   type="button"
-                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs lg:opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-0.5 right-0.5 bg-tertiary rounded-full p-0.5 flex items-center justify-center text-xs"
                 >
-                  ×
+                  <CloseIcon className="w-3 h-3 [&>path]:stroke-primary-inverted" />
                 </button>
               )}
             </div>
