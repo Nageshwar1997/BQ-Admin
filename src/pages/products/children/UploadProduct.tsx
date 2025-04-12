@@ -23,6 +23,7 @@ import QuillMarkupEditor from "../../../components/QuillMarkupEditor/QuillMarkup
 import Quill from "quill";
 import { useUploadProduct } from "../../../api/product/product.service";
 import LoadingPage from "../../../components/loaders/LoadingPage";
+import ImageUpload from "../../../components/input/ImageUpload";
 
 const productInitialValues: ProductType = {
   title: "",
@@ -34,6 +35,7 @@ const productInitialValues: ProductType = {
   categoryLevelOne: "",
   categoryLevelTwo: "",
   categoryLevelThree: "",
+  commonStock: null,
   originalPrice: null,
   sellingPrice: null,
   shades: [],
@@ -126,11 +128,12 @@ const UploadProduct = () => {
     formData.append("categoryLevelTwo", finalData.categoryLevelTwo);
     formData.append("categoryLevelThree", finalData.categoryLevelThree);
 
-    if (finalData.sellingPrice) {
-      formData.append("sellingPrice", finalData.sellingPrice.toString());
+    if (finalData.commonStock) {
+      formData.append("commonStock", finalData.commonStock.toString());
     }
 
-    if (finalData.originalPrice) {
+    if (finalData.sellingPrice && finalData.originalPrice) {
+      formData.append("sellingPrice", finalData.sellingPrice.toString());
       formData.append("originalPrice", finalData.originalPrice.toString());
     }
 
@@ -284,7 +287,7 @@ const UploadProduct = () => {
                   );
                 })}
               </div>
-              <div className="flex flex-col base:flex-row gap-7 base:gap-4">
+              <div className="grid sm:grid-cols-3 gap-y-7 gap-x-4">
                 {PRICE_DATA.map((input, index) => (
                   <PhoneInput
                     key={index}
@@ -303,65 +306,50 @@ const UploadProduct = () => {
                 name="commonImages"
                 defaultValue={[]}
                 render={({ field }) => (
-                  <>
-                    <label
-                      htmlFor="commonImages"
-                      className="text-sm font-medium"
-                    >
-                      Shade Images
-                    </label>
-                    <input
-                      id="commonImages"
-                      type="file"
-                      multiple
-                      // accept="image/*"
-                      onChange={(e) => {
-                        const files = Array.from(e.target.files || []);
-                        const previews = files.map((file) =>
-                          URL.createObjectURL(file)
-                        );
+                  <ImageUpload
+                    name={"commonImages"}
+                    label="Common Images"
+                    placeholder="Select Common Images"
+                    previewUrls={commonImagePreviews}
+                    containerClassName="w-full sm:col-span-3"
+                    errors={
+                      Array.isArray(productErrors.commonImages)
+                        ? productErrors.commonImages.map((err) => err.message)
+                        : productErrors.commonImages?.message
+                        ? [productErrors.commonImages.message]
+                        : []
+                    }
+                    handleChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      const previews = files.map((file) =>
+                        URL.createObjectURL(file)
+                      );
 
-                        setCommonImages((prev) => [...prev, ...files]);
-                        setCommonImagePreviews((prev) => [
-                          ...prev,
-                          ...previews,
-                        ]);
+                      const newFiles = [...commonImages, ...files];
+                      const newPreviews = [...commonImagePreviews, ...previews];
 
-                        // ✅ Update form field
-                        field.onChange([...commonImages, ...files]);
-                      }}
-                    />
-                    {Array.isArray(productErrors.commonImages) &&
-                      productErrors.commonImages.map(
-                        (error, index) =>
-                          error && (
-                            <p key={index} className="text-red-500 text-sm">
-                              {error.message}
-                            </p>
-                          )
-                      )}
-
-                    {productErrors.commonImages?.message && (
-                      <p className="text-red-500 text-sm">
-                        {productErrors.commonImages.message}
-                      </p>
-                    )}
-
-                    {commonImagePreviews.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {commonImagePreviews.map((src, idx) => (
-                          <img
-                            key={idx}
-                            src={src}
-                            alt={`shade-img-${idx}`}
-                            className="w-16 h-16 object-cover rounded border"
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </>
+                      setCommonImages(newFiles);
+                      setCommonImagePreviews(newPreviews);
+                      field.onChange(newFiles);
+                    }}
+                    handleRemoveImage={(idx) => {
+                      const updatedFiles = commonImages.filter(
+                        (_, index) => index !== idx
+                      );
+                      const updatedPreviews = commonImagePreviews.filter(
+                        (_, index) => index !== idx
+                      );
+                      setCommonImages(updatedFiles);
+                      setCommonImagePreviews(updatedPreviews);
+                      field.onChange(updatedFiles);
+                    }}
+                    icon={
+                      <UploadCloudIcon className="[&>path]:stroke-primary opacity-50 group-hover:opacity-100" />
+                    }
+                  />
                 )}
               />
+
               <div className="w-full grid gap-y-7 gap-x-4 lg:grid-cols-2">
                 {QUILL_DATA.map((input, index) => {
                   const ref =
