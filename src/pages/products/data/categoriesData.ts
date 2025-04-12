@@ -1071,6 +1071,11 @@ export const PRICE_DATA: InputDataProps[] = [
     label: "Selling Price",
     placeholder: "Enter Selling Price",
   },
+  {
+    name: "commonStock",
+    label: "Stock",
+    placeholder: "Enter Stock",
+  },
 ];
 
 export const CATEGORY_DATA: InputDataProps[] = [
