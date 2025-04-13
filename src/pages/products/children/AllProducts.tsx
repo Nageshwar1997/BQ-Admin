@@ -21,7 +21,7 @@ const AllProducts = () => {
           }
         />
       </div>
-      <div className="w-full grid gap-4 grid-cols-[repeat(auto-fit,minmax(10rem,1fr))] base:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(16rem,1fr))]">
+      <div className="w-full grid gap-4 grid-cols-[repeat(auto-fit,minmax(13rem,1fr))] base:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] xl:grid-cols-[repeat(auto-fill,minmax(16rem,1fr))]">
         {Array.from({ length: 21 }).map((_, ind) => {
           return (
             <div
@@ -36,7 +36,7 @@ const AllProducts = () => {
                       : "https://cdn.shopify.com/s/files/1/0906/2558/files/658887719-artboard-1.jpg?v=1736853930"
                   }
                   alt="Product"
-                  className="w-full h-full object-cover aspect-auto hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-fill aspect-auto hover:scale-105 transition-transform duration-500"
                 />
                 <span className="w-8 h-8 absolute top-1 right-1 text-[10px] flex flex-col items-center justify-center rounded-full font-semibold dark:bg-green-700 light:bg-green-600 leading-none">
                   -23%
