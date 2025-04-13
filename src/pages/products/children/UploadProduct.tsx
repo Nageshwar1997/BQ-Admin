@@ -352,41 +352,41 @@ const UploadProduct = () => {
 
               <div className="w-full grid gap-y-7 gap-x-4 lg:grid-cols-2">
                 {QUILL_DATA.map((input, index) => {
-                  const ref =
-                    input.name === "description"
-                      ? quillDescriptionRef
-                      : input.name === "howToUse"
-                      ? quillHowToUseRef
-                      : input.name === "ingredients"
-                      ? quillIngredientsUseRef
-                      : quillAdditionalDetailsUseRef;
+                  const editorMap = {
+                    description: quillDescriptionRef,
+                    howToUse: quillHowToUseRef,
+                    ingredients: quillIngredientsUseRef,
+                    additionalDetails: quillAdditionalDetailsUseRef,
+                  };
 
-                  const blobUrlsRef =
-                    input.name === "description"
-                      ? descriptionBlobUrlsRef
-                      : input.name === "howToUse"
-                      ? howToUseBlobUrlsRef
-                      : input.name === "ingredients"
-                      ? ingredientsBlobUrlsRef
-                      : additionalDetailsBlobUrlsRef;
+                  const blobMap = {
+                    description: descriptionBlobUrlsRef,
+                    howToUse: howToUseBlobUrlsRef,
+                    ingredients: ingredientsBlobUrlsRef,
+                    additionalDetails: additionalDetailsBlobUrlsRef,
+                  };
 
-                  const handleTextChange =
-                    input.name === "description"
-                      ? handleDescriptionTextChange
-                      : input.name === "howToUse"
-                      ? handleHowToUseTextChange
-                      : input.name === "ingredients"
-                      ? handleIngredientsTextChange
-                      : handleAdditionalDetailsTextChange;
+                  const textChangeMap = {
+                    description: handleDescriptionTextChange,
+                    howToUse: handleHowToUseTextChange,
+                    ingredients: handleIngredientsTextChange,
+                    additionalDetails: handleAdditionalDetailsTextChange,
+                  };
 
                   return (
                     <div key={index} className="w-full">
                       <QuillMarkupEditor
                         label={input.label}
-                        ref={ref}
-                        blobUrlsRef={blobUrlsRef}
+                        ref={editorMap[input.name as keyof typeof editorMap]}
+                        blobUrlsRef={
+                          blobMap[input.name as keyof typeof blobMap]
+                        }
+                        onTextChange={
+                          textChangeMap[
+                            input.name as keyof typeof textChangeMap
+                          ]
+                        }
                         placeholder={input.placeholder}
-                        onTextChange={handleTextChange}
                         errorText={productErrors[input.name]?.message}
                       />
                     </div>
