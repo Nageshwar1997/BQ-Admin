@@ -56,6 +56,7 @@ const ImageUpload = ({
             id={name}
             type="file"
             multiple={true}
+            accept="image/webp, image/png, image/jpeg, image/jpg"
             className="hidden"
             name={name}
             {...register}
