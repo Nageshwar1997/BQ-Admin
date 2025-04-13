@@ -1072,7 +1072,7 @@ export const PRICE_DATA: InputDataProps[] = [
     placeholder: "Enter Selling Price",
   },
   {
-    name: "commonStock",
+    name: "totalStock",
     label: "Stock",
     placeholder: "Enter Stock",
   },

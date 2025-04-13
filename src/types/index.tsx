@@ -155,7 +155,7 @@ export interface ProductType {
   categoryLevelThree: string;
   originalPrice: number | null;
   sellingPrice: number | null;
-  commonStock?: number | null;
+  totalStock: number | null;
   commonImages?: File[];
   shades?: ShadeType[];
 }

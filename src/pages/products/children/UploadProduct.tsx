@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import Button from "../../../components/button/Button";
 import PathNavigation from "../../../components/PathNavigation";
 import { UploadCloudIcon } from "../../../icons";
@@ -35,7 +35,7 @@ const productInitialValues: ProductType = {
   categoryLevelOne: "",
   categoryLevelTwo: "",
   categoryLevelThree: "",
-  commonStock: null,
+  totalStock: null,
   originalPrice: null,
   sellingPrice: null,
   shades: [],
@@ -127,15 +127,9 @@ const UploadProduct = () => {
     formData.append("categoryLevelOne", finalData.categoryLevelOne);
     formData.append("categoryLevelTwo", finalData.categoryLevelTwo);
     formData.append("categoryLevelThree", finalData.categoryLevelThree);
-
-    if (finalData.commonStock) {
-      formData.append("commonStock", finalData.commonStock.toString());
-    }
-
-    if (finalData.sellingPrice && finalData.originalPrice) {
-      formData.append("sellingPrice", finalData.sellingPrice.toString());
-      formData.append("originalPrice", finalData.originalPrice.toString());
-    }
+    formData.append("sellingPrice", JSON.stringify(finalData.sellingPrice));
+    formData.append("originalPrice", JSON.stringify(finalData.originalPrice));
+    formData.append("totalStock", JSON.stringify(finalData.totalStock));
 
     // Append shades with nested images
     if (finalData.shades && finalData.shades.length > 0) {
@@ -151,6 +145,8 @@ const UploadProduct = () => {
           formData.append(`shades[${shadeIndex}][images][${imgIndex}]`, image);
         });
       });
+    } else {
+      formData.append("shades", JSON.stringify([]));
     }
 
     // If you also have common product images (optional)
@@ -167,6 +163,17 @@ const UploadProduct = () => {
 
     uploadProduct.mutate(formData);
   };
+
+  useEffect(() => {
+    if (shades.length > 0) {
+      const totalStock = shades.reduce(
+        (total, shade) => total + (shade.stock ?? 0),
+        0
+      );
+      productSetValue("totalStock", totalStock, { shouldValidate: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shades.length]);
 
   return (
     <Fragment>
@@ -288,18 +295,24 @@ const UploadProduct = () => {
                 })}
               </div>
               <div className="grid sm:grid-cols-3 gap-y-7 gap-x-4">
-                {PRICE_DATA.map((input, index) => (
-                  <PhoneInput
-                    key={index}
-                    name={input.name}
-                    label={input.label}
-                    type="number"
-                    placeholder={input.placeholder}
-                    register={productRegister(input.name)}
-                    errorText={productErrors[input.name]?.message}
-                    containerClassName="[&>div>div>p]:hidden"
-                  />
-                ))}
+                {PRICE_DATA.map((input, index) => {
+                  const isDisabled =
+                    input.name === "totalStock" && shades.length > 0;
+                  return (
+                    <PhoneInput
+                      key={index}
+                      name={input.name}
+                      label={input.label}
+                      type="number"
+                      placeholder={input.placeholder}
+                      register={productRegister(input.name)}
+                      errorText={productErrors[input.name]?.message}
+                      containerClassName="[&>div>div>p]:hidden"
+                      className={`${isDisabled ? "cursor-not-allowed" : ""}`}
+                      readOnly={isDisabled}
+                    />
+                  );
+                })}
               </div>
               <Controller
                 control={productControl}

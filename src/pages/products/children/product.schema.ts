@@ -80,20 +80,11 @@ export const productSchema: yup.ObjectSchema<ProductType> = yup.object({
     .typeError("Selling price must be a number")
     .positive("Selling price must be positive")
     .min(1, "Selling price cannot be less than 1"),
-  commonStock: yup
+  totalStock: yup
     .number()
-    .transform((value, originalValue) =>
-      String(originalValue).trim() === "" ? null : value
-    )
-    .nullable()
-    .optional()
     .typeError("Stock must be a number")
-    .positive("Stock must be positive")
-    .test(
-      "min-if-present",
-      "Stock must be at least 5",
-      (value) => value == null || value >= 5
-    ),
+    .required("Stock is required")
+    .min(5, "Stock cannot be less than 5"),
   shades: yup.array().of(shadeSchema).optional(),
   commonImages: yup
     .array()
