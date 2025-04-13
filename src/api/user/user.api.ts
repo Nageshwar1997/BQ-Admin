@@ -12,11 +12,13 @@ export const get_user_details = async () => {
       url,
       headers: { Authorization: admin_token },
     });
-
-    console.log("response", response);
     return response.data;
   } catch (error) {
     console.log("error", error);
+    const admin = sessionStorage.getItem("admin");
+    if (admin) {
+      sessionStorage.removeItem("admin");
+    }
     if (error instanceof AxiosError) {
       // If it's an Axios error
       throw error?.response?.data?.message || "API Error occurred";
