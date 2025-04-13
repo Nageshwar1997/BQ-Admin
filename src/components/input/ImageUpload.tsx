@@ -1,7 +1,94 @@
-import { ChangeEvent, ReactNode } from "react";
-import { InfoIcon } from "../../icons";
+import { ChangeEvent, ReactNode, useState } from "react";
+import { DropdownIcon, InfoIcon } from "../../icons";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { CloseIcon } from "../sidebar/icons";
+
+const ImageModal = ({
+  className,
+  index,
+  previewUrls,
+  onClose,
+}: {
+  className?: string;
+  index: number;
+  previewUrls: string[];
+  onClose: () => void;
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(index);
+
+  return (
+    <div
+      className={`fixed inset-0 w-dvw h-dvh z-50 bg-primary-inverted-50 backdrop-blur-[2px] flex items-center justify-center ${className}`}
+    >
+      <div className="bg-primary-inverted rounded-lg p-4 relative max-w-3xl w-full">
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 bg-tertiary p-1 rounded-full z-[1] border border-tertiary-inverted"
+        >
+          <CloseIcon className="w-4 h-4 [&>path]:stroke-tertiary-inverted" />
+        </button>
+
+        {/* Main Image */}
+        <div className="mb-4 h-[400px] lg:h-[420px] xl:h-[500px] flex items-center justify-center relative">
+          <img
+            src={previewUrls[currentIndex]}
+            alt={`preview-${currentIndex}`}
+            className="max-h-full mx-auto object-contain rounded-lg border border-primary-50"
+          />
+          <div className="w-full py-2 absolute bottom-0 left-1/2 transform -translate-x-1/2 text-sm text-center flex items-center justify-center gap-5">
+            <button
+              type="button"
+              disabled={currentIndex === 0}
+              onClick={() => {
+                if (currentIndex > 0) setCurrentIndex((prev) => prev - 1);
+              }}
+              className="p-[5px] rounded border border-primary-50 bg-primary-inverted-50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <DropdownIcon className="rotate-90 [&>path]:stroke-primary" />
+            </button>
+
+            <span className="py-2 w-24 px-4 min-h-full border border-primary-50 content-center bg-primary-inverted-50 text-primary leading-none rounded">
+              {currentIndex + 1} of {previewUrls.length}
+            </span>
+
+            <button
+              type="button"
+              disabled={
+                previewUrls.length === 0 ||
+                currentIndex === previewUrls.length - 1
+              }
+              onClick={() => {
+                if (currentIndex < previewUrls.length - 1)
+                  setCurrentIndex((prev) => prev + 1);
+              }}
+              className="p-[5px] rounded border border-primary-50 bg-primary-inverted-50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <DropdownIcon className="-rotate-90 [&>path]:stroke-primary" />
+            </button>
+          </div>
+        </div>
+
+        <hr className="h-px mb-4 block border-none bg-gradient-line" />
+
+        {/* Thumbnails */}
+        <div className="flex gap-2 overflow-x-scroll">
+          {previewUrls.map((url, i) => (
+            <img
+              key={i}
+              src={url}
+              alt={`thumb-${i}`}
+              onClick={() => setCurrentIndex(i)}
+              className={`min-w-20 min-h-20 max-w-24 max-h-24 w-full h-full object-cover cursor-pointer rounded-md aspect-square border ${
+                i === currentIndex ? "border-tertiary" : "border-primary-30"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ImageUpload = ({
   icon,
@@ -30,9 +117,12 @@ const ImageUpload = ({
   previewUrls?: string[];
   handleRemoveImage?: (index: number) => void;
 }) => {
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalIndex, setModalIndex] = useState<number | null>(null);
+
   return (
-    <div className={`w-full space-y-1.5 ${containerClassName}`}>
-      <div className="relative min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 group">
+    <div className={`w-full ${containerClassName}`}>
+      <div className="relative min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 group mb-1.5">
         {label && (
           <label
             htmlFor={name}
@@ -44,7 +134,7 @@ const ImageUpload = ({
         {/* Input */}
         <label
           htmlFor={name}
-          className={`w-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 font-normal text-sm overflow-hidden bg-smoke-eerie rounded-lg border border-primary-10 p-3 2xl:py-4 flex items-center justify-between ${className}`}
+          className={`w-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 font-normal text-sm overflow-hidden bg-smoke-eerie rounded-lg border border-primary-10 p-3 2xl:py-4 flex items-center justify-between cursor-pointer ${className}`}
         >
           <p className="text-primary-50 text-sm line-clamp-1">{placeholder}</p>
           <input
@@ -67,7 +157,7 @@ const ImageUpload = ({
         </label>
       </div>
       {errors && errors?.length > 0 && (
-        <div className="space-y-1">
+        <div className="space-y-1 mb-1.5">
           {errors.map((error, index) => (
             <p
               key={index}
@@ -90,6 +180,10 @@ const ImageUpload = ({
                 src={url}
                 alt={`preview-${index}`}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+                onClick={() => {
+                  setModalIndex(index);
+                  setShowImageModal(true);
+                }}
               />
               {handleRemoveImage && (
                 <button
@@ -103,6 +197,16 @@ const ImageUpload = ({
             </div>
           ))}
         </div>
+      )}
+      {showImageModal && modalIndex !== null && (
+        <ImageModal
+          index={modalIndex}
+          previewUrls={previewUrls}
+          onClose={() => {
+            setShowImageModal(false);
+            setModalIndex(null);
+          }}
+        />
       )}
     </div>
   );
