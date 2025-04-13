@@ -2,21 +2,22 @@ import { useNavigate } from "react-router-dom";
 import Button from "../../../components/button/Button";
 import PathNavigation from "../../../components/PathNavigation";
 import { UploadCloudIcon } from "../../../icons";
+import { toINRCurrency } from "../../../utils";
 
 const AllProducts = () => {
   const navigate = useNavigate();
 
   return (
     <div className="w-full space-y-3 px-2">
-      <div className="w-full p-2 border-b border-primary-50 flex justify-between items-center">
-        <PathNavigation />
+      <div className="w-full px-4 py-3 border-b border-primary-50 flex justify-end base:justify-between items-center sticky top-16 bg-primary-inverted z-10 shadow-lg">
+        <PathNavigation className="hidden base:flex" />
         <Button
           pattern="secondary"
           content="Upload"
-          className="max-w-28 !py-2.5 !px-5 !rounded-lg gap-2"
+          className="max-w-36 !py-1.5 !px-4 !rounded-lg gap-2"
           onClick={() => navigate("upload")}
           rightIcon={
-            <UploadCloudIcon className="w-5 h-5 [&>path]:stroke-primary-inverted" />
+            <UploadCloudIcon className="w-5 h-5 [&>path]:stroke-[2.5] [&>path]:stroke-secondary-inverted" />
           }
         />
       </div>
@@ -55,11 +56,15 @@ const AllProducts = () => {
                 <div className="w-full space-y-1 text-sm font-medium text-tertiary">
                   <p className="flex items-center gap-1">
                     Selling Price:{" "}
-                    <span className="text-green-500">₹{999}</span>
+                    <span className="text-green-500">
+                      {toINRCurrency(9999)}
+                    </span>
                   </p>
                   <p className="flex items-center gap-1">
                     Original Price:{" "}
-                    <span className="text-red-600 line-through">₹{999}</span>
+                    <span className="text-red-600 line-through">
+                      {toINRCurrency(8899)}
+                    </span>
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
