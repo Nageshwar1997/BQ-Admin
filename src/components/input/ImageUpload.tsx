@@ -85,11 +85,11 @@ const ImageUpload = ({
         </div>
       )}
       {previewUrls.length > 0 && (
-        <div className="border border-primary-10 bg-smoke-eerie rounded-lg p-2 !mt-4 flex flex-wrap items-center gap-4">
+        <div className="border border-primary-10 bg-smoke-eerie rounded-lg p-2 !mt-4 grid gap-4 grid-cols-[repeat(auto-fill,minmax(4rem,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(5rem,1fr))]">
           {previewUrls.map((url, index) => (
             <div
               key={index}
-              className="w-24 h-24 relative group rounded overflow-hidden border border-primary-30 shadow-sm"
+              className="w-full aspect-square relative group rounded overflow-hidden border border-primary-30 shadow-sm"
             >
               <img
                 src={url}
