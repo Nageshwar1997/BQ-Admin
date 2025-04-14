@@ -1,22 +1,18 @@
-.rcp-root {
-  --rcp-background-color: #121212;
-  --rcp-field-input-color: #ffffff;
-  --rcp-field-input-border-color: #242424;
-  --rcp-field-label-color: #808080;
-}
-
 .rcp {
   display: flex;
   flex-direction: column;
-  background-color: var(--rcp-background-color);
+  gap: 15px;
+  border: 1px solid var(--primary-10);
+  background-color: var(--white-smoke-night-inverted);
   border-radius: 10px;
+  padding: 15px;
+  width: 100%;
 }
 
 .rcp-body {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 20px 10px;
+  gap: 15px;
 }
 
 .rcp-section {
@@ -41,8 +37,9 @@
   cursor: all-scroll;
   width: 100%;
   position: relative;
-  background-image: linear-gradient(to bottom, transparent, black), linear-gradient(to right, white, transparent);
-  border-radius: 10px 10px 0 0;
+  background-image: linear-gradient(to bottom, transparent, black),
+    linear-gradient(to right, white, transparent);
+  border-radius: 10px;
 }
 
 .rcp-saturation-cursor {
@@ -51,7 +48,7 @@
   height: 20px;
   border: 2px solid white;
   border-radius: 100%;
-  box-shadow: 0 0 15px 0 rgb(0 0 0 / .15);
+  box-shadow: 0 0 15px 0 rgb(0 0 0 / 0.2);
   transform: translate(-10px, -10px);
 }
 
@@ -79,7 +76,7 @@
   height: 20px;
   border: 2px solid white;
   border-radius: 100%;
-  box-shadow: 0 0 15px 0 rgb(0 0 0 / .15);
+  box-shadow: 0 0 15px 0 rgb(0 0 0 / 0.15);
   transform: translate(-10px, -4px);
 }
 
@@ -97,7 +94,7 @@
   height: 20px;
   border: 2px solid white;
   border-radius: 100%;
-  box-shadow: 0 0 15px 0 rgb(0 0 0 / .15);
+  box-shadow: 0 0 15px 0 rgb(0 0 0 / 0.15);
   transform: translate(-10px, -4px);
 }
 
@@ -115,7 +112,9 @@
 
 .rcp-field {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  flex-direction: row-reverse;
+  gap: 10px;
   width: 100%;
 }
 
@@ -124,12 +123,12 @@
   font-family: inherit;
   font-size: 14px;
   text-align: center;
-  color: var(--rcp-field-input-color);
-  background-color: transparent;
-  border: 2px solid var(--rcp-field-input-border-color);
+  color: var(--primary);
+  background-color: var(--smoke-eerie);
+  border: 1px solid var(--primary-10);
   border-radius: 5px;
   outline: none;
-  padding: 5px 0;
+  padding: 2px 0;
 }
 
 .rcp-field-input:read-only {
@@ -139,5 +138,5 @@
 .rcp-field-label {
   font-size: 14px;
   text-align: center;
-  color: var(--rcp-field-label-color);
+  color: var(--primary-50);
 }
