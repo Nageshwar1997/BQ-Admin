@@ -42,7 +42,6 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
 
   const [shadeImages, setShadeImages] = useState<File[]>([]);
   const [shadeImagePreviews, setShadeImagePreviews] = useState<string[]>([]);
-  // const [shades, setShades] = useState<any[]>([]);
 
   const onSubmitShade = (data: ShadeType) => {
     console.log("✅ Shade submitted", data);
