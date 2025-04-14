@@ -86,7 +86,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
     <div className="z-[100] fixed inset-0 w-full h-full flex justify-center items-center bg-primary-inverted-50 backdrop-blur-[2px]">
       <div className="max-w-lg max-h-[85dvh] md:max-h-[95dvh] w-full rounded-lg border border-secondary-battleship-davys-gray shadow-light-dark-soft bg-platinum-black relative overflow-hidden">
         {(showGradient as VerticalScrollType).top && (
-          <TopGradient className="!w-full h-8 z-[4] border" />
+          <TopGradient className="!w-full h-8 z-[4]" />
         )}
         <div
           className="w-full max-h-[85dvh] md:max-h-[95dvh] overflow-y-scroll p-4"
