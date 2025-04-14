@@ -24,6 +24,7 @@ import Quill from "quill";
 import { useUploadProduct } from "../../../api/product/product.service";
 import LoadingPage from "../../../components/loaders/LoadingPage";
 import ImageUpload from "../../../components/input/ImageUpload";
+import EditShade from "./EditShade";
 
 const productInitialValues: ProductType = {
   title: "",
@@ -185,7 +186,7 @@ const UploadProduct = () => {
             pattern="outline"
             content="Add Shade"
             className="max-w-36 sm:max-w-40 !py-1.5 !px-4 !rounded-lg gap-2"
-            onClick={() => setParams({ shade: "true" })}
+            onClick={() => setParams({ shade: "add" })}
             rightIcon={
               <UploadCloudIcon className="w-5 h-5 [&>path]:stroke-[2.75] [&>path]:stroke-secondary [&>path]:group-hover:stroke-tertiary-inverted" />
             }
@@ -314,55 +315,59 @@ const UploadProduct = () => {
                   );
                 })}
               </div>
-              <Controller
-                control={productControl}
-                name="commonImages"
-                defaultValue={[]}
-                render={({ field }) => (
-                  <ImageUpload
-                    name={"commonImages"}
-                    label="Common Images"
-                    placeholder="Select Common Images"
-                    previewUrls={commonImagePreviews}
-                    containerClassName="w-full sm:col-span-3"
-                    errors={
-                      Array.isArray(productErrors.commonImages)
-                        ? productErrors.commonImages.map((err) => err.message)
-                        : productErrors.commonImages?.message
-                        ? [productErrors.commonImages.message]
-                        : []
-                    }
-                    handleChange={(e) => {
-                      const files = Array.from(e.target.files || []);
-                      const previews = files.map((file) =>
-                        URL.createObjectURL(file)
-                      );
+              <div className="w-full">
+                <Controller
+                  control={productControl}
+                  name="commonImages"
+                  defaultValue={[]}
+                  render={({ field }) => (
+                    <ImageUpload
+                      name={"commonImages"}
+                      label="Common Images"
+                      placeholder="Select Common Images"
+                      previewUrls={commonImagePreviews}
+                      containerClassName="w-full sm:col-span-3"
+                      errors={
+                        Array.isArray(productErrors.commonImages)
+                          ? productErrors.commonImages.map((err) => err.message)
+                          : productErrors.commonImages?.message
+                          ? [productErrors.commonImages.message]
+                          : []
+                      }
+                      handleChange={(e) => {
+                        const files = Array.from(e.target.files || []);
+                        const previews = files.map((file) =>
+                          URL.createObjectURL(file)
+                        );
 
-                      const newFiles = [...commonImages, ...files];
-                      const newPreviews = [...commonImagePreviews, ...previews];
+                        const newFiles = [...commonImages, ...files];
+                        const newPreviews = [
+                          ...commonImagePreviews,
+                          ...previews,
+                        ];
 
-                      setCommonImages(newFiles);
-                      setCommonImagePreviews(newPreviews);
-                      field.onChange(newFiles);
-                    }}
-                    handleRemoveImage={(idx) => {
-                      const updatedFiles = commonImages.filter(
-                        (_, index) => index !== idx
-                      );
-                      const updatedPreviews = commonImagePreviews.filter(
-                        (_, index) => index !== idx
-                      );
-                      setCommonImages(updatedFiles);
-                      setCommonImagePreviews(updatedPreviews);
-                      field.onChange(updatedFiles);
-                    }}
-                    icon={
-                      <UploadCloudIcon className="[&>path]:stroke-primary opacity-50 group-hover:opacity-100" />
-                    }
-                  />
-                )}
-              />
-
+                        setCommonImages(newFiles);
+                        setCommonImagePreviews(newPreviews);
+                        field.onChange(newFiles);
+                      }}
+                      handleRemoveImage={(idx) => {
+                        const updatedFiles = commonImages.filter(
+                          (_, index) => index !== idx
+                        );
+                        const updatedPreviews = commonImagePreviews.filter(
+                          (_, index) => index !== idx
+                        );
+                        setCommonImages(updatedFiles);
+                        setCommonImagePreviews(updatedPreviews);
+                        field.onChange(updatedFiles);
+                      }}
+                      icon={
+                        <UploadCloudIcon className="[&>path]:stroke-primary opacity-50 group-hover:opacity-100" />
+                      }
+                    />
+                  )}
+                />
+              </div>
               <div className="w-full grid gap-y-7 gap-x-4 lg:grid-cols-2">
                 {QUILL_DATA.map((input, index) => {
                   const editorMap = {
@@ -406,13 +411,76 @@ const UploadProduct = () => {
                   );
                 })}
               </div>
+
+              <div className="w-full border">
+                {shades.map((shade, i) => {
+                  const firstImage = shade.images?.[0];
+                  const imageUrl =
+                    firstImage instanceof File
+                      ? URL.createObjectURL(firstImage)
+                      : typeof firstImage === "string"
+                      ? firstImage
+                      : "";
+
+                  return (
+                    <div key={i} className="p-4 border rounded mb-6 shadow-sm">
+                      {imageUrl && (
+                        <img
+                          src={imageUrl}
+                          alt={`Shade ${i + 1}`}
+                          className="w-24 h-24 object-cover rounded border mb-2"
+                        />
+                      )}
+                      <p>
+                        <strong>Shade Name:</strong> {shade.shadeName}
+                      </p>
+                      <p>
+                        <strong>Color Code:</strong> {shade.colorCode}
+                      </p>
+                      <p>
+                        <strong>Stock:</strong> {shade.stock}
+                      </p>
+
+                      {/* Buttons */}
+                      <div className="mt-2 flex gap-2">
+                        <button
+                          type="button"
+                          // onClick={() => handleEditShade(i)}
+                          onClick={() => {
+                            setParams({ shade: "edit", index: `${i}` });
+                            // handleEditShade(i);
+                          }}
+                          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updatedShades = shades.filter(
+                              (_, index) => index !== i
+                            );
+                            setShades(updatedShades);
+                          }}
+                          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
               <Button pattern="primary" type="submit" content="Upload" />
               <DevTool control={productControl} />
             </form>
           </div>
         </div>
       </div>
-      {queryParams.shade && <AddShade setShades={setShades} />}
+      {queryParams.shade === "add" && <AddShade setShades={setShades} />}
+      {queryParams.shade === "edit" && (
+        <EditShade shades={shades} setShades={setShades} />
+      )}
     </Fragment>
   );
 };
