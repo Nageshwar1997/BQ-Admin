@@ -25,7 +25,6 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
   const [showGradient, containerRef] = useVerticalScrollable();
   const editIndex = queryParams.index ? JSON.parse(queryParams.index) : -1;
 
-  const [editingShade, setEditingShade] = useState<ShadeType | null>(null);
   const [shadeImages, setShadeImages] = useState<File[]>([]);
   const [shadeImagePreviews, setShadeImagePreviews] = useState<string[]>([]);
 
@@ -41,7 +40,6 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
   });
 
   const handleClose = () => {
-    setEditingShade(null);
     shadeReset();
     setShadeImages([]);
     setShadeImagePreviews([]);
@@ -64,7 +62,6 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
   useEffect(() => {
     if (editIndex !== undefined && shades[editIndex]) {
       const selectedShade = shades[editIndex];
-      setEditingShade(selectedShade);
 
       shadeReset({
         ...selectedShade,
@@ -85,21 +82,21 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editIndex, shades]);
-  return editingShade ? (
-    <div className="z-[100] fixed inset-0 w-full h-full flex justify-center items-center bg-primary-inverted-50 backdrop-blur-[2px] p-5">
-      <div className="max-w-xl max-h-[80dvh] w-full rounded-lg border border-secondary-battleship-davys-gray shadow-light-dark-soft bg-platinum-black relative overflow-hidden">
+  return (
+    <div className="z-[100] fixed inset-0 w-full h-full flex justify-center items-center bg-primary-inverted-50 backdrop-blur-[2px]">
+      <div className="max-w-lg max-h-[85dvh] md:max-h-[95dvh] w-full rounded-lg border border-secondary-battleship-davys-gray shadow-light-dark-soft bg-platinum-black relative overflow-hidden">
         {(showGradient as VerticalScrollType).top && (
-          <TopGradient className="!w-full h-8 z-[4]" />
+          <TopGradient className="!w-full h-8 z-[4] border" />
         )}
         <div
-          className="w-full max-h-[80dvh] overflow-y-scroll p-4"
+          className="w-full max-h-[85dvh] md:max-h-[95dvh] overflow-y-scroll p-4"
           ref={containerRef as RefObject<HTMLDivElement>}
         >
           <form
             className="w-full flex flex-col gap-7"
             onSubmit={shadeHandleSubmit(onSubmitShade)}
           >
-            <div className="flex items-center justify-between mb-2 border-b border-primary-50 pb-2">
+            <div className="flex items-center justify-between border-b border-primary-50 pb-2">
               <div className="flex items-center gap-1 group">
                 <h3 className="text-lg text-tertiary group-hover:text-primary">
                   Edit Shade
@@ -118,28 +115,27 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
               register={shadeRegister("shadeName")}
               errorText={shadeErrors.shadeName?.message}
             />
-            <div className="flex flex-col base:flex-row gap-7 base:gap-4">
-              <Controller
-                control={shadeControl}
-                name="colorCode"
-                render={({ field }) => (
-                  <ColorPicker
-                    label="Select Color"
-                    value={field.value}
-                    onChange={field.onChange}
-                    errorText={shadeErrors.colorCode?.message}
-                  />
-                )}
-              />
-              <PhoneInput
-                name="stock"
-                label="Stock"
-                placeholder="Enter stock"
-                register={shadeRegister("stock")}
-                errorText={shadeErrors.stock?.message}
-                containerClassName="[&>div>div>p]:hidden"
-              />
-            </div>
+            <Controller
+              control={shadeControl}
+              name="colorCode"
+              render={({ field }) => (
+                <ColorPicker
+                  label="Select Color"
+                  value={field.value}
+                  onChange={field.onChange}
+                  errorText={shadeErrors.colorCode?.message}
+                />
+              )}
+            />
+            <PhoneInput
+              name="stock"
+              label="Stock"
+              type="number"
+              placeholder="Enter stock"
+              register={shadeRegister("stock")}
+              errorText={shadeErrors.stock?.message}
+              containerClassName="[&>div>div>p]:hidden"
+            />
             <Controller
               control={shadeControl}
               name="images"
@@ -188,7 +184,24 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
                 />
               )}
             />
-            <Button pattern="primary" type="submit" content="Add Shade" />
+            <div className="flex items-center gap-4 justify-center">
+              <Button
+                pattern="secondary"
+                className="!py-3 max-h-12"
+                content="Reset"
+                onClick={() => {
+                  setShadeImages([]);
+                  setShadeImagePreviews([]);
+                  shadeReset({ ...shadeInitialValue });
+                }}
+              />
+              <Button
+                pattern="primary"
+                type="submit"
+                className="!py-3 max-h-12"
+                content="Add Shade"
+              />
+            </div>
           </form>
         </div>
         {(showGradient as VerticalScrollType).bottom && (
@@ -196,7 +209,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
         )}
       </div>
     </div>
-  ) : null;
+  );
 };
 
 export default EditShade;
