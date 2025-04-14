@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 
-type ClickOutsideHandler = (event: MouseEvent) => void;
+type ClickOutsideHandler = (event: MouseEvent | TouchEvent) => void;
 
 function useClickOutside<T extends HTMLElement = HTMLElement>() {
   const containerRef = useRef<T | null>(null);
@@ -11,7 +11,7 @@ function useClickOutside<T extends HTMLElement = HTMLElement>() {
   }, []);
 
   useEffect(() => {
-    const listener = (event: MouseEvent) => {
+    const listener = (event: MouseEvent | TouchEvent) => {
       const el = containerRef.current;
       const handler = handlerRef.current;
 
@@ -19,9 +19,11 @@ function useClickOutside<T extends HTMLElement = HTMLElement>() {
       if (handler) handler(event);
     };
 
-    document.addEventListener("mousedown", listener);
+    document.addEventListener("mousedown", listener, { passive: false });
+    document.addEventListener("touchstart", listener, { passive: false });
     return () => {
       document.removeEventListener("mousedown", listener);
+      document.removeEventListener("touchstart", listener);
     };
   }, []);
 

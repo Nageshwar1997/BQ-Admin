@@ -11,7 +11,7 @@ import Input from "../../../components/input/Input";
 import PhoneInput from "../../../components/input/PhoneInput";
 import Select from "../../../components/input/Select";
 import {
-  categoriesData,
+  categoryLevelsData,
   CATEGORY_DATA,
   INPUTS_DATA,
   PRICE_DATA,
@@ -75,7 +75,7 @@ const UploadProduct = () => {
   const selectedCategory1 = productWatch("categoryLevelOne");
   const selectedCategory2 = productWatch("categoryLevelTwo");
 
-  const level1Data = categoriesData.find(
+  const level1Data = categoryLevelsData.find(
     (cat) => cat.value === selectedCategory1
   );
   const level2Options = level1Data?.subCategories || [];
@@ -230,7 +230,7 @@ const UploadProduct = () => {
 
                   const categories =
                     input.name === "categoryLevelOne"
-                      ? categoriesData
+                      ? categoryLevelsData
                       : input.name === "categoryLevelTwo"
                       ? level2Options
                       : level3Options;

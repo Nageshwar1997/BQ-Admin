@@ -967,7 +967,7 @@ const gifting: LevelTwoCategoryType = {
 
 /* ============= Collections End ============= */
 
-export const categoriesData: LevelOneCategoryType[] = [
+export const categoryLevelsData: LevelOneCategoryType[] = [
   {
     id: 1,
     level: 1,

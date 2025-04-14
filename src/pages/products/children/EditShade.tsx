@@ -13,13 +13,7 @@ import useQueryParams from "../../../hooks/useQueryParams";
 import ImageUpload from "../../../components/input/ImageUpload";
 import useVerticalScrollable from "../../../hooks/useVerticalScrollable";
 import { BottomGradient, TopGradient } from "../../../components/Gradients";
-
-const shadeInitialValue: ShadeType = {
-  shadeName: "",
-  colorCode: "",
-  stock: null,
-  images: [],
-};
+import { shadeInitialValue } from "../data";
 
 interface ShadeFormProps {
   setShades: React.Dispatch<React.SetStateAction<ShadeType[]>>;
@@ -29,8 +23,9 @@ interface ShadeFormProps {
 const EditShade = ({ shades, setShades }: ShadeFormProps) => {
   const { removeParam, queryParams } = useQueryParams();
   const [showGradient, containerRef] = useVerticalScrollable();
-  const [editingShade, setEditingShade] = useState<ShadeType | null>(null);
   const editIndex = queryParams.index ? JSON.parse(queryParams.index) : -1;
+
+  const [editingShade, setEditingShade] = useState<ShadeType | null>(null);
   const [shadeImages, setShadeImages] = useState<File[]>([]);
   const [shadeImagePreviews, setShadeImagePreviews] = useState<string[]>([]);
 
@@ -45,21 +40,25 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
     defaultValues: shadeInitialValue,
   });
 
-  const onSubmitShade = (data: ShadeType) => {
-    setShades((prevShades) => {
-      const updatedShades = [...prevShades];
-      updatedShades[editIndex] = {
-        ...data,
-        images: shadeImages, // ensure images are included correctly
-      };
-      return updatedShades;
-    });
+  const handleClose = () => {
     setEditingShade(null);
     shadeReset();
     setShadeImages([]);
     setShadeImagePreviews([]);
     removeParam("shade");
     removeParam("index");
+  };
+
+  const onSubmitShade = (data: ShadeType) => {
+    setShades((prevShades) => {
+      const updatedShades = [...prevShades];
+      updatedShades[editIndex] = {
+        ...data,
+        images: shadeImages,
+      };
+      return updatedShades;
+    });
+    handleClose();
   };
 
   console.log("shadeImages", shadeImages);
@@ -80,7 +79,12 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
         setShadeImagePreviews(imgUrls);
       }
     }
-  }, [editIndex, shades, shadeReset]);
+
+    return () => {
+      handleClose();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editIndex, shades]);
   return editingShade ? (
     <div className="z-[100] fixed inset-0 w-full h-full flex justify-center items-center bg-primary-inverted-50 backdrop-blur-[2px] p-5">
       <div className="max-w-xl max-h-[80dvh] w-full rounded-lg border border-secondary-battleship-davys-gray shadow-light-dark-soft bg-platinum-black relative overflow-hidden">
@@ -103,14 +107,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
                 <InfoIcon className="cursor-pointer fill-tertiary group-hover:fill-primary" />
               </div>
               <CloseIcon
-                onClick={() => {
-                  setEditingShade(null);
-                  shadeReset();
-                  setShadeImages([]);
-                  setShadeImagePreviews([]);
-                  removeParam("shade");
-                  removeParam("index");
-                }}
+                onClick={handleClose}
                 className="[&>path]:stroke-tertiary [&>path]:hover:stroke-primary cursor-pointer"
               />
             </div>

@@ -13,17 +13,11 @@ import useQueryParams from "../../../hooks/useQueryParams";
 import ImageUpload from "../../../components/input/ImageUpload";
 import useVerticalScrollable from "../../../hooks/useVerticalScrollable";
 import { BottomGradient, TopGradient } from "../../../components/Gradients";
+import { shadeInitialValue } from "../data";
 
 interface ShadeFormProps {
   setShades: React.Dispatch<React.SetStateAction<ShadeType[]>>;
 }
-
-const shadeInitialValue: ShadeType = {
-  shadeName: "",
-  colorCode: "",
-  stock: null,
-  images: [],
-};
 
 const AddShade = ({ setShades }: ShadeFormProps) => {
   const { removeParam } = useQueryParams();
