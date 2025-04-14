@@ -4,7 +4,7 @@ import { shadeSchema } from "./product.schema";
 import { ShadeType, VerticalScrollType } from "../../../types";
 import { RefObject, useEffect, useState } from "react";
 import Button from "../../../components/button/Button";
-import ColorPickerInput from "../../../components/input/ColorPickerInput";
+import ColorPicker from "../../../components/input/colorPicker/ColorPicker";
 import Input from "../../../components/input/Input";
 import PhoneInput from "../../../components/input/PhoneInput";
 import { InfoIcon, UploadCloudIcon } from "../../../icons";
@@ -61,7 +61,6 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
     handleClose();
   };
 
-  console.log("shadeImages", shadeImages);
   useEffect(() => {
     if (editIndex !== undefined && shades[editIndex]) {
       const selectedShade = shades[editIndex];
@@ -73,10 +72,11 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
 
       const imageFiles = selectedShade.images;
       if (imageFiles && imageFiles.length > 0) {
-        const imgUrls = imageFiles.map((file) =>
+        const previews = imageFiles.map((file) =>
           file instanceof File ? URL.createObjectURL(file) : file
         );
-        setShadeImagePreviews(imgUrls);
+        setShadeImagePreviews(previews);
+        setShadeImages(imageFiles);
       }
     }
 
@@ -123,8 +123,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
                 control={shadeControl}
                 name="colorCode"
                 render={({ field }) => (
-                  <ColorPickerInput
-                    name="colorCode"
+                  <ColorPicker
                     label="Select Color"
                     value={field.value}
                     onChange={field.onChange}

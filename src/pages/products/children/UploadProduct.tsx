@@ -174,7 +174,7 @@ const UploadProduct = () => {
       productSetValue("totalStock", totalStock, { shouldValidate: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shades.length]);
+  }, [shades, shades.length]);
 
   return (
     <Fragment>

@@ -4,7 +4,7 @@ import { shadeSchema } from "./product.schema";
 import { ShadeType, VerticalScrollType } from "../../../types";
 import { RefObject, useState } from "react";
 import Button from "../../../components/button/Button";
-import ColorPickerInput from "../../../components/input/ColorPickerInput";
+import ColorPicker from "../../../components/input/colorPicker/ColorPicker";
 import Input from "../../../components/input/Input";
 import PhoneInput from "../../../components/input/PhoneInput";
 import { InfoIcon, UploadCloudIcon } from "../../../icons";
@@ -88,8 +88,7 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
                 control={shadeControl}
                 name="colorCode"
                 render={({ field }) => (
-                  <ColorPickerInput
-                    name="colorCode"
+                  <ColorPicker
                     label="Select Color"
                     value={field.value}
                     onChange={field.onChange}
