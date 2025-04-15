@@ -79,7 +79,6 @@ export const addBlobUrlToImage = (
     if (!range) return;
 
     blobUrlsRef.current.push(blobUrl);
-    console.log("blobUrlsRef", blobUrlsRef.current);
 
     quill.insertEmbed(range.index, "image", blobUrl, "user");
 
