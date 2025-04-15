@@ -1,19 +1,19 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
-import { shadeSchema } from "./product.schema";
-import { ShadeType, VerticalScrollType } from "../../../types";
+import { shadeSchema } from "../product.schema";
+import { ShadeType, VerticalScrollType } from "../../../../types";
 import { RefObject, useEffect, useState } from "react";
-import Button from "../../../components/button/Button";
-import ColorPicker from "../../../components/input/colorPicker/ColorPicker";
-import Input from "../../../components/input/Input";
-import PhoneInput from "../../../components/input/PhoneInput";
-import { InfoIcon, UploadCloudIcon } from "../../../icons";
-import { CloseIcon } from "../../../components/sidebar/icons";
-import useQueryParams from "../../../hooks/useQueryParams";
-import ImageUpload from "../../../components/input/ImageUpload";
-import useVerticalScrollable from "../../../hooks/useVerticalScrollable";
-import { BottomGradient, TopGradient } from "../../../components/Gradients";
-import { shadeInitialValue } from "../data";
+import Button from "../../../../components/button/Button";
+import ColorPicker from "../../../../components/input/colorPicker/ColorPicker";
+import Input from "../../../../components/input/Input";
+import PhoneInput from "../../../../components/input/PhoneInput";
+import { InfoIcon, UploadCloudIcon } from "../../../../icons";
+import { CloseIcon } from "../../../../components/sidebar/icons";
+import useQueryParams from "../../../../hooks/useQueryParams";
+import ImageUpload from "../../../../components/input/ImageUpload";
+import useVerticalScrollable from "../../../../hooks/useVerticalScrollable";
+import { BottomGradient, TopGradient } from "../../../../components/Gradients";
+import { shadeInitialValue } from "../../data";
 
 interface ShadeFormProps {
   setShades: React.Dispatch<React.SetStateAction<ShadeType[]>>;
