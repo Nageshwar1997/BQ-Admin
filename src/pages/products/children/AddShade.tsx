@@ -20,15 +20,15 @@ interface ShadeFormProps {
 }
 
 const AddShade = ({ setShades }: ShadeFormProps) => {
-  const { removeParam } = useQueryParams();
+  const { removeParam, queryParams } = useQueryParams();
   const [showGradient, containerRef] = useVerticalScrollable();
 
   const {
-    register: shadeRegister,
-    handleSubmit: shadeHandleSubmit,
-    reset: shadeReset,
-    control: shadeControl,
-    formState: { errors: shadeErrors },
+    control,
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors },
   } = useForm<ShadeType>({
     resolver: yupResolver(shadeSchema),
     defaultValues: shadeInitialValue,
@@ -37,14 +37,27 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
   const [shadeImages, setShadeImages] = useState<File[]>([]);
   const [shadeImagePreviews, setShadeImagePreviews] = useState<string[]>([]);
 
+  const handleClose = () => {
+    shadeImagePreviews.forEach((preview) => {
+      if (preview.startsWith("blob:")) {
+        URL.revokeObjectURL(preview);
+      }
+    });
+    reset();
+    setShadeImages([]);
+    setShadeImagePreviews([]);
+    if (queryParams.shade === "add") {
+      removeParam("shade");
+    }
+  };
+
   const onSubmitShade = (data: ShadeType) => {
     console.log("✅ Shade submitted", data);
     setShades((prevShades) => [...prevShades, data]);
-    shadeReset();
-    setShadeImages([]);
-    setShadeImagePreviews([]);
-    removeParam("shade");
+
+    handleClose();
   };
+
   return (
     <div className="z-[100] fixed inset-0 w-full h-full flex justify-center items-center bg-primary-inverted-50 backdrop-blur-[2px]">
       <div className="max-w-lg max-h-[85dvh] md:max-h-[95dvh] w-full rounded-lg border border-secondary-battleship-davys-gray shadow-light-dark-soft bg-platinum-black relative overflow-hidden">
@@ -57,7 +70,7 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
         >
           <form
             className="w-full flex flex-col gap-7"
-            onSubmit={shadeHandleSubmit(onSubmitShade)}
+            onSubmit={handleSubmit(onSubmitShade)}
           >
             <div className="flex items-center justify-between border-b border-primary-50 pb-2">
               <div className="flex items-center gap-1 group">
@@ -67,12 +80,7 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
                 <InfoIcon className="cursor-pointer fill-tertiary group-hover:fill-primary" />
               </div>
               <CloseIcon
-                onClick={() => {
-                  shadeReset();
-                  setShadeImages([]);
-                  setShadeImagePreviews([]);
-                  removeParam("shade");
-                }}
+                onClick={handleClose}
                 className="[&>path]:stroke-tertiary [&>path]:hover:stroke-primary cursor-pointer"
               />
             </div>
@@ -80,18 +88,18 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
               name="shadeName"
               label="Shade Name"
               placeholder="Enter shade name"
-              register={shadeRegister("shadeName")}
-              errorText={shadeErrors.shadeName?.message}
+              register={register("shadeName")}
+              errorText={errors.shadeName?.message}
             />
             <Controller
-              control={shadeControl}
+              control={control}
               name="colorCode"
               render={({ field }) => (
                 <ColorPicker
                   label="Select Color"
                   value={field.value}
                   onChange={field.onChange}
-                  errorText={shadeErrors.colorCode?.message}
+                  errorText={errors.colorCode?.message}
                 />
               )}
             />
@@ -100,12 +108,12 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
               label="Stock"
               type="number"
               placeholder="Enter stock"
-              register={shadeRegister("stock")}
-              errorText={shadeErrors.stock?.message}
+              register={register("stock")}
+              errorText={errors.stock?.message}
               containerClassName="[&>div>div>p]:hidden"
             />
             <Controller
-              control={shadeControl}
+              control={control}
               name="images"
               defaultValue={[]}
               render={({ field }) => (
@@ -116,10 +124,10 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
                   previewUrls={shadeImagePreviews}
                   containerClassName="w-full sm:col-span-3"
                   errors={
-                    Array.isArray(shadeErrors.images)
-                      ? shadeErrors.images?.map((err) => err.message)
-                      : shadeErrors.images?.message
-                      ? [shadeErrors.images?.message]
+                    Array.isArray(errors.images)
+                      ? errors.images?.map((err) => err.message)
+                      : errors.images?.message
+                      ? [errors.images?.message]
                       : []
                   }
                   handleChange={(e) => {
@@ -157,11 +165,7 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
                 pattern="secondary"
                 className="!py-3 max-h-12 !rounded-lg"
                 content="Reset"
-                onClick={() => {
-                  setShadeImages([]);
-                  setShadeImagePreviews([]);
-                  shadeReset();
-                }}
+                onClick={handleClose}
               />
               <Button
                 pattern="primary"
