@@ -2,6 +2,7 @@ import Quill from "quill";
 import { RefObject } from "react";
 import { UseFormSetValue } from "react-hook-form";
 import { CloudinaryConfigOptionType, ProductType } from "../../../types";
+import { upload_single_image } from "../../../api/media/media.api";
 
 export const processQuillContent = async (
   quillRef: RefObject<Quill | null>,
@@ -30,20 +31,11 @@ export const processQuillContent = async (
         formData.append("folderName", folderName);
         formData.append("cloudinaryConfigOption", cloudinaryConfigOption);
 
-        const resp = await fetch(
-          "http://localhost:8080/api/media/image/upload",
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
+        const data = await upload_single_image(formData);
 
-        const data = await resp.json();
-
-        console.log("data", data);
         return { blobUrl, cloudUrl: data.cloudUrl };
       } catch (error) {
-        console.error("Upload error:", error);
+        console.error("Image upload error:", error);
         return null;
       }
     });
