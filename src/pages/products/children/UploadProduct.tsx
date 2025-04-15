@@ -1,10 +1,12 @@
 import { Fragment, useEffect, useRef, useState } from "react";
+import Quill from "quill";
+import { useNavigate } from "react-router-dom";
+import { DevTool } from "@hookform/devtools";
 import Button from "../../../components/button/Button";
 import PathNavigation from "../../../components/PathNavigation";
 import { UploadCloudIcon } from "../../../icons";
 import useQueryParams from "../../../hooks/useQueryParams";
 import AddShade from "./AddShade";
-import { DevTool } from "@hookform/devtools";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
 import Input from "../../../components/input/Input";
@@ -20,27 +22,11 @@ import {
 import { productSchema } from "./product.schema";
 import { ProductType, ShadeType } from "../../../types";
 import QuillMarkupEditor from "../../../components/QuillMarkupEditor/QuillMarkupEditor";
-import Quill from "quill";
 import { useUploadProduct } from "../../../api/product/product.service";
 import LoadingPage from "../../../components/loaders/LoadingPage";
 import ImageUpload from "../../../components/input/ImageUpload";
 import EditShade from "./EditShade";
-
-const productInitialValues: ProductType = {
-  title: "",
-  brand: "",
-  description: "",
-  howToUse: "",
-  ingredients: "",
-  additionalDetails: "",
-  categoryLevelOne: "",
-  categoryLevelTwo: "",
-  categoryLevelThree: "",
-  totalStock: null,
-  originalPrice: null,
-  sellingPrice: null,
-  shades: [],
-};
+import { productInitialValues } from "../data";
 
 const UploadProduct = () => {
   const quillDescriptionRef = useRef<Quill | null>(null);
@@ -59,21 +45,23 @@ const UploadProduct = () => {
 
   const { setParams, queryParams } = useQueryParams();
   const uploadProduct = useUploadProduct();
+  const navigate = useNavigate();
 
   const {
-    register: productRegister,
-    handleSubmit: productHandleSubmit,
-    setValue: productSetValue,
-    watch: productWatch,
-    control: productControl,
+    control,
+    handleSubmit,
+    register,
+    reset,
+    setValue,
+    watch,
     formState: { errors: productErrors },
   } = useForm<ProductType>({
     resolver: yupResolver(productSchema),
     defaultValues: productInitialValues,
   });
 
-  const selectedCategory1 = productWatch("categoryLevelOne");
-  const selectedCategory2 = productWatch("categoryLevelTwo");
+  const selectedCategory1 = watch("categoryLevelOne");
+  const selectedCategory2 = watch("categoryLevelTwo");
 
   const level1Data = categoryLevelsData.find(
     (cat) => cat.value === selectedCategory1
@@ -84,36 +72,19 @@ const UploadProduct = () => {
   );
   const level3Options = level2Data?.subCategories || [];
 
-  const handleDescriptionTextChange = () => {
-    if (quillDescriptionRef.current) {
-      const description = quillDescriptionRef.current.root.innerHTML;
-      productSetValue("description", description, { shouldValidate: true });
-    }
-  };
-  const handleHowToUseTextChange = () => {
-    if (quillHowToUseRef.current) {
-      const howToUse = quillHowToUseRef.current.root.innerHTML;
-      productSetValue("howToUse", howToUse, { shouldValidate: true });
-    }
-  };
-  const handleIngredientsTextChange = () => {
-    if (quillIngredientsUseRef.current) {
-      const ingredients = quillIngredientsUseRef.current.root.innerHTML;
-      productSetValue("ingredients", ingredients, { shouldValidate: true });
-    }
+  const handleReset = () => {
+    commonImagePreviews.forEach((preview) => {
+      if (preview.startsWith("blob:")) {
+        URL.revokeObjectURL(preview);
+      }
+    }); // Revoke all blob URLs to avoid memory leaks
+    reset({ ...productInitialValues });
+    setShades([]);
+    setCommonImages([]);
+    setCommonImagePreviews([]);
   };
 
-  const handleAdditionalDetailsTextChange = () => {
-    if (quillAdditionalDetailsUseRef.current) {
-      const additionalDetails =
-        quillAdditionalDetailsUseRef.current.root.innerHTML;
-      productSetValue("additionalDetails", additionalDetails, {
-        shouldValidate: true,
-      });
-    }
-  };
-
-  const onSubmitProduct = async (data: ProductType) => {
+  const handleUpload = async (data: ProductType) => {
     const finalData: ProductType = { ...data, shades };
 
     const formData = new FormData();
@@ -157,12 +128,14 @@ const UploadProduct = () => {
       });
     }
 
-    // For debugging
-    for (const pair of formData.entries()) {
-      console.log(`${pair[0]}:`, pair[1]);
-    }
-
-    uploadProduct.mutate(formData);
+    uploadProduct.mutate(formData, {
+      onSettled(data, error) {
+        if (data && !error) {
+          handleReset();
+          navigate("/products");
+        }
+      },
+    });
   };
 
   useEffect(() => {
@@ -171,7 +144,7 @@ const UploadProduct = () => {
         (total, shade) => total + (shade.stock ?? 0),
         0
       );
-      productSetValue("totalStock", totalStock, { shouldValidate: true });
+      setValue("totalStock", totalStock, { shouldValidate: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shades, shades.length]);
@@ -197,7 +170,7 @@ const UploadProduct = () => {
             {/* Product Form */}
             <form
               className="w-full p-4 flex flex-col gap-7"
-              onSubmit={productHandleSubmit(onSubmitProduct)}
+              onSubmit={handleSubmit(handleUpload)}
             >
               <div className="flex flex-col sm:flex-row gap-7 sm:gap-4">
                 {INPUTS_DATA.map((input, index) => (
@@ -213,7 +186,7 @@ const UploadProduct = () => {
                       name={input.name}
                       label={input.label}
                       placeholder={input.placeholder}
-                      register={productRegister(input.name)}
+                      register={register(input.name)}
                       errorText={productErrors[input.name]?.message}
                     />
                   </div>
@@ -221,13 +194,6 @@ const UploadProduct = () => {
               </div>
               <div className="grid gap-y-7 gap-x-4 sm:grid-cols-2 md:grid-cols-3">
                 {CATEGORY_DATA.map((input, index) => {
-                  const value =
-                    input.name === "categoryLevelOne"
-                      ? selectedCategory1
-                      : input.name === "categoryLevelTwo"
-                      ? selectedCategory2
-                      : productWatch("categoryLevelThree");
-
                   const categories =
                     input.name === "categoryLevelOne"
                       ? categoryLevelsData
@@ -252,27 +218,6 @@ const UploadProduct = () => {
                       ? "Select a level two category first"
                       : "Select a level three category";
 
-                  const onChange =
-                    input.name === "categoryLevelOne"
-                      ? (val: string) => {
-                          productSetValue("categoryLevelOne", val, {
-                            shouldValidate: true,
-                          });
-                          productSetValue("categoryLevelTwo", "");
-                          productSetValue("categoryLevelThree", "");
-                        }
-                      : input.name === "categoryLevelTwo"
-                      ? (val: string) => {
-                          productSetValue("categoryLevelTwo", val, {
-                            shouldValidate: true,
-                          });
-                          productSetValue("categoryLevelThree", "");
-                        }
-                      : (val: string) => {
-                          productSetValue("categoryLevelThree", val, {
-                            shouldValidate: true,
-                          });
-                        };
                   return (
                     <div
                       key={index}
@@ -282,14 +227,33 @@ const UploadProduct = () => {
                           : "col-span-1"
                       }`}
                     >
-                      <Select
-                        value={value}
-                        readOnly={readOnly}
-                        label={input.label}
-                        placeholder={placeholder}
-                        categories={categories}
-                        onChange={onChange}
-                        errorText={productErrors[input.name]?.message}
+                      <Controller
+                        name={input.name}
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            value={
+                              typeof field.value === "string"
+                                ? field.value
+                                : undefined
+                            }
+                            onChange={(val: string) => {
+                              field.onChange(val);
+                              // reset dependent levels
+                              if (input.name === "categoryLevelOne") {
+                                setValue("categoryLevelTwo", "");
+                                setValue("categoryLevelThree", "");
+                              } else if (input.name === "categoryLevelTwo") {
+                                setValue("categoryLevelThree", "");
+                              }
+                            }}
+                            readOnly={readOnly}
+                            label={input.label}
+                            placeholder={placeholder}
+                            categories={categories}
+                            errorText={productErrors[input.name]?.message}
+                          />
+                        )}
                       />
                     </div>
                   );
@@ -306,7 +270,7 @@ const UploadProduct = () => {
                       label={input.label}
                       type="number"
                       placeholder={input.placeholder}
-                      register={productRegister(input.name)}
+                      register={register(input.name)}
                       errorText={productErrors[input.name]?.message}
                       containerClassName="[&>div>div>p]:hidden"
                       className={`${isDisabled ? "cursor-not-allowed" : ""}`}
@@ -317,7 +281,7 @@ const UploadProduct = () => {
               </div>
               <div className="w-full">
                 <Controller
-                  control={productControl}
+                  control={control}
                   name="commonImages"
                   defaultValue={[]}
                   render={({ field }) => (
@@ -384,95 +348,139 @@ const UploadProduct = () => {
                     additionalDetails: additionalDetailsBlobUrlsRef,
                   };
 
-                  const textChangeMap = {
-                    description: handleDescriptionTextChange,
-                    howToUse: handleHowToUseTextChange,
-                    ingredients: handleIngredientsTextChange,
-                    additionalDetails: handleAdditionalDetailsTextChange,
-                  };
-
                   return (
                     <div key={index} className="w-full">
-                      <QuillMarkupEditor
-                        label={input.label}
-                        ref={editorMap[input.name as keyof typeof editorMap]}
-                        blobUrlsRef={
-                          blobMap[input.name as keyof typeof blobMap]
-                        }
-                        onTextChange={
-                          textChangeMap[
-                            input.name as keyof typeof textChangeMap
-                          ]
-                        }
-                        placeholder={input.placeholder}
-                        errorText={productErrors[input.name]?.message}
+                      <Controller
+                        control={control}
+                        name={input.name}
+                        render={({ field }) => (
+                          <QuillMarkupEditor
+                            label={input.label}
+                            ref={
+                              editorMap[input.name as keyof typeof editorMap]
+                            }
+                            blobUrlsRef={
+                              blobMap[input.name as keyof typeof blobMap]
+                            }
+                            onChange={field.onChange}
+                            value={
+                              typeof field.value === "string" ? field.value : ""
+                            }
+                            placeholder={input.placeholder}
+                            errorText={productErrors[input.name]?.message}
+                          />
+                        )}
                       />
                     </div>
                   );
                 })}
               </div>
 
-              <div className="w-full border">
-                {shades.map((shade, i) => {
-                  const firstImage = shade.images?.[0];
-                  const imageUrl =
-                    firstImage instanceof File
-                      ? URL.createObjectURL(firstImage)
-                      : typeof firstImage === "string"
-                      ? firstImage
-                      : "";
-
-                  return (
-                    <div key={i} className="p-4 border rounded mb-6 shadow-sm">
-                      {imageUrl && (
-                        <img
-                          src={imageUrl}
-                          alt={`Shade ${i + 1}`}
-                          className="w-24 h-24 object-cover rounded border mb-2"
-                        />
-                      )}
-                      <p>
-                        <strong>Shade Name:</strong> {shade.shadeName}
-                      </p>
-                      <p>
-                        <strong>Color Code:</strong> {shade.colorCode}
-                      </p>
-                      <p>
-                        <strong>Stock:</strong> {shade.stock}
-                      </p>
-
-                      {/* Buttons */}
-                      <div className="mt-2 flex gap-2">
-                        <button
-                          type="button"
-                          // onClick={() => handleEditShade(i)}
-                          onClick={() => {
-                            setParams({ shade: "edit", index: `${i}` });
-                            // handleEditShade(i);
-                          }}
-                          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+              <div className="w-full border border-primary-10 bg-smoke-eerie rounded-lg p-2 space-y-2">
+                <div className="text-tertiary pb-2 px-2 border-b border-primary-50 flex items-center justify-between">
+                  <div className="space-x-1 mt-1">
+                    <span>Added Shades:</span>
+                    <span className="font-semibold">
+                      {shades.length < 10
+                        ? `(0${shades.length})`
+                        : shades.length}
+                    </span>
+                  </div>
+                  <Button
+                    pattern="outline"
+                    content=""
+                    className="max-w-[10px] !py-1.5 !px-4 !rounded gap-2"
+                    onClick={() => setParams({ shade: "add" })}
+                    rightIcon={
+                      <UploadCloudIcon className="w-5 h-5 [&>path]:stroke-[2.75] [&>path]:stroke-secondary [&>path]:group-hover:stroke-tertiary-inverted" />
+                    }
+                  />
+                </div>
+                {shades?.length > 0 && (
+                  <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-2">
+                    {shades.map((shade, i) => {
+                      const firstImage = shade.images?.[0];
+                      const imageUrl =
+                        firstImage instanceof File
+                          ? URL.createObjectURL(firstImage)
+                          : typeof firstImage === "string"
+                          ? firstImage
+                          : "";
+                      return (
+                        <div
+                          key={i}
+                          className="p-2 border border-primary-10 rounded-md shadow-lg bg-primary-inverted-30"
                         >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updatedShades = shades.filter(
-                              (_, index) => index !== i
-                            );
-                            setShades(updatedShades);
-                          }}
-                          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
+                          <div className="flex items-start gap-3">
+                            {imageUrl && (
+                              <img
+                                src={imageUrl}
+                                alt={`Shade ${i + 1}`}
+                                className="w-24 h-24 object-cover rounded border"
+                              />
+                            )}
+                            <div className="text-xs flex flex-col gap-1">
+                              <p className="line-clamp-1 space-x-1">
+                                <strong>Name:</strong>
+                                <span>{shade.shadeName}</span>
+                              </p>
+                              <p className="space-x-1">
+                                <strong>Color:</strong>
+                                <span className="uppercase">
+                                  {shade.colorCode}
+                                </span>
+                              </p>
+                              <p className="space-x-1">
+                                <strong>Stock:</strong>
+                                <span>{shade.stock}</span>
+                              </p>
+                              <div className="mt-2 flex gap-2">
+                                <Button
+                                  type="button"
+                                  pattern="transparent"
+                                  content="Edit"
+                                  onClick={() => {
+                                    setParams({ shade: "edit", index: `${i}` });
+                                  }}
+                                  className="!px-2 !py-0.5 !text-xs !rounded text-white !font-medium bg-blue-600 hover:bg-blue-700 hover:!shadow-sm hover:!shadow-blue-600/50"
+                                />
+                                <Button
+                                  type="button"
+                                  pattern="transparent"
+                                  content="Remove"
+                                  onClick={() => {
+                                    const updatedShades = shades.filter(
+                                      (_, index) => index !== i
+                                    );
+                                    setShades(updatedShades);
+                                  }}
+                                  className="!px-2 !py-0.5 !text-xs !rounded !font-medium text-white bg-red-600 hover:bg-red-700 hover:!shadow-sm hover:!shadow-red-600/50"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-              <Button pattern="primary" type="submit" content="Upload" />
-              <DevTool control={productControl} />
+              <div className="flex items-center gap-4">
+                <Button
+                  pattern="secondary"
+                  content="Reset"
+                  type="button"
+                  className="!rounded-lg max-h-12"
+                  onClick={handleReset}
+                />
+                <Button
+                  pattern="primary"
+                  type="submit"
+                  content="Upload"
+                  className="!rounded-lg max-h-12"
+                />
+              </div>
+              <DevTool control={control} />
             </form>
           </div>
         </div>
