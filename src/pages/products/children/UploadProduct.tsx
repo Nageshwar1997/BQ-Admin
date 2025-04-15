@@ -8,7 +8,8 @@ import Button from "../../../components/button/Button";
 import PathNavigation from "../../../components/PathNavigation";
 import { UploadCloudIcon } from "../../../icons";
 import useQueryParams from "../../../hooks/useQueryParams";
-import AddShade from "./AddShade";
+import AddShade from "./shade/AddShade";
+import EditShade from "./shade/EditShade";
 import Input from "../../../components/input/Input";
 import PhoneInput from "../../../components/input/PhoneInput";
 import Select from "../../../components/input/Select";
@@ -21,11 +22,10 @@ import {
 } from "../data/categoriesData";
 import { productSchema } from "./product.schema";
 import { ProductType, ShadeType } from "../../../types";
-import QuillMarkupEditor from "../../../components/QuillMarkupEditor/QuillMarkupEditor";
+import QuillEditor from "../../../components/quillEditor/QuillEditor";
 import { useUploadProduct } from "../../../api/product/product.service";
 import LoadingPage from "../../../components/loaders/LoadingPage";
 import ImageUpload from "../../../components/input/ImageUpload";
-import EditShade from "./EditShade";
 import { productInitialValues } from "../data";
 
 const UploadProduct = () => {
@@ -354,7 +354,7 @@ const UploadProduct = () => {
                         control={control}
                         name={input.name}
                         render={({ field }) => (
-                          <QuillMarkupEditor
+                          <QuillEditor
                             label={input.label}
                             ref={
                               editorMap[input.name as keyof typeof editorMap]

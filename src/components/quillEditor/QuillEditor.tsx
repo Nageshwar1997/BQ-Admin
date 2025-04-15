@@ -35,7 +35,7 @@ interface EditorProps {
   placeholder?: string;
 }
 
-const QuillMarkupEditor = forwardRef<Quill | null, EditorProps>(
+const QuillEditor = forwardRef<Quill | null, EditorProps>(
   (
     {
       label,
@@ -157,4 +157,4 @@ const QuillMarkupEditor = forwardRef<Quill | null, EditorProps>(
   }
 );
 
-export default QuillMarkupEditor;
+export default QuillEditor
