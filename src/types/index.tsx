@@ -10,6 +10,8 @@ import { UseFormRegisterReturn } from "react-hook-form";
 
 export type ThemeType = "light" | "dark";
 
+export type CloudinaryConfigOptionType = "image" | "video" | "product";
+
 export type ThemeStoreType = {
   theme: ThemeType;
   toggleTheme: () => void;
