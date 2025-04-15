@@ -27,6 +27,7 @@ import { useUploadProduct } from "../../../api/product/product.service";
 import LoadingPage from "../../../components/loaders/LoadingPage";
 import ImageUpload from "../../../components/input/ImageUpload";
 import { productInitialValues } from "../data";
+import { processQuillContent, getQuillValue } from "./helpers";
 
 const UploadProduct = () => {
   const quillDescriptionRef = useRef<Quill | null>(null);
@@ -49,6 +50,7 @@ const UploadProduct = () => {
 
   const {
     control,
+    getValues,
     handleSubmit,
     register,
     reset,
@@ -85,33 +87,67 @@ const UploadProduct = () => {
   };
 
   const handleUpload = async (data: ProductType) => {
-    const finalData: ProductType = { ...data, shades };
+    await Promise.all([
+      processQuillContent(
+        quillDescriptionRef,
+        descriptionBlobUrlsRef,
+        setValue,
+        "description",
+        `Products/${data.title}/Description`,
+        "product"
+      ),
+      processQuillContent(
+        quillHowToUseRef,
+        howToUseBlobUrlsRef,
+        setValue,
+        "howToUse",
+        `Products/${data.title}/How_To_Use`,
+        "product"
+      ),
+      processQuillContent(
+        quillIngredientsUseRef,
+        ingredientsBlobUrlsRef,
+        setValue,
+        "ingredients",
+        `Products/${data.title}/Ingredients`,
+        "product"
+      ),
+      processQuillContent(
+        quillAdditionalDetailsUseRef,
+        additionalDetailsBlobUrlsRef,
+        setValue,
+        "additionalDetails",
+        `Products/${data.title}/Additional_Details`,
+        "product"
+      ),
+    ]);
+
+    const finalData: ProductType = { ...data, ...getValues(), shades };
 
     const formData = new FormData();
 
-    // Append simple fields
     formData.append("title", finalData.title);
     formData.append("brand", finalData.brand);
-    formData.append("description", finalData.description);
-    formData.append("howToUse", finalData.howToUse ?? "");
-    formData.append("ingredients", finalData.ingredients ?? "");
-    formData.append("additionalDetails", finalData.additionalDetails ?? "");
+    formData.append("description", getQuillValue(finalData.description));
+    formData.append("howToUse", getQuillValue(finalData.howToUse));
+    formData.append("ingredients", getQuillValue(finalData.ingredients));
+    formData.append(
+      "additionalDetails",
+      getQuillValue(finalData.additionalDetails)
+    );
     formData.append("categoryLevelOne", finalData.categoryLevelOne);
     formData.append("categoryLevelTwo", finalData.categoryLevelTwo);
     formData.append("categoryLevelThree", finalData.categoryLevelThree);
-    formData.append("sellingPrice", JSON.stringify(finalData.sellingPrice));
-    formData.append("originalPrice", JSON.stringify(finalData.originalPrice));
-    formData.append("totalStock", JSON.stringify(finalData.totalStock));
+    formData.append("sellingPrice", String(finalData.sellingPrice));
+    formData.append("originalPrice", String(finalData.originalPrice));
+    formData.append("totalStock", String(finalData.totalStock));
 
     // Append shades with nested images
     if (finalData.shades && finalData.shades.length > 0) {
       finalData.shades.forEach((shade, shadeIndex) => {
         formData.append(`shades[${shadeIndex}][shadeName]`, shade.shadeName);
         formData.append(`shades[${shadeIndex}][colorCode]`, shade.colorCode);
-        formData.append(
-          `shades[${shadeIndex}][stock]`,
-          String(shade.stock ?? "")
-        );
+        formData.append(`shades[${shadeIndex}][stock]`, String(shade.stock));
 
         shade.images.forEach((image, imgIndex) => {
           formData.append(`shades[${shadeIndex}][images][${imgIndex}]`, image);
@@ -121,9 +157,8 @@ const UploadProduct = () => {
       formData.append("shades", JSON.stringify([]));
     }
 
-    // If you also have common product images (optional)
-    if (data?.commonImages && data.commonImages.length > 0) {
-      data.commonImages.forEach((img: File, index: number) => {
+    if (finalData?.commonImages && finalData.commonImages.length > 0) {
+      finalData.commonImages.forEach((img: File, index: number) => {
         formData.append(`commonImages[${index}]`, img);
       });
     }
