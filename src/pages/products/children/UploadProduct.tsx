@@ -1,14 +1,14 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import Quill from "quill";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { DevTool } from "@hookform/devtools";
+
 import Button from "../../../components/button/Button";
 import PathNavigation from "../../../components/PathNavigation";
 import { UploadCloudIcon } from "../../../icons";
 import useQueryParams from "../../../hooks/useQueryParams";
 import AddShade from "./AddShade";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm, Controller } from "react-hook-form";
 import Input from "../../../components/input/Input";
 import PhoneInput from "../../../components/input/PhoneInput";
 import Select from "../../../components/input/Select";
@@ -54,7 +54,7 @@ const UploadProduct = () => {
     reset,
     setValue,
     watch,
-    formState: { errors: productErrors },
+    formState: { errors },
   } = useForm<ProductType>({
     resolver: yupResolver(productSchema),
     defaultValues: productInitialValues,
@@ -187,7 +187,7 @@ const UploadProduct = () => {
                       label={input.label}
                       placeholder={input.placeholder}
                       register={register(input.name)}
-                      errorText={productErrors[input.name]?.message}
+                      errorText={errors[input.name]?.message}
                     />
                   </div>
                 ))}
@@ -251,7 +251,7 @@ const UploadProduct = () => {
                             label={input.label}
                             placeholder={placeholder}
                             categories={categories}
-                            errorText={productErrors[input.name]?.message}
+                            errorText={errors[input.name]?.message}
                           />
                         )}
                       />
@@ -271,7 +271,7 @@ const UploadProduct = () => {
                       type="number"
                       placeholder={input.placeholder}
                       register={register(input.name)}
-                      errorText={productErrors[input.name]?.message}
+                      errorText={errors[input.name]?.message}
                       containerClassName="[&>div>div>p]:hidden"
                       className={`${isDisabled ? "cursor-not-allowed" : ""}`}
                       readOnly={isDisabled}
@@ -292,10 +292,10 @@ const UploadProduct = () => {
                       previewUrls={commonImagePreviews}
                       containerClassName="w-full sm:col-span-3"
                       errors={
-                        Array.isArray(productErrors.commonImages)
-                          ? productErrors.commonImages.map((err) => err.message)
-                          : productErrors.commonImages?.message
-                          ? [productErrors.commonImages.message]
+                        Array.isArray(errors.commonImages)
+                          ? errors.commonImages.map((err) => err.message)
+                          : errors.commonImages?.message
+                          ? [errors.commonImages.message]
                           : []
                       }
                       handleChange={(e) => {
@@ -367,7 +367,7 @@ const UploadProduct = () => {
                               typeof field.value === "string" ? field.value : ""
                             }
                             placeholder={input.placeholder}
-                            errorText={productErrors[input.name]?.message}
+                            errorText={errors[input.name]?.message}
                           />
                         )}
                       />
@@ -480,7 +480,6 @@ const UploadProduct = () => {
                   className="!rounded-lg max-h-12"
                 />
               </div>
-              <DevTool control={control} />
             </form>
           </div>
         </div>
