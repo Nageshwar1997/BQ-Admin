@@ -1,36 +1,26 @@
 import { forwardRef, RefObject, useEffect, useRef } from "react";
 import "./editor.css";
 import { InfoIcon } from "../../icons";
-import Quill, {
-  Delta,
-  // Range
-} from "quill";
-
+import Quill from "quill";
 import {
   addBlobUrlToImage,
   addIdsToHeadings,
   removeUnusedBlobUrls,
 } from "../../utils";
 
-// Import & Modify Quill Image Format to Allow Blob URLs
+// Allow blob URLs in image sanitize
 const Image = Quill.import("formats/image") as {
   sanitize?: (url: string) => string;
 };
-
-// Ensure Image has a sanitize method before modifying
 if (Image && typeof Image.sanitize === "function") {
   Image.sanitize = function (url: string): string {
-    if (url.startsWith("blob:")) {
-      return url; // Allow Blob URLs
-    }
+    if (url.startsWith("blob:")) return url;
     const Link = Quill.import("formats/link") as {
       sanitize?: (url: string) => string;
     };
-    return Link?.sanitize ? Link.sanitize(url) : url; // Use link sanitizer if available
+    return Link?.sanitize ? Link.sanitize(url) : url;
   };
 }
-
-// Register the modified Image format
 Quill.register("formats/image", Image, true);
 Quill.register("modules/addIdsToHeadings", addIdsToHeadings);
 
@@ -39,14 +29,10 @@ interface EditorProps {
   readOnly?: boolean;
   errorText?: string;
   className?: string;
-  onTextChange?: (delta: Delta, oldDelta: Delta, source: string) => void;
+  value?: string;
+  onChange?: (value: string) => void;
   blobUrlsRef: RefObject<string[]>;
   placeholder?: string;
-  // onSelectionChange?: (
-  //   range: Range | null,
-  //   oldRange: Range | null,
-  //   source: string
-  // ) => void;
 }
 
 const QuillMarkupEditor = forwardRef<Quill | null, EditorProps>(
@@ -56,15 +42,16 @@ const QuillMarkupEditor = forwardRef<Quill | null, EditorProps>(
       readOnly,
       errorText,
       className,
-      onTextChange,
+      value,
+      onChange,
       placeholder = "Write your content here...",
-      // onSelectionChange,
       blobUrlsRef,
     },
     ref
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const editorRef = useRef<Quill | null>(null);
+
     useEffect(() => {
       if (!containerRef.current) return;
 
@@ -84,7 +71,6 @@ const QuillMarkupEditor = forwardRef<Quill | null, EditorProps>(
               [{ list: "ordered" }, { list: "bullet" }],
               [{ script: "sub" }, { script: "super" }],
               [{ indent: "-1" }, { indent: "+1" }],
-              // [{ size: ["small", "medium", "large", "huge"] }],
               ["link", "image"],
               ["clean"],
             ],
@@ -103,14 +89,15 @@ const QuillMarkupEditor = forwardRef<Quill | null, EditorProps>(
         },
       });
 
-      quill.on("text-change", (delta, oldDelta, source) => {
-        onTextChange?.(delta, oldDelta, source);
-        removeUnusedBlobUrls(quill, blobUrlsRef);
+      quill.on("text-change", () => {
+        const html = quill.root.innerHTML;
+        if (html !== "<p><br></p>") {
+          onChange?.(html);
+          removeUnusedBlobUrls(quill, blobUrlsRef);
+        } else {
+          onChange?.("");
+        }
       });
-
-      // quill.on("selection-change", (range, oldRange, source) => {
-      //   onSelectionChange?.(range, oldRange, source);
-      // });
 
       editorRef.current = quill;
 
@@ -124,15 +111,20 @@ const QuillMarkupEditor = forwardRef<Quill | null, EditorProps>(
         if (ref && "current" in ref) {
           ref.current = null;
         }
-
         container.innerHTML = "";
-
         // Revoke all blob URLs
         blobUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
         blobUrlsRef.current = [];
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // Set value when it changes from outside
+    useEffect(() => {
+      if (editorRef.current && value !== editorRef.current.root.innerHTML) {
+        editorRef.current.root.innerHTML = value || "";
+      }
+    }, [value]);
 
     useEffect(() => {
       if (editorRef.current) {
@@ -144,9 +136,7 @@ const QuillMarkupEditor = forwardRef<Quill | null, EditorProps>(
       <div className={`w-full space-y-1.5 ${className}`}>
         <div className="relative">
           {label && (
-            <span
-              className={`text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded`}
-            >
+            <span className="text-[10px] lg:text-xs text-primary-50 absolute top-0 left-3 transform -translate-y-1/2 border border-primary-10 leading-none px-1 md:px-2 py-0.5 2xl:py-1 bg-smoke-eerie rounded">
               {label}
             </span>
           )}
@@ -157,9 +147,7 @@ const QuillMarkupEditor = forwardRef<Quill | null, EditorProps>(
           />
         </div>
         {!readOnly && errorText && (
-          <p
-            className={`w-full text-start flex gap-1 items-center text-[11px] leading-tight mt-2 text-red-500`}
-          >
+          <p className="w-full text-start flex gap-1 items-center text-[11px] leading-tight mt-2 text-red-500">
             <InfoIcon className="w-3 h-3 md:w-4 md:h-4 fill-red-500" />
             <span>{errorText}</span>
           </p>
