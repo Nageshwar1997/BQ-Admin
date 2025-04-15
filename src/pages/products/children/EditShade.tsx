@@ -63,9 +63,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
     if (editIndex !== undefined && shades[editIndex]) {
       const selectedShade = shades[editIndex];
 
-      shadeReset({
-        ...selectedShade,
-      });
+      shadeReset({ ...selectedShade });
 
       const imageFiles = selectedShade.images;
       if (imageFiles && imageFiles.length > 0) {
@@ -77,9 +75,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
       }
     }
 
-    return () => {
-      handleClose();
-    };
+    return () => handleClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editIndex, shades]);
   return (
@@ -187,7 +183,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
             <div className="flex items-center gap-4 justify-center">
               <Button
                 pattern="secondary"
-                className="!py-3 max-h-12"
+                className="!py-3 max-h-12 !rounded-lg"
                 content="Reset"
                 onClick={() => {
                   setShadeImages([]);
@@ -198,7 +194,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
               <Button
                 pattern="primary"
                 type="submit"
-                className="!py-3 max-h-12"
+                className="!py-3 max-h-12 !rounded-lg"
                 content="Add Shade"
               />
             </div>

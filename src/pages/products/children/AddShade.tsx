@@ -155,7 +155,7 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
             <div className="flex items-center gap-4 justify-center">
               <Button
                 pattern="secondary"
-                className="!py-3 max-h-12"
+                className="!py-3 max-h-12 !rounded-lg"
                 content="Reset"
                 onClick={() => {
                   setShadeImages([]);
@@ -166,7 +166,7 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
               <Button
                 pattern="primary"
                 type="submit"
-                className="!py-3 max-h-12"
+                className="!py-3 max-h-12 !rounded-lg"
                 content="Add Shade"
               />
             </div>
