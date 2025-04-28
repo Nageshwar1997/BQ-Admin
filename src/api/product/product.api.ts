@@ -23,3 +23,32 @@ export const upload_product = async (data: FormData) => {
     throw "Something went wrong!"; // For non-Axios errors
   }
 };
+
+export const get_all_products = async ({
+  data,
+  params,
+}: {
+  data: Record<string, string[]>;
+  params: { page: number; limit: number };
+}) => {
+  try {
+    const { method, url } = productRoutes.getAllProducts;
+    const response = await api.request({
+      method,
+      url,
+      data: { populateFields: data }, // ✅ Wrap 'data' inside populateFields
+      params, // ✅ page and limit as query params
+    });
+
+    console.log(
+      "🚀 ~ file: product.api.ts:27 ~ get_all_products ~ response",
+      response.data
+    );
+    return response.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw error?.response?.data?.message || "API Error occurred";
+    }
+    throw "Something went wrong!";
+  }
+};

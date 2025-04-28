@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { toastErrorMessage, toastSuccessMessage } from "../../utils/toasts";
-import { upload_product } from "./product.api";
+import { get_all_products, upload_product } from "./product.api";
 
 export const useUploadProduct = () => {
   return useMutation({
@@ -11,6 +11,26 @@ export const useUploadProduct = () => {
     onError: (error: unknown) => {
       toastErrorMessage(
         typeof error === "string" ? error : "Failed to upload product!"
+      );
+    },
+  });
+};
+
+export const useGetAllProducts = () => {
+  return useMutation({
+    mutationFn: ({
+      data,
+      params,
+    }: {
+      data: Record<string, string[]>;
+      params: { page: number; limit: number };
+    }) => get_all_products({ data, params }),
+    onSuccess: (data) => {
+      toastSuccessMessage(data?.message || "Product fetched successfully!");
+    },
+    onError: (error: unknown) => {
+      toastErrorMessage(
+        typeof error === "string" ? error : "Failed to fetch product!"
       );
     },
   });

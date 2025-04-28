@@ -2,10 +2,10 @@ import { RefObject } from "react";
 import CryptoJS from "crypto-js";
 import Quill from "quill";
 import { v4 as uuidv4 } from "uuid";
-import { ENCRYPTION_SECRET_KEY } from "../envs/index.env";
+import { envs } from "../envs";
 
 export const encryptData = (data: string): string => {
-  return CryptoJS.AES.encrypt(data, ENCRYPTION_SECRET_KEY).toString();
+  return CryptoJS.AES.encrypt(data, envs.ENCRYPTION_SECRET_KEY).toString();
 };
 
 export const saveUserLocal = (data: string) => {
@@ -36,7 +36,7 @@ export const getAdminToken = () => {
   }
 
   return JSON.parse(
-    CryptoJS.AES.decrypt(admin_token, ENCRYPTION_SECRET_KEY).toString(
+    CryptoJS.AES.decrypt(admin_token, envs.ENCRYPTION_SECRET_KEY).toString(
       CryptoJS.enc.Utf8
     )
   );

@@ -3,9 +3,38 @@ import Button from "../../../components/button/Button";
 import PathNavigation from "../../../components/PathNavigation";
 import { UploadCloudIcon } from "../../../icons";
 import { toINRCurrency } from "../../../utils";
+import { useGetAllProducts } from "../../../api/product/product.service";
+import { useEffect } from "react";
 
 const AllProducts = () => {
   const navigate = useNavigate();
+
+  const getAllProducts = useGetAllProducts();
+
+  const handleGetAllProducts = (page: number, limit: number) => {
+    getAllProducts.mutate(
+      {
+        data: {
+          shades: ["shadeName", "colorCode", "images"],
+          seller: ["firstName", "lastName", "email"],
+          category: ["name", "parentCategory", "level"],
+        },
+        params: { page, limit },
+      },
+      {
+        onSuccess: (data) => {
+          console.log("DATA", data);
+        },
+        onError: (error) => {
+          console.log("ERROR", error);
+        },
+      }
+    );
+  };
+
+  useEffect(() => {
+    handleGetAllProducts(1, 50);
+  }, []);
 
   return (
     <div className="w-full space-y-3 px-2">

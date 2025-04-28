@@ -4,6 +4,7 @@ export const authRoutes = {
 
 export const productRoutes = {
   uploadProduct: { method: "POST", url: "/products/upload" },
+  getAllProducts: { method: "POST", url: "/products/all" },
 };
 
 export const userRoutes = {

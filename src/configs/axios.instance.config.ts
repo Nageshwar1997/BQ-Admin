@@ -1,6 +1,6 @@
 import axios from "axios";
-import { BACKEND_URL } from "../envs/index.env";
+import { envs } from "../envs";
 
-const api = axios.create({ baseURL: `${BACKEND_URL}/api` });
+const api = axios.create({ baseURL: `${envs.BACKEND_URL}/api` });
 
 export default api;
