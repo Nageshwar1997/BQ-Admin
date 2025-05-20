@@ -64,6 +64,7 @@ const UploadProduct = () => {
 
   const selectedCategory1 = watch("categoryLevelOne");
   const selectedCategory2 = watch("categoryLevelTwo");
+  const selectedCategory3 = watch("categoryLevelThree");
 
   const level1Data = categoryLevelsData.find(
     (cat) => cat.value === selectedCategory1
@@ -73,6 +74,9 @@ const UploadProduct = () => {
     (cat) => cat.value === selectedCategory2
   );
   const level3Options = level2Data?.subCategories || [];
+  const level3Data = level3Options.find(
+    (cat) => cat.value === selectedCategory3
+  );
 
   const handleReset = () => {
     commonImagePreviews.forEach((preview) => {
@@ -135,9 +139,27 @@ const UploadProduct = () => {
       "additionalDetails",
       getQuillValue(finalData.additionalDetails)
     );
-    formData.append("categoryLevelOne", finalData.categoryLevelOne);
-    formData.append("categoryLevelTwo", finalData.categoryLevelTwo);
-    formData.append("categoryLevelThree", finalData.categoryLevelThree);
+    formData.append(
+      "categoryLevelOne",
+      JSON.stringify({
+        category: finalData.categoryLevelOne,
+        name: level1Data?.label,
+      })
+    );
+    formData.append(
+      "categoryLevelTwo",
+      JSON.stringify({
+        category: finalData.categoryLevelTwo,
+        name: level2Data?.label,
+      })
+    );
+    formData.append(
+      "categoryLevelThree",
+      JSON.stringify({
+        category: finalData.categoryLevelThree,
+        name: level3Data?.label,
+      })
+    );
     formData.append("sellingPrice", String(finalData.sellingPrice));
     formData.append("originalPrice", String(finalData.originalPrice));
     formData.append("totalStock", String(finalData.totalStock));
@@ -166,8 +188,10 @@ const UploadProduct = () => {
     uploadProduct.mutate(formData, {
       onSettled(data, error) {
         if (data && !error) {
-          handleReset();
-          navigate("/products");
+          setTimeout(() => {
+            handleReset();
+            navigate("/products");
+          }, 600);
         }
       },
     });

@@ -5,7 +5,8 @@ import { LoginFormInputProps } from "../../types";
 
 export const useLoginUser = () => {
   return useMutation({
-    mutationFn: (bodyData: Partial<LoginFormInputProps>) => login_user(bodyData),
+    mutationFn: (bodyData: Partial<LoginFormInputProps>) =>
+      login_user(bodyData),
     onSuccess: (data) => {
       toastSuccessMessage(data?.message || "Login successful!");
     },

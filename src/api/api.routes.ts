@@ -14,6 +14,6 @@ export const userRoutes = {
 export const mediaRoutes = {
   uploadSingleImage: { method: "POST", url: "/media/image/upload" },
   uploadMultipleImages: { method: "POST", url: "/media/images/upload" },
-  deleteSingleImage: { method: "DELETE", url: "/media/images/delete" },
+  deleteSingleImage: { method: "DELETE", url: "/media/image/delete" },
   deleteMultipleImages: { method: "DELETE", url: "/media/images/delete" },
 };
