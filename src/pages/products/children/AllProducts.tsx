@@ -17,7 +17,7 @@ const AllProducts = () => {
         data: {
           shades: ["shadeName", "colorCode", "images"],
           seller: ["firstName", "lastName", "email"],
-          category: ["name", "parentCategory", "level"],
+          category: ["name", "category", "parentCategory", "level"],
         },
         params: { page, limit },
       },
