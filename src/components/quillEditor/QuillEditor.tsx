@@ -66,13 +66,16 @@ const QuillEditor = forwardRef<Quill | null, EditorProps>(
         modules: {
           toolbar: {
             container: [
-              [{ header: [false, 4, 3, 2, 1] }],
-              ["bold", "italic", "underline"],
+              [{ header: [false, 6, 5, 4, 3, 2, 1] }],
+              ["bold", "italic", "underline", "strike"],
+              [{ color: [] }, { background: [] }],
               [{ list: "ordered" }, { list: "bullet" }],
               [{ script: "sub" }, { script: "super" }],
               [{ indent: "-1" }, { indent: "+1" }],
-              ["link", "image"],
-              ["clean"],
+              [{ align: [] }],
+              [{ direction: "rtl" }],
+              ["link", "image", "video"],
+              ["code", "clean"],
             ],
             handlers: {
               image: function () {
@@ -90,31 +93,37 @@ const QuillEditor = forwardRef<Quill | null, EditorProps>(
       });
 
       quill.on("text-change", () => {
-        const html = quill.root.innerHTML;
-        if (html !== "<p><br></p>") {
-          onChange?.(html);
+        const html = quill.root.innerHTML.trim();
+        const isEmpty = html === "<p><br></p>";
+        onChange?.(isEmpty ? "" : html);
+        if (!isEmpty) {
           removeUnusedBlobUrls(quill, blobUrlsRef);
-        } else {
-          onChange?.("");
         }
       });
 
       editorRef.current = quill;
 
-      if (typeof ref === "function") {
-        ref(quill);
-      } else if (ref && "current" in ref) {
-        ref.current = quill;
+      if (ref) {
+        if (typeof ref === "function") {
+          ref(quill);
+        } else {
+          (ref as RefObject<Quill | null>).current = quill;
+        }
       }
+
+      // **Important**: Cache blobUrlsRef.current here
+      const blobUrls = blobUrlsRef.current;
 
       return () => {
         if (ref && "current" in ref) {
           ref.current = null;
         }
         container.innerHTML = "";
-        // Revoke all blob URLs
-        blobUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-        blobUrlsRef.current = [];
+        // Safe cleanup using cached blobUrls
+        if (blobUrls) {
+          blobUrls.forEach((url) => URL.revokeObjectURL(url));
+          blobUrls.length = 0;
+        }
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -157,4 +166,4 @@ const QuillEditor = forwardRef<Quill | null, EditorProps>(
   }
 );
 
-export default QuillEditor
+export default QuillEditor;

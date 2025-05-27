@@ -3,6 +3,8 @@ import CryptoJS from "crypto-js";
 import Quill from "quill";
 import { v4 as uuidv4 } from "uuid";
 import { envs } from "../envs";
+import { MB } from "../constants";
+import { toastErrorMessage } from "./toasts";
 
 export const encryptData = (data: string): string => {
   return CryptoJS.AES.encrypt(data, envs.ENCRYPTION_SECRET_KEY).toString();
@@ -68,8 +70,8 @@ export const addBlobUrlToImage = (
     const file = input.files[0];
 
     // Validate file size (2MB max)
-    if (file.size > 2 * 1024 * 1024) {
-      alert("Image size must be under 2MB!");
+    if (file.size > 2 * MB) {
+      toastErrorMessage("Image size must be under 2MB!");
       return;
     }
 
@@ -78,7 +80,7 @@ export const addBlobUrlToImage = (
     const range = quill.getSelection();
     if (!range) return;
 
-    blobUrlsRef.current.push(blobUrl);
+    blobUrlsRef.current?.push(blobUrl);
 
     quill.insertEmbed(range.index, "image", blobUrl, "user");
 
@@ -91,7 +93,7 @@ export function addIdsToHeadings(quill: Quill, options: { enable: boolean }) {
 
   const processHeadings = () => {
     const headings = quill.container.querySelectorAll("h1, h2, h3, h4, h5, h6");
-    headings.forEach((heading) => {
+    headings.forEach((heading: Element) => {
       if (heading.id) return;
       heading.id = uuidv4();
     });
@@ -109,15 +111,19 @@ export const removeUnusedBlobUrls = (
     (img) => img.getAttribute("src")
   );
 
-  const removedBlobUrls = blobUrlsRef.current.filter(
+  const removedBlobUrls = blobUrlsRef.current?.filter(
     (url) => !editorImages.includes(url)
   );
 
-  removedBlobUrls.forEach((url) => URL.revokeObjectURL(url));
+  removedBlobUrls?.forEach((url) => URL.revokeObjectURL(url));
 
-  blobUrlsRef.current = blobUrlsRef.current.filter((url) =>
-    editorImages.includes(url)
-  );
+  if (blobUrlsRef.current) {
+    const filteredUrls = blobUrlsRef.current.filter((url) =>
+      editorImages.includes(url)
+    );
+    blobUrlsRef.current.length = 0; // clear old
+    blobUrlsRef.current.push(...filteredUrls); // add new
+  }
 };
 
 export const toINRCurrency = (amount: number): string =>

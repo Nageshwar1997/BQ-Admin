@@ -22,9 +22,11 @@
     height: 300px;
     max-height: 300px;
     margin-bottom: 12px;
+    padding-bottom: 0 !important;
     & a {
       color: var(--blue-crayola-c) !important;
       text-decoration: none !important;
+      cursor: pointer !important;
     }
   }
   & .ql-formats {
@@ -95,6 +97,7 @@
   & .ql-editor.ql-blank::before {
     font-size: 14px;
     color: var(--primary-50);
+    font-family: "metropolis", sans-serif !important;
     font-style: italic;
   }
 }
