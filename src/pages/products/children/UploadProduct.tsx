@@ -30,15 +30,19 @@ import { productInitialValues } from "../data";
 import { processQuillContent, getQuillValue } from "./helpers";
 
 const UploadProduct = () => {
-  const quillDescriptionRef = useRef<Quill | null>(null);
-  const quillHowToUseRef = useRef<Quill | null>(null);
-  const quillIngredientsUseRef = useRef<Quill | null>(null);
-  const quillAdditionalDetailsUseRef = useRef<Quill | null>(null);
+  const quillRefs = {
+    description: useRef<Quill | null>(null),
+    howToUse: useRef<Quill | null>(null),
+    ingredients: useRef<Quill | null>(null),
+    additionalDetails: useRef<Quill | null>(null),
+  };
 
-  const descriptionBlobUrlsRef = useRef<string[]>([]);
-  const howToUseBlobUrlsRef = useRef<string[]>([]);
-  const ingredientsBlobUrlsRef = useRef<string[]>([]);
-  const additionalDetailsBlobUrlsRef = useRef<string[]>([]);
+  const blobUrlRefs = {
+    description: useRef<string[]>([]),
+    howToUse: useRef<string[]>([]),
+    ingredients: useRef<string[]>([]),
+    additionalDetails: useRef<string[]>([]),
+  };
 
   const [shades, setShades] = useState<ShadeType[]>([]);
   const [commonImages, setCommonImages] = useState<File[]>([]);
@@ -93,32 +97,32 @@ const UploadProduct = () => {
   const handleUpload = async (data: ProductType) => {
     await Promise.all([
       processQuillContent(
-        quillDescriptionRef,
-        descriptionBlobUrlsRef,
+        quillRefs.description,
+        blobUrlRefs.description,
         setValue,
         "description",
         `Products/${data.title}/Description`,
         "product"
       ),
       processQuillContent(
-        quillHowToUseRef,
-        howToUseBlobUrlsRef,
+        quillRefs.howToUse,
+        blobUrlRefs.howToUse,
         setValue,
         "howToUse",
         `Products/${data.title}/How_To_Use`,
         "product"
       ),
       processQuillContent(
-        quillIngredientsUseRef,
-        ingredientsBlobUrlsRef,
+        quillRefs.ingredients,
+        blobUrlRefs.ingredients,
         setValue,
         "ingredients",
         `Products/${data.title}/Ingredients`,
         "product"
       ),
       processQuillContent(
-        quillAdditionalDetailsUseRef,
-        additionalDetailsBlobUrlsRef,
+        quillRefs.additionalDetails,
+        blobUrlRefs.additionalDetails,
         setValue,
         "additionalDetails",
         `Products/${data.title}/Additional_Details`,
@@ -394,17 +398,17 @@ const UploadProduct = () => {
               <div className="w-full grid gap-y-7 gap-x-4 lg:grid-cols-2">
                 {QUILL_DATA.map((input, index) => {
                   const editorMap = {
-                    description: quillDescriptionRef,
-                    howToUse: quillHowToUseRef,
-                    ingredients: quillIngredientsUseRef,
-                    additionalDetails: quillAdditionalDetailsUseRef,
+                    description: quillRefs.description,
+                    howToUse: quillRefs.howToUse,
+                    ingredients: quillRefs.ingredients,
+                    additionalDetails: quillRefs.additionalDetails,
                   };
 
                   const blobMap = {
-                    description: descriptionBlobUrlsRef,
-                    howToUse: howToUseBlobUrlsRef,
-                    ingredients: ingredientsBlobUrlsRef,
-                    additionalDetails: additionalDetailsBlobUrlsRef,
+                    description: blobUrlRefs.description,
+                    howToUse: blobUrlRefs.howToUse,
+                    ingredients: blobUrlRefs.ingredients,
+                    additionalDetails: blobUrlRefs.additionalDetails,
                   };
 
                   return (
