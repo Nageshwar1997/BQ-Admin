@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { shadeSchema } from "../product.schema";
-import { ShadeType, VerticalScrollType } from "../../../../types";
+import { ShadeType } from "../../../../types";
 import { RefObject, useEffect, useState } from "react";
 import Button from "../../../../components/button/Button";
 import ColorPicker from "../../../../components/input/colorPicker/ColorPicker";
@@ -82,9 +82,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
   return (
     <div className="z-[100] fixed inset-0 w-full h-full flex justify-center items-center bg-primary-inverted-50 backdrop-blur-[2px]">
       <div className="max-w-lg max-h-[85dvh] md:max-h-[95dvh] w-full rounded-lg border border-secondary-battleship-davys-gray shadow-light-dark-soft bg-platinum-black relative overflow-hidden">
-        {(showGradient as VerticalScrollType).top && (
-          <TopGradient className="!w-full h-8 z-[4]" />
-        )}
+        {showGradient.top && <TopGradient className="!w-full h-8 z-[4]" />}
         <div
           className="w-full max-h-[85dvh] md:max-h-[95dvh] overflow-y-scroll p-4"
           ref={containerRef as RefObject<HTMLDivElement>}
@@ -201,7 +199,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
             </div>
           </form>
         </div>
-        {(showGradient as VerticalScrollType).bottom && (
+        {showGradient.bottom && (
           <BottomGradient className="!w-full h-8 z-[4]" />
         )}
       </div>

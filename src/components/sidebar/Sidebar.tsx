@@ -1,10 +1,9 @@
 import { RefObject } from "react";
+import { useNavigate } from "react-router-dom";
 import useVerticalScrollable from "../../hooks/useVerticalScrollable";
 import { DropdownIcon } from "../../icons";
-import { VerticalScrollType } from "../../types";
 import { BottomGradient, TopGradient } from "../Gradients";
 import { sidebarData } from "./data";
-import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../../store/user.store";
 
 const Sidebar = () => {
@@ -46,7 +45,7 @@ const Sidebar = () => {
           </div>
         </div>
         <div className="w-full h-[calc(100%-152px)] relative">
-          {(showGradient as VerticalScrollType).top && (
+          {showGradient.top && (
             <TopGradient className="!w-full h-8 from-secondary-inverted rounded-t-lg" />
           )}
           <div
@@ -74,7 +73,7 @@ const Sidebar = () => {
               );
             })}
           </div>
-          {(showGradient as VerticalScrollType).bottom && (
+          {showGradient.bottom && (
             <BottomGradient className="!w-full h-8 from-secondary-inverted rounded-b-lg" />
           )}
         </div>

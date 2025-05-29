@@ -1,9 +1,8 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../../components/navbar/Navbar";
-// import Footer from "../../components/footer/Footer";
+import Footer from "../../components/footer/Footer";
 import { RefObject } from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
-import { VerticalScrollType } from "../../types";
 import { BottomGradient } from "../../components/Gradients";
 import useVerticalScrollable from "../../hooks/useVerticalScrollable";
 
@@ -25,10 +24,10 @@ const Main = () => {
             <main className="w-full bg-primary-inverted">
               <Outlet />
             </main>
-            {/* <Footer /> */}
+            <Footer />
           </div>
         </div>
-        {(showGradient as VerticalScrollType).bottom && (
+        {showGradient.bottom && (
           <BottomGradient className="!w-full h-8 from-secondary-inverted rounded-b-lg z-[100]" />
         )}
       </div>

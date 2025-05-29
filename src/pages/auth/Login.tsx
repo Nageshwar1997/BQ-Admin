@@ -7,11 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginZodSchema } from "./validations";
 import { loginInputMapData, LoginTextContent } from "./data";
 import useVerticalScrollable from "../../hooks/useVerticalScrollable";
-import {
-  LoginFormInputProps,
-  LoginTypes,
-  VerticalScrollType,
-} from "../../types";
+import { LoginFormInputProps, LoginTypes } from "../../types";
 import { BottomGradient, TopGradient } from "../../components/Gradients";
 import AuthRobot from "./components/AuthRobot";
 import TextDisplay from "../../components/TextDisplay";
@@ -101,13 +97,12 @@ const Login = () => {
       <div
         ref={containerRef as RefObject<HTMLDivElement>}
         className={`w-full lg:w-1/2 flex flex-col items-center gap-4 overflow-hidden overflow-y-scroll ${
-          !(showGradient as VerticalScrollType).bottom &&
-          !(showGradient as VerticalScrollType).top
+          !showGradient.bottom && !showGradient.top
             ? "justify-center"
             : "justify-start"
         }`}
       >
-        {(showGradient as VerticalScrollType).top && <TopGradient />}
+        {showGradient.top && <TopGradient />}
         <form
           onSubmit={handleSubmit(onSubmit)}
           autoComplete="off"
@@ -221,7 +216,7 @@ const Login = () => {
             </div>
           </div>
         </form>
-        {(showGradient as VerticalScrollType).bottom && <BottomGradient />}
+        {showGradient.bottom && <BottomGradient />}
       </div>
     </div>
   );
