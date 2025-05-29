@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { login_user } from "./auth.api";
-import { toastErrorMessage, toastSuccessMessage } from "../../utils/toasts";
+import { toastErrorMessage, toastSuccessMessage } from "../../utils/toast.util";
 import { LoginFormInputProps } from "../../types";
 
 export const useLoginUser = () => {

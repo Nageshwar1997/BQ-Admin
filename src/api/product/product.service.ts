@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { toastErrorMessage, toastSuccessMessage } from "../../utils/toasts";
+import { toastErrorMessage, toastSuccessMessage } from "../../utils/toast.util";
 import { get_all_products, upload_product } from "./product.api";
 
 export const useUploadProduct = () => {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zodStringOptional, zodStringRequired } from "../../../utils";
+import { zodStringOptional, zodStringRequired } from "../../../utils/zod.util";
 import { regexes } from "../../../constants";
 
 export const loginZodSchema = z
