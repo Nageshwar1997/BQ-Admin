@@ -1,4 +1,5 @@
-import { yupResolver } from "@hookform/resolvers/yup";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { shadeSchema } from "../product.schema";
 import { ShadeType, VerticalScrollType } from "../../../../types";
@@ -34,8 +35,8 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
     reset: shadeReset,
     control: shadeControl,
     formState: { errors: shadeErrors },
-  } = useForm<ShadeType>({
-    resolver: yupResolver(shadeSchema),
+  } = useForm<z.infer<typeof shadeSchema>>({
+    resolver: zodResolver(shadeSchema),
     defaultValues: shadeInitialValue,
   });
 
