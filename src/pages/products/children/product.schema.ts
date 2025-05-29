@@ -5,7 +5,11 @@ import {
   MB,
   regexes,
 } from "../../../constants";
-import { zodNumberRequired, zodStringRequired } from "../../../utils/zod.util";
+import {
+  zodNumberRequired,
+  zodStringOptional,
+  zodStringRequired,
+} from "../../../utils/zod.util";
 
 export const shadeSchema = z.object({
   shadeName: zodStringRequired({
@@ -40,7 +44,6 @@ export const shadeSchema = z.object({
     .min(1, "At least one image is required")
     .superRefine((files, ctx) => {
       files.forEach((file, index) => {
-        // Check if file is actually a File instance
         if (!(file instanceof File)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -79,53 +82,99 @@ export const shadeSchema = z.object({
 });
 
 export const productSchema = z.object({
-  title: z
-    .string({ required_error: "Title is required" })
-    .min(1, "Title is required"),
-  brand: z
-    .string({ required_error: "Brand is required" })
-    .min(1, "Brand is required"),
-  description: z
-    .string({ required_error: "Description is required" })
-    .min(1, "Description is required"),
-  howToUse: z.string().optional(),
-  ingredients: z.string().optional(),
-  additionalDetails: z.string().optional(),
-  categoryLevelOne: z
-    .string({ required_error: "Category 1 is required" })
-    .min(1, "Category 1 is required"),
-  categoryLevelTwo: z
-    .string({ required_error: "Category 2 is required" })
-    .min(1, "Category 2 is required"),
-  categoryLevelThree: z
-    .string({ required_error: "Category 3 is required" })
-    .min(1, "Category 3 is required"),
-  originalPrice: z.coerce
-    .number({
-      required_error: "Original price is required",
-      invalid_type_error: "Original price must be a number",
-    })
-    .positive("Original price must be positive")
-    .min(1, "Original price cannot be less than 1"),
-  sellingPrice: z.coerce
-    .number({
-      required_error: "Selling price is required",
-      invalid_type_error: "Selling price must be a number",
-    })
-    .positive("Selling price must be positive")
-    .min(1, "Selling price cannot be less than 1"),
-  totalStock: z.coerce
-    .number({
-      required_error: "Stock is required",
-      invalid_type_error: "Stock must be a number",
-    })
-    .min(5, "Stock cannot be less than 5"),
+  title: zodStringRequired({
+    field: "title",
+    showingFieldName: "Title",
+    min: 2,
+    blockMultipleSpaces: true,
+  }),
+  brand: zodStringRequired({
+    field: "brand",
+    showingFieldName: "Brand",
+    blockMultipleSpaces: true,
+  }),
+  description: zodStringRequired({
+    field: "description",
+    showingFieldName: "Description",
+    blockMultipleSpaces: true,
+    customRegexes: [
+      {
+        regex: regexes.contentAtLeastLength,
+        message: "must be exactly 10 characters long",
+      },
+    ],
+  }),
+  howToUse: zodStringOptional({
+    field: "howToUse",
+    showingFieldName: "How to use",
+    blockMultipleSpaces: true,
+    customRegexes: [
+      {
+        regex: regexes.contentAtLeastLength,
+        message: "must be exactly 10 characters long",
+      },
+    ],
+  }),
+  ingredients: zodStringOptional({
+    field: "ingredients",
+    showingFieldName: "Ingredients",
+    blockMultipleSpaces: true,
+    customRegexes: [
+      {
+        regex: regexes.contentAtLeastLength,
+        message: "must be exactly 10 characters long",
+      },
+    ],
+  }),
+  additionalDetails: zodStringOptional({
+    field: "additionalDetails",
+    showingFieldName: "Additional details",
+    blockMultipleSpaces: true,
+    customRegexes: [
+      {
+        regex: regexes.contentAtLeastLength,
+        message: "must be exactly 10 characters long",
+      },
+    ],
+  }),
+  categoryLevelOne: zodStringRequired({
+    field: "categoryLevelOne",
+    showingFieldName: "Category 1",
+    blockSingleSpace: true,
+  }),
+  categoryLevelTwo: zodStringRequired({
+    field: "categoryLevelTwo",
+    showingFieldName: "Category 2",
+    blockSingleSpace: true,
+  }),
+  categoryLevelThree: zodStringRequired({
+    field: "categoryLevelThree",
+    showingFieldName: "Category 3",
+    blockSingleSpace: true,
+  }),
+  originalPrice: zodNumberRequired({
+    field: "originalPrice",
+    showingFieldName: "Original price",
+    nonNegative: true,
+    min: 1,
+  }),
+  sellingPrice: zodNumberRequired({
+    field: "sellingPrice",
+    showingFieldName: "Selling price",
+    nonNegative: true,
+    min: 1,
+  }),
+  totalStock: zodNumberRequired({
+    field: "totalStock",
+    showingFieldName: "Total stock",
+    nonNegative: true,
+    min: 5,
+  }),
   commonImages: z
     .array(z.any())
     .min(1, "At least one image is required")
     .superRefine((files, ctx) => {
       files.forEach((file, index) => {
-        // Check if file is actually a File instance
         if (!(file instanceof File)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,

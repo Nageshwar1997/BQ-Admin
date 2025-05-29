@@ -182,4 +182,5 @@ export type TRegexes =
   | "atLeastOneLowercaseLetter"
   | "atLeastOneSpecialCharacter"
   | "atLeastOneUppercaseLetter"
+  | "contentAtLeastLength"
   | "onlyLettersAndSpacesAndDots";
