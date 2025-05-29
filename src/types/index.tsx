@@ -115,12 +115,11 @@ export interface UserStoreType {
   logout: () => void;
 }
 
-export interface LevelOneCategoryType {
+export interface LevelThreeCategoryType {
   id: number;
   level: number;
   label: string;
   value: string;
-  subCategories: LevelTwoCategoryType[];
 }
 
 export interface LevelTwoCategoryType {
@@ -131,17 +130,18 @@ export interface LevelTwoCategoryType {
   subCategories: LevelThreeCategoryType[];
 }
 
-export interface LevelThreeCategoryType {
+export interface LevelOneCategoryType {
   id: number;
   level: number;
   label: string;
   value: string;
+  subCategories: LevelTwoCategoryType[];
 }
 
 export interface ShadeType {
   shadeName: string;
   colorCode: string;
-  stock: number | null;
+  stock: number | undefined;
   images: File[];
 }
 
@@ -155,9 +155,9 @@ export interface ProductType {
   categoryLevelOne: string;
   categoryLevelTwo: string;
   categoryLevelThree: string;
-  originalPrice: number | null;
-  sellingPrice: number | null;
-  totalStock: number | null;
+  originalPrice: number | undefined;
+  sellingPrice: number | undefined;
+  totalStock: number | undefined;
   commonImages?: File[];
   shades?: ShadeType[];
 }
