@@ -1,8 +1,10 @@
 import { RefObject, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { loginSchema } from "./helpers/auth.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { loginZodSchema } from "./helpers/auth.schema";
 import { loginInputMapData, LoginTextContent } from "./data";
 import useVerticalScrollable from "../../hooks/useVerticalScrollable";
 import {
@@ -39,8 +41,8 @@ const Login = () => {
     reset,
     register,
     watch,
-  } = useForm({
-    resolver: yupResolver(loginSchema),
+  } = useForm<z.infer<typeof loginZodSchema>>({
+    resolver: zodResolver(loginZodSchema),
     defaultValues: {
       loginMethod: loginMethod,
       email: "",
@@ -52,7 +54,7 @@ const Login = () => {
 
   const selectedMethod = watch("loginMethod");
 
-  const handleLoginMethodChange = (method: "email" | "phoneNumber") => {
+  const handleLoginMethodChange = (method: LoginTypes) => {
     setLoginMethod(method);
     reset({
       loginMethod: method,

@@ -3,8 +3,10 @@ import CryptoJS from "crypto-js";
 import Quill from "quill";
 import { v4 as uuidv4 } from "uuid";
 import { envs } from "../envs";
-import { MB } from "../constants";
+import { MB, regexes } from "../constants";
 import { toastErrorMessage } from "./toasts";
+import { z } from "zod";
+import { ZodStringConfigs } from "../types";
 
 export const encryptData = (data: string): string => {
   return CryptoJS.AES.encrypt(data, envs.ENCRYPTION_SECRET_KEY).toString();
@@ -132,3 +134,161 @@ export const toINRCurrency = (amount: number): string =>
     currency: "INR",
     maximumFractionDigits: 2,
   }).format(amount);
+
+export interface ZodOptionalStringConfigs {
+  field: string;
+  showingFieldName: string;
+  parentField?: string;
+  showingParentFieldName?: string;
+  nonEmpty?: boolean;
+  min?: number;
+  max?: number;
+  blockSingleSpace?: boolean;
+  blockMultipleSpaces?: boolean;
+  customRegexes?: { regex: RegExp; message: string }[];
+}
+
+export const validateOptionalZodString = ({
+  field,
+  showingFieldName,
+  showingParentFieldName,
+  nonEmpty = true,
+  min,
+  max,
+  blockSingleSpace,
+  blockMultipleSpaces,
+  parentField,
+  customRegexes,
+}: ZodOptionalStringConfigs) => {
+  const readableField = showingFieldName ?? field;
+  const readableParent = showingParentFieldName ?? parentField;
+
+  const nestedField = readableParent
+    ? `${readableParent}${
+        readableParent.includes("[") ? " " : "."
+      }${readableField}`
+    : readableField;
+
+  const messages = {
+    required: `${nestedField} is required.`,
+    invalid_type: `${nestedField} must be a string.`,
+    non_empty: `${nestedField} cannot be empty.`,
+    min: `${nestedField} must be at least ${min} characters.`,
+    max: `${nestedField} must not exceed ${max} characters.`,
+    multiple_spaces: `${nestedField} must not contain multiple consecutive spaces.`,
+    single_space: `${nestedField} must not contain any spaces.`,
+    custom: `${nestedField} `,
+  };
+
+  const schema = z
+    .string()
+    .trim()
+    .optional()
+    .superRefine((val, ctx) => {
+      if (val === undefined || val === null || val === "") return;
+
+      if (nonEmpty && val.trim().length === 0) {
+        ctx.addIssue({ code: "custom", message: messages.non_empty });
+      }
+
+      if (nonEmpty && min !== undefined && val.length < min) {
+        ctx.addIssue({ code: "custom", message: messages.min });
+      }
+
+      if (nonEmpty && max !== undefined && val.length > max) {
+        ctx.addIssue({ code: "custom", message: messages.max });
+      }
+
+      if (blockMultipleSpaces && !regexes.singleSpace.test(val)) {
+        ctx.addIssue({ code: "custom", message: messages.multiple_spaces });
+      }
+
+      if (blockSingleSpace && !regexes.noSpace.test(val)) {
+        ctx.addIssue({ code: "custom", message: messages.single_space });
+      }
+
+      if (customRegexes?.length) {
+        customRegexes.forEach(
+          ({ regex, message }: { regex: RegExp; message: string }) => {
+            if (!regex.test(val)) {
+              ctx.addIssue({
+                code: "custom",
+                message: `${messages.custom} ${message}.`,
+              });
+            }
+          }
+        );
+      }
+    });
+
+  return schema;
+};
+
+export const validateZodString = ({
+  field,
+  showingFieldName,
+  showingParentFieldName,
+  nonEmpty = true,
+  min,
+  max,
+  blockSingleSpace,
+  blockMultipleSpaces,
+  parentField,
+  customRegexes,
+}: ZodStringConfigs) => {
+  const readableField = showingFieldName ?? field;
+  const readableParent = showingParentFieldName ?? parentField;
+
+  const nestedField = readableParent
+    ? `${readableParent}${
+        readableParent.includes("[") ? " " : "."
+      }${readableField}`
+    : readableField;
+
+  const messages = {
+    required: `${nestedField} is required.`,
+    invalid_type: `${nestedField} must be a string.`,
+    non_empty: `${nestedField} cannot be empty.`,
+    min: `${nestedField} must be at least ${min} characters.`,
+    max: `${nestedField} must not exceed ${max} characters.`,
+    multiple_spaces: `${nestedField} must not contain multiple consecutive spaces.`,
+    single_space: `${nestedField} must not contain any spaces.`,
+    custom: `${nestedField} `,
+  };
+
+  let schema = z
+    .string({
+      required_error: messages.required,
+      invalid_type_error: messages.invalid_type,
+    })
+    .trim()
+    .min(1, messages.required);
+
+  if (nonEmpty) {
+    schema = schema.nonempty({ message: messages.non_empty });
+  }
+
+  if (nonEmpty && min !== undefined) {
+    schema = schema.min(min, messages.min);
+  }
+
+  if (nonEmpty && max !== undefined) {
+    schema = schema.max(max, messages.max);
+  }
+
+  if (blockMultipleSpaces) {
+    schema = schema.regex(regexes.singleSpace, messages.multiple_spaces);
+  }
+
+  if (blockSingleSpace) {
+    schema = schema.regex(regexes.noSpace, messages.single_space);
+  }
+
+  if (customRegexes && customRegexes.length > 0) {
+    customRegexes.forEach(({ regex, message }) => {
+      schema = schema.regex(regex, `${messages.custom} ${message}.`);
+    });
+  }
+
+  return schema;
+};
