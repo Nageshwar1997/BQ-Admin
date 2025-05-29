@@ -3,6 +3,7 @@ import { InfoIcon } from "../../icons";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { CloseIcon } from "../sidebar/icons";
 import ImageCarousel from "../modals/ImageCarousel";
+import { ALLOWED_IMAGE_TYPES } from "../../constants";
 
 const ImageUpload = ({
   icon,
@@ -56,7 +57,7 @@ const ImageUpload = ({
             id={name}
             type="file"
             multiple={true}
-            accept="image/webp, image/png, image/jpeg, image/jpg"
+            accept={ALLOWED_IMAGE_TYPES.join(", ")}
             className="hidden"
             name={name}
             {...register}
