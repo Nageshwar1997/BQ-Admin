@@ -19,7 +19,7 @@ import Button from "../../components/button/Button";
 import Checkbox from "../../components/input/Checkbox";
 import { saveUserLocal, saveUserSession } from "../../utils";
 import { useLoginUser } from "../../api/auth/auth.service";
-import LoadingPage from "../../components/loaders/LoadingPage";
+import LoadingPage from "../../components/ui/loaders/LoadingPage";
 import DarkMode from "../../components/DarkMode";
 
 const Login = () => {

@@ -25,7 +25,7 @@ import { productSchema } from "./product.schema";
 import { ProductType, ShadeType } from "../../../types";
 import QuillEditor from "../../../components/quillEditor/QuillEditor";
 import { useUploadProduct } from "../../../api/product/product.service";
-import LoadingPage from "../../../components/loaders/LoadingPage";
+import LoadingPage from "../../../components/ui/loaders/LoadingPage";
 import ImageUpload from "../../../components/input/ImageUpload";
 import { productInitialValues } from "../data";
 import { processQuillContent, getQuillValue } from "./helpers";

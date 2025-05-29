@@ -7,7 +7,7 @@ const Main = lazy(() => import("../pages/main/Main"));
 import Home from "../pages/home/Home";
 import LoginRedirect from "./LoginRedirect";
 import NotFound from "../pages/error/NotFound";
-import LoadingScreen from "../components/loaders/LoadingScreen";
+import LoadingScreen from "../components/ui/loaders/LoadingScreen";
 import PrivateRoute from "./PrivateRoute";
 import AllProducts from "../pages/products/children/AllProducts";
 import UploadProduct from "../pages/products/children/UploadProduct";

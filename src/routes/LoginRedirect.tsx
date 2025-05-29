@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import Login from "../pages/auth/Login";
 import { useUserStore } from "../store/user.store";
 import { useAuthCheck } from "../hooks/useAuthCheck";
-import LoadingScreen from "../components/loaders/LoadingScreen";
+import LoadingScreen from "../components/ui/loaders/LoadingScreen";
 
 const LoginRedirect = () => {
   const { isAuthenticated } = useUserStore();
