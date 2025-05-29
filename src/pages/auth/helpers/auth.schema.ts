@@ -1,41 +1,91 @@
-import * as yup from "yup";
+import { z } from "zod";
+import { validateOptionalZodString, validateZodString } from "../../../utils";
+import { regexes } from "../../../constants";
 
-export const loginSchema = yup.object().shape({
-  loginMethod: yup.string().oneOf(["email", "phoneNumber"]).required(),
-  email: yup.string().when("loginMethod", {
-    is: "email",
-    then: (schema) =>
-      schema
-        .email("Invalid email format")
-        .required("Email is required")
-        .matches(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, {
-          message: "Invalid email address",
-          excludeEmptyString: true,
-        })
-        .matches(/^\S*$/, "Email cannot contain spaces"),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  phoneNumber: yup.string().when("loginMethod", {
-    is: "phoneNumber",
-    then: (schema) =>
-      schema
-        .required("Phone number is required")
-        .matches(/^[6-9]/, "Mobile number must start with 6, 7, 8, or 9")
-        .matches(/^\d{10}$/, "Mobile number must be exactly 10 digits"),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  password: yup
-    .string()
-    .required("Password is required")
-    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-    .matches(/\d/, "Password must contain at least one number")
-    .matches(
-      /[@$!%*?&#]/,
-      "Password must contain at least one special character"
-    )
-    .matches(/^\S*$/, "Password can't contain spaces")
-    .min(6, "Password must be at least 6 characters")
-    .max(20, "Password cannot exceed 20 characters"),
-  remember: yup.boolean(),
-});
+export const loginZodSchema = z
+  .object({
+    loginMethod: z.enum(["email", "phoneNumber"]),
+    email: validateOptionalZodString({
+      field: "email",
+      showingFieldName: "Email",
+      blockSingleSpace: true,
+      nonEmpty: false,
+      customRegexes: [
+        {
+          regex: regexes.email,
+          message: "in an invalid format, e.g. (example@domain.com)",
+        },
+      ],
+    }),
+    phoneNumber: validateOptionalZodString({
+      field: "phoneNumber",
+      showingFieldName: "Phone number",
+      blockSingleSpace: true,
+      nonEmpty: false,
+      customRegexes: [
+        {
+          regex: regexes.phoneStart,
+          message: "must start with 6, 7, 8, or 9",
+        },
+        {
+          regex: regexes.onlyDigits,
+          message: "must contain only digits (0-9)",
+        },
+        {
+          regex: regexes.phoneExactLength,
+          message: "must be exactly 10 digits long",
+        },
+        {
+          regex: regexes.phone,
+          message:
+            "must be a valid Indian number starting with 6, 7, 8, or 9 and be exactly 10 digits long.",
+        },
+      ],
+    }),
+    password: validateZodString({
+      field: "password",
+      showingFieldName: "Password",
+      blockSingleSpace: true,
+      min: 6,
+      max: 20,
+      customRegexes: [
+        {
+          regex: regexes.atLeastOneUppercaseLetter,
+          message: "must contain at least one uppercase letter",
+        },
+        {
+          regex: regexes.atLeastOneLowercaseLetter,
+          message: "must contain at least one lowercase letter",
+        },
+        {
+          regex: regexes.atLeastOneDigit,
+          message: "must contain at least one number",
+        },
+        {
+          regex: regexes.atLeastOneSpecialCharacter,
+          message: "must contain at least one special character",
+        },
+      ],
+    }),
+    remember: z.boolean().optional().default(false),
+  })
+  .superRefine((data, ctx) => {
+    if (data.loginMethod === "email") {
+      if (!data.email || data.email.trim() === "") {
+        ctx.addIssue({
+          path: ["email"],
+          code: z.ZodIssueCode.custom,
+          message: "Email is required",
+        });
+      }
+    }
+    if (data.loginMethod === "phoneNumber") {
+      if (!data.phoneNumber || data.phoneNumber.trim() === "") {
+        ctx.addIssue({
+          path: ["phoneNumber"],
+          code: z.ZodIssueCode.custom,
+          message: "Phone number is required",
+        });
+      }
+    }
+  });
