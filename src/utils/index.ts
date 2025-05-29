@@ -6,7 +6,11 @@ import { envs } from "../envs";
 import { MB, regexes } from "../constants";
 import { toastErrorMessage } from "./toasts";
 import { z } from "zod";
-import { ZodStringConfigs } from "../types";
+import {
+  TZodRegex,
+  ZodOptionalStringConfigs,
+  ZodRequiredStringConfigs,
+} from "../types/zod.types";
 
 export const encryptData = (data: string): string => {
   return CryptoJS.AES.encrypt(data, envs.ENCRYPTION_SECRET_KEY).toString();
@@ -135,20 +139,7 @@ export const toINRCurrency = (amount: number): string =>
     maximumFractionDigits: 2,
   }).format(amount);
 
-export interface ZodOptionalStringConfigs {
-  field: string;
-  showingFieldName: string;
-  parentField?: string;
-  showingParentFieldName?: string;
-  nonEmpty?: boolean;
-  min?: number;
-  max?: number;
-  blockSingleSpace?: boolean;
-  blockMultipleSpaces?: boolean;
-  customRegexes?: { regex: RegExp; message: string }[];
-}
-
-export const validateOptionalZodString = ({
+export const zodStringOptional = ({
   field,
   showingFieldName,
   showingParentFieldName,
@@ -224,7 +215,7 @@ export const validateOptionalZodString = ({
   return schema;
 };
 
-export const validateZodString = ({
+export const zodStringRequired = ({
   field,
   showingFieldName,
   showingParentFieldName,
@@ -235,7 +226,7 @@ export const validateZodString = ({
   blockMultipleSpaces,
   parentField,
   customRegexes,
-}: ZodStringConfigs) => {
+}: ZodRequiredStringConfigs) => {
   const readableField = showingFieldName ?? field;
   const readableParent = showingParentFieldName ?? parentField;
 
@@ -284,8 +275,8 @@ export const validateZodString = ({
     schema = schema.regex(regexes.noSpace, messages.single_space);
   }
 
-  if (customRegexes && customRegexes.length > 0) {
-    customRegexes.forEach(({ regex, message }) => {
+  if (customRegexes?.length) {
+    customRegexes.forEach(({ regex, message }: TZodRegex) => {
       schema = schema.regex(regex, `${messages.custom} ${message}.`);
     });
   }

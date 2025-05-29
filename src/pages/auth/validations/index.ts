@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { validateOptionalZodString, validateZodString } from "../../../utils";
+import { zodStringOptional, zodStringRequired } from "../../../utils";
 import { regexes } from "../../../constants";
 
 export const loginZodSchema = z
   .object({
     loginMethod: z.enum(["email", "phoneNumber"]),
-    email: validateOptionalZodString({
+    email: zodStringOptional({
       field: "email",
       showingFieldName: "Email",
       blockSingleSpace: true,
@@ -17,7 +17,7 @@ export const loginZodSchema = z
         },
       ],
     }),
-    phoneNumber: validateOptionalZodString({
+    phoneNumber: zodStringOptional({
       field: "phoneNumber",
       showingFieldName: "Phone number",
       blockSingleSpace: true,
@@ -42,7 +42,7 @@ export const loginZodSchema = z
         },
       ],
     }),
-    password: validateZodString({
+    password: zodStringRequired({
       field: "password",
       showingFieldName: "Password",
       blockSingleSpace: true,
