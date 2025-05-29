@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import Quill from "quill";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
@@ -61,8 +62,8 @@ const UploadProduct = () => {
     setValue,
     watch,
     formState: { errors },
-  } = useForm<ProductType>({
-    resolver: yupResolver(productSchema),
+  } = useForm<z.infer<typeof productSchema>>({
+    resolver: zodResolver(productSchema),
     defaultValues: productInitialValues,
   });
 
