@@ -1,23 +1,28 @@
 import { z } from "zod";
-import { MB } from "../../../constants";
+import { MB, regexes } from "../../../constants";
+import { zodStringRequired } from "../../../utils/zod.util";
 const MAX_FILE_SIZE = 0.2 * 1024 * 1024; // 2 MB
 const ACCEPTED_FORMATS = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
 
 export const shadeSchema = z.object({
-  shadeName: z
-    .string({ required_error: "Shade name is required" })
-    .min(1, "Shade name is required")
-    .refine((val) => !/\s{2,}/.test(val), {
-      message: "Only one space is allowed between words",
-    }),
-
-  colorCode: z
-    .string({ required_error: "Color code is required" })
-    .min(1, "Color code is required")
-    .regex(
-      /^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/,
-      "Please select or enter a valid color code"
-    ),
+  shadeName: zodStringRequired({
+    field: "shadeName",
+    showingFieldName: "Shade name",
+    blockMultipleSpaces: true,
+    min: 2,
+    max: 50,
+  }),
+  colorCode: zodStringRequired({
+    field: "colorCode",
+    showingFieldName: "Color code",
+    blockMultipleSpaces: true,
+    min: 4,
+    max: 9,
+    blockSingleSpace: true,
+    customRegexes: [
+      { regex: regexes.hexCode, message: "must be a valid hex code" },
+    ],
+  }),
 
   stock: z.coerce
     .number({
