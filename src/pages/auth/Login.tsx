@@ -1,4 +1,4 @@
-import { RefObject, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
@@ -95,7 +95,7 @@ const Login = () => {
       <AuthRobot />
       <DarkMode className="border absolute top-5 right-5 h-fit p-2 md:p-3 rounded-full bg-secondary-inverted [&_path]:!stroke-secondary z-10" />
       <div
-        ref={containerRef as RefObject<HTMLDivElement>}
+        ref={containerRef}
         className={`w-full lg:w-1/2 flex flex-col items-center gap-4 overflow-hidden overflow-y-scroll ${
           !showGradient.bottom && !showGradient.top
             ? "justify-center"

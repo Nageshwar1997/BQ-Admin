@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+
 import { shadeSchema } from "../product.schema";
 import { ShadeType } from "../../../../types";
-import { RefObject, useEffect, useState } from "react";
 import Button from "../../../../components/button/Button";
 import ColorPicker from "../../../../components/input/colorPicker/ColorPicker";
 import Input from "../../../../components/input/Input";
@@ -85,7 +86,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
         {showGradient.top && <TopGradient className="!w-full h-8 z-[4]" />}
         <div
           className="w-full max-h-[85dvh] md:max-h-[95dvh] overflow-y-scroll p-4"
-          ref={containerRef as RefObject<HTMLDivElement>}
+          ref={containerRef}
         >
           <form
             className="w-full flex flex-col gap-7"

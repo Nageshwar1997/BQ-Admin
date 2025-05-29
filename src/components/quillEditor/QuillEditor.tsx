@@ -107,7 +107,7 @@ const QuillEditor = forwardRef<Quill | null, EditorProps>(
         if (typeof ref === "function") {
           ref(quill);
         } else {
-          (ref as RefObject<Quill | null>).current = quill;
+          ref.current = quill;
         }
       }
 

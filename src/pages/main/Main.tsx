@@ -1,7 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "../../components/navbar/Navbar";
 import Footer from "../../components/footer/Footer";
-import { RefObject } from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
 import { BottomGradient } from "../../components/Gradients";
 import useVerticalScrollable from "../../hooks/useVerticalScrollable";
@@ -14,7 +13,7 @@ const Main = () => {
       <Sidebar />
       <div className="w-full h-full relative">
         <div
-          ref={containerRef as RefObject<HTMLDivElement>}
+          ref={containerRef}
           className="grow max-w-full h-full overflow-y-scroll rounded-lg relative"
         >
           <div className="bg-primary-inverted w-full sticky top-0 z-50">

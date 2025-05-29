@@ -1,4 +1,3 @@
-import { RefObject } from "react";
 import { useNavigate } from "react-router-dom";
 import useVerticalScrollable from "../../hooks/useVerticalScrollable";
 import { DropdownIcon } from "../../icons";
@@ -50,7 +49,7 @@ const Sidebar = () => {
           )}
           <div
             className="w-full h-full overflow-y-scroll p-2 flex flex-col gap-3 pb-5"
-            ref={containerRef as RefObject<HTMLDivElement>}
+            ref={containerRef}
           >
             {sidebarData.map((item, index) => {
               const Icon = item.icon;
