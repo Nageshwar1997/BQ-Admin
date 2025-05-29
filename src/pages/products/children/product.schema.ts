@@ -1,8 +1,11 @@
 import { z } from "zod";
-import { MB, regexes } from "../../../constants";
+import {
+  ALLOWED_IMAGE_TYPES,
+  MAX_IMAGE_FILE_SIZE,
+  MB,
+  regexes,
+} from "../../../constants";
 import { zodNumberRequired, zodStringRequired } from "../../../utils/zod.util";
-const MAX_FILE_SIZE = 0.2 * 1024 * 1024; // 2 MB
-const ACCEPTED_FORMATS = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
 
 export const shadeSchema = z.object({
   shadeName: zodStringRequired({
@@ -48,7 +51,7 @@ export const shadeSchema = z.object({
         }
 
         // File size check
-        if (file.size > MAX_FILE_SIZE) {
+        if (file.size > MAX_IMAGE_FILE_SIZE) {
           const sizeInMB = (file.size / MB).toFixed(1);
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -60,12 +63,14 @@ export const shadeSchema = z.object({
         }
 
         // File type check
-        if (!ACCEPTED_FORMATS.includes(file.type)) {
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Image ${
               index + 1
-            } invalid format (jpeg, png, webp, jpg).`,
+            } invalid format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map((t) =>
+              t.replace("image/", "")
+            ).join(", ")}`,
             path: [index],
           });
         }
@@ -131,7 +136,7 @@ export const productSchema = z.object({
         }
 
         // File size check
-        if (file.size > MAX_FILE_SIZE) {
+        if (file.size > MAX_IMAGE_FILE_SIZE) {
           const sizeInMB = (file.size / MB).toFixed(1);
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -143,12 +148,14 @@ export const productSchema = z.object({
         }
 
         // File type check
-        if (!ACCEPTED_FORMATS.includes(file.type)) {
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Image ${
               index + 1
-            } invalid format (jpeg, png, webp, jpg).`,
+            } invalid format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map((t) =>
+              t.replace("image/", "")
+            ).join(", ")}`,
             path: [index],
           });
         }
