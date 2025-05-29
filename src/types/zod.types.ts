@@ -5,7 +5,7 @@ interface ZodCommonConfigs {
   showingParentFieldName?: string;
 }
 
-interface ZodCompareConfigs {
+export interface ZodCompareConfigs {
   min?: number | undefined;
   max?: number | undefined;
 }

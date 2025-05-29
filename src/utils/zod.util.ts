@@ -4,7 +4,23 @@ import {
   ZodOptionalStringConfigs,
   ZodRequiredStringConfigs,
   TZodRegex,
+  ZodCompareConfigs,
 } from "../types/zod.types";
+
+export const getZodMessages = (
+  props: ZodCompareConfigs & { field: string }
+) => {
+  return {
+    required: `${props.field} is required.`,
+    invalid_type: `${props.field} must be a string.`,
+    non_empty: `${props.field} cannot be empty.`,
+    min: `${props.field} must be at least ${props.min} characters.`,
+    max: `${props.field} must not exceed ${props.max} characters.`,
+    multiple_spaces: `${props.field} must not contain multiple consecutive spaces.`,
+    single_space: `${props.field} must not contain any spaces.`,
+    custom: `${props.field} `,
+  };
+};
 
 export const zodStringOptional = ({
   field,
@@ -26,17 +42,7 @@ export const zodStringOptional = ({
         readableParent.includes("[") ? " " : "."
       }${readableField}`
     : readableField;
-
-  const messages = {
-    required: `${nestedField} is required.`,
-    invalid_type: `${nestedField} must be a string.`,
-    non_empty: `${nestedField} cannot be empty.`,
-    min: `${nestedField} must be at least ${min} characters.`,
-    max: `${nestedField} must not exceed ${max} characters.`,
-    multiple_spaces: `${nestedField} must not contain multiple consecutive spaces.`,
-    single_space: `${nestedField} must not contain any spaces.`,
-    custom: `${nestedField} `,
-  };
+  const messages = getZodMessages({ field: nestedField, min, max });
 
   const schema = z
     .string()
@@ -103,16 +109,7 @@ export const zodStringRequired = ({
       }${readableField}`
     : readableField;
 
-  const messages = {
-    required: `${nestedField} is required.`,
-    invalid_type: `${nestedField} must be a string.`,
-    non_empty: `${nestedField} cannot be empty.`,
-    min: `${nestedField} must be at least ${min} characters.`,
-    max: `${nestedField} must not exceed ${max} characters.`,
-    multiple_spaces: `${nestedField} must not contain multiple consecutive spaces.`,
-    single_space: `${nestedField} must not contain any spaces.`,
-    custom: `${nestedField} `,
-  };
+  const messages = getZodMessages({ field: nestedField, min, max });
 
   let schema = z
     .string({
