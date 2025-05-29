@@ -1,6 +1,5 @@
 import {
   ChangeEvent,
-  FC,
   HTMLInputAutoCompleteAttribute,
   KeyboardEvent,
   ReactNode,
@@ -95,7 +94,7 @@ export interface IconType {
   className?: string;
 }
 
-export type SVGType = FC<SVGProps<SVGSVGElement>>;
+export type IconProps = SVGProps<SVGSVGElement>;
 
 export interface UserTypes {
   _id: string;
