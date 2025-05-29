@@ -3,7 +3,7 @@ import { ProductType, ShadeType } from "../../../types";
 export const shadeInitialValue: ShadeType = {
   shadeName: "",
   colorCode: "",
-  stock: null,
+  stock: undefined,
   images: [],
 };
 
@@ -17,8 +17,9 @@ export const productInitialValues: ProductType = {
   categoryLevelOne: "",
   categoryLevelTwo: "",
   categoryLevelThree: "",
-  totalStock: null,
-  originalPrice: null,
-  sellingPrice: null,
+  totalStock: undefined,
+  originalPrice: undefined,
+  sellingPrice: undefined,
+  commonImages: [],
   shades: [],
 };
