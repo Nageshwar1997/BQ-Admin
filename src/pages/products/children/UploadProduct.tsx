@@ -29,7 +29,6 @@ import LoadingPage from "../../../components/loaders/LoadingPage";
 import ImageUpload from "../../../components/input/ImageUpload";
 import { productInitialValues } from "../data";
 import { processQuillContent, getQuillValue } from "./helpers";
-import { DevTool } from "@hookform/devtools";
 
 const UploadProduct = () => {
   const quillRefs = {
@@ -545,7 +544,6 @@ const UploadProduct = () => {
                   className="!rounded-lg max-h-12"
                 />
               </div>
-              <DevTool control={control} />
             </form>
           </div>
         </div>
