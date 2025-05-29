@@ -22,5 +22,15 @@ export interface ZodStringConfigs extends ZodCommonConfigs, ZodCompareConfigs {
   customRegexes?: TZodRegex[];
 }
 
+export interface ZodNumberConfigs extends ZodCommonConfigs, ZodCompareConfigs {
+  mustBeInt?: boolean;
+  nonNegative?: boolean;
+}
+
+// String
 export type ZodRequiredStringConfigs = ZodStringConfigs; // Required
 export type ZodOptionalStringConfigs = ZodStringConfigs; // Optional
+
+// Number
+export type ZodRequiredNumberConfigs = ZodNumberConfigs; // Required
+export type ZodOptionalNumberConfigs = ZodNumberConfigs; // Optional

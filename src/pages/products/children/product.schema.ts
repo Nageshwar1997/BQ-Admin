@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { MB, regexes } from "../../../constants";
-import { zodStringRequired } from "../../../utils/zod.util";
+import { zodNumberRequired, zodStringRequired } from "../../../utils/zod.util";
 const MAX_FILE_SIZE = 0.2 * 1024 * 1024; // 2 MB
 const ACCEPTED_FORMATS = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
 
@@ -23,14 +23,14 @@ export const shadeSchema = z.object({
       { regex: regexes.hexCode, message: "must be a valid hex code" },
     ],
   }),
-
-  stock: z.coerce
-    .number({
-      required_error: "Stock is required",
-      invalid_type_error: "Stock must be a number",
-    })
-    .min(5, "Stock cannot be less than 5")
-    .max(100, "Stock cannot be more than 100"),
+  stock: zodNumberRequired({
+    field: "stock",
+    showingFieldName: "Stock",
+    min: 5,
+    max: 100,
+    mustBeInt: true,
+    nonNegative: true,
+  }),
 
   images: z
     .array(z.any())
