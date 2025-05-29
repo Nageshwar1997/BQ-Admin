@@ -4,7 +4,7 @@ import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { loginZodSchema } from "./helpers/auth.schema";
+import { loginZodSchema } from "./validations";
 import { loginInputMapData, LoginTextContent } from "./data";
 import useVerticalScrollable from "../../hooks/useVerticalScrollable";
 import {
