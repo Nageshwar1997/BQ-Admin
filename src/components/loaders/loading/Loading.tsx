@@ -1,11 +1,11 @@
 import "./Loading.css";
 
 const Loading = ({
-  className,
+  className = "",
   content = "Loading....", // make sure the content length is not bigger than 11
 }: {
   className?: string;
-  content: string;
+  content?: string;
 }) => {
   return (
     <div className={`container ${className}`}>
