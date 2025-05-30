@@ -115,25 +115,22 @@ export interface UserStoreType {
 }
 
 export interface LevelThreeCategoryType {
-  id: number;
   level: number;
-  label: string;
-  value: string;
+  name: string;
+  category: string;
 }
 
 export interface LevelTwoCategoryType {
-  id: number;
   level: number;
-  label: string;
-  value: string;
+  name: string;
+  category: string;
   subCategories: LevelThreeCategoryType[];
 }
 
 export interface LevelOneCategoryType {
-  id: number;
   level: number;
-  label: string;
-  value: string;
+  name: string;
+  category: string;
   subCategories: LevelTwoCategoryType[];
 }
 
@@ -151,9 +148,9 @@ export interface ProductType {
   howToUse?: string;
   ingredients?: string;
   additionalDetails?: string;
-  categoryLevelOne: string;
-  categoryLevelTwo: string;
-  categoryLevelThree: string;
+  categoryLevelOne: { name: string; category: string };
+  categoryLevelTwo: { name: string; category: string };
+  categoryLevelThree: { name: string; category: string };
   originalPrice: number | undefined;
   sellingPrice: number | undefined;
   totalStock: number | undefined;
