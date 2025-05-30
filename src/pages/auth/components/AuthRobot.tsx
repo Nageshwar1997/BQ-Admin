@@ -1,5 +1,5 @@
 import Spline from "@splinetool/react-spline";
-import Branding from "../../../components/Branding";
+import Branding from "../../../components/ui/Branding";
 
 const AuthRobot = () => {
   return (
