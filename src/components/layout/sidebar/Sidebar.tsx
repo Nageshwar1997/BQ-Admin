@@ -31,7 +31,7 @@ const Sidebar = () => {
             <img
               src={user?.profilePic || "/images/sidebar/user-placeholder.webp"}
               alt="Logo"
-              className="object-cover w-full h-full rounded-full"
+              className="object-cover w-full h-full rounded-full aspect-square"
               draggable={false}
             />
           </div>
