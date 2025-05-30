@@ -11,9 +11,9 @@ import { UploadCloudIcon } from "../../../icons";
 import useQueryParams from "../../../hooks/useQueryParams";
 import AddShade from "./shade/AddShade";
 import EditShade from "./shade/EditShade";
-import Input from "../../../components/input/Input";
-import PhoneInput from "../../../components/input/PhoneInput";
-import Select from "../../../components/input/Select";
+import Input from "../../../components/ui/input/Input";
+import PhoneInput from "../../../components/ui/input/PhoneInput";
+import Select from "../../../components/ui/input/Select";
 import {
   categoryLevelsData,
   CATEGORY_DATA,
@@ -26,7 +26,7 @@ import { ProductType, ShadeType } from "../../../types";
 import QuillEditor from "../../../components/ui/quillEditor/QuillEditor";
 import { useUploadProduct } from "../../../api/product/product.service";
 import LoadingPage from "../../../components/ui/loaders/LoadingPage";
-import ImageUpload from "../../../components/input/ImageUpload";
+import ImageUpload from "../../../components/ui/input/ImageUpload";
 import { productInitialValues } from "../data";
 import { processQuillContent, getQuillValue } from "./helpers";
 

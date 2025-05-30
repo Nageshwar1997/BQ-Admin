@@ -1,9 +1,9 @@
 import { ChangeEvent, ReactNode, useState } from "react";
-import { InfoIcon } from "../../icons";
 import { UseFormRegisterReturn } from "react-hook-form";
-import { CloseIcon } from "../layout/sidebar/icons";
-import ImageCarousel from "../layout/modals/ImageCarousel";
-import { ALLOWED_IMAGE_TYPES } from "../../constants";
+import { InfoIcon } from "../../../icons";
+import { CloseIcon } from "../../layout/sidebar/icons";
+import ImageCarousel from "../../layout/modals/ImageCarousel";
+import { ALLOWED_IMAGE_TYPES } from "../../../constants";
 
 const ImageUpload = ({
   icon,

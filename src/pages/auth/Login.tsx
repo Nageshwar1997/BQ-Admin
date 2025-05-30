@@ -11,16 +11,16 @@ import { LoginFormInputProps, LoginTypes } from "../../types";
 import { BottomGradient, TopGradient } from "../../components/Gradients";
 import AuthRobot from "./components/AuthRobot";
 import TextDisplay from "../../components/TextDisplay";
-import PhoneInput from "../../components/input/PhoneInput";
-import Input from "../../components/input/Input";
 import { EyeIcon, EyeOffIcon } from "../../icons";
-import Radio from "../../components/input/Radio";
 import Button from "../../components/ui/button/Button";
-import Checkbox from "../../components/input/Checkbox";
 import { saveUserLocal, saveUserSession } from "../../utils";
 import { useLoginUser } from "../../api/auth/auth.service";
 import LoadingPage from "../../components/ui/loaders/LoadingPage";
 import DarkMode from "../../components/DarkMode";
+import Checkbox from "../../components/ui/input/Checkbox";
+import Input from "../../components/ui/input/Input";
+import PhoneInput from "../../components/ui/input/PhoneInput";
+import Radio from "../../components/ui/input/Radio";
 
 const Login = () => {
   const [showGradient, containerRef] = useVerticalScrollable();

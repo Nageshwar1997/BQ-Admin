@@ -1,4 +1,4 @@
-import { InfoIcon, CheckMark, DropdownIcon } from "../../icons";
+import { InfoIcon, CheckMark, DropdownIcon } from "../../../icons";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { useState } from "react";
 

@@ -1,8 +1,8 @@
 import { ChangeEvent } from "react";
-import { CheckMark, InfoIcon } from "../../icons";
-import { InputProps } from "../../types";
+import { CheckMark, InfoIcon } from "../../../icons";
+import { InputProps } from "../../../types";
 
-const Input = ({
+const PhoneInput = ({
   icon,
   value,
   name = "",
@@ -40,23 +40,28 @@ const Input = ({
           </label>
         )}
         {/* Input */}
-        <input
-          aria-autocomplete="none"
-          id={name}
-          type={type}
-          name={name}
-          value={value}
-          {...register}
-          readOnly={readOnly}
-          disabled={readOnly}
-          onKeyDown={onKeyDown}
-          onChange={handleChange}
-          placeholder={placeholder}
-          autoComplete={autoComplete}
-          className={`w-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 outline-none focus:outline-none font-normal text-sm overflow-hidden bg-smoke-eerie rounded-lg border border-primary-10 p-3 2xl:py-4 text-primary placeholder:text-primary-50 placeholder:text-sm ${
-            icon && "pr-10"
-          } autofill-effect ${className}`}
-        />
+        <div className="w-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 fle items-center text-sm flex bg-smoke-eerie rounded-lg border border-primary-10 text-primary">
+          <p className="w-[16%] min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 h-full text-primary-50 content-center text-center border-r border-primary-10 p-3 2xl:py-4">
+            +91
+          </p>
+          <input
+            id={name}
+            type={type}
+            name={name}
+            value={value}
+            {...register}
+            readOnly={readOnly}
+            disabled={readOnly}
+            onKeyDown={onKeyDown}
+            onChange={handleChange}
+            placeholder={placeholder}
+            autoComplete={autoComplete}
+            onWheel={(event) => event.currentTarget.blur()}
+            className={`w-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 outline-none focus:outline-none font-normal overflow-hidden bg-transparent p-3 2xl:py-4 placeholder:text-primary-50 placeholder:text-sm ${
+              icon && "pr-10"
+            } autofill-effect number-input-mouse-control-none ${className}`}
+          />
+        </div>
 
         {/* Icon */}
         {icon && (
@@ -85,4 +90,4 @@ const Input = ({
   );
 };
 
-export default Input;
+export default PhoneInput;

@@ -4,7 +4,7 @@ import {
 } from "react-color-palette";
 import type { IColor } from "react-color-palette";
 import "./colorPicker.css";
-import { CheckMark, InfoIcon } from "../../../icons";
+import { CheckMark, InfoIcon } from "../../../../icons";
 
 export interface ColorPickerInputProps {
   value: string;

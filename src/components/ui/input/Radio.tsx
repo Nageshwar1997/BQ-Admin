@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { RadioProps } from "../../types";
+import { RadioProps } from "../../../types";
 
 const Radio: FC<RadioProps> = ({
   value,
