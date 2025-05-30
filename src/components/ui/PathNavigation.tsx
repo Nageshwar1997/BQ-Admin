@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { DropdownIcon } from "../icons";
+import { DropdownIcon } from "../../icons";
 
 const PathNavigation = ({ className = "" }: { className?: string }) => {
   const { pathname } = useLocation();

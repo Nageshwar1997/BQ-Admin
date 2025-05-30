@@ -10,7 +10,7 @@ import useVerticalScrollable from "../../hooks/useVerticalScrollable";
 import { LoginFormInputProps, LoginTypes } from "../../types";
 import { BottomGradient, TopGradient } from "../../components/ui/Gradients";
 import AuthRobot from "./components/AuthRobot";
-import TextDisplay from "../../components/TextDisplay";
+import TextDisplay from "../../components/ui/TextDisplay";
 import { EyeIcon, EyeOffIcon } from "../../icons";
 import Button from "../../components/ui/button/Button";
 import { saveUserLocal, saveUserSession } from "../../utils";

@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { TextDisplayProps } from "../types";
+import { TextDisplayProps } from "../../types";
 
 const TextDisplay = ({
   content,

@@ -6,7 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
 import Button from "../../../components/ui/button/Button";
-import PathNavigation from "../../../components/PathNavigation";
+import PathNavigation from "../../../components/ui/PathNavigation";
 import { UploadCloudIcon } from "../../../icons";
 import useQueryParams from "../../../hooks/useQueryParams";
 import AddShade from "./shade/AddShade";
