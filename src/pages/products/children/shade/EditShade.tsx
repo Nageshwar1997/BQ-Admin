@@ -10,7 +10,7 @@ import ColorPicker from "../../../../components/ui/input/colorPicker/ColorPicker
 import Input from "../../../../components/ui/input/Input";
 import PhoneInput from "../../../../components/ui/input/PhoneInput";
 import { InfoIcon, UploadCloudIcon } from "../../../../icons";
-import { CloseIcon } from "../../../../components/layout/sidebar/icons";
+import { CloseIcon } from "../../../../icons";
 import useQueryParams from "../../../../hooks/useQueryParams";
 import ImageUpload from "../../../../components/ui/input/ImageUpload";
 import useVerticalScrollable from "../../../../hooks/useVerticalScrollable";

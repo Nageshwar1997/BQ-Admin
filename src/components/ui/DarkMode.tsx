@@ -1,7 +1,7 @@
-import { IconProps, MoonIcon, SunIcon } from "../../icons";
+import { MoonIcon, SunIcon } from "../../icons";
 import useThemeStore from "../../store/theme.store";
 
-function DarkMode({ className }: IconProps) {
+function DarkMode({ className }: { className?: string }) {
   const { theme, toggleTheme } = useThemeStore();
 
   return (

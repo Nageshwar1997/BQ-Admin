@@ -1,7 +1,7 @@
 import { ChangeEvent, ReactNode, useState } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { InfoIcon } from "../../../icons";
-import { CloseIcon } from "../../layout/sidebar/icons";
+import { CloseIcon } from "../../../icons";
 import ImageCarousel from "../../layout/modals/ImageCarousel";
 import { ALLOWED_IMAGE_TYPES } from "../../../constants";
 

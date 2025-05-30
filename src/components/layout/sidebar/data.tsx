@@ -15,7 +15,7 @@ import {
   TeamIcon,
   TruckIcon,
   UsersIcon,
-} from "./icons";
+} from "../../../icons";
 
 export const sidebarData = [
   {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DropdownIcon } from "../../../icons";
-import { CloseIcon } from "../sidebar/icons";
+import { CloseIcon } from "../../../icons";
 
 const ImageCarousel = ({
   className,
