@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../../../components/ui/button/Button";
-import PathNavigation from "../../../components/PathNavigation";
+import PathNavigation from "../../../components/ui/PathNavigation";
 import { UploadCloudIcon } from "../../../icons";
 import { toINRCurrency } from "../../../utils";
 import { useGetAllProducts } from "../../../api/product/product.service";
@@ -75,7 +75,7 @@ const AllProducts = () => {
               <hr className="h-px block border-none bg-gradient-line" />
               <div className="space-y-3">
                 <p className="text-sm font-semibold line-clamp-2 text-secondary">
-                  Lorem ipsum dolor sit amet. Lorem, ipsum dolor. Lorem ipsum
+                  Lorem ipsum dolor sit ame. Lorem, ipsum dolor. Lorem ipsum
                   dolor sit.
                 </p>
                 <p className="text-xs text-tertiary line-clamp-1 border border-primary-50 w-fit px-3 py-1 rounded-full">
