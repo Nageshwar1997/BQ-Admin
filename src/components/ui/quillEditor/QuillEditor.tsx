@@ -1,12 +1,13 @@
 import { forwardRef, RefObject, useEffect, useRef } from "react";
-import "./editor.css";
-import { InfoIcon } from "../../icons";
 import Quill from "quill";
+import "./editor.css";
+
+import { InfoIcon } from "../../../icons";
 import {
   addBlobUrlToImage,
   addIdsToHeadings,
   removeUnusedBlobUrls,
-} from "../../utils";
+} from "../../../utils";
 
 // Allow blob URLs in image sanitize
 const Image = Quill.import("formats/image") as {

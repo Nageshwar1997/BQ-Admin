@@ -23,7 +23,7 @@ import {
 } from "../data/categoriesData";
 import { productSchema } from "./product.schema";
 import { ProductType, ShadeType } from "../../../types";
-import QuillEditor from "../../../components/quillEditor/QuillEditor";
+import QuillEditor from "../../../components/ui/quillEditor/QuillEditor";
 import { useUploadProduct } from "../../../api/product/product.service";
 import LoadingPage from "../../../components/ui/loaders/LoadingPage";
 import ImageUpload from "../../../components/input/ImageUpload";
