@@ -16,7 +16,7 @@ import Button from "../../components/ui/button/Button";
 import { saveUserLocal, saveUserSession } from "../../utils";
 import { useLoginUser } from "../../api/auth/auth.service";
 import LoadingPage from "../../components/ui/loaders/LoadingPage";
-import DarkMode from "../../components/DarkMode";
+import DarkMode from "../../components/ui/DarkMode";
 import Checkbox from "../../components/ui/input/Checkbox";
 import Input from "../../components/ui/input/Input";
 import PhoneInput from "../../components/ui/input/PhoneInput";
