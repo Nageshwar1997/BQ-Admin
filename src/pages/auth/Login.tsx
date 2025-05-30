@@ -8,7 +8,7 @@ import { loginZodSchema } from "./validations";
 import { loginInputMapData, LoginTextContent } from "./data";
 import useVerticalScrollable from "../../hooks/useVerticalScrollable";
 import { LoginFormInputProps, LoginTypes } from "../../types";
-import { BottomGradient, TopGradient } from "../../components/Gradients";
+import { BottomGradient, TopGradient } from "../../components/ui/Gradients";
 import AuthRobot from "./components/AuthRobot";
 import TextDisplay from "../../components/TextDisplay";
 import { EyeIcon, EyeOffIcon } from "../../icons";

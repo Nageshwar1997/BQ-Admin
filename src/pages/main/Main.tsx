@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "../../components/layout/navbar/Navbar";
 import Footer from "../../components/layout/footer/Footer";
 import Sidebar from "../../components/layout/sidebar/Sidebar";
-import { BottomGradient } from "../../components/Gradients";
+import { BottomGradient } from "../../components/ui/Gradients";
 import useVerticalScrollable from "../../hooks/useVerticalScrollable";
 
 const Main = () => {

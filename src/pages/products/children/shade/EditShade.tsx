@@ -14,7 +14,10 @@ import { CloseIcon } from "../../../../components/layout/sidebar/icons";
 import useQueryParams from "../../../../hooks/useQueryParams";
 import ImageUpload from "../../../../components/ui/input/ImageUpload";
 import useVerticalScrollable from "../../../../hooks/useVerticalScrollable";
-import { BottomGradient, TopGradient } from "../../../../components/Gradients";
+import {
+  BottomGradient,
+  TopGradient,
+} from "../../../../components/ui/Gradients";
 import { shadeInitialValue } from "../../data";
 
 interface ShadeFormProps {
