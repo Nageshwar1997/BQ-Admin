@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import { shadeSchema } from "../product.schema";
 import { ShadeType } from "../../../../types";
-import Button from "../../../../components/button/Button";
+import Button from "../../../../components/ui/button/Button";
 import ColorPicker from "../../../../components/input/colorPicker/ColorPicker";
 import Input from "../../../../components/input/Input";
 import PhoneInput from "../../../../components/input/PhoneInput";

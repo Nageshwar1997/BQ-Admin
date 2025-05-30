@@ -1,5 +1,5 @@
 import { useUserStore } from "../../../store/user.store";
-import Button from "../../button/Button";
+import Button from "../../ui/button/Button";
 import DarkMode from "../../DarkMode";
 
 const Navbar = () => {

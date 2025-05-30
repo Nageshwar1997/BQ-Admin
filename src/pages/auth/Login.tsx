@@ -15,7 +15,7 @@ import PhoneInput from "../../components/input/PhoneInput";
 import Input from "../../components/input/Input";
 import { EyeIcon, EyeOffIcon } from "../../icons";
 import Radio from "../../components/input/Radio";
-import Button from "../../components/button/Button";
+import Button from "../../components/ui/button/Button";
 import Checkbox from "../../components/input/Checkbox";
 import { saveUserLocal, saveUserSession } from "../../utils";
 import { useLoginUser } from "../../api/auth/auth.service";
