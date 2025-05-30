@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import Navbar from "../../components/navbar/Navbar";
+import Navbar from "../../components/layout/navbar/Navbar";
 import Footer from "../../components/layout/footer/Footer";
 import Sidebar from "../../components/layout/sidebar/Sidebar";
 import { BottomGradient } from "../../components/Gradients";

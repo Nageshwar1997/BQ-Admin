@@ -1,6 +1,6 @@
-import { useUserStore } from "../../store/user.store";
-import Button from "../button/Button";
-import DarkMode from "../DarkMode";
+import { useUserStore } from "../../../store/user.store";
+import Button from "../../button/Button";
+import DarkMode from "../../DarkMode";
 
 const Navbar = () => {
   const { logout } = useUserStore();
