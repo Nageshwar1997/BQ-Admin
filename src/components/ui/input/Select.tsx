@@ -1,9 +1,9 @@
-import { InfoIcon, CheckMark, DropdownIcon } from "../../../icons";
-import { UseFormRegisterReturn } from "react-hook-form";
 import { useState } from "react";
+import { UseFormRegisterReturn } from "react-hook-form";
+import { InfoIcon, CheckMark, DropdownIcon } from "../../../icons";
 
 export interface SelectInputProps {
-  value?: string;
+  value: string;
   label?: string;
   readOnly?: boolean;
   errorText?: string;
@@ -13,8 +13,8 @@ export interface SelectInputProps {
   containerClassName?: string;
   register?: UseFormRegisterReturn;
   iconClick?: () => void;
-  onChange?: (val: string) => void;
-  categories: { label: string; value: string }[];
+  onChange?: (val: { name: string; category: string }) => void;
+  categories: { name: string; category: string }[];
 }
 
 const Select = ({
@@ -31,7 +31,7 @@ const Select = ({
 }: SelectInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const selected = categories.find((opt) => opt.value === value);
+  const selected = categories.find((opt) => opt.category === value);
   const isError = errorText && !successText;
   const isSuccess = successText && !errorText;
 
@@ -51,8 +51,12 @@ const Select = ({
           className={`relative w-full h-full min-h-10 max-h-10 lg:min-h-12 lg:max-h-12 font-normal text-sm bg-smoke-eerie rounded-lg border border-primary-10 p-3 2xl:py-4 text-primary flex justify-between items-center autofill-effect cursor-pointer ${className}`}
           onClick={() => !readOnly && setIsOpen((prev) => !prev)}
         >
-          <span className={`line-clamp-1 ${selected ? "" : "text-primary-50"}`}>
-            {selected?.label || placeholder}
+          <span
+            className={`line-clamp-1 ${
+              selected?.category ? "" : "text-primary-50"
+            }`}
+          >
+            {selected?.name || placeholder}
           </span>
           <DropdownIcon
             className={`w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 transition-transform ${
@@ -61,18 +65,25 @@ const Select = ({
           />
           {isOpen && (
             <div className="absolute left-0 top-full w-full z-[2] mt-1 rounded-lg border border-primary-10 bg-smoke-eerie shadow-md overflow-hidden py-2">
-              <ul className="max-h-60 overflow-auto px-1">
+              <ul className="max-h-60 overflow-auto px-1 space-y-0.5">
                 {categories.map((option) => (
                   <li
-                    key={option.value}
-                    className="p-2 hover:bg-primary-10 text-primary cursor-pointer text-sm rounded-[4px]"
+                    key={option.category}
+                    className={`p-2 hover:bg-primary-10 text-primary cursor-pointer text-sm rounded-[4px] ${
+                      selected?.category === option.category
+                        ? "bg-primary-8"
+                        : ""
+                    }`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      onChange?.(option.value);
+                      onChange?.({
+                        name: option.name,
+                        category: option.category,
+                      });
                       setIsOpen(false);
                     }}
                   >
-                    {option.label}
+                    {option.name}
                   </li>
                 ))}
               </ul>
