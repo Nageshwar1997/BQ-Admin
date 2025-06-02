@@ -56,7 +56,7 @@ export const zodStringOptional = ({
 
   const nestedField = readableParent
     ? `${readableParent}${
-        readableParent.includes("[") ? " " : "."
+        readableParent.includes("[") ? " " : ": "
       }${readableField}`
     : readableField;
   const messages = getZodStringMessages({ field: nestedField, min, max });
@@ -129,7 +129,7 @@ export const zodStringRequired = ({
 
   const nestedField = readableParent
     ? `${readableParent}${
-        readableParent.includes("[") ? " " : "."
+        readableParent.includes("[") ? " " : ": "
       }${readableField}`
     : readableField;
 
@@ -187,7 +187,7 @@ export const zodNumberRequired = ({
 
   const nestedField = readableParent
     ? `${readableParent}${
-        readableParent.includes("[") ? " " : "."
+        readableParent.includes("[") ? " " : ": "
       }${readableField}`
     : readableField;
 
@@ -261,7 +261,7 @@ export const zodNumberOptional = ({
 
   const nestedField = readableParent
     ? `${readableParent}${
-        readableParent.includes("[") ? " " : "."
+        readableParent.includes("[") ? " " : ": "
       }${readableField}`
     : readableField;
 
