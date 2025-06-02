@@ -138,21 +138,139 @@ export const productSchema = z
         },
       ],
     }),
-    categoryLevelOne: zodStringRequired({
-      field: "categoryLevelOne",
-      showingFieldName: "Category 1",
-      blockSingleSpace: true,
-    }),
-    categoryLevelTwo: zodStringRequired({
-      field: "categoryLevelTwo",
-      showingFieldName: "Category 2",
-      blockSingleSpace: true,
-    }),
-    categoryLevelThree: zodStringRequired({
-      field: "categoryLevelThree",
-      showingFieldName: "Category 3",
-      blockSingleSpace: true,
-    }),
+    categoryLevelOne: z
+      .object({
+        name: z.string().optional().default(""),
+        category: z.string().optional().default(""),
+      })
+      .superRefine((data, ctx) => {
+        const nameResult = zodStringRequired({
+          field: "name",
+          showingFieldName: "Name",
+          parentField: "categoryLevelOne",
+          showingParentFieldName: "Category 1",
+          blockMultipleSpaces: true,
+        }).safeParse(data.name);
+
+        const categoryResult = zodStringRequired({
+          field: "category",
+          parentField: "categoryLevelOne",
+          showingParentFieldName: "Category 1",
+          showingFieldName: "Category",
+          blockSingleSpace: true,
+        }).safeParse(data.category);
+
+        if (!data.name && !data.category) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Category 1 is required",
+            path: [],
+          });
+        }
+
+        if (!nameResult.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: nameResult.error.issues[0].message,
+            path: [],
+          });
+        } else if (!categoryResult.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: categoryResult.error.issues[0].message,
+            path: [],
+          });
+        }
+      }),
+    categoryLevelTwo: z
+      .object({
+        name: z.string().optional().default(""),
+        category: z.string().optional().default(""),
+      })
+      .superRefine((data, ctx) => {
+        const nameResult = zodStringRequired({
+          field: "name",
+          showingFieldName: "Name",
+          parentField: "categoryLevelTwo",
+          showingParentFieldName: "Category 2",
+          blockMultipleSpaces: true,
+        }).safeParse(data.name);
+
+        const categoryResult = zodStringRequired({
+          field: "category",
+          parentField: "categoryLevelTwo",
+          showingParentFieldName: "Category 2",
+          showingFieldName: "Category",
+          blockSingleSpace: true,
+        }).safeParse(data.category);
+
+        if (!data.name && !data.category) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Category 2 is required",
+            path: [],
+          });
+        }
+
+        if (!nameResult.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: nameResult.error.issues[0].message,
+            path: [],
+          });
+        } else if (!categoryResult.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: categoryResult.error.issues[0].message,
+            path: [],
+          });
+        }
+      }),
+    categoryLevelThree: z
+      .object({
+        name: z.string().optional().default(""),
+        category: z.string().optional().default(""),
+      })
+      .superRefine((data, ctx) => {
+        const nameResult = zodStringRequired({
+          field: "name",
+          showingFieldName: "Name",
+          parentField: "categoryLevelThree",
+          showingParentFieldName: "Category 3",
+          blockMultipleSpaces: true,
+        }).safeParse(data.name);
+
+        const categoryResult = zodStringRequired({
+          field: "category",
+          parentField: "categoryLevelThree",
+          showingParentFieldName: "Category 3",
+          showingFieldName: "Category",
+          blockSingleSpace: true,
+        }).safeParse(data.category);
+
+        if (!data.name && !data.category) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Category 3 is required",
+            path: [],
+          });
+        }
+
+        if (!nameResult.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: nameResult.error.issues[0].message,
+            path: [],
+          });
+        } else if (!categoryResult.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: categoryResult.error.issues[0].message,
+            path: [],
+          });
+        }
+      }),
+
     originalPrice: zodNumberRequired({
       field: "originalPrice",
       showingFieldName: "Original price",
