@@ -69,19 +69,15 @@ const UploadProduct = () => {
 
   const selectedCategory1 = watch("categoryLevelOne");
   const selectedCategory2 = watch("categoryLevelTwo");
-  const selectedCategory3 = watch("categoryLevelThree");
 
   const level1Data = categoryLevelsData.find(
-    (cat) => cat.value === selectedCategory1
+    (cat) => cat.category === selectedCategory1.category
   );
   const level2Options = level1Data?.subCategories || [];
   const level2Data = level2Options.find(
-    (cat) => cat.value === selectedCategory2
+    (cat) => cat.category === selectedCategory2.category
   );
   const level3Options = level2Data?.subCategories || [];
-  const level3Data = level3Options.find(
-    (cat) => cat.value === selectedCategory3
-  );
 
   const handleReset = () => {
     commonImagePreviews.forEach((preview) => {
@@ -146,24 +142,15 @@ const UploadProduct = () => {
     );
     formData.append(
       "categoryLevelOne",
-      JSON.stringify({
-        category: finalData.categoryLevelOne,
-        name: level1Data?.label,
-      })
+      JSON.stringify(finalData.categoryLevelOne)
     );
     formData.append(
       "categoryLevelTwo",
-      JSON.stringify({
-        category: finalData.categoryLevelTwo,
-        name: level2Data?.label,
-      })
+      JSON.stringify(finalData.categoryLevelTwo)
     );
     formData.append(
       "categoryLevelThree",
-      JSON.stringify({
-        category: finalData.categoryLevelThree,
-        name: level3Data?.label,
-      })
+      JSON.stringify(finalData.categoryLevelThree)
     );
     formData.append("sellingPrice", String(finalData.sellingPrice));
     formData.append("originalPrice", String(finalData.originalPrice));
@@ -294,30 +281,40 @@ const UploadProduct = () => {
                       <Controller
                         name={input.name}
                         control={control}
-                        render={({ field }) => (
-                          <Select
-                            value={
-                              typeof field.value === "string"
-                                ? field.value
-                                : undefined
-                            }
-                            onChange={(val: string) => {
-                              field.onChange(val);
-                              // reset dependent levels
-                              if (input.name === "categoryLevelOne") {
-                                setValue("categoryLevelTwo", "");
-                                setValue("categoryLevelThree", "");
-                              } else if (input.name === "categoryLevelTwo") {
-                                setValue("categoryLevelThree", "");
-                              }
-                            }}
-                            readOnly={readOnly}
-                            label={input.label}
-                            placeholder={placeholder}
-                            categories={categories}
-                            errorText={errors[input.name]?.message}
-                          />
-                        )}
+                        render={({ field }) => {
+                          const val = field.value as
+                            | { name: string; category: string }
+                            | undefined;
+
+                          return (
+                            <Select
+                              value={val?.category ?? ""}
+                              onChange={(val) => {
+                                field.onChange(val);
+                                if (input.name === "categoryLevelOne") {
+                                  setValue("categoryLevelTwo", {
+                                    name: "",
+                                    category: "",
+                                  });
+                                  setValue("categoryLevelThree", {
+                                    name: "",
+                                    category: "",
+                                  });
+                                } else if (input.name === "categoryLevelTwo") {
+                                  setValue("categoryLevelThree", {
+                                    name: "",
+                                    category: "",
+                                  });
+                                }
+                              }}
+                              readOnly={readOnly}
+                              label={input.label}
+                              placeholder={placeholder}
+                              categories={categories}
+                              errorText={errors[input.name]?.message}
+                            />
+                          );
+                        }}
                       />
                     </div>
                   );
