@@ -139,7 +139,7 @@ export interface ShadeType {
   shadeName: string;
   colorCode: string;
   stock: number | undefined;
-  images: File[] | string[];
+  images: (File | string)[];
 }
 
 export interface FetchedShadeType extends ShadeType {
@@ -160,7 +160,7 @@ export interface ProductType {
   originalPrice: number | undefined;
   sellingPrice: number | undefined;
   totalStock: number | undefined;
-  commonImages: File[] | string[];
+  commonImages: (File | string)[];
   shades?: ShadeType[];
 }
 
