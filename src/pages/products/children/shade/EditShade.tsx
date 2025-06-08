@@ -30,7 +30,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
   const [showGradient, containerRef] = useVerticalScrollable();
   const editIndex = queryParams.index ? JSON.parse(queryParams.index) : -1;
 
-  const [shadeImages, setShadeImages] = useState<File[]>([]);
+  const [shadeImages, setShadeImages] = useState<(File | string)[]>([]);
   const [shadeImagePreviews, setShadeImagePreviews] = useState<string[]>([]);
 
   const {
