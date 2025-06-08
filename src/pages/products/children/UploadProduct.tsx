@@ -172,7 +172,7 @@ const UploadProduct = () => {
     }
 
     if (finalData?.commonImages && finalData.commonImages.length > 0) {
-      finalData.commonImages.forEach((img: File, index: number) => {
+      finalData.commonImages.forEach((img, index) => {
         formData.append(`commonImages[${index}]`, img);
       });
     }
