@@ -3,7 +3,6 @@ import Quill from "quill";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
-// import { useNavigate } from "react-router-dom";
 
 import Button from "../../../components/ui/button/Button";
 import PathNavigation from "../../../components/ui/PathNavigation";
@@ -26,10 +25,8 @@ import { productSchema } from "./product.schema";
 import { FetchedProductType, ProductType, ShadeType } from "../../../types";
 import QuillEditor from "../../../components/ui/quillEditor/QuillEditor";
 import { useGetProductById } from "../../../api/product/product.service";
-// import LoadingPage from "../../../components/ui/loaders/LoadingPage";
+import { productInitialValues } from "../data";
 import ImageUpload from "../../../components/ui/input/ImageUpload";
-import { processQuillContent, getQuillValue } from "./helpers";
-import { useLocation } from "react-router-dom";
 
 const UpdateProduct = () => {
   const quillRefs = {
@@ -47,42 +44,21 @@ const UpdateProduct = () => {
   };
 
   const [shades, setShades] = useState<ShadeType[]>([]);
-  const [commonImages, setCommonImages] = useState<File[]>([]);
+  const [commonImages, setCommonImages] = useState<(string | File)[]>([]);
   const [commonImagePreviews, setCommonImagePreviews] = useState<string[]>([]);
 
   const { setParams, queryParams } = useQueryParams();
   const selectedProduct = useGetProductById();
 
-  // const navigate = useNavigate();
-
-  // const productInitialValues = {
-  //   title: "",
-  //   brand: "",
-  //   description: "",
-  //   howToUse: "",
-  //   ingredients: "",
-  //   additionalDetails: "",
-  //   categoryLevelOne: { name: "", category: "" },
-  //   categoryLevelTwo: { name: "", category: "" },
-  //   categoryLevelThree: { name: "", category: "" },
-  //   totalStock: undefined,
-  //   originalPrice: undefined,
-  //   sellingPrice: undefined,
-  //   commonImages: [],
-  //   shades: [],
-  // };
-
   const {
     control,
-    getValues,
     handleSubmit,
     register,
-    reset,
     setValue,
     watch,
     formState: { errors },
   } = useForm<z.infer<typeof productSchema>>({
-    // defaultValues: productInitialValues,
+    defaultValues: productInitialValues,
     resolver: zodResolver(productSchema),
   });
 
@@ -117,7 +93,7 @@ const UpdateProduct = () => {
   const handleGetAllProducts = () => {
     selectedProduct.mutate({
       data: {
-        shades: ["shadeName", "colorCode", "images"],
+        shades: ["shadeName", "colorCode", "images", "stock"],
         seller: ["firstName", "lastName", "email"],
         category: ["name", "category", "parentCategory", "level"],
       },
@@ -166,13 +142,16 @@ const UpdateProduct = () => {
       setValue("sellingPrice", product.sellingPrice, {
         shouldValidate: true,
       });
-      setValue("commonImages", product.commonImages, { shouldValidate: true });
+      setValue("commonImages", product.commonImages);
       setValue("description", product.description, { shouldValidate: true });
       setValue("howToUse", product.howToUse, { shouldValidate: true });
       setValue("ingredients", product.ingredients, { shouldValidate: true });
       setValue("additionalDetails", product.additionalDetails, {
         shouldValidate: true,
       });
+
+      setCommonImagePreviews(product.commonImages);
+      setCommonImages(product.commonImages);
       setShades(product.shades);
     }
   }, [selectedProduct.data, selectedProduct.isPending, setValue]);
