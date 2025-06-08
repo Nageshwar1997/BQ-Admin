@@ -12,6 +12,7 @@ import PrivateRoute from "./PrivateRoute";
 import AllProducts from "../pages/products/children/AllProducts";
 import UploadProduct from "../pages/products/children/UploadProduct";
 import Products from "../pages/products/Products";
+import UpdateProduct from "../pages/products/children/UpdateProduct";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
           {
             path: "upload",
             element: <UploadProduct />,
+          },
+          {
+            path: "update/:id",
+            element: <UpdateProduct />,
           },
         ],
       },
