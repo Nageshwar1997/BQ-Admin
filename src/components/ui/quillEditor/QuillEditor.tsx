@@ -6,8 +6,11 @@ import { InfoIcon } from "../../../icons";
 import {
   addBlobUrlToImage,
   addIdsToHeadings,
+  buildToolbarFromOptions,
   removeUnusedBlobUrls,
 } from "../../../utils";
+import { QuillEditorProps } from "../../../types";
+import { defaultToolbarOptions } from "../../../constants";
 
 // Allow blob URLs in image sanitize
 const Image = Quill.import("formats/image") as {
@@ -25,18 +28,7 @@ if (Image && typeof Image.sanitize === "function") {
 Quill.register("formats/image", Image, true);
 Quill.register("modules/addIdsToHeadings", addIdsToHeadings);
 
-interface EditorProps {
-  label?: string;
-  readOnly?: boolean;
-  errorText?: string;
-  className?: string;
-  value?: string;
-  onChange?: (value: string) => void;
-  blobUrlsRef: RefObject<string[]>;
-  placeholder?: string;
-}
-
-const QuillEditor = forwardRef<Quill | null, EditorProps>(
+const QuillEditor = forwardRef<Quill | null, QuillEditorProps>(
   (
     {
       label,
@@ -47,6 +39,7 @@ const QuillEditor = forwardRef<Quill | null, EditorProps>(
       onChange,
       placeholder = "Write your content here...",
       blobUrlsRef,
+      toolbarOptions,
     },
     ref
   ) => {
@@ -66,38 +59,47 @@ const QuillEditor = forwardRef<Quill | null, EditorProps>(
         placeholder,
         modules: {
           toolbar: {
-            container: [
-              [{ header: [false, 6, 5, 4, 3, 2, 1] }],
-              ["bold", "italic", "underline", "strike"],
-              [{ color: [] }, { background: [] }],
-              [{ list: "ordered" }, { list: "bullet" }],
-              [{ script: "sub" }, { script: "super" }],
-              [{ indent: "-1" }, { indent: "+1" }],
-              [{ align: [] }],
-              [{ direction: "rtl" }],
-              ["link", "image", "video"],
-              ["code", "clean"],
-            ],
+            container: toolbarOptions
+              ? buildToolbarFromOptions(toolbarOptions)
+              : defaultToolbarOptions,
             handlers: {
-              image: function () {
-                addBlobUrlToImage(quill, blobUrlsRef);
-              },
+              ...(blobUrlsRef && {
+                image: function () {
+                  addBlobUrlToImage(quill, blobUrlsRef);
+                },
+              }),
             },
           },
-          clipboard: {
-            matchVisual: true,
-          },
-          addIdsToHeadings: {
-            enable: true,
-          },
+          clipboard: { matchVisual: true },
+          addIdsToHeadings: { enable: true },
         },
       });
 
       quill.on("text-change", () => {
         const html = quill.root.innerHTML.trim();
-        const isEmpty = html === "<p><br></p>";
-        onChange?.(isEmpty ? "" : html);
-        if (!isEmpty) {
+        const text = quill.getText().trim();
+
+        // Remove leading blank <p><br></p> blocks
+        const match = html.match(/^(<p><br><\/p>\s*)+/);
+        if (match) {
+          const lengthToDelete = quill.getLength();
+          const blankLines = quill
+            .getLines(0, lengthToDelete)
+            .filter((line) => line.domNode.innerHTML === "<br>");
+
+          if (blankLines.length) {
+            const charsToDelete = blankLines.length + blankLines.length; // each line + newline
+            quill.deleteText(0, charsToDelete, "silent");
+            quill.setSelection(0);
+          }
+        }
+
+        const cleanHtml = quill.root.innerHTML.trim();
+        const isOnlyEmptyTag = cleanHtml === "<p><br></p>";
+        const isTrulyEmpty = text.length === 0 && isOnlyEmptyTag;
+
+        onChange?.(isTrulyEmpty ? "" : cleanHtml);
+        if (!isTrulyEmpty && blobUrlsRef) {
           removeUnusedBlobUrls(quill, blobUrlsRef);
         }
       });
@@ -108,12 +110,12 @@ const QuillEditor = forwardRef<Quill | null, EditorProps>(
         if (typeof ref === "function") {
           ref(quill);
         } else {
-          ref.current = quill;
+          (ref as RefObject<Quill | null>).current = quill;
         }
       }
 
       // **Important**: Cache blobUrlsRef.current here
-      const blobUrls = blobUrlsRef.current;
+      const blobUrls = blobUrlsRef?.current;
 
       return () => {
         if (ref && "current" in ref) {

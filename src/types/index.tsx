@@ -3,6 +3,7 @@ import {
   HTMLInputAutoCompleteAttribute,
   KeyboardEvent,
   ReactNode,
+  RefObject,
   SVGProps,
 } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
@@ -134,30 +135,6 @@ export interface LevelOneCategoryType {
   subCategories: LevelTwoCategoryType[];
 }
 
-export interface ShadeType {
-  shadeName: string;
-  colorCode: string;
-  stock: number | undefined;
-  images: File[];
-}
-
-export interface ProductType {
-  title: string;
-  brand: string;
-  description: string;
-  howToUse?: string;
-  ingredients?: string;
-  additionalDetails?: string;
-  categoryLevelOne: { name: string; category: string };
-  categoryLevelTwo: { name: string; category: string };
-  categoryLevelThree: { name: string; category: string };
-  originalPrice: number | undefined;
-  sellingPrice: number | undefined;
-  totalStock: number | undefined;
-  commonImages?: File[];
-  shades?: ShadeType[];
-}
-
 export type TRegexes =
   | "noSpace"
   | "singleSpace"
@@ -180,3 +157,50 @@ export type TRegexes =
   | "atLeastOneUppercaseLetter"
   | "contentAtLeastLength"
   | "onlyLettersAndSpacesAndDots";
+
+export type ToolbarOption =
+  | { header: (1 | 2 | 3 | 4 | 5 | 6 | false)[] }
+  | "bold"
+  | "italic"
+  | "underline"
+  | "strike"
+  | { list: "ordered" | "bullet" }
+  | { script: "sub" | "super" }
+  | { indent: "-1" | "+1" }
+  | { color: string[] } // can be empty for Quill to auto-generate colors
+  | { background: string[] }
+  | { align: string[] }
+  | { direction: "rtl" }
+  | "link"
+  | "image"
+  | "video"
+  | "code"
+  | "clean";
+
+export type QuillToolbar = (ToolbarOption | ToolbarOption[])[];
+
+export interface IToolBarOptions {
+  header?: (1 | 2 | 3 | 4 | 5 | 6 | false)[];
+  script?: ("sub" | "super")[];
+  indent?: ("-1" | "+1")[];
+  color?: boolean;
+  background?: boolean;
+  align?: boolean;
+  direction?: "rtl";
+  text?: ("bold" | "italic" | "underline" | "strike" | "link")[];
+  list?: ("ordered" | "bullet")[];
+  media?: ("image" | "video" | "link")[];
+  misc?: ("code" | "clean")[];
+}
+
+export interface QuillEditorProps {
+  label?: string;
+  readOnly?: boolean;
+  errorText?: string;
+  className?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  blobUrlsRef?: RefObject<string[]>;
+  placeholder?: string;
+  toolbarOptions?: IToolBarOptions;
+}

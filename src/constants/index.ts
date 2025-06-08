@@ -1,4 +1,4 @@
-import { TRegexes } from "../types";
+import { QuillToolbar, TRegexes } from "../types";
 
 export const regexes: Record<TRegexes, RegExp> = {
   noSpace: /^\S+$/, // No spaces allowed
@@ -37,3 +37,16 @@ export const ALLOWED_IMAGE_TYPES = [
 ];
 
 export const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm"];
+
+export const defaultToolbarOptions: QuillToolbar = [
+  [{ header: [false, 6, 5, 4, 3, 2, 1] }],
+  ["bold", "italic", "underline", "strike"],
+  [{ color: [] }, { background: [] }],
+  [{ list: "ordered" }, { list: "bullet" }],
+  [{ script: "sub" }, { script: "super" }],
+  [{ indent: "-1" }, { indent: "+1" }],
+  [{ align: [] }],
+  [{ direction: "rtl" }],
+  ["link", "image", "video"],
+  ["code", "clean"],
+];
