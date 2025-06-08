@@ -44,36 +44,48 @@ export const shadeSchema = z.object({
     .min(1, "At least one image is required")
     .superRefine((files, ctx) => {
       files.forEach((file, index) => {
-        if (!(file instanceof File)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Item ${index + 1} is not a valid file`,
-            path: [index],
-          });
-          return;
-        }
+        if (typeof File !== "undefined" && file instanceof File) {
+          // File size check
+          if (file.size > MAX_IMAGE_FILE_SIZE) {
+            const sizeInMB = (file.size / MB).toFixed(1);
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Image ${
+                index + 1
+              } is too large (${sizeInMB} MB). Max allowed is 2 MB.`,
+              path: [index],
+            });
+          }
 
-        // File size check
-        if (file.size > MAX_IMAGE_FILE_SIZE) {
-          const sizeInMB = (file.size / MB).toFixed(1);
+          // File type check
+          if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Image ${
+                index + 1
+              } invalid format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map(
+                (t) => t.replace("image/", "")
+              ).join(", ")}`,
+              path: [index],
+            });
+          }
+        } else if (typeof file === "string") {
+          try {
+            const url = new URL(file);
+            if (!["http:", "https:"].includes(url.protocol)) {
+              throw new Error();
+            }
+          } catch {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Image ${index + 1} is not a valid URL`,
+              path: [index],
+            });
+          }
+        } else {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Image ${
-              index + 1
-            } is too large (${sizeInMB} MB). Max allowed is 2 MB.`,
-            path: [index],
-          });
-        }
-
-        // File type check
-        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Image ${
-              index + 1
-            } invalid format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map((t) =>
-              t.replace("image/", "")
-            ).join(", ")}`,
+            message: `Item ${index + 1} must be a File or a valid image URL`,
             path: [index],
           });
         }
@@ -294,36 +306,48 @@ export const productSchema = z
       .min(1, "At least one image is required")
       .superRefine((files, ctx) => {
         files.forEach((file, index) => {
-          if (!(file instanceof File)) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Item ${index + 1} is not a valid file`,
-              path: [index],
-            });
-            return;
-          }
+          if (typeof File !== "undefined" && file instanceof File) {
+            // File size check
+            if (file.size > MAX_IMAGE_FILE_SIZE) {
+              const sizeInMB = (file.size / MB).toFixed(1);
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `Image ${
+                  index + 1
+                } is too large (${sizeInMB} MB). Max allowed is 2 MB.`,
+                path: [index],
+              });
+            }
 
-          // File size check
-          if (file.size > MAX_IMAGE_FILE_SIZE) {
-            const sizeInMB = (file.size / MB).toFixed(1);
+            // File type check
+            if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `Image ${
+                  index + 1
+                } invalid format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map(
+                  (t) => t.replace("image/", "")
+                ).join(", ")}`,
+                path: [index],
+              });
+            }
+          } else if (typeof file === "string") {
+            try {
+              const url = new URL(file);
+              if (!["http:", "https:"].includes(url.protocol)) {
+                throw new Error();
+              }
+            } catch {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `Image ${index + 1} is not a valid URL`,
+                path: [index],
+              });
+            }
+          } else {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
-              message: `Image ${
-                index + 1
-              } is too large (${sizeInMB} MB). Max allowed is 2 MB.`,
-              path: [index],
-            });
-          }
-
-          // File type check
-          if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `Image ${
-                index + 1
-              } invalid format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map(
-                (t) => t.replace("image/", "")
-              ).join(", ")}`,
+              message: `Item ${index + 1} must be a File or a valid image URL`,
               path: [index],
             });
           }
