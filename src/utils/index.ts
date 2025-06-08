@@ -163,3 +163,39 @@ export const toINRCurrency = (amount: number): string =>
     currency: "INR",
     maximumFractionDigits: 2,
   }).format(amount);
+
+export const deepEqual = <T>(obj1: T, obj2: T): boolean => {
+  if (obj1 === obj2) return true;
+
+  if (
+    typeof obj1 !== "object" ||
+    typeof obj2 !== "object" ||
+    obj1 === null ||
+    obj2 === null
+  ) {
+    return false;
+  }
+
+  // Handle arrays
+  if (Array.isArray(obj1) && Array.isArray(obj2)) {
+    if (obj1.length !== obj2.length) return false;
+    return obj1.every((item, index) => deepEqual(item, obj2[index]));
+  }
+
+  // If one is array but the other isn't
+  if (Array.isArray(obj1) || Array.isArray(obj2)) {
+    return false;
+  }
+
+  const keys1 = Object.keys(obj1 as Record<string, unknown>);
+  const keys2 = Object.keys(obj2 as Record<string, unknown>);
+
+  if (keys1.length !== keys2.length) return false;
+
+  return keys1.every((key) =>
+    deepEqual(
+      (obj1 as Record<string, unknown>)[key],
+      (obj2 as Record<string, unknown>)[key]
+    )
+  );
+};
