@@ -176,26 +176,10 @@ export const deepEqual = <T>(obj1: T, obj2: T): boolean => {
     return false;
   }
 
-  // Handle arrays
-  if (Array.isArray(obj1) && Array.isArray(obj2)) {
-    if (obj1.length !== obj2.length) return false;
-    return obj1.every((item, index) => deepEqual(item, obj2[index]));
-  }
-
-  // If one is array but the other isn't
-  if (Array.isArray(obj1) || Array.isArray(obj2)) {
-    return false;
-  }
-
-  const keys1 = Object.keys(obj1 as Record<string, unknown>);
-  const keys2 = Object.keys(obj2 as Record<string, unknown>);
+  const keys1 = Object.keys(obj1) as (keyof T)[];
+  const keys2 = Object.keys(obj2) as (keyof T)[];
 
   if (keys1.length !== keys2.length) return false;
 
-  return keys1.every((key) =>
-    deepEqual(
-      (obj1 as Record<string, unknown>)[key],
-      (obj2 as Record<string, unknown>)[key]
-    )
-  );
+  return keys1.every((key) => deepEqual(obj1[key], obj2[key]));
 };
