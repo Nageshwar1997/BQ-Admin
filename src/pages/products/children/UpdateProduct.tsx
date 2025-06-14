@@ -489,7 +489,7 @@ const UpdateProduct = () => {
       setCommonImages(product.commonImages);
       setShades(product.shades);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedProduct.data, selectedProduct.isPending]);
 
   useEffect(() => {
@@ -500,7 +500,7 @@ const UpdateProduct = () => {
       );
       setValue("totalStock", totalStock, { shouldValidate: true });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shades, shades.length]);
 
   return (
