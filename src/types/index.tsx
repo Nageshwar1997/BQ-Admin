@@ -211,7 +211,6 @@ export type TRegexes =
   | "atLeastOneLowercaseLetter"
   | "atLeastOneSpecialCharacter"
   | "atLeastOneUppercaseLetter"
-  | "contentAtLeastLength"
   | "onlyLettersAndSpacesAndDots";
 
 export type ToolbarOption =

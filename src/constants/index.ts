@@ -11,7 +11,6 @@ export const regexes: Record<TRegexes, RegExp> = {
     /^[a-zA-Z0-9]+([._%+-]?[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(-?[a-zA-Z0-9]+)*(\.[a-zA-Z]{2,})+$/, // Email e.g. 3oYQK@example.com
   phoneStart: /^[6-9]/, // Starts with 6, 7, 8, or 9
   phoneExactLength: /^\d{10}$/, // Exactly 10 digits
-  contentAtLeastLength: /^.{17,}$/, // At least 17 digits
   phone: /^[6-9][0-9]{9}$/, // Phone number e.g. 9876543210
   atLeastOneUppercaseLetter: /[A-Z]/, // At least one uppercase letter
   atLeastOneLowercaseLetter: /[a-z]/, // At least one lowercase letter
