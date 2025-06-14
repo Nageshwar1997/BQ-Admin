@@ -136,15 +136,11 @@ export interface LevelOneCategoryType {
 }
 
 export interface ShadeType {
+  _id?: string;
   shadeName: string;
   colorCode: string;
   stock: number | undefined;
   images: (File | string)[];
-}
-
-export interface FetchedShadeType extends ShadeType {
-  _id: string;
-  images: string[];
 }
 
 export interface ProductType {
@@ -164,7 +160,7 @@ export interface ProductType {
   shades?: ShadeType[];
 }
 
-interface PopulatedCategory {
+export interface PopulatedCategory {
   _id: string;
   name: string;
   category: string;
@@ -192,7 +188,7 @@ export interface FetchedProductType extends ProductType {
   sellingPrice: number;
   originalPrice: number;
   category: PopulatedCategory;
-  shades: FetchedShadeType[];
+  shades: ShadeType[];
 }
 
 export type TRegexes =
