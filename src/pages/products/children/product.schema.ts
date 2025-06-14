@@ -112,7 +112,7 @@ export const productSchema = z
       blockMultipleSpaces: true,
       customRegexes: [
         {
-          regex: regexes.contentAtLeastLength,
+          regex: /^.{17,}$/, // Skipping the <p></p> tag value 7 characters
           message: "must be exactly 10 characters long",
         },
       ],
@@ -121,34 +121,16 @@ export const productSchema = z
       field: "howToUse",
       showingFieldName: "How to use",
       blockMultipleSpaces: true,
-      customRegexes: [
-        {
-          regex: regexes.contentAtLeastLength,
-          message: "must be exactly 10 characters long",
-        },
-      ],
     }),
     ingredients: zodStringOptional({
       field: "ingredients",
       showingFieldName: "Ingredients",
       blockMultipleSpaces: true,
-      customRegexes: [
-        {
-          regex: regexes.contentAtLeastLength,
-          message: "must be exactly 10 characters long",
-        },
-      ],
     }),
     additionalDetails: zodStringOptional({
       field: "additionalDetails",
       showingFieldName: "Additional details",
       blockMultipleSpaces: true,
-      customRegexes: [
-        {
-          regex: regexes.contentAtLeastLength,
-          message: "must be exactly 10 characters long",
-        },
-      ],
     }),
     categoryLevelOne: z
       .object({
