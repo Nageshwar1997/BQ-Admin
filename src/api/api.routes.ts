@@ -4,7 +4,7 @@ export const authRoutes = {
 
 export const productRoutes = {
   uploadProduct: { method: "POST", url: "/products/upload" },
-  updateProduct: { method: "PATCH", url: "/products/update" },
+  updateProduct: { method: "PATCH", url: "/products/product/update" },
   getAllProducts: { method: "POST", url: "/products/all" },
   getProductById: { method: "POST", url: "/products/product" },
   deleteProduct: { method: "DELETE", url: "/products/delete" },
