@@ -76,14 +76,20 @@ export const get_product_by_id = async ({
   }
 };
 
-export const update_product = async (data: FormData) => {
+export const update_product = async ({
+  data,
+  productId,
+}: {
+  data: FormData;
+  productId: string;
+}) => {
   try {
     const admin_token = getAdminToken();
 
     const { method, url } = productRoutes.updateProduct;
     const response = await api.request({
       method,
-      url,
+      url: `${url}/${productId}`,
       data,
       headers: { Authorization: admin_token },
     });
