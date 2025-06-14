@@ -77,29 +77,9 @@ const QuillEditor = forwardRef<Quill | null, QuillEditorProps>(
 
       quill.on("text-change", () => {
         const html = quill.root.innerHTML.trim();
-        const text = quill.getText().trim();
-
-        // Remove leading blank <p><br></p> blocks
-        const match = html.match(/^(<p><br><\/p>\s*)+/);
-        if (match) {
-          const lengthToDelete = quill.getLength();
-          const blankLines = quill
-            .getLines(0, lengthToDelete)
-            .filter((line) => line.domNode.innerHTML === "<br>");
-
-          if (blankLines.length) {
-            const charsToDelete = blankLines.length + blankLines.length; // each line + newline
-            quill.deleteText(0, charsToDelete, "silent");
-            quill.setSelection(0);
-          }
-        }
-
-        const cleanHtml = quill.root.innerHTML.trim();
-        const isOnlyEmptyTag = cleanHtml === "<p><br></p>";
-        const isTrulyEmpty = text.length === 0 && isOnlyEmptyTag;
-
-        onChange?.(isTrulyEmpty ? "" : cleanHtml);
-        if (!isTrulyEmpty && blobUrlsRef) {
+        const isEmpty = html === "<p><br></p>";
+        onChange?.(isEmpty ? "" : html);
+        if (!isEmpty && blobUrlsRef) {
           removeUnusedBlobUrls(quill, blobUrlsRef);
         }
       });
