@@ -22,11 +22,22 @@ import {
   QUILL_DATA,
 } from "../data/categoriesData";
 import { productSchema } from "./product.schema";
-import { FetchedProductType, ProductType, ShadeType } from "../../../types";
+import {
+  FetchedProductType,
+  PopulatedCategory,
+  ProductType,
+  ShadeType,
+} from "../../../types";
 import QuillEditor from "../../../components/ui/quillEditor/QuillEditor";
-import { useGetProductById } from "../../../api/product/product.service";
+import {
+  useGetProductById,
+  useUpdateProduct,
+} from "../../../api/product/product.service";
 import { productInitialValues } from "../data";
 import ImageUpload from "../../../components/ui/input/ImageUpload";
+import { getQuillValue, processQuillContent } from "./helpers";
+import { deepEqual } from "../../../utils";
+import { toastErrorMessage } from "../../../utils/toast.util";
 
 const UpdateProduct = () => {
   const quillRefs = {
@@ -49,13 +60,16 @@ const UpdateProduct = () => {
 
   const { setParams, queryParams } = useQueryParams();
   const selectedProduct = useGetProductById();
+  const updateProduct = useUpdateProduct();
 
   const {
     control,
     handleSubmit,
     register,
     setValue,
+    getValues,
     watch,
+    reset,
     formState: { errors },
   } = useForm<z.infer<typeof productSchema>>({
     defaultValues: productInitialValues,
@@ -80,20 +94,341 @@ const UpdateProduct = () => {
         URL.revokeObjectURL(preview);
       }
     }); // Revoke all blob URLs to avoid memory leaks
-    // reset({ ...productInitialValues });
+    reset({ ...productInitialValues });
     setShades([]);
     setCommonImages([]);
     setCommonImagePreviews([]);
   };
 
   const handleUpload = async (data: ProductType) => {
-    console.log("DATA", data);
+    let hasChanges = false;
+
+    await Promise.all([
+      processQuillContent(
+        quillRefs.description,
+        blobUrlRefs.description,
+        setValue,
+        "description",
+        `Products/${data.title}/Description`,
+        "product"
+      ),
+      processQuillContent(
+        quillRefs.howToUse,
+        blobUrlRefs.howToUse,
+        setValue,
+        "howToUse",
+        `Products/${data.title}/How_To_Use`,
+        "product"
+      ),
+      processQuillContent(
+        quillRefs.ingredients,
+        blobUrlRefs.ingredients,
+        setValue,
+        "ingredients",
+        `Products/${data.title}/Ingredients`,
+        "product"
+      ),
+      processQuillContent(
+        quillRefs.additionalDetails,
+        blobUrlRefs.additionalDetails,
+        setValue,
+        "additionalDetails",
+        `Products/${data.title}/Additional_Details`,
+        "product"
+      ),
+    ]);
+
+    const formData = new FormData();
+
+    const finalData: ProductType = { ...data, ...getValues(), shades };
+    const product: FetchedProductType = selectedProduct.data?.product;
+    const category: PopulatedCategory = product?.category;
+
+    // For Common Images
+    const newAddedCommonImageFiles: File[] = [];
+    const unChangedCommonImageURLs: string[] = [];
+    const apiCommonImageURLs: string[] = product.commonImages;
+
+    data.commonImages.forEach((img) => {
+      if (img instanceof File) {
+        newAddedCommonImageFiles.push(img);
+      } else {
+        unChangedCommonImageURLs.push(img);
+      }
+    });
+
+    const removedCommonImageURLs: string[] = apiCommonImageURLs.filter(
+      (img) => !unChangedCommonImageURLs.includes(img)
+    );
+
+    if (removedCommonImageURLs.length) {
+      hasChanges = true;
+      formData.append(
+        "removingCommonImageURLs",
+        JSON.stringify(removedCommonImageURLs)
+      );
+    }
+
+    if (newAddedCommonImageFiles.length) {
+      hasChanges = true;
+      newAddedCommonImageFiles.forEach((img, index) => {
+        formData.append(`commonImages[${index}]`, img);
+      });
+    }
+
+    const removedShadeURLsWithID: { _id: string; urls: string[] }[] = [];
+
+    product?.shades?.forEach((originalShade) => {
+      const currentShade = shades.find((s) => s._id === originalShade._id);
+      if (!currentShade || !originalShade._id) return;
+
+      const originalURLs = originalShade.images?.filter(
+        (img) => typeof img === "string"
+      );
+
+      const currentURLs = currentShade.images?.filter(
+        (img) => typeof img === "string"
+      );
+
+      const removedURLs = originalURLs.filter(
+        (url) => !currentURLs.includes(url)
+      );
+
+      if (removedURLs.length) {
+        removedShadeURLsWithID.push({
+          _id: originalShade._id,
+          urls: removedURLs,
+        });
+      }
+    });
+
+    if (removedShadeURLsWithID.length) {
+      hasChanges = true;
+      formData.append(
+        "removingShadeImageUrls",
+        JSON.stringify(removedShadeURLsWithID)
+      );
+    }
+
+    const apiData: Partial<FetchedProductType> = {
+      title: product?.title,
+      brand: product?.brand,
+      additionalDetails: product?.additionalDetails,
+      description: product?.description,
+      howToUse: product?.howToUse,
+      ingredients: product?.ingredients,
+      categoryLevelThree: {
+        name: category.name,
+        category: category.category,
+      },
+      categoryLevelTwo: {
+        name: category.parentCategory.name,
+        category: category.parentCategory.category,
+      },
+      categoryLevelOne: {
+        name: category.parentCategory.parentCategory.name,
+        category: category.parentCategory.parentCategory.category,
+      },
+      originalPrice: product?.originalPrice,
+      sellingPrice: product?.sellingPrice,
+      totalStock: product?.totalStock,
+    };
+
+    const updatedData: Partial<ProductType> = {
+      title: finalData.title,
+      brand: finalData.brand,
+      additionalDetails: getQuillValue(finalData.additionalDetails),
+      description: getQuillValue(finalData.description),
+      howToUse: getQuillValue(finalData.howToUse),
+      ingredients: getQuillValue(finalData.ingredients),
+      categoryLevelThree: finalData.categoryLevelThree,
+      categoryLevelTwo: finalData.categoryLevelTwo,
+      categoryLevelOne: finalData.categoryLevelOne,
+      originalPrice: finalData.originalPrice,
+      sellingPrice: finalData.sellingPrice,
+      totalStock: finalData.totalStock,
+    };
+
+    const existingShades: ShadeType[] = [];
+    const newAddedShades: ShadeType[] = [];
+
+    shades?.forEach((shade: ShadeType) => {
+      if (shade?._id) {
+        existingShades.push(shade);
+      } else {
+        newAddedShades.push(shade);
+      }
+    });
+
+    if (newAddedShades.length) {
+      hasChanges = true;
+      newAddedShades.forEach((shade, shadeIndex) => {
+        formData.append(`shades[${shadeIndex}][shadeName]`, shade.shadeName);
+        formData.append(`shades[${shadeIndex}][colorCode]`, shade.colorCode);
+        formData.append(`shades[${shadeIndex}][stock]`, String(shade.stock));
+
+        shade.images.forEach((image, imgIndex) => {
+          formData.append(`shades[${shadeIndex}][images][${imgIndex}]`, image);
+        });
+      });
+    }
+
+    const updatedShadesWithImageFiles: ShadeType[] = [];
+    const updatedShadesWithoutImageFiles: ShadeType[] = [];
+
+    existingShades.forEach((shade) => {
+      if (shade?.images?.some((img) => img instanceof File)) {
+        updatedShadesWithImageFiles.push(shade);
+      } else {
+        updatedShadesWithoutImageFiles.push(shade);
+      }
+    });
+
+    // For Image Changed Shades
+    const changedShadesFieldsWithImageFiles: Partial<ShadeType>[] = [];
+
+    updatedShadesWithImageFiles.forEach((shade) => {
+      const originalShade = product?.shades?.find((s) => s._id === shade._id);
+      if (!originalShade || !shade._id) return;
+
+      const updatedFields: Partial<ShadeType> = {
+        _id: shade._id,
+        images: shade.images.filter((img) => img instanceof File),
+      };
+
+      (Object.keys(shade) as (keyof ShadeType)[]).forEach((key) => {
+        const typedKey = key as keyof ShadeType;
+        if (
+          typedKey !== "images" &&
+          !deepEqual(shade[typedKey], originalShade[typedKey])
+        ) {
+          (updatedFields[typedKey] as unknown) = shade[typedKey];
+        }
+      });
+
+      if (Object.keys(updatedFields).length > 1) {
+        changedShadesFieldsWithImageFiles.push(updatedFields);
+      }
+    });
+
+    if (changedShadesFieldsWithImageFiles.length) {
+      hasChanges = true;
+      changedShadesFieldsWithImageFiles.forEach((shade, shadeIndex) => {
+        if (shade.shadeName) {
+          formData.append(
+            `updated-with-files-shades[${shadeIndex}][shadeName]`,
+            shade.shadeName
+          );
+        }
+        if (shade.colorCode) {
+          formData.append(
+            `updated-with-files-shades[${shadeIndex}][colorCode]`,
+            shade.colorCode
+          );
+        }
+        if (shade.stock && shade.stock > 0) {
+          formData.append(
+            `updated-with-files-shades[${shadeIndex}][stock]`,
+            String(shade.stock)
+          );
+        }
+        if (shade.images?.length) {
+          shade.images?.forEach((image, imgIndex) => {
+            formData.append(
+              `updated-with-files-shades[${shadeIndex}][images][${imgIndex}]`,
+              image
+            );
+          });
+        }
+      });
+    }
+    const changedShadesFieldsWithoutImageFiles: Partial<ShadeType>[] = [];
+
+    updatedShadesWithoutImageFiles.forEach((shade) => {
+      const originalShade = product?.shades?.find((s) => s._id === shade._id);
+      if (!originalShade || !shade._id) return;
+
+      const updatedShadeFields: Partial<ShadeType> = { _id: shade._id };
+
+      Object.keys(shade).forEach((key) => {
+        const typedKey = key as keyof ShadeType;
+        if (
+          typedKey !== "images" &&
+          !deepEqual(shade[typedKey], originalShade[typedKey])
+        ) {
+          (updatedShadeFields[typedKey] as unknown) = shade[typedKey];
+        }
+      });
+
+      if (Object.keys(updatedShadeFields).length > 1) {
+        changedShadesFieldsWithoutImageFiles.push(updatedShadeFields);
+      }
+    });
+
+    if (changedShadesFieldsWithoutImageFiles.length) {
+      hasChanges = true;
+      changedShadesFieldsWithoutImageFiles.forEach((shade, shadeIndex) => {
+        if (shade.shadeName) {
+          formData.append(
+            `updated-without-files-shades[${shadeIndex}][shadeName]`,
+            shade.shadeName
+          );
+        }
+        if (shade.colorCode) {
+          formData.append(
+            `updated-without-files-shades[${shadeIndex}][colorCode]`,
+            shade.colorCode
+          );
+        }
+        if (shade.stock && shade.stock > 0) {
+          formData.append(
+            `updated-without-files-shades[${shadeIndex}][stock]`,
+            String(shade.stock)
+          );
+        }
+        if (shade.images?.length) {
+          shade.images?.forEach((image, imgIndex) => {
+            formData.append(
+              `updated-without-files-shades[${shadeIndex}][images][${imgIndex}]`,
+              image
+            );
+          });
+        }
+      });
+    }
+
+    // For All
+    const changedProductFields: Partial<ProductType> = {};
+    Object.keys(updatedData).forEach((key) => {
+      const typedKey = key as keyof ProductType;
+      if (!deepEqual(updatedData[typedKey], apiData?.[typedKey])) {
+        (changedProductFields[typedKey] as unknown) = updatedData[typedKey];
+      }
+    });
+
+    if (!Object.keys(changedProductFields).length && !hasChanges) {
+      toastErrorMessage("No Product Data Changed");
+      return;
+    }
+
+    Object.entries(changedProductFields).forEach(([key, value]) => {
+      if (typeof value === "object") {
+        formData.append(key, JSON.stringify(value));
+      } else {
+        formData.append(key, value as string);
+      }
+    });
+
+    updateProduct.mutate({
+      data: formData,
+      productId: "68457b215b4c4618ea6a6821",
+    });
   };
 
   const handleGetAllProducts = () => {
     selectedProduct.mutate({
       data: {
-        shades: ["shadeName", "colorCode", "images", "stock"],
+        shades: ["_id", "shadeName", "colorCode", "images", "stock"],
         seller: ["firstName", "lastName", "email"],
         category: ["name", "category", "parentCategory", "level"],
       },
@@ -154,7 +489,8 @@ const UpdateProduct = () => {
       setCommonImages(product.commonImages);
       setShades(product.shades);
     }
-  }, [selectedProduct.data, selectedProduct.isPending, setValue]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedProduct.data, selectedProduct.isPending]);
 
   useEffect(() => {
     if (shades.length > 0) {
@@ -164,7 +500,7 @@ const UpdateProduct = () => {
       );
       setValue("totalStock", totalStock, { shouldValidate: true });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shades, shades.length]);
 
   return (
