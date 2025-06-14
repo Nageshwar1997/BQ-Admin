@@ -56,6 +56,7 @@ const EditShade = ({ shades, setShades }: ShadeFormProps) => {
     setShades((prevShades) => {
       const updatedShades = [...prevShades];
       updatedShades[editIndex] = {
+        ...(shades[editIndex]?._id && { _id: shades[editIndex]._id }),
         ...data,
         images: shadeImages,
       };
