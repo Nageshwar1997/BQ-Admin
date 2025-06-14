@@ -63,7 +63,8 @@ export const useGetProductById = () => {
 
 export const useUpdateProduct = () => {
   return useMutation({
-    mutationFn: (bodyData: FormData) => update_product(bodyData),
+    mutationFn: ({ data, productId }: { data: FormData; productId: string }) =>
+      update_product({ data, productId }),
     onSuccess: (data) => {
       toastSuccessMessage(data?.message || "Product updated successfully!");
     },
