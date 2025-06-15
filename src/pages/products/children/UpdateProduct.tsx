@@ -69,7 +69,6 @@ const UpdateProduct = () => {
     setValue,
     getValues,
     watch,
-    reset,
     formState: { errors },
   } = useForm<z.infer<typeof productSchema>>({
     defaultValues: productInitialValues,
@@ -87,18 +86,6 @@ const UpdateProduct = () => {
     (cat) => cat?.category === selectedCategory2?.category
   );
   const level3Options = level2Data?.subCategories || [];
-
-  const handleReset = () => {
-    commonImagePreviews.forEach((preview) => {
-      if (preview.startsWith("blob:")) {
-        URL.revokeObjectURL(preview);
-      }
-    }); // Revoke all blob URLs to avoid memory leaks
-    reset({ ...productInitialValues });
-    setShades([]);
-    setCommonImages([]);
-    setCommonImagePreviews([]);
-  };
 
   const handleUpload = async (data: ProductType) => {
     let hasChanges = false;
@@ -441,8 +428,7 @@ const UpdateProduct = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (selectedProduct.isPending) return;
+  const setInitialValues = () => {
     if (selectedProduct.data?.product) {
       const product: FetchedProductType = selectedProduct.data.product;
       setValue("title", product.title, { shouldValidate: true });
@@ -489,6 +475,23 @@ const UpdateProduct = () => {
       setCommonImages(product.commonImages);
       setShades(product.shades);
     }
+  };
+
+  const handleReset = () => {
+    if (commonImagePreviews.length) {
+      commonImagePreviews.forEach((preview) => {
+        if (preview.startsWith("blob:")) {
+          URL.revokeObjectURL(preview);
+        }
+      }); // Revoke all blob URLs to avoid memory leaks
+    }
+
+    setInitialValues();
+  };
+
+  useEffect(() => {
+    if (selectedProduct.isPending) return;
+    setInitialValues();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedProduct.data, selectedProduct.isPending]);
 
