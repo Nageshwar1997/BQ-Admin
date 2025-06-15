@@ -216,9 +216,11 @@ const UpdateProduct = () => {
         name: category.parentCategory.parentCategory.name,
         category: category.parentCategory.parentCategory.category,
       },
-      originalPrice: product?.originalPrice,
-      sellingPrice: product?.sellingPrice,
-      totalStock: product?.totalStock,
+    };
+    const apiNumberFields = {
+      originalPrice: String(product?.originalPrice),
+      sellingPrice: String(product?.sellingPrice),
+      totalStock: String(product?.totalStock),
     };
 
     const updatedData: Partial<ProductType> = {
@@ -231,10 +233,27 @@ const UpdateProduct = () => {
       categoryLevelThree: finalData.categoryLevelThree,
       categoryLevelTwo: finalData.categoryLevelTwo,
       categoryLevelOne: finalData.categoryLevelOne,
-      originalPrice: finalData.originalPrice,
-      sellingPrice: finalData.sellingPrice,
-      totalStock: finalData.totalStock,
     };
+
+    const updatedNumberFields = {
+      originalPrice: String(finalData.originalPrice),
+      sellingPrice: String(finalData.sellingPrice),
+      totalStock: String(finalData.totalStock),
+    };
+
+    const changedProductNumberFields: Partial<
+      Record<"originalPrice" | "sellingPrice" | "totalStock", string>
+    > = {};
+    Object.keys(updatedData).forEach((key) => {
+      const typedKey = key as "originalPrice" | "sellingPrice" | "totalStock";
+      if (!deepEqual(updatedData[typedKey], apiData?.[typedKey])) {
+        (updatedNumberFields[typedKey] as unknown) = apiNumberFields[typedKey];
+      }
+    });
+
+    Object.entries(changedProductNumberFields).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
 
     const existingShades: ShadeType[] = [];
     const newAddedShades: ShadeType[] = [];
@@ -406,10 +425,20 @@ const UpdateProduct = () => {
       }
     });
 
-    updateProduct.mutate({
-      data: formData,
-      productId: "68457b215b4c4618ea6a6821",
-    });
+    updateProduct.mutate(
+      {
+        data: formData,
+        productId: "68457b215b4c4618ea6a6821",
+      },
+      {
+        onError: (error) => {
+          console.error("API ERROR", error);
+        },
+        onSuccess: (data) => {
+          console.log("API DATA", data);
+        },
+      }
+    );
   };
 
   const handleGetAllProducts = () => {
