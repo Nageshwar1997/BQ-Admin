@@ -415,7 +415,7 @@ const UpdateProduct = () => {
   const handleGetAllProducts = () => {
     selectedProduct.mutate({
       data: {
-        shades: ["_id", "shadeName", "colorCode", "images", "stock"],
+        shades: ["shadeName", "colorCode", "images", "stock"],
         seller: ["firstName", "lastName", "email"],
         category: ["name", "category", "parentCategory", "level"],
       },
