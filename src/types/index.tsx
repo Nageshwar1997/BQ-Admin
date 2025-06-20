@@ -1,12 +1,16 @@
+import Quill from "quill";
+import { z } from "zod";
 import {
   ChangeEvent,
+  Dispatch,
   HTMLInputAutoCompleteAttribute,
   KeyboardEvent,
   ReactNode,
   RefObject,
+  SetStateAction,
   SVGProps,
 } from "react";
-import { UseFormRegisterReturn } from "react-hook-form";
+import { UseFormRegisterReturn, UseFormSetValue } from "react-hook-form";
 
 export type ThemeType = "light" | "dark";
 
@@ -212,6 +216,16 @@ export type TRegexes =
   | "atLeastOneSpecialCharacter"
   | "atLeastOneUppercaseLetter"
   | "onlyLettersAndSpacesAndDots";
+
+export interface IProcessQuillContent<T extends z.ZodTypeAny> {
+  quillRef: RefObject<Quill | null>;
+  blobUrlsRef: RefObject<string[]>;
+  setValue: UseFormSetValue<z.infer<T>>;
+  fieldName: keyof ProductType;
+  folderName: string;
+  cloudinaryConfigOption: CloudinaryConfigOptionType;
+  setLoading?: Dispatch<SetStateAction<boolean>>;
+}
 
 export type ToolbarOption =
   | { header: (1 | 2 | 3 | 4 | 5 | 6 | false)[] }
