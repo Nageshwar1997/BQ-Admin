@@ -12,52 +12,62 @@ export const processQuillContent = async (
   setValue: UseFormSetValue<z.infer<typeof productSchema>>,
   fieldName: keyof ProductType,
   folderName: string,
-  cloudinaryConfigOption: CloudinaryConfigOptionType
+  cloudinaryConfigOption: CloudinaryConfigOptionType,
+  setLoading?: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   if (!quillRef.current) return;
   const quill = quillRef.current;
   let content = quill.root.innerHTML;
 
+  // If no blob images, just set the value and return
   if (!blobUrlsRef.current || blobUrlsRef.current.length === 0) {
     setValue(fieldName, content);
     return;
   }
-  const uploadPromises = blobUrlsRef.current.map(async (blobUrl, index) => {
-    try {
-      const response = await fetch(blobUrl);
-      const blob = await response.blob();
-      const ext = blob.type.split("/")[1] || "webp"; // e.g: jpeg, png, etc. OR fallback to webp
 
-      const file = new File([blob], `image_${index}.${ext}`, {
-        type: blob.type,
-      });
+  if (setLoading) {
+    setLoading(true);
+  }
+  try {
+    const uploadPromises = blobUrlsRef.current.map(async (blobUrl, index) => {
+      try {
+        const response = await fetch(blobUrl);
+        const blob = await response.blob();
+        const ext = blob.type.split("/")[1] || "webp";
 
-      const formData = new FormData();
-      formData.append("image", file);
-      formData.append("folderName", folderName);
-      formData.append("cloudinaryConfigOption", cloudinaryConfigOption);
+        const file = new File([blob], `image_${index}.${ext}`, {
+          type: blob.type,
+        });
 
-      const data = await upload_single_image(formData);
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("folderName", folderName);
+        formData.append("cloudinaryConfigOption", cloudinaryConfigOption);
 
-      return { blobUrl, cloudUrl: data.cloudUrl };
-    } catch (error) {
-      console.error("Image upload error:", error);
-      return null;
+        const data = await upload_single_image(formData);
+        return { blobUrl, cloudUrl: data.cloudUrl };
+      } catch (error) {
+        console.error("Image upload error:", error);
+        return null;
+      }
+    });
+
+    const uploadedImages = await Promise.all(uploadPromises);
+    const validUploadedImages = uploadedImages.filter(
+      (img): img is { blobUrl: string; cloudUrl: string } => img !== null
+    );
+
+    validUploadedImages.forEach(({ blobUrl, cloudUrl }) => {
+      content = content.replace(blobUrl, cloudUrl);
+    });
+
+    quill.root.innerHTML = content;
+    setValue(fieldName, content);
+  } finally {
+    if (setLoading) {
+      setLoading(false); // End loading no matter what
     }
-  });
-
-  const uploadedImages = await Promise.all(uploadPromises);
-  const validUploadedImages = uploadedImages.filter(
-    (img): img is { blobUrl: string; cloudUrl: string } => img !== null
-  );
-
-  validUploadedImages.forEach(({ blobUrl, cloudUrl }) => {
-    content = content.replace(blobUrl, cloudUrl);
-  });
-
-  quill.root.innerHTML = content;
-
-  setValue(fieldName, content);
+  }
 };
 
 export const getQuillValue = (value: string | undefined) => {
