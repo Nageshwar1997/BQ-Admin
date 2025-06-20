@@ -43,6 +43,18 @@ import LoadingPage from "../../../components/ui/loaders/LoadingPage";
 const allowedKeys = ["originalPrice", "sellingPrice", "totalStock"] as const;
 type PriceKey = (typeof allowedKeys)[number];
 
+const extractImageUrls = (html: string): string[] => {
+  const regex = /<img[^>]+src="([^">]+)"/g;
+  const urls: string[] = [];
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(html))) {
+    urls.push(match[1]);
+  }
+
+  return urls;
+};
+
 const UpdateProduct = () => {
   const quillRefs = {
     description: useRef<Quill | null>(null),
@@ -433,6 +445,24 @@ const UpdateProduct = () => {
         (changedProductFields[typedKey] as unknown) = updatedData[typedKey];
       }
     });
+    const fieldsToCheck: (keyof Pick<
+      ProductType,
+      "description" | "howToUse" | "ingredients" | "additionalDetails"
+    >)[] = ["description", "howToUse", "ingredients", "additionalDetails"];
+
+    const removedUrls = fieldsToCheck.flatMap((field) => {
+      const originalHtml = product?.[field] || "";
+      const updatedHtml = getValues(field) || "";
+
+      const originalUrls = extractImageUrls(originalHtml);
+      const updatedUrls = extractImageUrls(updatedHtml);
+
+      return originalUrls.filter((url) => !updatedUrls.includes(url));
+    });
+
+    if (removedUrls?.length) {
+      formData.append("removedQuillImageURLs", JSON.stringify(removedUrls));
+    }
 
     if (!Object.keys(changedProductFields).length && !hasChanges) {
       toastErrorMessage("No Product Data Changed");
