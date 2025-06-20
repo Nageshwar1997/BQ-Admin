@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import { shadeSchema } from "../product.schema";
 import { ShadeType } from "../../../../types";
@@ -21,7 +21,7 @@ import {
 import { shadeInitialValue } from "../../data";
 
 interface ShadeFormProps {
-  setShades: React.Dispatch<React.SetStateAction<ShadeType[]>>;
+  setShades: Dispatch<SetStateAction<ShadeType[]>>;
   shades: ShadeType[];
 }
 

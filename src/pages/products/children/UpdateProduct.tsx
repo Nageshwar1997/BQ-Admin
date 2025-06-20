@@ -92,7 +92,7 @@ const UpdateProduct = () => {
   );
   const level3Options = level2Data?.subCategories || [];
 
-  const handleUpload = async (data: ProductType) => {
+  const handleUpdate = async (data: ProductType) => {
     let hasChanges = false;
 
     await Promise.all([
@@ -577,7 +577,7 @@ const UpdateProduct = () => {
             {/* Product Form */}
             <form
               className="w-full p-4 flex flex-col gap-7"
-              onSubmit={handleSubmit(handleUpload)}
+              onSubmit={handleSubmit(handleUpdate)}
             >
               <div className="flex flex-col sm:flex-row gap-7 sm:gap-4">
                 {INPUTS_DATA.map((input, index) => (
@@ -893,7 +893,7 @@ const UpdateProduct = () => {
                 <Button
                   pattern="primary"
                   type="submit"
-                  content="Upload"
+                  content="Update"
                   className="!rounded-lg max-h-12"
                 />
               </div>
