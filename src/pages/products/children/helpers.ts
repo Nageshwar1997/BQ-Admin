@@ -1,20 +1,16 @@
-import { z } from "zod";
-import Quill from "quill";
-import { RefObject } from "react";
-import { UseFormSetValue } from "react-hook-form";
-import { CloudinaryConfigOptionType, ProductType } from "../../../types";
+import { IProcessQuillContent } from "../../../types";
 import { upload_single_image } from "../../../api/media/media.api";
 import { productSchema } from "./product.schema";
 
-export const processQuillContent = async (
-  quillRef: RefObject<Quill | null>,
-  blobUrlsRef: RefObject<string[]>,
-  setValue: UseFormSetValue<z.infer<typeof productSchema>>,
-  fieldName: keyof ProductType,
-  folderName: string,
-  cloudinaryConfigOption: CloudinaryConfigOptionType,
-  setLoading?: React.Dispatch<React.SetStateAction<boolean>>
-) => {
+export const processQuillContent = async ({
+  quillRef,
+  blobUrlsRef,
+  setValue,
+  fieldName,
+  folderName,
+  cloudinaryConfigOption,
+  setLoading,
+}: IProcessQuillContent<typeof productSchema>) => {
   if (!quillRef.current) return;
   const quill = quillRef.current;
   let content = quill.root.innerHTML;
