@@ -584,15 +584,15 @@ const UpdateProduct = () => {
         0
       );
       setValue("totalStock", totalStock, { shouldValidate: true });
-    } else if (shades.length === 0) {
-      setValue("totalStock", 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shades, shades.length]);
 
   return (
     <Fragment>
-      {(updateProduct.isPending || isApiRunning) && <LoadingPage />}
+      {(selectedProduct.isPending ||
+        updateProduct.isPending ||
+        isApiRunning) && <LoadingPage />}
       <div className="w-full space-y-3">
         <div className="w-full px-4 py-3 border-b border-primary-50 flex justify-end base:justify-between items-center sticky top-16 bg-primary-inverted z-10 shadow-lg">
           <PathNavigation
