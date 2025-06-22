@@ -1,6 +1,6 @@
 import { ChangeEvent } from "react";
-import { CheckMark, InfoIcon } from "../../icons";
-import { InputProps } from "../../types";
+import { CheckMark, InfoIcon } from "../../../icons";
+import { InputProps } from "../../../types";
 
 const Textarea = ({
   value,
