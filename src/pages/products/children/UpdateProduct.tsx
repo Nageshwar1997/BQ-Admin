@@ -582,6 +582,8 @@ const UpdateProduct = () => {
         0
       );
       setValue("totalStock", totalStock, { shouldValidate: true });
+    } else if (shades.length === 0) {
+      setValue("totalStock", 0, { shouldValidate: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shades, shades.length]);
