@@ -1,17 +1,17 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { QueryParams } from "../types";
-
 
 function useQueryParams() {
   const navigate = useNavigate();
+  const params = useParams();
 
   const getParams = (): QueryParams => {
     const searchParams = new URLSearchParams(window.location.search);
-    const params: QueryParams = {};
+    const Q_Params: QueryParams = {};
     for (const [key, value] of searchParams.entries()) {
-      params[key] = value;
+      Q_Params[key] = value;
     }
-    return params;
+    return Q_Params;
   };
   const setParams = (params: QueryParams): void => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -34,6 +34,7 @@ function useQueryParams() {
     queryParams: getParams(),
     setParams,
     removeParam,
+    params,
   };
 }
 

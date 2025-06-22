@@ -1,28 +1,26 @@
-import { RefObject, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { loginSchema } from "./helpers/auth.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { loginZodSchema } from "./validations";
 import { loginInputMapData, LoginTextContent } from "./data";
 import useVerticalScrollable from "../../hooks/useVerticalScrollable";
-import {
-  LoginFormInputProps,
-  LoginTypes,
-  VerticalScrollType,
-} from "../../types";
-import { BottomGradient, TopGradient } from "../../components/Gradients";
+import { LoginFormInputProps, LoginTypes } from "../../types";
+import { BottomGradient, TopGradient } from "../../components/ui/Gradients";
 import AuthRobot from "./components/AuthRobot";
-import TextDisplay from "../../components/TextDisplay";
-import PhoneInput from "../../components/input/PhoneInput";
-import Input from "../../components/input/Input";
+import TextDisplay from "../../components/ui/TextDisplay";
 import { EyeIcon, EyeOffIcon } from "../../icons";
-import Radio from "../../components/input/Radio";
-import Button from "../../components/button/Button";
-import Checkbox from "../../components/input/Checkbox";
+import Button from "../../components/ui/button/Button";
 import { saveUserLocal, saveUserSession } from "../../utils";
 import { useLoginUser } from "../../api/auth/auth.service";
-import LoadingPage from "../../components/loaders/LoadingPage";
-import DarkMode from "../../components/DarkMode";
+import LoadingPage from "../../components/ui/loaders/LoadingPage";
+import DarkMode from "../../components/ui/DarkMode";
+import Checkbox from "../../components/ui/input/Checkbox";
+import Input from "../../components/ui/input/Input";
+import PhoneInput from "../../components/ui/input/PhoneInput";
+import Radio from "../../components/ui/input/Radio";
 
 const Login = () => {
   const [showGradient, containerRef] = useVerticalScrollable();
@@ -39,8 +37,8 @@ const Login = () => {
     reset,
     register,
     watch,
-  } = useForm({
-    resolver: yupResolver(loginSchema),
+  } = useForm<z.infer<typeof loginZodSchema>>({
+    resolver: zodResolver(loginZodSchema),
     defaultValues: {
       loginMethod: loginMethod,
       email: "",
@@ -52,7 +50,7 @@ const Login = () => {
 
   const selectedMethod = watch("loginMethod");
 
-  const handleLoginMethodChange = (method: "email" | "phoneNumber") => {
+  const handleLoginMethodChange = (method: LoginTypes) => {
     setLoginMethod(method);
     reset({
       loginMethod: method,
@@ -97,15 +95,14 @@ const Login = () => {
       <AuthRobot />
       <DarkMode className="border absolute top-5 right-5 h-fit p-2 md:p-3 rounded-full bg-secondary-inverted [&_path]:!stroke-secondary z-10" />
       <div
-        ref={containerRef as RefObject<HTMLDivElement>}
+        ref={containerRef}
         className={`w-full lg:w-1/2 flex flex-col items-center gap-4 overflow-hidden overflow-y-scroll ${
-          !(showGradient as VerticalScrollType).bottom &&
-          !(showGradient as VerticalScrollType).top
+          !showGradient.bottom && !showGradient.top
             ? "justify-center"
             : "justify-start"
         }`}
       >
-        {(showGradient as VerticalScrollType).top && <TopGradient />}
+        {showGradient.top && <TopGradient />}
         <form
           onSubmit={handleSubmit(onSubmit)}
           autoComplete="off"
@@ -219,7 +216,7 @@ const Login = () => {
             </div>
           </div>
         </form>
-        {(showGradient as VerticalScrollType).bottom && <BottomGradient />}
+        {showGradient.bottom && <BottomGradient />}
       </div>
     </div>
   );

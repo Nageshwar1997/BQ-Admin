@@ -1,12 +1,16 @@
+import Quill from "quill";
+import { z } from "zod";
 import {
   ChangeEvent,
-  FC,
+  Dispatch,
   HTMLInputAutoCompleteAttribute,
   KeyboardEvent,
   ReactNode,
+  RefObject,
+  SetStateAction,
   SVGProps,
 } from "react";
-import { UseFormRegisterReturn } from "react-hook-form";
+import { UseFormRegisterReturn, UseFormSetValue } from "react-hook-form";
 
 export type ThemeType = "light" | "dark";
 
@@ -95,7 +99,7 @@ export interface IconType {
   className?: string;
 }
 
-export type SVGType = FC<SVGProps<SVGSVGElement>>;
+export type IconProps = SVGProps<SVGSVGElement>;
 
 export interface UserTypes {
   _id: string;
@@ -115,34 +119,32 @@ export interface UserStoreType {
   logout: () => void;
 }
 
-export interface LevelOneCategoryType {
-  id: number;
+export interface LevelThreeCategoryType {
   level: number;
-  label: string;
-  value: string;
-  subCategories: LevelTwoCategoryType[];
+  name: string;
+  category: string;
 }
 
 export interface LevelTwoCategoryType {
-  id: number;
   level: number;
-  label: string;
-  value: string;
+  name: string;
+  category: string;
   subCategories: LevelThreeCategoryType[];
 }
 
-export interface LevelThreeCategoryType {
-  id: number;
+export interface LevelOneCategoryType {
   level: number;
-  label: string;
-  value: string;
+  name: string;
+  category: string;
+  subCategories: LevelTwoCategoryType[];
 }
 
 export interface ShadeType {
+  _id?: string;
   shadeName: string;
   colorCode: string;
-  stock: number | null;
-  images: File[];
+  stock: number | undefined;
+  images: (File | string)[];
 }
 
 export interface ProductType {
@@ -152,12 +154,122 @@ export interface ProductType {
   howToUse?: string;
   ingredients?: string;
   additionalDetails?: string;
-  categoryLevelOne: string;
-  categoryLevelTwo: string;
-  categoryLevelThree: string;
-  originalPrice: number | null;
-  sellingPrice: number | null;
-  totalStock: number | null;
-  commonImages?: File[];
+  categoryLevelOne: { name: string; category: string };
+  categoryLevelTwo: { name: string; category: string };
+  categoryLevelThree: { name: string; category: string };
+  originalPrice: number | undefined;
+  sellingPrice: number | undefined;
+  totalStock: number | undefined;
+  commonImages: (File | string)[];
   shades?: ShadeType[];
+}
+
+export interface PopulatedCategory {
+  _id: string;
+  name: string;
+  category: string;
+  level: number;
+  parentCategory: {
+    _id: string;
+    name: string;
+    category: string;
+    level: number;
+    parentCategory: {
+      _id: string;
+      name: string;
+      category: string;
+      level: number;
+    };
+  };
+}
+
+export interface FetchedProductType extends ProductType {
+  _id: string;
+  createdAt: string;
+  updatedAt: string;
+  commonImages: string[];
+  discount: number;
+  sellingPrice: number;
+  originalPrice: number;
+  category: PopulatedCategory;
+  shades: ShadeType[];
+}
+
+export type TRegexes =
+  | "noSpace"
+  | "singleSpace"
+  | "hexCode"
+  | "date"
+  | "name"
+  | "password"
+  | "email"
+  | "phone"
+  | "phoneStart"
+  | "phoneExactLength"
+  | "onlyDigits"
+  | "onlyLetters"
+  | "onlyUppercase"
+  | "onlyLowercase"
+  | "atLeastOneDigit"
+  | "onlyLettersAndSpaces"
+  | "atLeastOneLowercaseLetter"
+  | "atLeastOneSpecialCharacter"
+  | "atLeastOneUppercaseLetter"
+  | "onlyLettersAndSpacesAndDots";
+
+export interface IProcessQuillContent<T extends z.ZodTypeAny> {
+  quillRef: RefObject<Quill | null>;
+  blobUrlsRef: RefObject<string[]>;
+  setValue: UseFormSetValue<z.infer<T>>;
+  fieldName: keyof ProductType;
+  folderName: string;
+  cloudinaryConfigOption: CloudinaryConfigOptionType;
+  setLoading?: Dispatch<SetStateAction<boolean>>;
+}
+
+export type ToolbarOption =
+  | { header: (1 | 2 | 3 | 4 | 5 | 6 | false)[] }
+  | "bold"
+  | "italic"
+  | "underline"
+  | "strike"
+  | { list: "ordered" | "bullet" }
+  | { script: "sub" | "super" }
+  | { indent: "-1" | "+1" }
+  | { color: string[] } // can be empty for Quill to auto-generate colors
+  | { background: string[] }
+  | { align: string[] }
+  | { direction: "rtl" }
+  | "link"
+  | "image"
+  | "video"
+  | "code"
+  | "clean";
+
+export type QuillToolbar = (ToolbarOption | ToolbarOption[])[];
+
+export interface IToolBarOptions {
+  header?: (1 | 2 | 3 | 4 | 5 | 6 | false)[];
+  script?: ("sub" | "super")[];
+  indent?: ("-1" | "+1")[];
+  color?: boolean;
+  background?: boolean;
+  align?: boolean;
+  direction?: "rtl";
+  text?: ("bold" | "italic" | "underline" | "strike" | "link")[];
+  list?: ("ordered" | "bullet")[];
+  media?: ("image" | "video" | "link")[];
+  misc?: ("code" | "clean")[];
+}
+
+export interface QuillEditorProps {
+  label?: string;
+  readOnly?: boolean;
+  errorText?: string;
+  className?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  blobUrlsRef?: RefObject<string[]>;
+  placeholder?: string;
+  toolbarOptions?: IToolBarOptions;
 }

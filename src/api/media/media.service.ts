@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { toastErrorMessage, toastSuccessMessage } from "../../utils/toasts";
+import { toastErrorMessage, toastSuccessMessage } from "../../utils/toast.util";
 import { upload_single_image } from "./media.api";
 
 export const useUploadSingleImage = () => {

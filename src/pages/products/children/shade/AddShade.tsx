@@ -1,22 +1,27 @@
-import { yupResolver } from "@hookform/resolvers/yup";
+import { Dispatch, SetStateAction, useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+
 import { shadeSchema } from "../product.schema";
-import { ShadeType, VerticalScrollType } from "../../../../types";
-import { RefObject, useState } from "react";
-import Button from "../../../../components/button/Button";
-import ColorPicker from "../../../../components/input/colorPicker/ColorPicker";
-import Input from "../../../../components/input/Input";
-import PhoneInput from "../../../../components/input/PhoneInput";
-import { InfoIcon, UploadCloudIcon } from "../../../../icons";
-import { CloseIcon } from "../../../../components/sidebar/icons";
+import { ShadeType } from "../../../../types";
+import Button from "../../../../components/ui/button/Button";
+import ColorPicker from "../../../../components/ui/input/colorPicker/ColorPicker";
+import Input from "../../../../components/ui/input/Input";
+import PhoneInput from "../../../../components/ui/input/PhoneInput";
+import { CloseIcon } from "../../../../icons";
 import useQueryParams from "../../../../hooks/useQueryParams";
-import ImageUpload from "../../../../components/input/ImageUpload";
+import ImageUpload from "../../../../components/ui/input/ImageUpload";
+import { InfoIcon, UploadCloudIcon } from "../../../../icons";
 import useVerticalScrollable from "../../../../hooks/useVerticalScrollable";
-import { BottomGradient, TopGradient } from "../../../../components/Gradients";
+import {
+  BottomGradient,
+  TopGradient,
+} from "../../../../components/ui/Gradients";
 import { shadeInitialValue } from "../../data";
 
 interface ShadeFormProps {
-  setShades: React.Dispatch<React.SetStateAction<ShadeType[]>>;
+  setShades: Dispatch<SetStateAction<ShadeType[]>>;
 }
 
 const AddShade = ({ setShades }: ShadeFormProps) => {
@@ -29,8 +34,8 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
     register,
     reset,
     formState: { errors },
-  } = useForm<ShadeType>({
-    resolver: yupResolver(shadeSchema),
+  } = useForm<z.infer<typeof shadeSchema>>({
+    resolver: zodResolver(shadeSchema),
     defaultValues: shadeInitialValue,
   });
 
@@ -61,12 +66,10 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
   return (
     <div className="z-[100] fixed inset-0 w-full h-full flex justify-center items-center bg-primary-inverted-50 backdrop-blur-[2px]">
       <div className="max-w-lg max-h-[85dvh] md:max-h-[95dvh] w-full rounded-lg border border-secondary-battleship-davys-gray shadow-light-dark-soft bg-platinum-black relative overflow-hidden">
-        {(showGradient as VerticalScrollType).top && (
-          <TopGradient className="!w-full h-8 z-[4]" />
-        )}
+        {showGradient.top && <TopGradient className="!w-full h-8 z-[4]" />}
         <div
           className="w-full max-h-[85dvh] md:max-h-[95dvh] overflow-y-scroll p-4"
-          ref={containerRef as RefObject<HTMLDivElement>}
+          ref={containerRef}
         >
           <form
             className="w-full flex flex-col gap-7"
@@ -176,7 +179,7 @@ const AddShade = ({ setShades }: ShadeFormProps) => {
             </div>
           </form>
         </div>
-        {(showGradient as VerticalScrollType).bottom && (
+        {showGradient.bottom && (
           <BottomGradient className="!w-full h-8 z-[4]" />
         )}
       </div>

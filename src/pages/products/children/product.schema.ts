@@ -1,126 +1,343 @@
-import * as yup from "yup";
-import { ProductType, ShadeType } from "../../../types";
+import { z } from "zod";
+import {
+  ALLOWED_IMAGE_TYPES,
+  MAX_IMAGE_FILE_SIZE,
+  MB,
+  regexes,
+} from "../../../constants";
+import {
+  zodNumberRequired,
+  zodStringOptional,
+  zodStringRequired,
+} from "../../../utils/zod.util";
 
-export const shadeSchema: yup.ObjectSchema<ShadeType> = yup.object({
-  shadeName: yup
-    .string()
-    .required("Shade name is required")
-    .matches(/^(?!.*\s{2,}).*$/, "Only one space is allowed between words"),
-  colorCode: yup
-    .string()
-    .required("Color code is required")
-    .matches(
-      /^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/,
-      "Please select or enter a valid color code"
-    ),
-  stock: yup
-    .number()
-    .typeError("Stock must be a number")
-    .required("Stock is required")
-    .min(5, "Stock cannot be less than 5")
-    .max(100, "Stock cannot be more than 100"),
-  images: yup
-    .array()
-    .of(
-      yup
-        .mixed<File>()
-        .required("File is required")
-        .test("file-size", function (value, context) {
-          if (value instanceof File && value.size > 2 * 1024 * 1024) {
-            const match = context.path?.match(/\d+/);
-            const index = match ? parseInt(match[0]) + 1 : null;
-            const sizeInMB = (value.size / 1024 / 1024).toFixed(1);
+export const shadeSchema = z.object({
+  shadeName: zodStringRequired({
+    field: "shadeName",
+    showingFieldName: "Shade name",
+    blockMultipleSpaces: true,
+    min: 2,
+    max: 50,
+  }),
+  colorCode: zodStringRequired({
+    field: "colorCode",
+    showingFieldName: "Color code",
+    blockMultipleSpaces: true,
+    min: 4,
+    max: 9,
+    blockSingleSpace: true,
+    customRegexes: [
+      { regex: regexes.hexCode, message: "must be a valid hex code" },
+    ],
+  }),
+  stock: zodNumberRequired({
+    field: "stock",
+    showingFieldName: "Stock",
+    min: 5,
+    max: 100,
+    mustBeInt: true,
+    nonNegative: true,
+  }),
 
-            return this.createError({
-              message: index
-                ? `Image ${index} is too large (${sizeInMB} MB). Max allowed is 2 MB.`
-                : `Image "${value.name}" is too large (${sizeInMB} MB). Max allowed is 2 MB.`,
-            });
-          }
-          return true;
-        })
-        .test("file-type", function (value, context) {
-          if (
-            value instanceof File &&
-            !["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(
-              value.type
-            )
-          ) {
-            const index = context.path?.match(/\d+/)?.[0] ?? "?";
-            return this.createError({
-              message: `Image ${index} invalid format (jpeg, png, webp, jpg).`,
-            });
-          }
-          return true;
-        })
-    )
+  images: z
+    .array(z.any())
     .min(1, "At least one image is required")
-    .required("At least one image is required"),
+    .superRefine((files, ctx) => {
+      files.forEach((file, index) => {
+        if (typeof File !== "undefined" && file instanceof File) {
+          // File size check
+          if (file.size > MAX_IMAGE_FILE_SIZE) {
+            const sizeInMB = (file.size / MB).toFixed(1);
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Image ${
+                index + 1
+              } is too large (${sizeInMB} MB). Max allowed is 2 MB.`,
+              path: [index],
+            });
+          }
+
+          // File type check
+          if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Image ${
+                index + 1
+              } invalid format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map(
+                (t) => t.replace("image/", "")
+              ).join(", ")}`,
+              path: [index],
+            });
+          }
+        } else if (typeof file === "string") {
+          try {
+            const url = new URL(file);
+            if (!["http:", "https:"].includes(url.protocol)) {
+              throw new Error();
+            }
+          } catch {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Image ${index + 1} is not a valid URL`,
+              path: [index],
+            });
+          }
+        } else {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Item ${index + 1} must be a File or a valid image URL`,
+            path: [index],
+          });
+        }
+      });
+    }),
 });
 
-export const productSchema: yup.ObjectSchema<ProductType> = yup.object({
-  title: yup.string().required("Title is required"),
-  brand: yup.string().required("Brand is required"),
-  description: yup.string().required("Description is required"),
-  howToUse: yup.string().optional(),
-  ingredients: yup.string().optional(),
-  additionalDetails: yup.string().optional(),
-  categoryLevelOne: yup.string().required("Category 1 is required"),
-  categoryLevelTwo: yup.string().required("Category 2 is required"),
-  categoryLevelThree: yup.string().required("Category 3 is required"),
-  originalPrice: yup
-    .number()
-    .required("Original price is required")
-    .typeError("Original price must be a number")
-    .positive("Original price must be positive")
-    .min(1, "Original price cannot be less than 1"),
-  sellingPrice: yup
-    .number()
-    .required("Selling price is required")
-    .typeError("Selling price must be a number")
-    .positive("Selling price must be positive")
-    .min(1, "Selling price cannot be less than 1"),
-  totalStock: yup
-    .number()
-    .typeError("Stock must be a number")
-    .required("Stock is required")
-    .min(5, "Stock cannot be less than 5"),
-  shades: yup.array().of(shadeSchema).optional(),
-  commonImages: yup
-    .array()
-    .of(
-      yup
-        .mixed<File>()
-        .required("File is required")
-        .test("file-size", function (value, context) {
-          if (value instanceof File && value.size > 2 * 1024 * 1024) {
-            const match = context.path?.match(/\d+/);
-            const index = match ? parseInt(match[0]) + 1 : null;
-            const sizeInMB = (value.size / 1024 / 1024).toFixed(1);
+export const productSchema = z
+  .object({
+    title: zodStringRequired({
+      field: "title",
+      showingFieldName: "Title",
+      min: 2,
+      blockMultipleSpaces: true,
+    }),
+    brand: zodStringRequired({
+      field: "brand",
+      showingFieldName: "Brand",
+      blockMultipleSpaces: true,
+    }),
+    description: zodStringRequired({
+      field: "description",
+      showingFieldName: "Description",
+      blockMultipleSpaces: true,
+      customRegexes: [
+        {
+          regex: /^.{17,}$/, // Skipping the <p></p> tag value 7 characters
+          message: "must be exactly 10 characters long",
+        },
+      ],
+    }),
+    howToUse: zodStringOptional({
+      field: "howToUse",
+      showingFieldName: "How to use",
+      blockMultipleSpaces: true,
+    }),
+    ingredients: zodStringOptional({
+      field: "ingredients",
+      showingFieldName: "Ingredients",
+      blockMultipleSpaces: true,
+    }),
+    additionalDetails: zodStringOptional({
+      field: "additionalDetails",
+      showingFieldName: "Additional details",
+      blockMultipleSpaces: true,
+    }),
+    categoryLevelOne: z
+      .object({
+        name: z.string().optional().default(""),
+        category: z.string().optional().default(""),
+      })
+      .superRefine((data, ctx) => {
+        const nameResult = zodStringRequired({
+          field: "name",
+          showingFieldName: "Name",
+          parentField: "categoryLevelOne",
+          showingParentFieldName: "Category 1",
+          blockMultipleSpaces: true,
+        }).safeParse(data.name);
 
-            return this.createError({
-              message: index
-                ? `Image ${index} is too large (${sizeInMB} MB). Max allowed is 2 MB.`
-                : `Image "${value.name}" is too large (${sizeInMB} MB). Max allowed is 2 MB.`,
+        const categoryResult = zodStringRequired({
+          field: "category",
+          parentField: "categoryLevelOne",
+          showingParentFieldName: "Category 1",
+          showingFieldName: "Category",
+          blockSingleSpace: true,
+        }).safeParse(data.category);
+
+        if (!data.name && !data.category) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Category 1 is required",
+            path: [],
+          });
+        }
+
+        if (!nameResult.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: nameResult.error.issues[0].message,
+            path: [],
+          });
+        } else if (!categoryResult.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: categoryResult.error.issues[0].message,
+            path: [],
+          });
+        }
+      }),
+    categoryLevelTwo: z
+      .object({
+        name: z.string().optional().default(""),
+        category: z.string().optional().default(""),
+      })
+      .superRefine((data, ctx) => {
+        const nameResult = zodStringRequired({
+          field: "name",
+          showingFieldName: "Name",
+          parentField: "categoryLevelTwo",
+          showingParentFieldName: "Category 2",
+          blockMultipleSpaces: true,
+        }).safeParse(data.name);
+
+        const categoryResult = zodStringRequired({
+          field: "category",
+          parentField: "categoryLevelTwo",
+          showingParentFieldName: "Category 2",
+          showingFieldName: "Category",
+          blockSingleSpace: true,
+        }).safeParse(data.category);
+
+        if (!data.name && !data.category) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Category 2 is required",
+            path: [],
+          });
+        }
+
+        if (!nameResult.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: nameResult.error.issues[0].message,
+            path: [],
+          });
+        } else if (!categoryResult.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: categoryResult.error.issues[0].message,
+            path: [],
+          });
+        }
+      }),
+    categoryLevelThree: z
+      .object({
+        name: z.string().optional().default(""),
+        category: z.string().optional().default(""),
+      })
+      .superRefine((data, ctx) => {
+        const nameResult = zodStringRequired({
+          field: "name",
+          showingFieldName: "Name",
+          parentField: "categoryLevelThree",
+          showingParentFieldName: "Category 3",
+          blockMultipleSpaces: true,
+        }).safeParse(data.name);
+
+        const categoryResult = zodStringRequired({
+          field: "category",
+          parentField: "categoryLevelThree",
+          showingParentFieldName: "Category 3",
+          showingFieldName: "Category",
+          blockSingleSpace: true,
+        }).safeParse(data.category);
+
+        if (!data.name && !data.category) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Category 3 is required",
+            path: [],
+          });
+        }
+
+        if (!nameResult.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: nameResult.error.issues[0].message,
+            path: [],
+          });
+        } else if (!categoryResult.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: categoryResult.error.issues[0].message,
+            path: [],
+          });
+        }
+      }),
+
+    originalPrice: zodNumberRequired({
+      field: "originalPrice",
+      showingFieldName: "Original price",
+      nonNegative: true,
+      min: 1,
+    }),
+    sellingPrice: zodNumberRequired({
+      field: "sellingPrice",
+      showingFieldName: "Selling price",
+      nonNegative: true,
+      min: 1,
+    }),
+    totalStock: zodNumberRequired({
+      field: "totalStock",
+      showingFieldName: "Total stock",
+      nonNegative: true,
+      min: 5,
+    }),
+    commonImages: z
+      .array(z.any())
+      .min(1, "At least one image is required")
+      .superRefine((files, ctx) => {
+        files.forEach((file, index) => {
+          if (typeof File !== "undefined" && file instanceof File) {
+            // File size check
+            if (file.size > MAX_IMAGE_FILE_SIZE) {
+              const sizeInMB = (file.size / MB).toFixed(1);
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `Image ${
+                  index + 1
+                } is too large (${sizeInMB} MB). Max allowed is 2 MB.`,
+                path: [index],
+              });
+            }
+
+            // File type check
+            if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `Image ${
+                  index + 1
+                } invalid format. Allowed formats: ${ALLOWED_IMAGE_TYPES.map(
+                  (t) => t.replace("image/", "")
+                ).join(", ")}`,
+                path: [index],
+              });
+            }
+          } else if (typeof file === "string") {
+            try {
+              const url = new URL(file);
+              if (!["http:", "https:"].includes(url.protocol)) {
+                throw new Error();
+              }
+            } catch {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: `Image ${index + 1} is not a valid URL`,
+                path: [index],
+              });
+            }
+          } else {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Item ${index + 1} must be a File or a valid image URL`,
+              path: [index],
             });
           }
-          return true;
-        })
-        .test("file-type", function (value, context) {
-          if (
-            value instanceof File &&
-            !["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(
-              value.type
-            )
-          ) {
-            const index = context.path?.match(/\d+/)?.[0] ?? "?";
-            return this.createError({
-              message: `Image ${index} invalid format (jpeg, png, webp, jpg).`,
-            });
-          }
-          return true;
-        })
-    )
-    .min(1, "At least one image is required")
-    .required("Images are required"),
-});
+        });
+      }),
+    shades: z.array(shadeSchema).optional(),
+  })
+  .refine((data) => data.sellingPrice <= data.originalPrice, {
+    message: "Selling price not be greater than original price.",
+    path: ["sellingPrice"],
+  });

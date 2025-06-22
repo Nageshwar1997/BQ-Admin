@@ -1,10 +1,8 @@
 import { Outlet } from "react-router-dom";
-import Navbar from "../../components/navbar/Navbar";
-// import Footer from "../../components/footer/Footer";
-import { RefObject } from "react";
-import Sidebar from "../../components/sidebar/Sidebar";
-import { VerticalScrollType } from "../../types";
-import { BottomGradient } from "../../components/Gradients";
+import Navbar from "../../components/layout/navbar/Navbar";
+import Footer from "../../components/layout/footer/Footer";
+import Sidebar from "../../components/layout/sidebar/Sidebar";
+import { BottomGradient } from "../../components/ui/Gradients";
 import useVerticalScrollable from "../../hooks/useVerticalScrollable";
 
 const Main = () => {
@@ -15,7 +13,7 @@ const Main = () => {
       <Sidebar />
       <div className="w-full h-full relative">
         <div
-          ref={containerRef as RefObject<HTMLDivElement>}
+          ref={containerRef}
           className="grow max-w-full h-full overflow-y-scroll rounded-lg relative"
         >
           <div className="bg-primary-inverted w-full sticky top-0 z-50">
@@ -25,10 +23,10 @@ const Main = () => {
             <main className="w-full bg-primary-inverted">
               <Outlet />
             </main>
-            {/* <Footer /> */}
+            <Footer />
           </div>
         </div>
-        {(showGradient as VerticalScrollType).bottom && (
+        {showGradient.bottom && (
           <BottomGradient className="!w-full h-8 from-secondary-inverted rounded-b-lg z-[100]" />
         )}
       </div>

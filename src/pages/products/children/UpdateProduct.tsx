@@ -1,9 +1,9 @@
 import { Fragment, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Quill from "quill";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 
 import Button from "../../../components/ui/button/Button";
 import PathNavigation from "../../../components/ui/PathNavigation";
@@ -14,6 +14,7 @@ import EditShade from "./shade/EditShade";
 import Input from "../../../components/ui/input/Input";
 import PhoneInput from "../../../components/ui/input/PhoneInput";
 import Select from "../../../components/ui/input/Select";
+import { DevTool } from "@hookform/devtools";
 import {
   categoryLevelsData,
   CATEGORY_DATA,
@@ -22,15 +23,40 @@ import {
   QUILL_DATA,
 } from "../data/categoriesData";
 import { productSchema } from "./product.schema";
-import { ProductType, ShadeType } from "../../../types";
+import {
+  FetchedProductType,
+  PopulatedCategory,
+  ProductType,
+  ShadeType,
+} from "../../../types";
 import QuillEditor from "../../../components/ui/quillEditor/QuillEditor";
-import { useUploadProduct } from "../../../api/product/product.service";
-import LoadingPage from "../../../components/ui/loaders/LoadingPage";
-import ImageUpload from "../../../components/ui/input/ImageUpload";
+import {
+  useGetProductById,
+  useUpdateProduct,
+} from "../../../api/product/product.service";
 import { productInitialValues } from "../data";
-import { processQuillContent, getQuillValue } from "./helpers";
+import ImageUpload from "../../../components/ui/input/ImageUpload";
+import { getQuillValue, processQuillContent } from "./helpers";
+import { deepEqual } from "../../../utils";
+import { toastErrorMessage } from "../../../utils/toast.util";
+import LoadingPage from "../../../components/ui/loaders/LoadingPage";
 
-const UploadProduct = () => {
+const allowedKeys = ["originalPrice", "sellingPrice", "totalStock"] as const;
+type PriceKey = (typeof allowedKeys)[number];
+
+const extractImageUrls = (html: string): string[] => {
+  const regex = /<img[^>]+src="([^">]+)"/g;
+  const urls: string[] = [];
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(html))) {
+    urls.push(match[1]);
+  }
+
+  return urls;
+};
+
+const UpdateProduct = () => {
   const quillRefs = {
     description: useRef<Quill | null>(null),
     howToUse: useRef<Quill | null>(null),
@@ -45,53 +71,44 @@ const UploadProduct = () => {
     additionalDetails: useRef<string[]>([]),
   };
 
+  const [isApiRunning, setIsApiRunning] = useState(false);
   const [shades, setShades] = useState<ShadeType[]>([]);
-  const [commonImages, setCommonImages] = useState<File[]>([]);
+  const [commonImages, setCommonImages] = useState<(string | File)[]>([]);
   const [commonImagePreviews, setCommonImagePreviews] = useState<string[]>([]);
 
-  const { setParams, queryParams } = useQueryParams();
-  const uploadProduct = useUploadProduct();
-  const navigate = useNavigate();
+  const { setParams, queryParams, params } = useQueryParams();
+  const selectedProduct = useGetProductById();
+  const updateProduct = useUpdateProduct();
+  const { pathname } = useLocation();
 
   const {
     control,
-    getValues,
     handleSubmit,
     register,
-    reset,
     setValue,
+    getValues,
     watch,
     formState: { errors },
   } = useForm<z.infer<typeof productSchema>>({
-    resolver: zodResolver(productSchema),
     defaultValues: productInitialValues,
+    resolver: zodResolver(productSchema),
   });
 
   const selectedCategory1 = watch("categoryLevelOne");
   const selectedCategory2 = watch("categoryLevelTwo");
 
   const level1Data = categoryLevelsData.find(
-    (cat) => cat.category === selectedCategory1.category
+    (cat) => cat?.category === selectedCategory1?.category
   );
   const level2Options = level1Data?.subCategories || [];
   const level2Data = level2Options.find(
-    (cat) => cat.category === selectedCategory2.category
+    (cat) => cat?.category === selectedCategory2?.category
   );
   const level3Options = level2Data?.subCategories || [];
 
-  const handleReset = () => {
-    commonImagePreviews.forEach((preview) => {
-      if (preview.startsWith("blob:")) {
-        URL.revokeObjectURL(preview);
-      }
-    }); // Revoke all blob URLs to avoid memory leaks
-    reset({ ...productInitialValues });
-    setShades([]);
-    setCommonImages([]);
-    setCommonImagePreviews([]);
-  };
+  const handleUpdate = async (data: ProductType) => {
+    let hasChanges = false;
 
-  const handleUpload = async (data: ProductType) => {
     await Promise.all([
       processQuillContent({
         quillRef: quillRefs.description,
@@ -100,6 +117,7 @@ const UploadProduct = () => {
         fieldName: "description",
         folderName: `Products/${data.title}/Description`,
         cloudinaryConfigOption: "product",
+        setLoading: setIsApiRunning,
       }),
       processQuillContent({
         quillRef: quillRefs.howToUse,
@@ -108,6 +126,7 @@ const UploadProduct = () => {
         fieldName: "howToUse",
         folderName: `Products/${data.title}/How_To_Use`,
         cloudinaryConfigOption: "product",
+        setLoading: setIsApiRunning,
       }),
       processQuillContent({
         quillRef: quillRefs.ingredients,
@@ -116,6 +135,7 @@ const UploadProduct = () => {
         fieldName: "ingredients",
         folderName: `Products/${data.title}/Ingredients`,
         cloudinaryConfigOption: "product",
+        setLoading: setIsApiRunning,
       }),
       processQuillContent({
         quillRef: quillRefs.additionalDetails,
@@ -124,70 +144,438 @@ const UploadProduct = () => {
         fieldName: "additionalDetails",
         folderName: `Products/${data.title}/Additional_Details`,
         cloudinaryConfigOption: "product",
+        setLoading: setIsApiRunning,
       }),
     ]);
 
-    const finalData: ProductType = { ...data, ...getValues(), shades };
-
     const formData = new FormData();
 
-    formData.append("title", finalData.title);
-    formData.append("brand", finalData.brand);
-    formData.append("description", getQuillValue(finalData.description));
-    formData.append("howToUse", getQuillValue(finalData.howToUse));
-    formData.append("ingredients", getQuillValue(finalData.ingredients));
-    formData.append(
-      "additionalDetails",
-      getQuillValue(finalData.additionalDetails)
-    );
-    formData.append(
-      "categoryLevelOne",
-      JSON.stringify(finalData.categoryLevelOne)
-    );
-    formData.append(
-      "categoryLevelTwo",
-      JSON.stringify(finalData.categoryLevelTwo)
-    );
-    formData.append(
-      "categoryLevelThree",
-      JSON.stringify(finalData.categoryLevelThree)
-    );
-    formData.append("sellingPrice", String(finalData.sellingPrice));
-    formData.append("originalPrice", String(finalData.originalPrice));
-    formData.append("totalStock", String(finalData.totalStock));
+    const finalData: ProductType = { ...data, ...getValues(), shades };
+    const product: FetchedProductType = selectedProduct.data?.product;
+    const category: PopulatedCategory = product?.category;
 
-    // Append shades with nested images
-    if (finalData.shades && finalData.shades.length > 0) {
-      finalData.shades.forEach((shade, shadeIndex) => {
-        formData.append(`shades[${shadeIndex}][shadeName]`, shade.shadeName);
-        formData.append(`shades[${shadeIndex}][colorCode]`, shade.colorCode);
-        formData.append(`shades[${shadeIndex}][stock]`, String(shade.stock));
+    // For Common Images
+    const newAddedCommonImageFiles: File[] = [];
+    const unChangedCommonImageURLs: string[] = [];
+    const apiCommonImageURLs: string[] = product.commonImages;
 
-        shade.images.forEach((image, imgIndex) => {
-          formData.append(`shades[${shadeIndex}][images][${imgIndex}]`, image);
-        });
-      });
-    } else {
-      formData.append("shades", JSON.stringify([]));
+    data.commonImages.forEach((img) => {
+      if (img instanceof File) {
+        newAddedCommonImageFiles.push(img);
+      } else {
+        unChangedCommonImageURLs.push(img);
+      }
+    });
+
+    const removedCommonImageURLs: string[] = apiCommonImageURLs.filter(
+      (img) => !unChangedCommonImageURLs.includes(img)
+    );
+
+    if (removedCommonImageURLs.length) {
+      hasChanges = true;
+      formData.append(
+        "removingCommonImageURLs",
+        JSON.stringify(removedCommonImageURLs)
+      );
     }
 
-    if (finalData?.commonImages && finalData.commonImages.length > 0) {
-      finalData.commonImages.forEach((img, index) => {
+    if (newAddedCommonImageFiles.length) {
+      hasChanges = true;
+      newAddedCommonImageFiles.forEach((img, index) => {
         formData.append(`commonImages[${index}]`, img);
       });
     }
 
-    uploadProduct.mutate(formData, {
-      onSettled(data, error) {
-        if (data && !error) {
-          setTimeout(() => {
-            handleReset();
-            navigate("/products");
-          }, 600);
-        }
+    const removedShadeURLsWithID: { _id: string; urls: string[] }[] = [];
+    const currentShadeIds = new Set(shades.map((s) => s._id?.toString()));
+    const removingShades: string[] = product.shades
+      ?.filter(
+        (originalShade) =>
+          originalShade._id !== undefined &&
+          !currentShadeIds.has(originalShade._id.toString())
+      )
+      .map((shade) => shade._id)
+      .filter((id) => id !== undefined);
+
+    if (removingShades?.length) {
+      hasChanges = true;
+      formData.append("removingShades", JSON.stringify(removingShades));
+    }
+
+    product?.shades?.forEach((originalShade) => {
+      const currentShade = shades.find((s) => s._id === originalShade._id);
+      if (!currentShade || !originalShade._id) return;
+
+      const originalURLs = originalShade.images?.filter(
+        (img) => typeof img === "string"
+      );
+
+      const currentURLs = currentShade.images?.filter(
+        (img) => typeof img === "string"
+      );
+
+      const removedURLs = originalURLs.filter(
+        (url) => !currentURLs.includes(url)
+      );
+
+      if (removedURLs.length) {
+        removedShadeURLsWithID.push({
+          _id: originalShade._id,
+          urls: removedURLs,
+        });
+      }
+    });
+
+    if (removedShadeURLsWithID.length) {
+      hasChanges = true;
+      formData.append(
+        "removingShadeImageUrls",
+        JSON.stringify(removedShadeURLsWithID)
+      );
+    }
+
+    const apiData: Partial<FetchedProductType> = {
+      title: product?.title,
+      brand: product?.brand,
+      additionalDetails: product?.additionalDetails,
+      description: product?.description,
+      howToUse: product?.howToUse,
+      ingredients: product?.ingredients,
+      categoryLevelThree: {
+        name: category.name,
+        category: category.category,
       },
+      categoryLevelTwo: {
+        name: category.parentCategory.name,
+        category: category.parentCategory.category,
+      },
+      categoryLevelOne: {
+        name: category.parentCategory.parentCategory.name,
+        category: category.parentCategory.parentCategory.category,
+      },
+    };
+    const apiNumberFields = {
+      originalPrice: String(product?.originalPrice),
+      sellingPrice: String(product?.sellingPrice),
+      totalStock: String(product?.totalStock),
+    };
+
+    const updatedData: Partial<ProductType> = {
+      title: finalData.title,
+      brand: finalData.brand,
+      additionalDetails: getQuillValue(finalData.additionalDetails),
+      description: getQuillValue(finalData.description),
+      howToUse: getQuillValue(finalData.howToUse),
+      ingredients: getQuillValue(finalData.ingredients),
+      categoryLevelThree: finalData.categoryLevelThree,
+      categoryLevelTwo: finalData.categoryLevelTwo,
+      categoryLevelOne: finalData.categoryLevelOne,
+    };
+
+    const updatedNumberFields = {
+      originalPrice: String(finalData.originalPrice),
+      sellingPrice: String(finalData.sellingPrice),
+      totalStock: String(finalData.totalStock),
+    };
+
+    const changedProductNumberFields: Partial<Record<PriceKey, string>> = {};
+
+    Object.keys(updatedNumberFields).forEach((key) => {
+      if (allowedKeys.includes(key as PriceKey)) {
+        const typedKey = key as PriceKey;
+        if (
+          !deepEqual(updatedNumberFields[typedKey], apiNumberFields?.[typedKey])
+        ) {
+          changedProductNumberFields[typedKey] = updatedNumberFields[typedKey];
+        }
+      }
+    });
+
+    if (Object.keys(changedProductNumberFields)?.length) {
+      hasChanges = true;
+      Object.entries(changedProductNumberFields).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+    }
+
+    const existingShades: ShadeType[] = [];
+    const newAddedShades: ShadeType[] = [];
+
+    shades?.forEach((shade: ShadeType) => {
+      if (shade?._id) {
+        existingShades.push(shade);
+      } else {
+        newAddedShades.push(shade);
+      }
+    });
+
+    if (newAddedShades.length) {
+      hasChanges = true;
+      newAddedShades.forEach((shade, shadeIndex) => {
+        formData.append(
+          `newAddedShades[${shadeIndex}][shadeName]`,
+          shade.shadeName
+        );
+        formData.append(
+          `newAddedShades[${shadeIndex}][colorCode]`,
+          shade.colorCode
+        );
+        formData.append(
+          `newAddedShades[${shadeIndex}][stock]`,
+          String(shade.stock)
+        );
+
+        shade.images.forEach((image, imgIndex) => {
+          formData.append(
+            `newAddedShades[${shadeIndex}][images][${imgIndex}]`,
+            image
+          );
+        });
+      });
+    }
+
+    const updatedShadesWithImageFiles: ShadeType[] = [];
+    const updatedShadesWithoutImageFiles: ShadeType[] = [];
+
+    existingShades.forEach((shade) => {
+      if (shade?.images?.some((img) => img instanceof File)) {
+        updatedShadesWithImageFiles.push(shade);
+      } else {
+        updatedShadesWithoutImageFiles.push(shade);
+      }
+    });
+
+    // For Image Changed Shades
+    const changedShadesFieldsWithImageFiles: Partial<ShadeType>[] = [];
+
+    updatedShadesWithImageFiles.forEach((shade) => {
+      const originalShade = product?.shades?.find((s) => s._id === shade._id);
+      if (!originalShade || !shade._id) return;
+
+      const updatedFields: Partial<ShadeType> = {
+        _id: shade._id,
+        images: shade.images.filter((img) => img instanceof File),
+      };
+
+      (Object.keys(shade) as (keyof ShadeType)[]).forEach((key) => {
+        const typedKey = key as keyof ShadeType;
+        if (
+          typedKey !== "images" &&
+          !deepEqual(shade[typedKey], originalShade[typedKey])
+        ) {
+          (updatedFields[typedKey] as unknown) = shade[typedKey];
+        }
+      });
+
+      if (Object.keys(updatedFields).length > 1) {
+        changedShadesFieldsWithImageFiles.push(updatedFields);
+      }
+    });
+
+    if (changedShadesFieldsWithImageFiles.length) {
+      hasChanges = true;
+      changedShadesFieldsWithImageFiles.forEach((shade, shadeIndex) => {
+        if (shade._id) {
+          formData.append(
+            `updatedShadeWithFiles[${shadeIndex}][_id]`,
+            shade._id
+          );
+        }
+        if (shade.shadeName) {
+          formData.append(
+            `updatedShadeWithFiles[${shadeIndex}][shadeName]`,
+            shade.shadeName
+          );
+        }
+        if (shade.colorCode) {
+          formData.append(
+            `updatedShadeWithFiles[${shadeIndex}][colorCode]`,
+            shade.colorCode
+          );
+        }
+        if (shade.stock && shade.stock > 0) {
+          formData.append(
+            `updatedShadeWithFiles[${shadeIndex}][stock]`,
+            String(shade.stock)
+          );
+        }
+        if (shade.images?.length) {
+          shade.images?.forEach((image, imgIndex) => {
+            formData.append(
+              `updatedShadeWithFiles[${shadeIndex}][images][${imgIndex}]`,
+              image
+            );
+          });
+        }
+      });
+    }
+    const changedShadesFieldsWithoutImageFiles: Partial<ShadeType>[] = [];
+
+    updatedShadesWithoutImageFiles.forEach((shade) => {
+      const originalShade = product?.shades?.find((s) => s._id === shade._id);
+      if (!originalShade || !shade._id) return;
+
+      const updatedShadeFields: Partial<ShadeType> = { _id: shade._id };
+
+      Object.keys(shade).forEach((key) => {
+        const typedKey = key as keyof ShadeType;
+        if (
+          typedKey !== "images" &&
+          !deepEqual(shade[typedKey], originalShade[typedKey])
+        ) {
+          (updatedShadeFields[typedKey] as unknown) = shade[typedKey];
+        }
+      });
+
+      if (Object.keys(updatedShadeFields).length > 1) {
+        changedShadesFieldsWithoutImageFiles.push(updatedShadeFields);
+      }
+    });
+
+    if (changedShadesFieldsWithoutImageFiles.length) {
+      formData.append(
+        "updatedShadeWithoutFiles",
+        JSON.stringify(changedShadesFieldsWithoutImageFiles)
+      );
+    }
+
+    // For All
+    const changedProductFields: Partial<ProductType> = {};
+    Object.keys(updatedData).forEach((key) => {
+      const typedKey = key as keyof ProductType;
+      if (!deepEqual(updatedData[typedKey], apiData?.[typedKey])) {
+        (changedProductFields[typedKey] as unknown) = updatedData[typedKey];
+      }
+    });
+    const fieldsToCheck: (keyof Pick<
+      ProductType,
+      "description" | "howToUse" | "ingredients" | "additionalDetails"
+    >)[] = ["description", "howToUse", "ingredients", "additionalDetails"];
+
+    const removedUrls = fieldsToCheck.flatMap((field) => {
+      const originalHtml = product?.[field] || "";
+      const updatedHtml = getValues(field) || "";
+
+      const originalUrls = extractImageUrls(originalHtml);
+      const updatedUrls = extractImageUrls(updatedHtml);
+
+      return originalUrls.filter((url) => !updatedUrls.includes(url));
+    });
+
+    if (removedUrls?.length) {
+      formData.append("removedQuillImageURLs", JSON.stringify(removedUrls));
+    }
+
+    if (!Object.keys(changedProductFields).length && !hasChanges) {
+      toastErrorMessage("No Product Data Changed");
+      return;
+    }
+
+    Object.entries(changedProductFields).forEach(([key, value]) => {
+      if (typeof value === "object") {
+        formData.append(key, JSON.stringify(value));
+      } else {
+        formData.append(key, value as string);
+      }
+    });
+
+    setIsApiRunning(true);
+    updateProduct.mutate(
+      {
+        data: formData,
+        productId: params.id as string,
+      },
+      {
+        onSettled: () => {
+          setIsApiRunning(false);
+        },
+      }
+    );
+  };
+
+  const handleGetAllProducts = () => {
+    selectedProduct.mutate({
+      data: {
+        shades: ["shadeName", "colorCode", "images", "stock"],
+        seller: ["firstName", "lastName", "email"],
+        category: ["name", "category", "parentCategory", "level"],
+      },
+      params: { productId: params.id as string },
     });
   };
+
+  useEffect(() => {
+    handleGetAllProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const setInitialValues = () => {
+    if (selectedProduct.data?.product) {
+      const product: FetchedProductType = selectedProduct.data.product;
+      setValue("title", product.title, { shouldValidate: true });
+      setValue("brand", product.brand, { shouldValidate: true });
+      setValue(
+        "categoryLevelThree",
+        {
+          name: product.category.name,
+          category: product.category.category,
+        },
+        { shouldValidate: true }
+      );
+      setValue(
+        "categoryLevelTwo",
+        {
+          name: product.category.parentCategory.name,
+          category: product.category.parentCategory.category,
+        },
+        { shouldValidate: true }
+      );
+      setValue(
+        "categoryLevelOne",
+        {
+          name: product.category.parentCategory.parentCategory.name,
+          category: product.category.parentCategory.parentCategory.category,
+        },
+        { shouldValidate: true }
+      );
+      setValue("originalPrice", product.originalPrice, {
+        shouldValidate: true,
+      });
+      setValue("sellingPrice", product.sellingPrice, {
+        shouldValidate: true,
+      });
+      setValue("commonImages", product.commonImages);
+      setValue("description", product.description, { shouldValidate: true });
+      setValue("howToUse", product.howToUse, { shouldValidate: true });
+      setValue("ingredients", product.ingredients, { shouldValidate: true });
+      setValue("additionalDetails", product.additionalDetails, {
+        shouldValidate: true,
+      });
+      setValue("totalStock", Number(product.totalStock));
+
+      setCommonImagePreviews(product.commonImages);
+      setCommonImages(product.commonImages);
+      setShades(product.shades);
+    }
+  };
+
+  const handleReset = () => {
+    if (commonImagePreviews.length) {
+      commonImagePreviews.forEach((preview) => {
+        if (preview.startsWith("blob:")) {
+          URL.revokeObjectURL(preview);
+        }
+      }); // Revoke all blob URLs to avoid memory leaks
+    }
+
+    setInitialValues();
+  };
+
+  useEffect(() => {
+    if (selectedProduct.isPending) return;
+    setInitialValues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedProduct.data, selectedProduct.isPending]);
 
   useEffect(() => {
     if (shades.length > 0) {
@@ -202,10 +590,19 @@ const UploadProduct = () => {
 
   return (
     <Fragment>
-      {uploadProduct.isPending && <LoadingPage />}
+      {(selectedProduct.isPending ||
+        updateProduct.isPending ||
+        isApiRunning) && <LoadingPage />}
       <div className="w-full space-y-3">
         <div className="w-full px-4 py-3 border-b border-primary-50 flex justify-end base:justify-between items-center sticky top-16 bg-primary-inverted z-10 shadow-lg">
-          <PathNavigation className="hidden base:flex" />
+          <PathNavigation
+            className="hidden base:flex"
+            path={pathname
+              .split("/")
+              .filter((path) => path !== "")
+              .splice(0, 2)
+              .join("/")}
+          />
           <Button
             pattern="outline"
             content="Add Shade"
@@ -221,7 +618,7 @@ const UploadProduct = () => {
             {/* Product Form */}
             <form
               className="w-full p-4 flex flex-col gap-7"
-              onSubmit={handleSubmit(handleUpload)}
+              onSubmit={handleSubmit(handleUpdate)}
             >
               <div className="flex flex-col sm:flex-row gap-7 sm:gap-4">
                 {INPUTS_DATA.map((input, index) => (
@@ -537,10 +934,11 @@ const UploadProduct = () => {
                 <Button
                   pattern="primary"
                   type="submit"
-                  content="Upload"
+                  content="Update"
                   className="!rounded-lg max-h-12"
                 />
               </div>
+              <DevTool control={control} />
             </form>
           </div>
         </div>
@@ -553,4 +951,4 @@ const UploadProduct = () => {
   );
 };
 
-export default UploadProduct;
+export default UpdateProduct;

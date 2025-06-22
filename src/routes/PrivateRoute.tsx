@@ -1,6 +1,6 @@
 import { JSX } from "react";
 import { Navigate } from "react-router-dom";
-import LoadingScreen from "../components/loaders/LoadingScreen";
+import LoadingScreen from "../components/ui/loaders/LoadingScreen";
 import { useAuthCheck } from "../hooks/useAuthCheck";
 import { useUserStore } from "../store/user.store";
 

@@ -1,27 +1,36 @@
-import Quill from "quill";
-import { RefObject } from "react";
-import { UseFormSetValue } from "react-hook-form";
-import { CloudinaryConfigOptionType, ProductType } from "../../../types";
+import { IProcessQuillContent } from "../../../types";
 import { upload_single_image } from "../../../api/media/media.api";
+import { productSchema } from "./product.schema";
 
-export const processQuillContent = async (
-  quillRef: RefObject<Quill | null>,
-  blobUrlsRef: RefObject<string[]>,
-  setValue: UseFormSetValue<ProductType>,
-  fieldName: keyof ProductType,
-  folderName: string,
-  cloudinaryConfigOption: CloudinaryConfigOptionType
-) => {
+export const processQuillContent = async ({
+  quillRef,
+  blobUrlsRef,
+  setValue,
+  fieldName,
+  folderName,
+  cloudinaryConfigOption,
+  setLoading,
+}: IProcessQuillContent<typeof productSchema>) => {
   if (!quillRef.current) return;
   const quill = quillRef.current;
   let content = quill.root.innerHTML;
 
-  if (blobUrlsRef.current.length > 0) {
+  // If no blob images, just set the value and return
+  if (!blobUrlsRef.current || blobUrlsRef.current.length === 0) {
+    setValue(fieldName, content);
+    return;
+  }
+
+  if (setLoading) {
+    setLoading(true);
+  }
+  try {
     const uploadPromises = blobUrlsRef.current.map(async (blobUrl, index) => {
       try {
         const response = await fetch(blobUrl);
         const blob = await response.blob();
-        const ext = blob.type.split("/")[1]; // e.g: jpeg, png, etc
+        const ext = blob.type.split("/")[1] || "webp";
+
         const file = new File([blob], `image_${index}.${ext}`, {
           type: blob.type,
         });
@@ -32,7 +41,6 @@ export const processQuillContent = async (
         formData.append("cloudinaryConfigOption", cloudinaryConfigOption);
 
         const data = await upload_single_image(formData);
-
         return { blobUrl, cloudUrl: data.cloudUrl };
       } catch (error) {
         console.error("Image upload error:", error);
@@ -50,9 +58,12 @@ export const processQuillContent = async (
     });
 
     quill.root.innerHTML = content;
+    setValue(fieldName, content);
+  } finally {
+    if (setLoading) {
+      setLoading(false); // End loading no matter what
+    }
   }
-
-  setValue(fieldName, content);
 };
 
 export const getQuillValue = (value: string | undefined) => {

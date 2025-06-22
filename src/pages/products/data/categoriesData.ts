@@ -6,31 +6,27 @@ import {
 
 /* ============= For You Start ============= */
 const new_new: LevelTwoCategoryType = {
-  id: 1,
   level: 2,
-  label: "New",
-  value: "new",
+  name: "New",
+  category: "new",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "New Arrivals",
-      value: "new_arrivals",
+      name: "New Arrivals",
+      category: "new_arrivals",
     },
   ],
 };
 
 const sugar_play: LevelTwoCategoryType = {
-  id: 2,
   level: 2,
-  label: "Sugar Play",
-  value: "sugar_play",
+  name: "Sugar Play",
+  category: "sugar_play",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Sugar Play",
-      value: "sugar_play",
+      name: "Sugar Play",
+      category: "sugar_play",
     },
   ],
 };
@@ -39,187 +35,159 @@ const sugar_play: LevelTwoCategoryType = {
 
 /* ============= Lips Start ============= */
 const finish_types: LevelTwoCategoryType = {
-  id: 1,
   level: 2,
-  label: "Finish Types",
-  value: "finish_types",
+  name: "Finish Types",
+  category: "finish_types",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Matte Lipstick",
-      value: "matte_lipstick",
+      name: "Matte Lipstick",
+      category: "matte_lipstick",
     },
     {
-      id: 2,
       level: 3,
-      label: "Satin Lipstick",
-      value: "satin_lipstick",
+      name: "Satin Lipstick",
+      category: "satin_lipstick",
     },
     {
-      id: 3,
       level: 3,
-      label: "Hi-Shine Lipstick",
-      value: "hi_shine_lipstick",
+      name: "Hi-Shine Lipstick",
+      category: "hi_shine_lipstick",
     },
     {
-      id: 4,
       level: 3,
-      label: "Lip Gloss",
-      value: "lip_gloss",
+      name: "Lip Gloss",
+      category: "lip_gloss",
     },
   ],
 };
 
 const lipstick_forms: LevelTwoCategoryType = {
-  id: 2,
   level: 2,
-  label: "Lipstick Forms",
-  value: "lipstick_forms",
+  name: "Lipstick Forms",
+  category: "lipstick_forms",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Liquid Lipstick",
-      value: "liquid_lipstick",
+      name: "Liquid Lipstick",
+      category: "liquid_lipstick",
     },
     {
-      id: 2,
       level: 3,
-      label: "Powder Lipstick",
-      value: "powder_lipstick",
+      name: "Powder Lipstick",
+      category: "powder_lipstick",
     },
     {
-      id: 3,
       level: 3,
-      label: "Crayon Lipstick",
-      value: "crayon_lipstick",
+      name: "Crayon Lipstick",
+      category: "crayon_lipstick",
     },
     {
-      id: 4,
       level: 3,
-      label: "Bullet Lipstick",
-      value: "bullet_lipstick",
+      name: "Bullet Lipstick",
+      category: "bullet_lipstick",
     },
   ],
 };
 
 const long_lasting_lipsticks: LevelTwoCategoryType = {
-  id: 3,
   level: 2,
-  label: "Long-Lasting Lipsticks",
-  value: "long_lasting_lipsticks",
+  name: "Long-Lasting Lipsticks",
+  category: "long_lasting_lipsticks",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Transfer Proof Lipstick",
-      value: "transfer_proof_lipstick",
+      name: "Transfer Proof Lipstick",
+      category: "transfer_proof_lipstick",
     },
     {
-      id: 2,
       level: 3,
-      label: "Water Proof Lipstick",
-      value: "water_proof_lipstick",
+      name: "Water Proof Lipstick",
+      category: "water_proof_lipstick",
     },
     {
-      id: 3,
       level: 3,
-      label: "Lip Tint & Stain",
-      value: "lip_tint_and_stain",
+      name: "Lip Tint & Stain",
+      category: "lip_tint_and_stain",
     },
     {
-      id: 4,
       level: 3,
-      label: "Smudge Proof",
-      value: "smudge_proof_lipstick",
+      name: "Smudge Proof",
+      category: "smudge_proof_lipstick",
     },
   ],
 };
 
 const lip_care: LevelTwoCategoryType = {
-  id: 4,
   level: 2,
-  label: "Lip Care",
-  value: "lip_care",
+  name: "Lip Care",
+  category: "lip_care",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Lip Primer & Scrub",
-      value: "lip_primer_and_scrub",
+      name: "Lip Primer & Scrub",
+      category: "lip_primer_and_scrub",
     },
     {
-      id: 2,
       level: 3,
-      label: "Lipstick Fixer & Remover",
-      value: "lipstick_fixer_and_remover",
+      name: "Lipstick Fixer & Remover",
+      category: "lipstick_fixer_and_remover",
     },
     {
-      id: 3,
       level: 3,
-      label: "Lip Balm",
-      value: "lip_balm",
+      name: "Lip Balm",
+      category: "lip_balm",
     },
     {
-      id: 4,
       level: 3,
-      label: "Tinted Lip Balm",
-      value: "tinted_lip_balm",
+      name: "Tinted Lip Balm",
+      category: "tinted_lip_balm",
     },
   ],
 };
 
 const lip_enhancers_and_other: LevelTwoCategoryType = {
-  id: 5,
   level: 2,
-  label: "Lip Enhancers & Other",
-  value: "lip_enhancers_and_other",
+  name: "Lip Enhancers & Other",
+  category: "lip_enhancers_and_other",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Lip Liner",
-      value: "lip_liner",
+      name: "Lip Liner",
+      category: "lip_liner",
     },
     {
-      id: 2,
       level: 3,
-      label: "Lip Glitter",
-      value: "lip_glitter",
+      name: "Lip Glitter",
+      category: "lip_glitter",
     },
     {
-      id: 3,
       level: 3,
-      label: "View All",
-      value: "view_all",
+      name: "View All",
+      category: "view_all",
     },
   ],
 };
 
 const lipstick_sets_and_combos: LevelTwoCategoryType = {
-  id: 6,
   level: 2,
-  label: "Lipstick Set & Combo",
-  value: "lipstick_set_and_combo",
+  name: "Lipstick Set & Combo",
+  category: "lipstick_set_and_combo",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Lipstick Set",
-      value: "lipstick_set",
+      name: "Lipstick Set",
+      category: "lipstick_set",
     },
     {
-      id: 2,
       level: 3,
-      label: "Lipstick Combo",
-      value: "lipstick_combo",
+      name: "Lipstick Combo",
+      category: "lipstick_combo",
     },
     {
-      id: 3,
       level: 3,
-      label: "Lip Palette",
-      value: "lip_palette",
+      name: "Lip Palette",
+      category: "lip_palette",
     },
   ],
 };
@@ -228,163 +196,139 @@ const lipstick_sets_and_combos: LevelTwoCategoryType = {
 /* ============= Eyes Start ============= */
 
 const kohl_and_kajal: LevelTwoCategoryType = {
-  id: 1,
   level: 2,
-  label: "Kohl & Kajal",
-  value: "kohl_and_kajal",
+  name: "Kohl & Kajal",
+  category: "kohl_and_kajal",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Kohl",
-      value: "kohl",
+      name: "Kohl",
+      category: "kohl",
     },
     {
-      id: 2,
       level: 3,
-      label: "Kajal",
-      value: "kajal",
+      name: "Kajal",
+      category: "kajal",
     },
     {
-      id: 3,
       level: 3,
-      label: "Smudge Proof Kajal",
-      value: "smudge_proof_kajal",
+      name: "Smudge Proof Kajal",
+      category: "smudge_proof_kajal",
     },
   ],
 };
 
 const mascaras: LevelTwoCategoryType = {
-  id: 2,
   level: 2,
-  label: "Mascaras",
-  value: "mascaras",
+  name: "Mascaras",
+  category: "mascaras",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Volumizing Mascara",
-      value: "volumizing_mascara",
+      name: "Volumizing Mascara",
+      category: "volumizing_mascara",
     },
     {
-      id: 2,
       level: 3,
-      label: "Curl Lengthening Mascara",
-      value: "curl_lengthening_mascara",
+      name: "Curl Lengthening Mascara",
+      category: "curl_lengthening_mascara",
     },
     {
-      id: 3,
       level: 3,
-      label: "Waterproof Mascara",
-      value: "waterproof_mascara",
+      name: "Waterproof Mascara",
+      category: "waterproof_mascara",
     },
   ],
 };
 
 const eyeliners: LevelTwoCategoryType = {
-  id: 3,
   level: 2,
-  label: "Eyeliners",
-  value: "eyeliners",
+  name: "Eyeliners",
+  category: "eyeliners",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Liquid Eyeliner",
-      value: "liquid_eyeliner",
+      name: "Liquid Eyeliner",
+      category: "liquid_eyeliner",
     },
     {
-      id: 2,
       level: 3,
-      label: "Gel Eyeliner",
-      value: "gel_eyeliner",
+      name: "Gel Eyeliner",
+      category: "gel_eyeliner",
     },
     {
-      id: 3,
       level: 3,
-      label: "Pen Eyeliner",
-      value: "pen_eyeliner",
+      name: "Pen Eyeliner",
+      category: "pen_eyeliner",
     },
   ],
 };
 
 const eyeshadow: LevelTwoCategoryType = {
-  id: 4,
   level: 2,
-  label: "Eyeshadow",
-  value: "eyeshadow",
+  name: "Eyeshadow",
+  category: "eyeshadow",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Eyeshadow Palette",
-      value: "eyeshadow_palette",
+      name: "Eyeshadow Palette",
+      category: "eyeshadow_palette",
     },
     {
-      id: 2,
       level: 3,
-      label: "Liquid Eyeshadow",
-      value: "liquid_eyeshadow",
+      name: "Liquid Eyeshadow",
+      category: "liquid_eyeshadow",
     },
     {
-      id: 3,
       level: 3,
-      label: "Glitter Eyeshadow",
-      value: "glitter_eyeshadow",
+      name: "Glitter Eyeshadow",
+      category: "glitter_eyeshadow",
     },
   ],
 };
 
 const eyebrows: LevelTwoCategoryType = {
-  id: 5,
   level: 2,
-  label: "Eyebrows",
-  value: "eyebrows",
+  name: "Eyebrows",
+  category: "eyebrows",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Brow Definer",
-      value: "brow_definer",
+      name: "Brow Definer",
+      category: "brow_definer",
     },
     {
-      id: 2,
       level: 3,
-      label: "Brow Pencil",
-      value: "brow_pencil",
+      name: "Brow Pencil",
+      category: "brow_pencil",
     },
     {
-      id: 3,
       level: 3,
-      label: "Brow Gel",
-      value: "brow_gel",
+      name: "Brow Gel",
+      category: "brow_gel",
     },
   ],
 };
 
 const eye_value_set: LevelTwoCategoryType = {
-  id: 6,
   level: 2,
-  label: "Eye Value Set",
-  value: "eye_value_set",
+  name: "Eye Value Set",
+  category: "eye_value_set",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Eyelashes",
-      value: "eyelashes",
+      name: "Eyelashes",
+      category: "eyelashes",
     },
     {
-      id: 2,
       level: 3,
-      label: "Eye Gift Set",
-      value: "eye_gift_set",
+      name: "Eye Gift Set",
+      category: "eye_gift_set",
     },
     {
-      id: 3,
       level: 3,
-      label: "Eye Combo",
-      value: "eye_combo",
+      name: "Eye Combo",
+      category: "eye_combo",
     },
   ],
 };
@@ -393,244 +337,208 @@ const eye_value_set: LevelTwoCategoryType = {
 
 /* ============= Face Start ============= */
 const face_makeup: LevelTwoCategoryType = {
-  id: 1,
   level: 2,
-  label: "Face Makeup",
-  value: "face_makeup",
+  name: "Face Makeup",
+  category: "face_makeup",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Foundation",
-      value: "foundation",
+      name: "Foundation",
+      category: "foundation",
     },
     {
-      id: 2,
       level: 3,
-      label: "BB Cream",
-      value: "bb_cream",
+      name: "BB Cream",
+      category: "bb_cream",
     },
     {
-      id: 3,
       level: 3,
-      label: "Compact Powder",
-      value: "compact_powder",
+      name: "Compact Powder",
+      category: "compact_powder",
     },
     {
-      id: 4,
       level: 3,
-      label: "Loose Powder",
-      value: "loose_powder",
+      name: "Loose Powder",
+      category: "loose_powder",
     },
     {
-      id: 5,
       level: 3,
-      label: "Banana Powder",
-      value: "banana_powder",
+      name: "Banana Powder",
+      category: "banana_powder",
     },
     {
-      id: 6,
       level: 3,
-      label: "SPF Foundation",
-      value: "spf_foundation",
+      name: "SPF Foundation",
+      category: "spf_foundation",
     },
   ],
 };
 
 const traditional_and_essentials: LevelTwoCategoryType = {
-  id: 2,
   level: 2,
-  label: "Traditional & Essentials",
-  value: "traditional_and_essentials",
+  name: "Traditional & Essentials",
+  category: "traditional_and_essentials",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Sindoor",
-      value: "sindoor",
+      name: "Sindoor",
+      category: "sindoor",
     },
   ],
 };
 
 const cheeks_and_glow: LevelTwoCategoryType = {
-  id: 3,
   level: 2,
-  label: "Cheeks & Glow",
-  value: "cheeks_and_glow",
+  name: "Cheeks & Glow",
+  category: "cheeks_and_glow",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Highlighter",
-      value: "highlighter",
+      name: "Highlighter",
+      category: "highlighter",
     },
     {
-      id: 2,
       level: 3,
-      label: "Liquid Highlighter",
-      value: "liquid_highlighter",
+      name: "Liquid Highlighter",
+      category: "liquid_highlighter",
     },
     {
-      id: 3,
       level: 3,
-      label: "Blush",
-      value: "blush",
+      name: "Blush",
+      category: "blush",
     },
     {
-      id: 4,
       level: 3,
-      label: "Cheek Stain",
-      value: "cheek_stain",
+      name: "Cheek Stain",
+      category: "cheek_stain",
     },
   ],
 };
 
 const setting_and_finishing: LevelTwoCategoryType = {
-  id: 4,
   level: 2,
-  label: "Setting & Finishing",
-  value: "setting_and_finishing",
+  name: "Setting & Finishing",
+  category: "setting_and_finishing",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Setting Spray",
-      value: "setting_spray",
+      name: "Setting Spray",
+      category: "setting_spray",
     },
     {
-      id: 2,
       level: 3,
-      label: "Compact",
-      value: "compact",
+      name: "Compact",
+      category: "compact",
     },
     {
-      id: 3,
       level: 3,
-      label: "Fixer",
-      value: "fixer",
+      name: "Fixer",
+      category: "fixer",
     },
   ],
 };
 
 const foundations_by_finish: LevelTwoCategoryType = {
-  id: 5,
   level: 2,
-  label: "Foundations by Finish",
-  value: "foundations_by_finish",
+  name: "Foundations by Finish",
+  category: "foundations_by_finish",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Liquid Foundation",
-      value: "liquid_foundation",
+      name: "Liquid Foundation",
+      category: "liquid_foundation",
     },
     {
-      id: 2,
       level: 3,
-      label: "Matte Foundation",
-      value: "matte_foundation",
+      name: "Matte Foundation",
+      category: "matte_foundation",
     },
     {
-      id: 3,
       level: 3,
-      label: "Water Resistant Foundation",
-      value: "water_resistant_foundation",
+      name: "Water Resistant Foundation",
+      category: "water_resistant_foundation",
     },
     {
-      id: 4,
       level: 3,
-      label: "High Coverage Foundation",
-      value: "high_coverage_foundation",
+      name: "High Coverage Foundation",
+      category: "high_coverage_foundation",
     },
     {
-      id: 5,
       level: 3,
-      label: "Stick Foundation",
-      value: "stick_foundation",
+      name: "Stick Foundation",
+      category: "stick_foundation",
     },
   ],
 };
 
 const foundations_by_skin_type: LevelTwoCategoryType = {
-  id: 6,
   level: 2,
-  label: "Foundations by Skin Type",
-  value: "foundations_by_skin_type",
+  name: "Foundations by Skin Type",
+  category: "foundations_by_skin_type",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Best for Dry Skin",
-      value: "best_for_dry_skin",
+      name: "Best for Dry Skin",
+      category: "best_for_dry_skin",
     },
     {
-      id: 2,
       level: 3,
-      label: "Best for Oily Skin",
-      value: "best_for_oily_skin",
+      name: "Best for Oily Skin",
+      category: "best_for_oily_skin",
     },
   ],
 };
 
 const primers_and_removers: LevelTwoCategoryType = {
-  id: 7,
   level: 2,
-  label: "Primers & Removers",
-  value: "primers_and_removers",
+  name: "Primers & Removers",
+  category: "primers_and_removers",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Makeup Remover",
-      value: "makeup_remover",
+      name: "Makeup Remover",
+      category: "makeup_remover",
     },
     {
-      id: 2,
       level: 3,
-      label: "Primer",
-      value: "primer",
+      name: "Primer",
+      category: "primer",
     },
   ],
 };
 
 const bronzers_and_contours: LevelTwoCategoryType = {
-  id: 8,
   level: 2,
-  label: "Bronzers & Contours",
-  value: "bronzers_and_contours",
+  name: "Bronzers & Contours",
+  category: "bronzers_and_contours",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Bronzer",
-      value: "bronzer",
+      name: "Bronzer",
+      category: "bronzer",
     },
     {
-      id: 2,
       level: 3,
-      label: "Contour",
-      value: "contour",
+      name: "Contour",
+      category: "contour",
     },
   ],
 };
 
 const concealers_and_correctors: LevelTwoCategoryType = {
-  id: 9,
   level: 2,
-  label: "Concealers & Correctors",
-  value: "concealers_and_correctors",
+  name: "Concealers & Correctors",
+  category: "concealers_and_correctors",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Color Concealer",
-      value: "color_concealer",
+      name: "Color Concealer",
+      category: "color_concealer",
     },
     {
-      id: 2,
       level: 3,
-      label: "Color Corrector",
-      value: "color_corrector",
+      name: "Color Corrector",
+      category: "color_corrector",
     },
   ],
 };
@@ -639,127 +547,108 @@ const concealers_and_correctors: LevelTwoCategoryType = {
 
 /* ============= Skin Start ============= */
 const moisturizers: LevelTwoCategoryType = {
-  id: 1,
   level: 2,
-  label: "Moisturizers",
-  value: "moisturizers",
+  name: "Moisturizers",
+  category: "moisturizers",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Night Cream",
-      value: "night_cream",
+      name: "Night Cream",
+      category: "night_cream",
     },
     {
-      id: 2,
       level: 3,
-      label: "Eye Cream",
-      value: "eye_cream",
+      name: "Eye Cream",
+      category: "eye_cream",
     },
     {
-      id: 3,
       level: 3,
-      label: "Serum",
-      value: "serum",
+      name: "Serum",
+      category: "serum",
     },
     {
-      id: 4,
       level: 3,
-      label: "Skincare Kit",
-      value: "skincare_kit",
+      name: "Skincare Kit",
+      category: "skincare_kit",
     },
   ],
 };
 
 const cleansing_and_exfoliation: LevelTwoCategoryType = {
-  id: 2,
   level: 2,
-  label: "Cleansing & Exfoliation",
-  value: "cleansing_and_exfoliation",
+  name: "Cleansing & Exfoliation",
+  category: "cleansing_and_exfoliation",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Cleanser",
-      value: "cleanser",
+      name: "Cleanser",
+      category: "cleanser",
     },
     {
-      id: 2,
       level: 3,
-      label: "Face Wash",
-      value: "face_wash",
+      name: "Face Wash",
+      category: "face_wash",
     },
     {
-      id: 3,
       level: 3,
-      label: "Exfoliator & Scrub",
-      value: "exfoliator_and_scrub",
+      name: "Exfoliator & Scrub",
+      category: "exfoliator_and_scrub",
     },
     {
-      id: 4,
       level: 3,
-      label: "Sunscreen",
-      value: "sunscreen",
+      name: "Sunscreen",
+      category: "sunscreen",
     },
   ],
 };
 
 const natures_blend: LevelTwoCategoryType = {
-  id: 3,
   level: 2,
-  label: "Nature's Blend",
-  value: "natures_blend",
+  name: "Nature's Blend",
+  category: "natures_blend",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Aquaholic",
-      value: "aquaholic",
+      name: "Aquaholic",
+      category: "aquaholic",
     },
     {
-      id: 2,
       level: 3,
-      label: "Coffee Culture",
-      value: "coffee_culture",
+      name: "Coffee Culture",
+      category: "coffee_culture",
     },
     {
-      id: 3,
       level: 3,
-      label: "Citrus Got Real",
-      value: "citrus_got_real",
+      name: "Citrus Got Real",
+      category: "citrus_got_real",
     },
     {
-      id: 4,
       level: 3,
-      label: "View All",
-      value: "view_all",
+      name: "View All",
+      category: "view_all",
     },
   ],
 };
 
 const face_mask: LevelTwoCategoryType = {
-  id: 4,
   level: 2,
-  label: "Face Mask",
-  value: "face_mask",
+  name: "Face Mask",
+  category: "face_mask",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Sheet Mask",
-      value: "sheet_mask",
+      name: "Sheet Mask",
+      category: "sheet_mask",
     },
     {
-      id: 2,
       level: 3,
-      label: "Face Pack",
-      value: "face_pack",
+      name: "Face Pack",
+      category: "face_pack",
     },
     {
-      id: 3,
       level: 3,
-      label: "View All",
-      value: "view_all",
+      name: "View All",
+      category: "view_all",
     },
   ],
 };
@@ -768,199 +657,168 @@ const face_mask: LevelTwoCategoryType = {
 
 /* ============= Collections Start ============= */
 const bath_and_body: LevelTwoCategoryType = {
-  id: 1,
   level: 2,
-  label: "Bath & Body",
-  value: "bath_and_body",
+  name: "Bath & Body",
+  category: "bath_and_body",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Shower Gel",
-      value: "shower_gel",
+      name: "Shower Gel",
+      category: "shower_gel",
     },
     {
-      id: 2,
       level: 3,
-      label: "Soap",
-      value: "soap",
+      name: "Soap",
+      category: "soap",
     },
     {
-      id: 3,
       level: 3,
-      label: "Body Lotion",
-      value: "body_lotion",
+      name: "Body Lotion",
+      category: "body_lotion",
     },
     {
-      id: 4,
       level: 3,
-      label: "Body Spray",
-      value: "body_spray",
+      name: "Body Spray",
+      category: "body_spray",
     },
     {
-      id: 5,
       level: 3,
-      label: "Hand Wash",
-      value: "hand_wash",
+      name: "Hand Wash",
+      category: "hand_wash",
     },
     {
-      id: 6,
       level: 3,
-      label: "Foot Cream",
-      value: "foot_cream",
+      name: "Foot Cream",
+      category: "foot_cream",
     },
     {
-      id: 7,
       level: 3,
-      label: "Hand Cream",
-      value: "hand_cream",
+      name: "Hand Cream",
+      category: "hand_cream",
     },
   ],
 };
 
 const sugar_pop: LevelTwoCategoryType = {
-  id: 2,
   level: 2,
-  label: "Sugar Pop",
-  value: "sugar_pop",
+  name: "Sugar Pop",
+  category: "sugar_pop",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Lips",
-      value: "lips",
+      name: "Lips",
+      category: "lips",
     },
     {
-      id: 2,
       level: 3,
-      label: "Eyes",
-      value: "eyes",
+      name: "Eyes",
+      category: "eyes",
     },
     {
-      id: 3,
       level: 3,
-      label: "Face",
-      value: "face",
+      name: "Face",
+      category: "face",
     },
     {
-      id: 4,
       level: 3,
-      label: "Nails",
-      value: "nails",
+      name: "Nails",
+      category: "nails",
     },
     {
-      id: 5,
       level: 3,
-      label: "Skincare",
-      value: "skincare",
+      name: "Skincare",
+      category: "skincare",
     },
     {
-      id: 6,
       level: 3,
-      label: "Body Care",
-      value: "body_care",
+      name: "Body Care",
+      category: "body_care",
     },
     {
-      id: 7,
       level: 3,
-      label: "Best of Sugar Pop",
-      value: "best_of_sugar_pop",
+      name: "Best of Sugar Pop",
+      category: "best_of_sugar_pop",
     },
   ],
 };
 
 const hair_care: LevelTwoCategoryType = {
-  id: 3,
   level: 2,
-  label: "Hair Care",
-  value: "hair_care",
+  name: "Hair Care",
+  category: "hair_care",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Shampoo",
-      value: "shampoo",
+      name: "Shampoo",
+      category: "shampoo",
     },
     {
-      id: 2,
       level: 3,
-      label: "Conditioner",
-      value: "conditioner",
+      name: "Conditioner",
+      category: "conditioner",
     },
     {
-      id: 3,
       level: 3,
-      label: "Hair Oil",
-      value: "hair_oil",
+      name: "Hair Oil",
+      category: "hair_oil",
     },
     {
-      id: 4,
       level: 3,
-      label: "Serum",
-      value: "serum",
+      name: "Serum",
+      category: "serum",
     },
     {
-      id: 5,
       level: 3,
-      label: "Hair Mask",
-      value: "hair_mask",
+      name: "Hair Mask",
+      category: "hair_mask",
     },
     {
-      id: 6,
       level: 3,
-      label: "Combo",
-      value: "combo",
+      name: "Combo",
+      category: "combo",
     },
     {
-      id: 7,
       level: 3,
-      label: "View All",
-      value: "view_all",
+      name: "View All",
+      category: "view_all",
     },
   ],
 };
 
 const gifting: LevelTwoCategoryType = {
-  id: 4,
   level: 2,
-  label: "Gifting",
-  value: "gifting",
+  name: "Gifting",
+  category: "gifting",
   subCategories: [
     {
-      id: 1,
       level: 3,
-      label: "Lipstick Set",
-      value: "lipstick_set",
+      name: "Lipstick Set",
+      category: "lipstick_set",
     },
     {
-      id: 2,
       level: 3,
-      label: "Sugar Merch",
-      value: "sugar_merch",
+      name: "Sugar Merch",
+      category: "sugar_merch",
     },
     {
-      id: 3,
       level: 3,
-      label: "Value Set",
-      value: "value_set",
+      name: "Value Set",
+      category: "value_set",
     },
     {
-      id: 4,
       level: 3,
-      label: "Makeup Kit",
-      value: "makeup_kit",
+      name: "Makeup Kit",
+      category: "makeup_kit",
     },
     {
-      id: 5,
       level: 3,
-      label: "Corporate Gifting",
-      value: "corporate_gifting",
+      name: "Corporate Gifting",
+      category: "corporate_gifting",
     },
     {
-      id: 6,
       level: 3,
-      label: "Sugar Set",
-      value: "sugar_set",
+      name: "Sugar Set",
+      category: "sugar_set",
     },
   ],
 };
@@ -969,17 +827,15 @@ const gifting: LevelTwoCategoryType = {
 
 export const categoryLevelsData: LevelOneCategoryType[] = [
   {
-    id: 1,
     level: 1,
-    label: "For You",
-    value: "for_you",
+    name: "For You",
+    category: "for_you",
     subCategories: [new_new, sugar_play], // only new is reserved keyword we can't use new
   },
   {
-    id: 2,
     level: 1,
-    label: "Lips",
-    value: "lips",
+    name: "Lips",
+    category: "lips",
     subCategories: [
       finish_types,
       lipstick_forms,
@@ -990,10 +846,9 @@ export const categoryLevelsData: LevelOneCategoryType[] = [
     ],
   },
   {
-    id: 3,
     level: 1,
-    label: "Eyes",
-    value: "eyes",
+    name: "Eyes",
+    category: "eyes",
     subCategories: [
       kohl_and_kajal,
       mascaras,
@@ -1004,10 +859,9 @@ export const categoryLevelsData: LevelOneCategoryType[] = [
     ],
   },
   {
-    id: 4,
     level: 1,
-    label: "Face",
-    value: "face",
+    name: "Face",
+    category: "face",
     subCategories: [
       face_makeup,
       traditional_and_essentials,
@@ -1021,10 +875,9 @@ export const categoryLevelsData: LevelOneCategoryType[] = [
     ],
   },
   {
-    id: 5,
     level: 1,
-    label: "Skin",
-    value: "skin",
+    name: "Skin",
+    category: "skin",
     subCategories: [
       moisturizers,
       cleansing_and_exfoliation,
@@ -1033,10 +886,9 @@ export const categoryLevelsData: LevelOneCategoryType[] = [
     ],
   },
   {
-    id: 6,
     level: 1,
-    label: "Collections",
-    value: "collections",
+    name: "Collections",
+    category: "collections",
     subCategories: [bath_and_body, sugar_pop, hair_care, gifting],
   },
 ];
