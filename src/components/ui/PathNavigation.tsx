@@ -1,8 +1,14 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { DropdownIcon } from "../../icons";
 
-const PathNavigation = ({ className = "" }: { className?: string }) => {
-  const { pathname } = useLocation();
+type TPathNavigation = {
+  className?: string;
+  path?: string;
+};
+
+const PathNavigation = ({ className = "", path }: TPathNavigation) => {
+  const defaultPathName = useLocation().pathname;
+  const pathname = path ? path : defaultPathName;
   const navigate = useNavigate();
 
   const paths = pathname.split("/").filter((path) => path !== "");

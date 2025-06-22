@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Quill from "quill";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -78,6 +79,7 @@ const UpdateProduct = () => {
   const { setParams, queryParams, params } = useQueryParams();
   const selectedProduct = useGetProductById();
   const updateProduct = useUpdateProduct();
+  const { pathname } = useLocation();
 
   const {
     control,
@@ -583,7 +585,7 @@ const UpdateProduct = () => {
       );
       setValue("totalStock", totalStock, { shouldValidate: true });
     } else if (shades.length === 0) {
-      setValue("totalStock", 0, { shouldValidate: true });
+      setValue("totalStock", 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shades, shades.length]);
@@ -593,7 +595,14 @@ const UpdateProduct = () => {
       {(updateProduct.isPending || isApiRunning) && <LoadingPage />}
       <div className="w-full space-y-3">
         <div className="w-full px-4 py-3 border-b border-primary-50 flex justify-end base:justify-between items-center sticky top-16 bg-primary-inverted z-10 shadow-lg">
-          <PathNavigation className="hidden base:flex" />
+          <PathNavigation
+            className="hidden base:flex"
+            path={pathname
+              .split("/")
+              .filter((path) => path !== "")
+              .splice(0, 2)
+              .join("/")}
+          />
           <Button
             pattern="outline"
             content="Add Shade"
