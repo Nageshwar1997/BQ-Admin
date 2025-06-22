@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toastErrorMessage, toastSuccessMessage } from "../../utils/toast.util";
 import {
+  delete_product,
   get_all_products,
   get_product_by_id,
   update_product,
@@ -71,6 +72,20 @@ export const useUpdateProduct = () => {
     onError: (error: unknown) => {
       toastErrorMessage(
         typeof error === "string" ? error : "Failed to update product!"
+      );
+    },
+  });
+};
+
+export const useDeleteProduct = () => {
+  return useMutation({
+    mutationFn: (productId: string) => delete_product(productId),
+    onSuccess: (data) => {
+      toastSuccessMessage(data?.message || "Product deleted successfully!");
+    },
+    onError: (error: unknown) => {
+      toastErrorMessage(
+        typeof error === "string" ? error : "Failed to delete product!"
       );
     },
   });

@@ -7,7 +7,7 @@ export const productRoutes = {
   updateProduct: { method: "PATCH", url: "/products/product/update" },
   getAllProducts: { method: "POST", url: "/products/all" },
   getProductById: { method: "POST", url: "/products/product" },
-  deleteProduct: { method: "DELETE", url: "/products/delete" },
+  deleteProduct: { method: "DELETE", url: "/products/product/delete" },
 };
 
 export const userRoutes = {
