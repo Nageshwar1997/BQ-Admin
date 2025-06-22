@@ -495,7 +495,7 @@ const UploadProduct = () => {
                                 <strong>Stock:</strong>
                                 <span>{shade.stock}</span>
                               </p>
-                              <div className="mt-2 flex gap-2">
+                              <div className="mt-2 flex gap-2 w-fit">
                                 <Button
                                   type="button"
                                   pattern="transparent"
@@ -503,7 +503,7 @@ const UploadProduct = () => {
                                   onClick={() => {
                                     setParams({ shade: "edit", index: `${i}` });
                                   }}
-                                  className="!px-2 !py-0.5 !text-xs !rounded text-white !font-medium bg-blue-600 hover:bg-blue-700 hover:!shadow-sm hover:!shadow-blue-600/50"
+                                  className="!px-2 !py-0.5 !text-xs !rounded text-white !font-medium bg-blue-600 hover:bg-blue-700 hover:!shadow-sm hover:!shadow-blue-600/50 !w-16"
                                 />
                                 <Button
                                   type="button"
@@ -515,7 +515,7 @@ const UploadProduct = () => {
                                     );
                                     setShades(updatedShades);
                                   }}
-                                  className="!px-2 !py-0.5 !text-xs !rounded !font-medium text-white bg-red-600 hover:bg-red-700 hover:!shadow-sm hover:!shadow-red-600/50"
+                                  className="!px-2 !py-0.5 !text-xs !rounded !font-medium text-white bg-red-600 hover:bg-red-700 hover:!shadow-sm hover:!shadow-red-600/50 !w-16"
                                 />
                               </div>
                             </div>
