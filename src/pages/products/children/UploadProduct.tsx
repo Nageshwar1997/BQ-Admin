@@ -93,38 +93,38 @@ const UploadProduct = () => {
 
   const handleUpload = async (data: ProductType) => {
     await Promise.all([
-      processQuillContent(
-        quillRefs.description,
-        blobUrlRefs.description,
+      processQuillContent({
+        quillRef: quillRefs.description,
+        blobUrlsRef: blobUrlRefs.description,
         setValue,
-        "description",
-        `Products/${data.title}/Description`,
-        "product"
-      ),
-      processQuillContent(
-        quillRefs.howToUse,
-        blobUrlRefs.howToUse,
+        fieldName: "description",
+        folderName: `Products/${data.title}/Description`,
+        cloudinaryConfigOption: "product",
+      }),
+      processQuillContent({
+        quillRef: quillRefs.howToUse,
+        blobUrlsRef: blobUrlRefs.howToUse,
         setValue,
-        "howToUse",
-        `Products/${data.title}/How_To_Use`,
-        "product"
-      ),
-      processQuillContent(
-        quillRefs.ingredients,
-        blobUrlRefs.ingredients,
+        fieldName: "howToUse",
+        folderName: `Products/${data.title}/How_To_Use`,
+        cloudinaryConfigOption: "product",
+      }),
+      processQuillContent({
+        quillRef: quillRefs.ingredients,
+        blobUrlsRef: blobUrlRefs.ingredients,
         setValue,
-        "ingredients",
-        `Products/${data.title}/Ingredients`,
-        "product"
-      ),
-      processQuillContent(
-        quillRefs.additionalDetails,
-        blobUrlRefs.additionalDetails,
+        fieldName: "ingredients",
+        folderName: `Products/${data.title}/Ingredients`,
+        cloudinaryConfigOption: "product",
+      }),
+      processQuillContent({
+        quillRef: quillRefs.additionalDetails,
+        blobUrlsRef: blobUrlRefs.additionalDetails,
         setValue,
-        "additionalDetails",
-        `Products/${data.title}/Additional_Details`,
-        "product"
-      ),
+        fieldName: "additionalDetails",
+        folderName: `Products/${data.title}/Additional_Details`,
+        cloudinaryConfigOption: "product",
+      }),
     ]);
 
     const finalData: ProductType = { ...data, ...getValues(), shades };
