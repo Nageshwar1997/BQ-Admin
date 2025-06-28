@@ -119,23 +119,19 @@ export interface UserStoreType {
   logout: () => void;
 }
 
-export interface LevelThreeCategoryType {
+export interface CategoryType {
   level: number;
   name: string;
   category: string;
 }
 
-export interface LevelTwoCategoryType {
-  level: number;
-  name: string;
-  category: string;
+export type LevelThreeCategoryType = CategoryType;
+
+export interface LevelTwoCategoryType extends CategoryType {
   subCategories: LevelThreeCategoryType[];
 }
 
-export interface LevelOneCategoryType {
-  level: number;
-  name: string;
-  category: string;
+export interface LevelOneCategoryType extends CategoryType {
   subCategories: LevelTwoCategoryType[];
 }
 
@@ -272,4 +268,27 @@ export interface QuillEditorProps {
   blobUrlsRef?: RefObject<string[]>;
   placeholder?: string;
   toolbarOptions?: IToolBarOptions;
+}
+
+export interface ReviewType {
+  rating: number;
+  title: string;
+  comment: string;
+  images: (string | File)[];
+  videos: (string | File)[];
+  user: string;
+}
+
+// export interface PopulatedReviewType extends Omit<ReviewType, "user"> {
+//   _id: string;
+//   createdAt: string;
+//   updatedAt: string;
+//   user: Exclude<keyof UserTypes, "password">;
+// }
+
+export interface IProductPossiblePopulateFields {
+  shades?: (keyof ShadeType | "images")[];
+  seller?: Exclude<keyof UserTypes, "password">[];
+  category?: (keyof CategoryType | "parentCategory")[];
+  reviews?: (keyof ReviewType | "images" | "videos")[];
 }

@@ -7,6 +7,7 @@ import {
   update_product,
   upload_product,
 } from "./product.api";
+import { IProductPossiblePopulateFields } from "../../types";
 
 export const useUploadProduct = () => {
   return useMutation({
@@ -28,7 +29,7 @@ export const useGetAllProducts = () => {
       data,
       params,
     }: {
-      data: Record<string, string[]>;
+      data: IProductPossiblePopulateFields;
       params: { page: number; limit: number };
     }) => get_all_products({ data, params }),
     onSuccess: (data) => {
@@ -48,7 +49,7 @@ export const useGetProductById = () => {
       data,
       params,
     }: {
-      data: Record<string, string[]>;
+      data: IProductPossiblePopulateFields;
       params: { productId: string };
     }) => get_product_by_id({ data, params }),
     onSuccess: (data) => {

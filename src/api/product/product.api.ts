@@ -2,6 +2,7 @@ import { AxiosError } from "axios";
 import api from "../../configs/axios.instance.config";
 import { getAdminToken } from "../../utils";
 import { productRoutes } from "../api.routes";
+import { IProductPossiblePopulateFields } from "../../types";
 
 export const upload_product = async (data: FormData) => {
   try {
@@ -28,7 +29,7 @@ export const get_all_products = async ({
   data,
   params,
 }: {
-  data: Record<string, string[]>;
+  data: IProductPossiblePopulateFields;
   params: { page: number; limit: number };
 }) => {
   try {
@@ -57,7 +58,7 @@ export const get_product_by_id = async ({
   data,
   params,
 }: {
-  data: Record<string, string[]>;
+  data: IProductPossiblePopulateFields;
   params: { productId: string };
 }) => {
   try {
@@ -103,7 +104,7 @@ export const update_product = async ({
   }
 };
 
-export const delete_product = async (productId: string ) => {
+export const delete_product = async (productId: string) => {
   try {
     const admin_token = getAdminToken();
 
