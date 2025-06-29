@@ -45,7 +45,7 @@ const AllProducts = () => {
   useEffect(() => {
     handleGetAllProducts(1, 50);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [deleteProduct?.isSuccess]);
 
   return (
     <>
