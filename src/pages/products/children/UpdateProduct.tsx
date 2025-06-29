@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Quill from "quill";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -80,6 +80,7 @@ const UpdateProduct = () => {
   const selectedProduct = useGetProductById();
   const updateProduct = useUpdateProduct();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const {
     control,
@@ -488,6 +489,9 @@ const UpdateProduct = () => {
       {
         onSettled: () => {
           setIsApiRunning(false);
+          setTimeout(() => {
+            navigate(-1);
+          }, 600);
         },
       }
     );
