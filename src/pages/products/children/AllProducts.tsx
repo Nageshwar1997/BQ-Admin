@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Button from "../../../components/ui/button/Button";
 import PathNavigation from "../../../components/ui/PathNavigation";
-import { UploadCloudIcon } from "../../../icons";
+import { DeleteIcon, EditIcon, UploadCloudIcon } from "../../../icons";
 import { toINRCurrency } from "../../../utils";
 import {
   useDeleteProduct,
@@ -68,7 +68,7 @@ const AllProducts = () => {
             return (
               <div
                 key={product?._id}
-                className="p-4 rounded-lg shadow-sm bg-primary-inverted space-y-4 border-rounded-corners-gradient cursor-pointer"
+                className="p-4 rounded-lg shadow-sm bg-primary-inverted flex flex-col gap-4 border-rounded-corners-gradient cursor-pointer"
               >
                 <div className="aspect-square overflow-hidden rounded-md relative group">
                   <img
@@ -76,12 +76,26 @@ const AllProducts = () => {
                     alt="Product"
                     className="w-full h-full object-fill aspect-auto hover:scale-105 transition-transform duration-500"
                   />
-                  <span className="w-8 h-8 absolute top-1 right-1 text-[10px] flex flex-col items-center justify-center rounded-full font-semibold dark:bg-green-700 light:bg-green-600 leading-none">
+                  <span className="w-6 h-6 absolute top-0.5 left-0.5 text-[8px] flex flex-col items-center justify-center rounded-full font-semibold dark:bg-green-700 light:bg-green-600 leading-none">
                     {`-${product.discount.toFixed(0)}%`}
                   </span>
+                  <div className="flex items-center gap-1 absolute top-0.5 right-0.5">
+                    <button
+                      className="rounded-full flex items-center justify-center bg-primary shadow-md"
+                      onClick={() => navigate(`update/${product._id}`)}
+                    >
+                      <EditIcon className="w-6 h-6 p-1.5 [&>path]:stroke-[2.5] [&>path]:stroke-primary-inverted [&>path]:hover:stroke-blue-crayola-c" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product._id)}
+                      className="rounded-full flex items-center justify-center bg-primary shadow-md"
+                    >
+                      <DeleteIcon className="w-6 h-6 p-1.5 [&>path]:stroke-[2.5] [&>path]:stroke-primary-inverted [&>path]:hover:stroke-red-600" />
+                    </button>
+                  </div>
                 </div>
                 <hr className="h-px block border-none bg-gradient-line" />
-                <div className="space-y-2">
+                <div className="flex flex-col justify-between gap-2 grow">
                   <p className="text-sm font-semibold line-clamp-2 text-secondary">
                     {product.title}
                   </p>
@@ -91,30 +105,14 @@ const AllProducts = () => {
                   <p className="text-xs text-tertiary line-clamp-1 border border-primary-50 w-fit px-3 py-1 rounded-full">
                     {product.brand}
                   </p>
-                  <div className="w-full space-y-1 text-sm font-medium text-tertiary">
-                    <p className="flex items-center gap-3">
-                      <span>Price:</span>
-                      <span className="text-green-500">
-                        {toINRCurrency(product.sellingPrice)}
-                      </span>
-                      <span className="text-red-600 line-through">
-                        {toINRCurrency(product.originalPrice)}
-                      </span>
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Button
-                      pattern="secondary"
-                      content="Edit"
-                      className="!py-1 !rounded-[5px] !text-sm"
-                      onClick={() => navigate(`update/${product._id}`)}
-                    />
-                    <Button
-                      pattern="primary"
-                      content="Delete"
-                      className="!py-1 !rounded-[5px] !text-sm"
-                      onClick={() => handleDeleteProduct(product._id)}
-                    />
+                  <div className="text-sm font-medium text-tertiary flex items-center gap-3">
+                    <span>Price:</span>
+                    <span className="text-green-500">
+                      {toINRCurrency(product.sellingPrice)}
+                    </span>
+                    <span className="text-red-600 line-through">
+                      {toINRCurrency(product.originalPrice)}
+                    </span>
                   </div>
                 </div>
               </div>
