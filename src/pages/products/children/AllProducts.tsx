@@ -21,9 +21,15 @@ const AllProducts = () => {
     getAllProducts.mutate(
       {
         data: {
-          shades: ["shadeName", "colorCode", "images"],
-          seller: ["firstName", "lastName", "email"],
-          category: ["name", "category", "parentCategory", "level"],
+          populateFields: { category: ["name", "category"] },
+          requiredFields: [
+            "commonImages",
+            "originalPrice",
+            "sellingPrice",
+            "totalStock",
+            "discount",
+            "brand",
+          ],
         },
         params: { page, limit },
       },
@@ -72,12 +78,12 @@ const AllProducts = () => {
               >
                 <div className="aspect-square overflow-hidden rounded-md relative group">
                   <img
-                    src={product.commonImages[0]}
+                    src={product?.commonImages[0]}
                     alt="Product"
                     className="w-full h-full object-fill aspect-auto hover:scale-105 transition-transform duration-500"
                   />
                   <span className="w-6 h-6 absolute top-0.5 left-0.5 text-[8px] flex flex-col items-center justify-center rounded-full font-semibold dark:bg-green-700 light:bg-green-600 leading-none">
-                    {`-${product.discount.toFixed(0)}%`}
+                    {`-${product?.discount.toFixed(0)}%`}
                   </span>
                   <div className="flex items-center gap-1 absolute top-0.5 right-0.5">
                     <button
@@ -97,21 +103,21 @@ const AllProducts = () => {
                 <hr className="h-px block border-none bg-gradient-line" />
                 <div className="flex flex-col justify-between gap-2 grow">
                   <p className="text-sm font-semibold line-clamp-2 text-secondary">
-                    {product.title}
+                    {product?.title}
                   </p>
                   <p className="text-xs font-semibold line-clamp-1 text-secondary opacity-70">
-                    {product.category.name}
+                    {product?.category?.name}
                   </p>
                   <p className="text-xs text-tertiary line-clamp-1 border border-primary-50 w-fit px-3 py-1 rounded-full">
-                    {product.brand}
+                    {product?.brand}
                   </p>
                   <div className="text-sm font-medium text-tertiary flex items-center gap-3">
                     <span>Price:</span>
                     <span className="text-green-500">
-                      {toINRCurrency(product.sellingPrice)}
+                      {toINRCurrency(product?.sellingPrice)}
                     </span>
                     <span className="text-red-600 line-through">
-                      {toINRCurrency(product.originalPrice)}
+                      {toINRCurrency(product?.originalPrice)}
                     </span>
                   </div>
                 </div>
