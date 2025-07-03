@@ -500,9 +500,11 @@ const UpdateProduct = () => {
   const handleGetAllProducts = () => {
     selectedProduct.mutate({
       data: {
-        shades: ["shadeName", "colorCode", "images", "stock"],
-        seller: ["firstName", "lastName", "email"],
-        category: ["name", "category", "parentCategory", "level"],
+        populateFields: {
+          shades: ["shadeName", "colorCode", "images", "stock"],
+          seller: ["firstName", "lastName", "email"],
+          category: ["name", "category", "parentCategory", "level"],
+        },
       },
       params: { productId: params.id as string },
     });
