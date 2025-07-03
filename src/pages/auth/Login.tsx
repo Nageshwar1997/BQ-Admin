@@ -13,7 +13,7 @@ import AuthRobot from "./components/AuthRobot";
 import TextDisplay from "../../components/ui/TextDisplay";
 import { EyeIcon, EyeOffIcon } from "../../icons";
 import Button from "../../components/ui/button/Button";
-import { saveUserLocal, saveUserSession } from "../../utils";
+import { saveLocalToken, saveSessionToken } from "../../utils";
 import { useLoginUser } from "../../api/auth/auth.service";
 import LoadingPage from "../../components/ui/loaders/LoadingPage";
 import DarkMode from "../../components/ui/DarkMode";
@@ -76,9 +76,9 @@ const Login = () => {
       onSettled(data, error) {
         if (data && !error) {
           if (bodyData.remember) {
-            saveUserLocal(data?.token);
+            saveLocalToken(data?.token);
           } else {
-            saveUserSession(data?.token);
+            saveSessionToken(data?.token);
           }
           navigate("/");
         }
