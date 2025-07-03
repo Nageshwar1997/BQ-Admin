@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import api from "../../configs/axios.instance.config";
 import { getAdminToken } from "../../utils";
 import { productRoutes } from "../api.routes";
-import { IProductPossiblePopulateFields } from "../../types";
+import { IProductPossibleBodyFields } from "../../types";
 
 export const upload_product = async (data: FormData) => {
   try {
@@ -29,7 +29,7 @@ export const get_all_products = async ({
   data,
   params,
 }: {
-  data: IProductPossiblePopulateFields;
+  data?: IProductPossibleBodyFields;
   params: { page: number; limit: number };
 }) => {
   try {
@@ -37,14 +37,13 @@ export const get_all_products = async ({
     const response = await api.request({
       method,
       url,
-      data: { populateFields: data }, // ✅ Wrap 'data' inside populateFields
-      params, // ✅ page and limit as query params
+      data: {
+        populateFields: data?.populateFields, // shades, category, seller, reviews
+        requiredFields: data?.requiredFields, // requiredFields
+      },
+      params, // ✅ page & limit as query params
     });
 
-    console.log(
-      "🚀 ~ file: product.api.ts:27 ~ get_all_products ~ response",
-      response.data
-    );
     return response.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -58,7 +57,7 @@ export const get_product_by_id = async ({
   data,
   params,
 }: {
-  data: IProductPossiblePopulateFields;
+  data: IProductPossibleBodyFields;
   params: { productId: string };
 }) => {
   try {
@@ -66,7 +65,10 @@ export const get_product_by_id = async ({
     const response = await api.request({
       method,
       url: `${url}/${params.productId}`,
-      data: { populateFields: data }, // ✅ Wrap 'data' inside populateFields
+      data: {
+        populateFields: data?.populateFields, // shades, category, seller, reviews
+        requiredFields: data?.requiredFields, // requiredFields
+      },
     });
     return response.data;
   } catch (error) {

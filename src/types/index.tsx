@@ -286,9 +286,12 @@ export interface ReviewType {
 //   user: Exclude<keyof UserTypes, "password">;
 // }
 
-export interface IProductPossiblePopulateFields {
-  shades?: (keyof ShadeType | "images")[];
-  seller?: Exclude<keyof UserTypes, "password">[];
-  category?: (keyof CategoryType | "parentCategory")[];
-  reviews?: (keyof ReviewType | "images" | "videos")[];
+export interface IProductPossibleBodyFields {
+  requiredFields?: (keyof FetchedProductType)[];
+  populateFields?: {
+    shades?: (keyof ShadeType | "images")[];
+    seller?: Exclude<keyof UserTypes, "password">[];
+    category?: (keyof CategoryType | "parentCategory")[];
+    reviews?: (keyof ReviewType | "images" | "videos")[];
+  };
 }
