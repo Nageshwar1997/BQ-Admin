@@ -7,42 +7,81 @@ import { MB } from "../constants";
 import { toastErrorMessage } from "./toast.util";
 import { IToolBarOptions, QuillToolbar } from "../types";
 
-export const encryptData = (data: string): string => {
-  return CryptoJS.AES.encrypt(data, envs.ENCRYPTION_SECRET_KEY).toString();
+const TOKEN_KEY = "admin_token";
+const SECRET_KEY = envs.ENCRYPTION_SECRET_KEY;
+
+export const encryptData = (data: object | string) => {
+  const stringData = typeof data === "string" ? data : JSON.stringify(data);
+  const encrypted = CryptoJS.AES.encrypt(stringData, SECRET_KEY);
+  return encrypted.toString();
 };
 
-export const saveUserLocal = (data: string) => {
-  removeUserSession();
-  localStorage.setItem("admin_token", encryptData(JSON.stringify(data)));
+export const decryptData = (
+  encryptedData: string | null
+): object | string | null => {
+  if (!encryptedData) return null;
+
+  const bytes = CryptoJS.AES.decrypt(encryptedData, SECRET_KEY);
+  const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+
+  if (decrypted) {
+    try {
+      return JSON.parse(decrypted);
+    } catch (err) {
+      console.error("JSON parse failed", err);
+      return decrypted;
+    }
+  }
+
+  return null;
 };
 
-export const saveUserSession = (data: string) => {
-  removeUserLocal();
-  sessionStorage.setItem("admin_token", encryptData(JSON.stringify(data)));
+const getLocalToken = () => localStorage.getItem(TOKEN_KEY);
+const getSessionToken = () => sessionStorage.getItem(TOKEN_KEY);
+
+const removeLocalToken = () => localStorage.removeItem(TOKEN_KEY);
+const removeSessionToken = () => sessionStorage.removeItem(TOKEN_KEY);
+
+export const saveLocalToken = (token: string) => {
+  const encryptedToken = encryptData(token);
+  localStorage.setItem(TOKEN_KEY, encryptedToken);
+  removeSessionToken();
+};
+export const saveSessionToken = (token: string) => {
+  const encryptedToken = encryptData(token);
+  sessionStorage.setItem(TOKEN_KEY, encryptedToken);
+  removeLocalToken();
 };
 
-export const removeUserLocal = () => {
-  localStorage.removeItem("admin_token");
+const getStorageToken = () => {
+  let token: string | null = null;
+  const LToken = getLocalToken();
+  const SToken = getSessionToken();
+  if (LToken) {
+    token = LToken;
+  } else if (SToken) {
+    token = SToken;
+  }
+
+  return token;
 };
 
-export const removeUserSession = () => {
-  sessionStorage.removeItem("admin_token");
+export const removeStorageToken = (): void => {
+  removeLocalToken();
+  removeSessionToken();
 };
 
 export const getAdminToken = () => {
-  const admin_token =
-    localStorage.getItem("admin_token") ||
-    sessionStorage.getItem("admin_token");
-
-  if (!admin_token) {
+  const raw_token = getStorageToken();
+  if (!raw_token) {
     throw new Error("No Token found");
   }
 
-  return JSON.parse(
-    CryptoJS.AES.decrypt(admin_token, envs.ENCRYPTION_SECRET_KEY).toString(
-      CryptoJS.enc.Utf8
-    )
-  );
+  const token = decryptData(raw_token) as string | null;
+  if (!token) {
+    throw new Error("No Token found");
+  }
+  return token;
 };
 
 export const debounce = <Args extends unknown[]>(
