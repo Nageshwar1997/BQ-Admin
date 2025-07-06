@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
-import { InfoIcon, CheckMark, DropdownIcon } from "../../../icons";
+import { InfoIcon, CheckedCircleIcon, DropdownIcon } from "../../../icons";
 
 export interface SelectInputProps {
   value: string;
@@ -96,7 +96,7 @@ const Select = ({
           {isError ? (
             <InfoIcon className="w-3 h-3 md:w-4 md:h-4 fill-red-500" />
           ) : (
-            <CheckMark className="w-3 h-3 md:w-4 md:h-4 fill-green-500" />
+            <CheckedCircleIcon className="w-3 h-3 md:w-4 md:h-4 fill-green-500" />
           )}
           <span>{isError ? errorText : successText}</span>
         </p>

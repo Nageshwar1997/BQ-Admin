@@ -4,7 +4,7 @@ import {
 } from "react-color-palette";
 import type { IColor } from "react-color-palette";
 import "./colorPicker.css";
-import { CheckMark, InfoIcon } from "../../../../icons";
+import { CheckedCircleIcon, InfoIcon } from "../../../../icons";
 
 export interface ColorPickerInputProps {
   value: string;
@@ -59,7 +59,7 @@ const ColorPicker = ({
           {isError ? (
             <InfoIcon className="w-3 h-3 md:w-4 md:h-4 fill-red-500" />
           ) : (
-            <CheckMark className="w-3 h-3 md:w-4 md:h-4 fill-green-500" />
+            <CheckedCircleIcon className="w-3 h-3 md:w-4 md:h-4 fill-green-500" />
           )}
           <span>{isError ? errorText : successText}</span>
         </p>
