@@ -28,20 +28,23 @@ export const upload_product = async (data: FormData) => {
 export const get_all_products = async ({
   data,
   params,
+  queryParams = {},
 }: {
   data?: IProductPossibleBodyFields;
   params: { page: number; limit: number };
+  queryParams?: Record<string, string>;
 }) => {
   try {
     const { method, url } = productRoutes.getAllProducts;
     const response = await api.request({
       method,
       url,
-      data: {
-        populateFields: data?.populateFields, // shades, category, seller, reviews
-        requiredFields: data?.requiredFields, // requiredFields
+      params: {
+        ...params,
+        ...queryParams,
+        populateFields: data?.populateFields,
+        requiredFields: data?.requiredFields,
       },
-      params, // ✅ page & limit as query params
     });
 
     return response.data;
@@ -65,9 +68,9 @@ export const get_product_by_id = async ({
     const response = await api.request({
       method,
       url: `${url}/${params.productId}`,
-      data: {
-        populateFields: data?.populateFields, // shades, category, seller, reviews
-        requiredFields: data?.requiredFields, // requiredFields
+      params: {
+        populateFields: data?.populateFields,
+        requiredFields: data?.requiredFields,
       },
     });
     return response.data;
