@@ -14,7 +14,6 @@ import EditShade from "./shade/EditShade";
 import Input from "../../../components/ui/input/Input";
 import PhoneInput from "../../../components/ui/input/PhoneInput";
 import Select from "../../../components/ui/input/Select";
-import { DevTool } from "@hookform/devtools";
 import {
   categoryLevelsData,
   CATEGORY_DATA,
@@ -434,6 +433,7 @@ const UpdateProduct = () => {
     });
 
     if (changedShadesFieldsWithoutImageFiles.length) {
+      hasChanges = true;
       formData.append(
         "updatedShadeWithoutFiles",
         JSON.stringify(changedShadesFieldsWithoutImageFiles)
@@ -490,7 +490,7 @@ const UpdateProduct = () => {
         onSettled: () => {
           setIsApiRunning(false);
           setTimeout(() => {
-            navigate(-1);
+            navigate("/products");
           }, 600);
         },
       }
@@ -506,7 +506,7 @@ const UpdateProduct = () => {
           category: ["name", "category", "parentCategory", "level"],
         },
       },
-      params: { productId: params.id as string },
+      params: { productId: params.id ?? "" },
     });
   };
 
@@ -944,7 +944,6 @@ const UpdateProduct = () => {
                   className="!rounded-lg max-h-12"
                 />
               </div>
-              <DevTool control={control} />
             </form>
           </div>
         </div>
