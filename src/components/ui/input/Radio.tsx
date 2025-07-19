@@ -31,6 +31,7 @@ const Radio: FC<RadioProps> = ({
             <input
               type="radio"
               name="radio"
+              id={option.value}
               value={option.value}
               checked={value === option.value}
               onChange={() => onChange(option.value)}
