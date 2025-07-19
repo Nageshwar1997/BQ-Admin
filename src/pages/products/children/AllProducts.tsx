@@ -23,6 +23,7 @@ const AllProducts = () => {
         data: {
           populateFields: { category: ["name", "category"] },
           requiredFields: [
+            "title",
             "commonImages",
             "originalPrice",
             "sellingPrice",
