@@ -19,7 +19,7 @@ export const shadeSchema = z.object({
     min: 2,
     max: 50,
   }),
-  colorCode: zodStringRequired({
+  colorCode: zodStringOptional({
     field: "colorCode",
     showingFieldName: "Color code",
     blockMultipleSpaces: true,
@@ -29,7 +29,7 @@ export const shadeSchema = z.object({
     customRegexes: [
       { regex: regexes.hexCode, message: "must be a valid hex code" },
     ],
-  }),
+  }).default(""),
   stock: zodNumberRequired({
     field: "stock",
     showingFieldName: "Stock",
