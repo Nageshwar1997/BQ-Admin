@@ -2,7 +2,7 @@ import { QuillToolbar, TRegexes } from "../types";
 
 export const regexes: Record<TRegexes, RegExp> = {
   noSpace: /^\S+$/, // No spaces allowed
-  singleSpace: /^(?!.*\s{2,}).*$/, // Single space allowed
+  singleSpace: /^(?!.* {2,}).*$/s, // Single space allowed
   hexCode: /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/, // Hex color code
   date: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(?:\.\d+)?(Z|([+-]\d{2}:\d{2}))?)?$/, // Date e.g. 2022-01-01T12:00:00Z
   name: /^(?!.*\d)(?!.* {2})([A-Za-z]+( [A-Za-z]+)*)$/, // Only letters & single space
