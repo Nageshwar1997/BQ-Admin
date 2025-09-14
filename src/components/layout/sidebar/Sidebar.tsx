@@ -1,5 +1,4 @@
-import { useNavigate } from "react-router-dom";
-
+import usePathParams from "../../../hooks/usePathParams";
 import { sidebarData } from "./data";
 import { useUserStore } from "../../../store/user.store";
 import useVerticalScrollable from "../../../hooks/useVerticalScrollable";
@@ -7,7 +6,7 @@ import { BottomGradient, TopGradient } from "../../ui/Gradients";
 import { DropdownIcon } from "../../../icons";
 
 const Sidebar = () => {
-  const navigate = useNavigate();
+  const { navigate } = usePathParams();
   const { user } = useUserStore();
 
   const [showGradient, containerRef] = useVerticalScrollable();

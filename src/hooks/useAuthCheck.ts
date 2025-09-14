@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { useGetUserDetails } from "../api/user/user.service";
 import { useUserStore } from "../store/user.store";
 import { getAdminToken } from "../utils";
-import { useNavigate } from "react-router-dom";
+import usePathParams from "./usePathParams";
 
 export const useAuthCheck = () => {
   const { setUser, isAuthenticated, user } = useUserStore();
   const { data, isLoading, isError } = useGetUserDetails();
-  const navigate = useNavigate();
+  const { navigate } = usePathParams();
 
   useEffect(() => {
     try {

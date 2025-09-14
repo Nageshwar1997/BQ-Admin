@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import usePathParams from "../../../hooks/usePathParams";
 import Button from "../../../components/ui/button/Button";
 import PathNavigation from "../../../components/ui/PathNavigation";
 import { DeleteIcon, EditIcon, UploadCloudIcon } from "../../../icons";
@@ -12,7 +12,7 @@ import { FetchedProductType } from "../../../types";
 import LoadingPage from "../../../components/ui/loaders/LoadingPage";
 
 const AllProducts = () => {
-  const navigate = useNavigate();
+  const { navigate } = usePathParams();
 
   const getAllProducts = useGetAllProducts();
   const deleteProduct = useDeleteProduct();

@@ -3,8 +3,8 @@ import Quill from "quill";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 
+import usePathParams from "../../../hooks/usePathParams";
 import Button from "../../../components/ui/button/Button";
 import PathNavigation from "../../../components/ui/PathNavigation";
 import { UploadCloudIcon } from "../../../icons";
@@ -51,7 +51,7 @@ const UploadProduct = () => {
 
   const { setParams, queryParams } = useQueryParams();
   const uploadProduct = useUploadProduct();
-  const navigate = useNavigate();
+  const { navigate } = usePathParams();
 
   const {
     control,

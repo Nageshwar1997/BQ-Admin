@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +21,7 @@ import Checkbox from "../../components/ui/input/Checkbox";
 import Input from "../../components/ui/input/Input";
 import PhoneInput from "../../components/ui/input/PhoneInput";
 import Radio from "../../components/ui/input/Radio";
+import usePathParams from "../../hooks/usePathParams";
 
 const Login = () => {
   const [showGradient, containerRef] = useVerticalScrollable();
@@ -28,11 +29,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const userLoginMutation = useLoginUser();
-  const navigate = useNavigate();
-
-  const params = useParams();
-
-  console.log("params", params);
+  const { navigate } = usePathParams();
 
   const {
     control,
