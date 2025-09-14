@@ -1,25 +1,28 @@
-import { useLocation, useNavigate } from "react-router-dom";
 import { DropdownIcon } from "../../icons";
+import usePathParams from "../../hooks/usePathParams";
 
 type TPathNavigation = {
   className?: string;
-  path?: string;
+  customPath?: string;
+  customPaths?: string[];
 };
 
-const PathNavigation = ({ className = "", path }: TPathNavigation) => {
-  const defaultPathName = useLocation().pathname;
-  const pathname = path ? path : defaultPathName;
-  const navigate = useNavigate();
-
-  const paths = pathname.split("/").filter((path) => path !== "");
+const PathNavigation = ({
+  className = "",
+  customPath,
+  customPaths,
+}: TPathNavigation) => {
+  const { pathname, paths, navigate } = usePathParams();
+  const finalPathName = customPath ?? pathname;
+  const activePaths = customPaths ?? paths;
 
   const handleNavigate = (targetIndex: number) => {
     const targetPath =
       targetIndex === -1
         ? "/"
-        : "/" + paths.slice(0, targetIndex + 1).join("/");
+        : "/" + activePaths.slice(0, targetIndex + 1).join("/");
 
-    if (targetPath !== pathname) {
+    if (targetPath !== finalPathName) {
       navigate(targetPath);
     }
   };
@@ -29,30 +32,32 @@ const PathNavigation = ({ className = "", path }: TPathNavigation) => {
       <div className="flex items-center gap-2">
         <span
           className={`capitalize line-clamp-1 ${
-            pathname !== "/" ? "cursor-pointer" : "opacity-80"
+            finalPathName !== "/" ? "cursor-pointer" : "opacity-80"
           }`}
           onClick={() => handleNavigate(-1)}
         >
           Home
         </span>
-        {paths.length > 0 && <DropdownIcon className="-rotate-90" />}
+        {activePaths.length > 0 && <DropdownIcon className="-rotate-90" />}
       </div>
 
-      {paths.map((path, index) => {
-        const targetPath = "/" + paths.slice(0, index + 1).join("/");
+      {activePaths.map((path, index) => {
+        const targetPath = "/" + activePaths.slice(0, index + 1).join("/");
+        const isLast = index === activePaths.length - 1;
+
         return (
           <div key={index} className="flex items-center gap-2">
             <span
               className={`capitalize line-clamp-1 ${
-                pathname !== targetPath ? "cursor-pointer" : "opacity-80"
+                !isLast && finalPathName !== targetPath
+                  ? "cursor-pointer"
+                  : "opacity-80"
               }`}
-              onClick={() => handleNavigate(index)}
+              onClick={!isLast ? () => handleNavigate(index) : undefined}
             >
               {path}
             </span>
-            {index < paths.length - 1 && (
-              <DropdownIcon className="-rotate-90" />
-            )}
+            {!isLast && <DropdownIcon className="-rotate-90" />}
           </div>
         );
       })}
