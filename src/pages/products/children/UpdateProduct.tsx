@@ -1,5 +1,4 @@
 import { Fragment, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import Quill from "quill";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +8,7 @@ import Button from "../../../components/ui/button/Button";
 import PathNavigation from "../../../components/ui/PathNavigation";
 import { UploadCloudIcon } from "../../../icons";
 import useQueryParams from "../../../hooks/useQueryParams";
+import usePathParams from "../../../hooks/usePathParams";
 import AddShade from "./shade/AddShade";
 import EditShade from "./shade/EditShade";
 import Input from "../../../components/ui/input/Input";
@@ -75,11 +75,10 @@ const UpdateProduct = () => {
   const [commonImages, setCommonImages] = useState<(string | File)[]>([]);
   const [commonImagePreviews, setCommonImagePreviews] = useState<string[]>([]);
 
-  const { setParams, queryParams, params } = useQueryParams();
+  const { setParams, queryParams } = useQueryParams();
   const selectedProduct = useGetProductById();
   const updateProduct = useUpdateProduct();
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
+  const { pathParams, paths, navigate } = usePathParams();
 
   const {
     control,
@@ -484,7 +483,7 @@ const UpdateProduct = () => {
     updateProduct.mutate(
       {
         data: formData,
-        productId: params.id as string,
+        productId: pathParams.id as string,
       },
       {
         onSettled: () => {
@@ -506,7 +505,7 @@ const UpdateProduct = () => {
           category: ["name", "category", "parentCategory", "level"],
         },
       },
-      params: { productId: params.id ?? "" },
+      params: { productId: pathParams.id ?? "" },
     });
   };
 
@@ -514,7 +513,6 @@ const UpdateProduct = () => {
     handleGetAllProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   const setInitialValues = () => {
     if (selectedProduct.data?.product) {
       const product: FetchedProductType = selectedProduct.data.product;
@@ -603,11 +601,8 @@ const UpdateProduct = () => {
         <div className="w-full px-4 py-3 border-b border-primary-50 flex justify-end base:justify-between items-center sticky top-16 bg-primary-inverted z-10 shadow-lg">
           <PathNavigation
             className="hidden base:flex"
-            path={pathname
-              .split("/")
-              .filter((path) => path !== "")
-              .splice(0, 2)
-              .join("/")}
+            customPath={paths.slice(0, -1).join("/")}
+            customPaths={paths.slice(0, -1)}
           />
           <Button
             pattern="outline"

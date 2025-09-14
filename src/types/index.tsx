@@ -21,7 +21,7 @@ export type ThemeStoreType = {
   toggleTheme: () => void;
 };
 
-export interface QueryParams {
+export interface IQueryParams {
   [key: string]: string;
 }
 
