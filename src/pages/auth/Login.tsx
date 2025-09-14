@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +29,10 @@ const Login = () => {
 
   const userLoginMutation = useLoginUser();
   const navigate = useNavigate();
+
+  const params = useParams();
+
+  console.log("params", params);
 
   const {
     control,
