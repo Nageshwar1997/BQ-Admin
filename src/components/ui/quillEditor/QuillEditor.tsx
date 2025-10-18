@@ -175,10 +175,12 @@ const QuillEditor = forwardRef<Quill | null, QuillEditorProps>(
         )}
         {/* Make it beautiful later */}
         {/* Quill Tools Guide */}
-        <QuillToolsGuideModal
-          isOpen={isToolGuideOpen}
-          onClose={() => setIsToolGuideOpen(false)}
-        />
+        {needLinkButton && (
+          <QuillToolsGuideModal
+            isOpen={isToolGuideOpen}
+            onClose={() => setIsToolGuideOpen(false)}
+          />
+        )}
       </div>
     );
   }
