@@ -1,31 +1,24 @@
-import { forwardRef, RefObject, useEffect, useRef } from "react";
-import Quill from "quill";
+import { forwardRef, useEffect, useRef, useState } from "react";
+import Quill, { Delta } from "quill";
 import "./editor.css";
 
 import { InfoIcon } from "../../../icons";
 import {
   addBlobUrlToImage,
   addIdsToHeadings,
+  addIdToLink,
+  blockDraggedOrCopiedImage,
   buildToolbarFromOptions,
+  createLinkIdButtonToToolbar,
+  QuillImage,
+  removeDefaultCss,
   removeUnusedBlobUrls,
 } from "../../../utils";
 import { QuillEditorProps } from "../../../types";
 import { defaultToolbarOptions } from "../../../constants";
+import QuillToolsGuideModal from "./QuillToolsGuideModal";
 
-// Allow blob URLs in image sanitize
-const Image = Quill.import("formats/image") as {
-  sanitize?: (url: string) => string;
-};
-if (Image && typeof Image.sanitize === "function") {
-  Image.sanitize = function (url: string): string {
-    if (url.startsWith("blob:")) return url;
-    const Link = Quill.import("formats/link") as {
-      sanitize?: (url: string) => string;
-    };
-    return Link?.sanitize ? Link.sanitize(url) : url;
-  };
-}
-Quill.register("formats/image", Image, true);
+Quill.register("formats/image", QuillImage, true);
 Quill.register("modules/addIdsToHeadings", addIdsToHeadings);
 
 const QuillEditor = forwardRef<Quill | null, QuillEditorProps>(
@@ -40,11 +33,13 @@ const QuillEditor = forwardRef<Quill | null, QuillEditorProps>(
       placeholder = "Write your content here...",
       blobUrlsRef,
       toolbarOptions,
+      needLinkButton = false,
     },
     ref
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const editorRef = useRef<Quill | null>(null);
+    const [isToolGuideOpen, setIsToolGuideOpen] = useState(false);
 
     useEffect(() => {
       if (!containerRef.current) return;
@@ -68,20 +63,47 @@ const QuillEditor = forwardRef<Quill | null, QuillEditorProps>(
                   addBlobUrlToImage(quill, blobUrlsRef);
                 },
               }),
+              ...(needLinkButton && {
+                addIdToLink: () => addIdToLink(quill),
+              }),
             },
           },
-          clipboard: { matchVisual: true },
+          clipboard: {
+            matchVisual: true,
+            matchers: [
+              // *NOTE - To remove copied images
+              ["IMG", () => new Delta()],
+              // *NOTE - To remove copied styles
+              [
+                Node.ELEMENT_NODE,
+                (_node: HTMLElement, delta: Delta) => removeDefaultCss(delta),
+              ],
+            ],
+          },
           addIdsToHeadings: { enable: true },
         },
       });
 
-      quill.on("text-change", () => {
+      // Add link id button to toolbar
+      if (needLinkButton) {
+        createLinkIdButtonToToolbar(quill);
+      }
+
+      quill.on("text-change", (delta, _oldDelta, source) => {
+        // *NOTE - Don't change order
         const html = quill.root.innerHTML.trim();
         const isEmpty = html === "<p><br></p>";
+
         onChange?.(isEmpty ? "" : html);
         if (!isEmpty && blobUrlsRef) {
           removeUnusedBlobUrls(quill, blobUrlsRef);
         }
+
+        if (source !== "user") return; // only block user actions
+
+        // *NOTE - For prevent drag & drop Or Copy images
+        const isDraggedOrCopied = blockDraggedOrCopiedImage(delta);
+        if (isDraggedOrCopied) quill.history.undo();
       });
 
       editorRef.current = quill;
@@ -90,7 +112,7 @@ const QuillEditor = forwardRef<Quill | null, QuillEditorProps>(
         if (typeof ref === "function") {
           ref(quill);
         } else {
-          (ref as RefObject<Quill | null>).current = quill;
+          ref.current = quill;
         }
       }
 
@@ -137,6 +159,13 @@ const QuillEditor = forwardRef<Quill | null, QuillEditorProps>(
             id="custom-editor"
             className="w-full bg-smoke-eerie rounded-lg border border-primary-10 text-primary flex flex-col gap-2"
           />
+          {/* Align It Properly Later */}
+          <span
+            onClick={() => setIsToolGuideOpen(true)}
+            className="border border-(--primary-10) hover:border-(--primary-30) rounded-sm absolute right-3 top-20 min-[400px]:top-3 md:top-12 min-[800px]:top-3! z-10 py-0.5 px-1 w-[34px] h-[30px] flex items-center justify-center cursor-pointer"
+          >
+            <InfoIcon />
+          </span>
         </div>
         {!readOnly && errorText && (
           <p className="w-full text-start flex gap-1 items-center text-[11px] leading-tight mt-2 text-red-500">
@@ -144,6 +173,12 @@ const QuillEditor = forwardRef<Quill | null, QuillEditorProps>(
             <span>{errorText}</span>
           </p>
         )}
+        {/* Make it beautiful later */}
+        {/* Quill Tools Guide */}
+        <QuillToolsGuideModal
+          isOpen={isToolGuideOpen}
+          onClose={() => setIsToolGuideOpen(false)}
+        />
       </div>
     );
   }

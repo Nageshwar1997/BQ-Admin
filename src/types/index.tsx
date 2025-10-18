@@ -4,6 +4,7 @@ import {
   ChangeEvent,
   Dispatch,
   HTMLInputAutoCompleteAttribute,
+  JSX,
   KeyboardEvent,
   ReactNode,
   RefObject,
@@ -11,6 +12,7 @@ import {
   SVGProps,
 } from "react";
 import { UseFormRegisterReturn, UseFormSetValue } from "react-hook-form";
+import { ToolbarProps } from "quill/modules/toolbar";
 
 export type ThemeType = "light" | "dark";
 
@@ -264,11 +266,22 @@ export interface QuillEditorProps {
   errorText?: string;
   className?: string;
   value?: string;
+  needLinkButton?: boolean;
   onChange?: (value: string) => void;
   blobUrlsRef?: RefObject<string[]>;
   placeholder?: string;
   toolbarOptions?: IToolBarOptions;
 }
+
+export interface IQuillToolbarExtended extends ToolbarProps {
+  handlers: Record<string, (...args: unknown[]) => void>;
+}
+
+export type TQuillImageBlot = {
+  new (): HTMLElement;
+  create(value: unknown): HTMLElement;
+  value(node: HTMLElement): unknown;
+};
 
 export interface ReviewType {
   rating: number;
@@ -294,4 +307,13 @@ export interface IProductPossibleBodyFields {
     category?: (keyof CategoryType | "parentCategory")[];
     reviews?: (keyof ReviewType | "images" | "videos")[];
   };
+}
+
+export interface ModalProps {
+  className?: string;
+  isOpen: boolean;
+  onClose: () => void;
+  children: JSX.Element;
+  containerProps?: JSX.IntrinsicElements["div"];
+  heading?: string;
 }

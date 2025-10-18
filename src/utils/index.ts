@@ -1,11 +1,17 @@
 import { RefObject } from "react";
 import CryptoJS from "crypto-js";
-import Quill from "quill";
+import Quill, { Delta } from "quill";
+import Inline from "quill/blots/inline";
 import { v4 as uuidv4 } from "uuid";
 import { envs } from "../envs";
-import { MB } from "../constants";
+import { DEFAULT_QUILL_LINK_ID, MB } from "../constants";
 import { toastErrorMessage } from "./toast.util";
-import { IToolBarOptions, QuillToolbar } from "../types";
+import {
+  IQuillToolbarExtended,
+  IToolBarOptions,
+  QuillToolbar,
+  TQuillImageBlot,
+} from "../types";
 
 const TOKEN_KEY = "admin_token";
 const SECRET_KEY = envs.ENCRYPTION_SECRET_KEY;
@@ -165,6 +171,79 @@ export const removeUnusedBlobUrls = (
   }
 };
 
+export const removeDefaultCss = (delta: Delta) => {
+  delta.ops = delta.ops.map((op: (typeof delta.ops)[0]) => {
+    if (op.attributes) {
+      ["color", "background-color", "background-image", "background"].forEach(
+        (attr) => delete op?.attributes?.[attr]
+      );
+    }
+    return op;
+  });
+  return delta;
+};
+
+// Toggle ID on link
+export const addIdToLink = (quill: Quill) => {
+  const range = quill.getSelection();
+  if (!range) return;
+
+  const [link] = quill.scroll.descendant(Inline, range.index);
+
+  if (!link) return;
+
+  const domNode = (link as Inline & { domNode: HTMLElement }).domNode;
+  if (domNode.getAttribute("id") === DEFAULT_QUILL_LINK_ID) {
+    domNode.removeAttribute("id");
+  } else {
+    domNode.setAttribute("id", DEFAULT_QUILL_LINK_ID);
+  }
+};
+
+export const blockDraggedOrCopiedImage = (delta: Delta): boolean => {
+  let block = false;
+  delta.ops.forEach((op) => {
+    if (op.insert && typeof op.insert === "object" && "image" in op.insert) {
+      const image = op.insert.image as { src: string };
+      // Todo: Replace ctruh with actual CDN Domain
+      const isAllowedURL = ["blob:", "ctruh"].some((prefix) =>
+        image.src.includes(prefix)
+      );
+      if (image && !isAllowedURL) {
+        block = true;
+        return;
+      }
+    }
+  });
+  if (block) {
+    toastErrorMessage(
+      "You cannot copy, drag & drop images here. Please upload it using the upload image button."
+    );
+  }
+
+  return block;
+};
+
+// Toolbar link button
+export const createLinkIdButtonToToolbar = (quill: Quill) => {
+  const toolbarContainer = document.querySelector(".ql-toolbar");
+  if (toolbarContainer) {
+    const toolbarModule = quill.getModule("toolbar") as IQuillToolbarExtended;
+    const button = document.createElement("button");
+    const section = document.createElement("span");
+    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 24 24" class="ql-fill">
+      <path fill="none" d="M0 0h24v24H0V0z"></path>
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"></path>
+      <circle cx="12" cy="12" r="5"></circle>
+    </svg>`;
+    button.type = "button";
+    button.onclick = () => toolbarModule?.handlers.addIdToLink();
+    section.classList.add("ql-formats");
+    section.appendChild(button);
+    toolbarContainer.appendChild(section);
+  }
+};
+
 export const buildToolbarFromOptions = (
   options?: IToolBarOptions
 ): QuillToolbar => {
@@ -194,6 +273,32 @@ export const buildToolbarFromOptions = (
 
   return toolbar;
 };
+
+// Extended Image Blot
+const BaseImage = Quill.import("formats/image") as TQuillImageBlot;
+
+export class QuillImage extends BaseImage {
+  static create(value: { alt: string; src: string } | string) {
+    const node = super.create(value) as HTMLImageElement;
+    if (typeof value === "string") {
+      node.setAttribute("src", value);
+    } else if (value?.src) {
+      node.setAttribute("src", value.src);
+      if (value.alt) node.setAttribute("alt", value.alt);
+    }
+    return node;
+  }
+  static value(node: HTMLImageElement) {
+    return { src: node.getAttribute("src"), alt: node.getAttribute("alt") };
+  }
+  static sanitize(url: string) {
+    if (url.startsWith("blob:")) return url;
+    const Link = Quill.import("formats/link") as {
+      sanitize?: (url: string) => string;
+    };
+    return Link?.sanitize ? Link.sanitize(url) : url;
+  }
+}
 
 export const toINRCurrency = (amount: number): string =>
   new Intl.NumberFormat("en-IN", {

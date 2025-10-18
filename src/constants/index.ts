@@ -49,3 +49,14 @@ export const defaultToolbarOptions: QuillToolbar = [
   ["link", "image", "video"],
   ["code", "clean"],
 ];
+
+export const QUILL_TOOLS_TUTORIAL = [
+  {
+    name: "Button",
+    icon: "/icons/quill/radio-button.webp",
+    description: "Learn how to create and use buttons in the editor.",
+    videoUrl: "/videos/quill/button.mp4",
+  },
+];
+
+export const DEFAULT_QUILL_LINK_ID = "custom-link-btn" as const;
