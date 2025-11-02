@@ -89,6 +89,7 @@ export const getAdminToken = () => {
   return token;
 };
 
+// Debounce
 export const debounce = <Args extends unknown[]>(
   fn: (...args: Args) => void,
   delay = 300
@@ -100,6 +101,7 @@ export const debounce = <Args extends unknown[]>(
   };
 };
 
+// Add Blob URL to Image
 export const addBlobUrlToImage = (
   quill: Quill,
   blobUrlsRef: RefObject<string[]>
@@ -110,7 +112,7 @@ export const addBlobUrlToImage = (
   input.click();
 
   input.onchange = async () => {
-    if (!input.files || input.files.length === 0) return;
+    if (!input.files?.length) return;
 
     const file = input.files[0];
 
@@ -126,13 +128,15 @@ export const addBlobUrlToImage = (
     if (!range) return;
 
     blobUrlsRef.current?.push(blobUrl);
+    const alt = file?.name || "Image";
 
-    quill.insertEmbed(range.index, "image", blobUrl, "user");
+    quill.insertEmbed(range.index, "image", { src: blobUrl, alt }, "user");
 
     quill.setSelection({ index: range.index + 1, length: 0 });
   };
 };
 
+// Add IDs to headings
 export function addIdsToHeadings(quill: Quill, options: { enable: boolean }) {
   if (!options.enable) return;
 
@@ -148,6 +152,7 @@ export function addIdsToHeadings(quill: Quill, options: { enable: boolean }) {
   quill.on("text-change", debouncedProcess);
 }
 
+// Clean unused blob URLs
 export const removeUnusedBlobUrls = (
   quill: Quill,
   blobUrlsRef: RefObject<string[]>
@@ -171,6 +176,7 @@ export const removeUnusedBlobUrls = (
   }
 };
 
+// Remove default css
 export const removeDefaultCss = (delta: Delta) => {
   delta.ops = delta.ops.map((op: (typeof delta.ops)[0]) => {
     if (op.attributes) {
@@ -200,6 +206,7 @@ export const addIdToLink = (quill: Quill) => {
   }
 };
 
+// Block dragged or copied image
 export const blockDraggedOrCopiedImage = (delta: Delta): boolean => {
   let block = false;
   delta.ops.forEach((op) => {
@@ -244,6 +251,7 @@ export const createLinkIdButtonToToolbar = (quill: Quill) => {
   }
 };
 
+// Toolbar builder
 export const buildToolbarFromOptions = (
   options?: IToolBarOptions
 ): QuillToolbar => {
