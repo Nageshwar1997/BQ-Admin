@@ -7,15 +7,15 @@ import {
 /* ============= For You Start ============= */
 const new_new: LevelTwoCategoryType = {
   level: 2,
-  name: "New",
-  category: "new",
+  name: "Latest Trends",
+  category: "latest_trends",
   subCategories: [{ level: 3, name: "New Arrivals", category: "new_arrivals" }],
 };
 
 const sugar_play: LevelTwoCategoryType = {
   level: 2,
-  name: "Sugar Play",
-  category: "sugar_play",
+  name: "Best Sellers",
+  category: "best_sellers",
   subCategories: [{ level: 3, name: "Sugar Play", category: "sugar_play" }],
 };
 
