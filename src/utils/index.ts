@@ -3,7 +3,12 @@ import CryptoJS from "crypto-js";
 import Quill, { Delta } from "quill";
 import Inline from "quill/blots/inline";
 import { v4 as uuidv4 } from "uuid";
-import { envs } from "../envs";
+import {
+  VITE_ENCRYPTION_SECRET_KEY,
+  VITE_IS_DEV,
+  VITE_LOCALHOST_BACKEND_URL,
+  VITE_PRODUCTION_BACKEND_URL,
+} from "../envs";
 import { DEFAULT_QUILL_LINK_ID, MB } from "../constants";
 import { toastErrorMessage } from "./toast.util";
 import {
@@ -14,11 +19,13 @@ import {
 } from "../types";
 
 const TOKEN_KEY = "admin_token";
-const SECRET_KEY = envs.ENCRYPTION_SECRET_KEY;
 
 export const encryptData = (data: object | string) => {
   const stringData = typeof data === "string" ? data : JSON.stringify(data);
-  const encrypted = CryptoJS.AES.encrypt(stringData, SECRET_KEY);
+  const encrypted = CryptoJS.AES.encrypt(
+    stringData,
+    VITE_ENCRYPTION_SECRET_KEY
+  );
   return encrypted.toString();
 };
 
@@ -27,7 +34,7 @@ export const decryptData = (
 ): object | string | null => {
   if (!encryptedData) return null;
 
-  const bytes = CryptoJS.AES.decrypt(encryptedData, SECRET_KEY);
+  const bytes = CryptoJS.AES.decrypt(encryptedData, VITE_ENCRYPTION_SECRET_KEY);
   const decrypted = bytes.toString(CryptoJS.enc.Utf8);
 
   if (decrypted) {
@@ -334,3 +341,8 @@ export const deepEqual = <T>(obj1: T, obj2: T): boolean => {
 
   return keys1.every((key) => deepEqual(obj1[key], obj2[key]));
 };
+
+export const getBackendURL = (): string =>
+  VITE_IS_DEV === "true"
+    ? VITE_LOCALHOST_BACKEND_URL
+    : VITE_PRODUCTION_BACKEND_URL;
