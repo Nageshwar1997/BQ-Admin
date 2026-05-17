@@ -33,4 +33,12 @@ export const FORM_DEFAULT_VALUES = {
     imageUrl: '',
     confirmDetails: false,
   },
+  addCategory: {
+    name: '',
+    slug: '',
+    level: '1',
+    mainCategory: '',
+    subCategory: '',
+    confirmDetails: false,
+  },
 } as const;

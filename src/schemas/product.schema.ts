@@ -1,4 +1,4 @@
-import { boolean, object, string } from 'zod';
+import { boolean, enum as zodEnum, object, string } from 'zod';
 
 const requiredText = (field: string, min = 2, max = 100) =>
   string()
@@ -35,3 +35,19 @@ export const addProductSchema = object({
   path: ['salePrice'],
   message: 'Sale price cannot be greater than MRP.',
 });
+
+export const addCategorySchema = object({
+  name: requiredText('Category name', 2, 80),
+  level: zodEnum(['1', '2', '3'], 'Category level is required.'),
+  mainCategory: string().trim(),
+  subCategory: string().trim(),
+  confirmDetails: boolean().refine(Boolean, 'Please confirm category details before saving.'),
+})
+  .refine((data) => data.level === '1' || !!data.mainCategory, {
+    path: ['mainCategory'],
+    message: 'Main category is required for level 2 and level 3 categories.',
+  })
+  .refine((data) => data.level !== '3' || !!data.subCategory, {
+    path: ['subCategory'],
+    message: 'Sub-category is required for level 3 categories.',
+  });
