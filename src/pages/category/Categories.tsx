@@ -24,6 +24,31 @@ const getSubCategoryLabel = (level: ICategory['level']) => {
   return 'No child categories';
 };
 
+type TSortDirection = '' | 'asc' | 'desc';
+
+const getFilteredAndSortedCategories = (
+  categories: ICategory[],
+  search: string,
+  sort: TSortDirection,
+) => {
+  const searchValue = search.toLowerCase().trim();
+  const filteredCategories = searchValue
+    ? categories.filter((category) =>
+        [category.name, category.slug, category.parent || '']
+          .join(' ')
+          .toLowerCase()
+          .includes(searchValue),
+      )
+    : categories;
+
+  if (!sort) return filteredCategories;
+
+  return [...filteredCategories].sort((a, b) => {
+    const direction = sort === 'desc' ? -1 : 1;
+    return a.name.localeCompare(b.name) * direction;
+  });
+};
+
 const SearchAndSort = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const [searchQuery, setSearchQuery] = useState(queryParams?.search || '');
@@ -79,6 +104,53 @@ const SearchAndSort = () => {
     </div>
   );
 };
+
+const LocalSearchAndSort = ({
+  search,
+  setSearch,
+  setSort,
+  sort,
+  placeholder,
+}: {
+  search: string;
+  setSearch: (search: string) => void;
+  setSort: (sort: TSortDirection) => void;
+  sort: TSortDirection;
+  placeholder: string;
+}) => (
+  <div className="flex w-full items-center gap-3 sm:max-w-md">
+    <Input
+      inputProps={{
+        name: placeholder,
+        placeholder,
+        value: search.trimStart(),
+        onChange: (e) => setSearch(e.target.value),
+      }}
+      icons={{
+        right: { icon: 'solar:magnifer-linear', className: 'text-primary/50 size-4' },
+      }}
+    />
+    <Button
+      pattern="outline"
+      content={{
+        icon: sort === 'asc' ? 'solar:list-arrow-up-linear' : 'solar:list-arrow-down-linear',
+        className: 'size-full',
+      }}
+      buttonProps={{
+        onClick: () => {
+          if (sort === 'asc') {
+            setSort('desc');
+          } else if (sort === 'desc') {
+            setSort('');
+          } else {
+            setSort('asc');
+          }
+        },
+      }}
+      className="border-primary/10 bg-smoke-eerie size-10 max-w-fit p-2! lg:size-12"
+    />
+  </div>
+);
 
 const EmptyState = ({
   icon,
@@ -320,6 +392,10 @@ const SubCategoriesPanel = ({
   onEditCategory: (categoryId: string) => void;
 }) => {
   const [selectedSubCategory, setSelectedSubCategory] = useState<ICategory>();
+  const [subCategorySearch, setSubCategorySearch] = useState('');
+  const [subCategorySort, setSubCategorySort] = useState<TSortDirection>('');
+  const [childCategorySearch, setChildCategorySearch] = useState('');
+  const [childCategorySort, setChildCategorySort] = useState<TSortDirection>('');
   const nextLevel = category?.level ? ((category.level + 1) as ICategory['level']) : undefined;
   const { data: subCategoriesData = [], isFetching } = useGetCategoriesByParentLevel({
     level: nextLevel,
@@ -336,16 +412,31 @@ const SubCategoriesPanel = ({
       enabled: !!selectedSubCategory && selectedSubCategory.level < 3,
     });
   const childCategories = childCategoriesData as ICategory[];
+  const filteredSubCategories = useMemo(
+    () => getFilteredAndSortedCategories(subCategories, subCategorySearch, subCategorySort),
+    [subCategories, subCategorySearch, subCategorySort],
+  );
+  const filteredChildCategories = useMemo(
+    () => getFilteredAndSortedCategories(childCategories, childCategorySearch, childCategorySort),
+    [childCategories, childCategorySearch, childCategorySort],
+  );
 
   useEffect(() => {
     setSelectedSubCategory(undefined);
+    setSubCategorySearch('');
+    setSubCategorySort('');
   }, [category?._id]);
+
+  useEffect(() => {
+    setChildCategorySearch('');
+    setChildCategorySort('');
+  }, [selectedSubCategory?._id]);
 
   if (!category) return null;
 
   return (
     <section className="border-primary/10 bg-smoke-eerie flex flex-col gap-4 rounded-xl border p-4">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-primary text-base font-semibold">{category.name}</p>
           <p className="text-primary/50 text-sm">
@@ -354,9 +445,17 @@ const SubCategoriesPanel = ({
         </div>
         <span className="border-primary/10 bg-primary/5 text-primary inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold">
           <Icon icon="solar:folder-with-files-linear" className="size-4" />
-          {subCategories.length} items
+          {filteredSubCategories.length}/{subCategories.length} items
         </span>
       </div>
+
+      <LocalSearchAndSort
+        search={subCategorySearch}
+        setSearch={setSubCategorySearch}
+        sort={subCategorySort}
+        setSort={setSubCategorySort}
+        placeholder="Search level 2 categories..."
+      />
 
       {isFetching ? (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -364,19 +463,27 @@ const SubCategoriesPanel = ({
             <div key={index} className="bg-primary/5 h-18 animate-pulse rounded-lg" />
           ))}
         </div>
-      ) : subCategories.length ? (
+      ) : filteredSubCategories.length ? (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {subCategories.map((item) => (
-            <button
-              type="button"
+          {filteredSubCategories.map((item) => (
+            <div
               key={item._id}
-              disabled={item.level >= 3}
-              onClick={() => setSelectedSubCategory(item)}
-              className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-left transition-all disabled:cursor-default disabled:opacity-85 ${
+              role={item.level < 3 ? 'button' : undefined}
+              tabIndex={item.level < 3 ? 0 : undefined}
+              onClick={() => {
+                if (item.level < 3) setSelectedSubCategory(item);
+              }}
+              onKeyDown={(event) => {
+                if (item.level < 3 && (event.key === 'Enter' || event.key === ' ')) {
+                  event.preventDefault();
+                  setSelectedSubCategory(item);
+                }
+              }}
+              className={`flex items-center gap-3 rounded-lg border p-3 text-left transition-all ${
                 selectedSubCategory?._id === item._id
                   ? 'border-primary bg-primary/7'
                   : 'border-primary/10 bg-primary/3 hover:border-primary/30'
-              }`}
+              } ${item.level < 3 ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
             >
               <div className="bg-primary/8 text-primary grid size-9 shrink-0 place-items-center rounded-lg">
                 <Icon icon="solar:tag-linear" className="size-4.5" />
@@ -393,14 +500,18 @@ const SubCategoriesPanel = ({
               {item.level < 3 && (
                 <Icon icon="solar:alt-arrow-right-linear" className="text-primary/45 size-4" />
               )}
-            </button>
+            </div>
           ))}
         </div>
       ) : (
         <EmptyState
           icon="solar:folder-error-linear"
-          title="No sub-categories yet"
-          description="This category does not have any child categories at the next level."
+          title={subCategories.length ? 'No matching sub-categories' : 'No sub-categories yet'}
+          description={
+            subCategories.length
+              ? 'Try a different search term or reset the sort.'
+              : 'This category does not have any child categories at the next level.'
+          }
         />
       )}
 
@@ -413,8 +524,18 @@ const SubCategoriesPanel = ({
             </div>
             <span className="border-primary/10 bg-primary/5 text-primary inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold">
               <Icon icon="solar:folder-with-files-linear" className="size-4" />
-              {childCategories.length} items
+              {filteredChildCategories.length}/{childCategories.length} items
             </span>
+          </div>
+
+          <div className="mb-4">
+            <LocalSearchAndSort
+              search={childCategorySearch}
+              setSearch={setChildCategorySearch}
+              sort={childCategorySort}
+              setSort={setChildCategorySort}
+              placeholder="Search level 3 categories..."
+            />
           </div>
 
           {isFetchingChildren ? (
@@ -423,9 +544,9 @@ const SubCategoriesPanel = ({
                 <div key={index} className="bg-primary/5 h-18 animate-pulse rounded-lg" />
               ))}
             </div>
-          ) : childCategories.length ? (
+          ) : filteredChildCategories.length ? (
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {childCategories.map((item) => (
+              {filteredChildCategories.map((item) => (
                 <div
                   key={item._id}
                   className="border-primary/10 bg-primary/3 flex items-center gap-3 rounded-lg border p-3"
@@ -448,8 +569,14 @@ const SubCategoriesPanel = ({
           ) : (
             <EmptyState
               icon="solar:folder-error-linear"
-              title="No level 3 sub-categories yet"
-              description="This level 2 sub-category does not have any child categories."
+              title={
+                childCategories.length ? 'No matching level 3 sub-categories' : 'No level 3 sub-categories yet'
+              }
+              description={
+                childCategories.length
+                  ? 'Try a different search term or reset the sort.'
+                  : 'This level 2 sub-category does not have any child categories.'
+              }
             />
           )}
         </div>
@@ -474,22 +601,8 @@ const Categories = () => {
   };
 
   const filteredCategories = useMemo(() => {
-    const search = queryParams.search?.toLowerCase().trim() || '';
-    const categories = search
-      ? level1Cats.filter((category) =>
-          [category.name, category.slug, category.parent || '']
-            .join(' ')
-            .toLowerCase()
-            .includes(search),
-        )
-      : level1Cats;
-
-    if (!queryParams.sort) return categories;
-
-    return [...categories].sort((a, b) => {
-      const direction = queryParams.sort === 'desc' ? -1 : 1;
-      return a.name.localeCompare(b.name) * direction;
-    });
+    const sort = queryParams.sort === 'asc' || queryParams.sort === 'desc' ? queryParams.sort : '';
+    return getFilteredAndSortedCategories(level1Cats, queryParams.search || '', sort);
   }, [level1Cats, queryParams.search, queryParams.sort]);
 
   return (
