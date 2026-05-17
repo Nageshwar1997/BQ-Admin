@@ -28,8 +28,10 @@ const Stepper = ({ steps, activeStep, onStepClick, className = '', children }: S
       >
         {steps.map((step, index) => {
           const completed = index < currentStep;
+          const nextCompleted = index < currentStep;
           const active = index === currentStep;
           const clickable = !!onStepClick;
+          const hasNextStep = index < steps.length - 1;
 
           return (
             <button
@@ -41,10 +43,10 @@ const Stepper = ({ steps, activeStep, onStepClick, className = '', children }: S
                 clickable ? 'cursor-pointer' : 'cursor-default'
               }`}
             >
-              {index > 0 && (
+              {hasNextStep && (
                 <span
-                  className={`absolute top-5 left-5 h-[calc(100%+1rem)] w-px -translate-x-1/2 md:top-5 md:right-1/2 md:left-auto md:h-px md:w-full md:-translate-x-5 ${
-                    completed || active ? 'bg-blue-crayola-c' : 'bg-primary/10'
+                  className={`absolute top-10 left-5 h-4 w-0.5 -translate-x-1/2 md:top-5 md:left-[calc(50%+1.375rem)] md:h-0.5 md:w-[calc(100%-2.75rem)] md:translate-x-0 ${
+                    nextCompleted ? 'bg-accent-duo' : 'bg-primary/10'
                   }`}
                 />
               )}

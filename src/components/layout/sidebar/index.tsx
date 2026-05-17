@@ -49,8 +49,9 @@ const Sidebar = () => {
     }
   };
 
+  console.log('🚀 ~ Sidebar ~ pathname:', pathname);
   return (
-    <aside className="border-t-silver/30 md:border-r-silver/30 bg-primary-invert sticky bottom-0 left-0 flex w-dvw items-center justify-center gap-4 border-t px-2 py-4 md:top-0 md:bottom-auto md:h-dvh md:w-fit md:flex-col md:border-r md:border-t-transparent z-50">
+    <aside className="border-t-silver/30 md:border-r-silver/30 bg-primary-invert sticky bottom-0 left-0 z-50 flex w-dvw items-center justify-center gap-4 border-t px-2 py-4 md:top-0 md:bottom-auto md:h-dvh md:w-fit md:flex-col md:border-r md:border-t-transparent">
       <Link to="/" className="hidden w-14 items-center justify-center md:flex">
         <img
           src="/images/logo/BQ_gradient_logo.webp"
@@ -66,7 +67,8 @@ const Sidebar = () => {
       >
         <div className="flex gap-4 md:flex-col">
           {SIDEBAR_DATA.map((item, index) => {
-            const path = 'path' in item ? item.path : '';
+            const path =
+              'path' in item ? (item.path !== '/' ? item.path.replace('/', '') : item.path) : '';
             const isSameRoute = path === pathname || paths.includes(path);
             const isSameIndex = hoveredIdx === index;
 
