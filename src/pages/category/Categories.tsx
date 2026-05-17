@@ -24,7 +24,7 @@ const getFilteredAndSortedCategories = (
   search: string,
   sort: TSortDirection,
 ) => {
-  const searchValue = search.toLowerCase().trim();
+  const searchValue = search?.toLowerCase().trim();
   const filteredCategories = searchValue
     ? categories.filter((category) =>
         [category.name, category.slug, category.parent || '']
@@ -174,33 +174,6 @@ const SubCategoryTableTr = (props: {
   );
 };
 
-const SearchInput = ({
-  needRef,
-  onChange,
-  placeholder,
-  value,
-  className = '',
-}: {
-  needRef?: boolean;
-  onChange: (value: string) => void;
-  placeholder: string;
-  value: string;
-} & TClassName) => (
-  <Input
-    needRef={needRef}
-    inputProps={{
-      name: placeholder,
-      placeholder,
-      value: value.trimStart(),
-      onChange: (event) => onChange(event.target.value),
-    }}
-    className={`bg-silver/10! ${className}`}
-    icons={{
-      right: { icon: 'solar:magnifer-linear', className: 'text-primary/50 size-4 md:size-5' },
-    }}
-  />
-);
-
 const Search = ({
   className = '',
   needRef,
@@ -254,7 +227,7 @@ const Search = ({
           debouncedSetQuery(trimmedValue);
         },
       }}
-      className={`bg-silver/10! ${className}`}
+      className={`bg-silver/10! max-w-md ${className}`}
       icons={{
         right: { icon: 'solar:magnifer-linear', className: 'text-primary/50 size-4 md:size-5' },
       }}
@@ -339,7 +312,7 @@ const Level3Table = ({
   onDeleteCategory: (categoryId: string) => void;
   onEditCategory: (categoryId: string) => void;
 }) => {
-  const [search, setSearch] = useState('');
+  const { queryParams } = useQueryParams();
   const [sort, setSort] = useState<TSortDirection>('');
   const {
     data: categoriesData = [],
@@ -351,8 +324,8 @@ const Level3Table = ({
   });
   const categories = categoriesData as ICategory[];
   const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(categories, search, sort),
-    [categories, search, sort],
+    () => getFilteredAndSortedCategories(categories, queryParams.search, sort),
+    [categories, queryParams.search, sort],
   );
 
   return (
@@ -367,11 +340,7 @@ const Level3Table = ({
         </span>
       </div>
       <div className="mb-3 max-w-md">
-        <SearchInput
-          placeholder="Search level 3 categories..."
-          value={search}
-          onChange={setSearch}
-        />
+        <Search level={3} queryKey="s_l3" needRef />
       </div>
       <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
@@ -411,8 +380,8 @@ const Level2Table = ({
   onDeleteCategory: (categoryId: string) => void;
   onEditCategory: (categoryId: string) => void;
 }) => {
+  const { queryParams } = useQueryParams();
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
-  const [search, setSearch] = useState('');
   const [sort, setSort] = useState<TSortDirection>('');
   const {
     data: categoriesData = [],
@@ -424,13 +393,12 @@ const Level2Table = ({
   });
   const categories = categoriesData as ICategory[];
   const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(categories, search, sort),
-    [categories, search, sort],
+    () => getFilteredAndSortedCategories(categories, queryParams.search, sort),
+    [categories, queryParams.search, sort],
   );
 
   useEffect(() => {
     setSelectedCategoryId('');
-    setSearch('');
     setSort('');
   }, [parentCategory._id]);
 
@@ -446,11 +414,7 @@ const Level2Table = ({
         </span>
       </div>
       <div className="mb-3 max-w-md">
-        <SearchInput
-          placeholder="Search level 2 categories..."
-          value={search}
-          onChange={setSearch}
-        />
+        <Search level={2} queryKey="s_l2" needRef />
       </div>
       <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
@@ -506,7 +470,6 @@ const Level2Table = ({
 const Level1Table = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const [selectedCategory, setSelectedCategory] = useState<ICategory>();
-  const [search, setSearch] = useState('');
   const {
     data: level1CatsData = [],
     isLoading,
@@ -534,19 +497,14 @@ const Level1Table = () => {
   };
 
   const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(level1Cats, search, level1Sort),
-    [level1Cats, search, level1Sort],
+    () => getFilteredAndSortedCategories(level1Cats, queryParams.search, level1Sort),
+    [level1Cats, queryParams.search, level1Sort],
   );
 
   return (
     <div className="border-primary/10 bg-secondary-invert rounded-xl border p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <SearchInput
-          className="max-w-md"
-          placeholder="Search level 1 categories..."
-          value={search}
-          onChange={setSearch}
-        />
+        <Search level={3} queryKey="s_l3" needRef />
         <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
           {filteredCategories.length}/{level1Cats.length} items
         </span>
