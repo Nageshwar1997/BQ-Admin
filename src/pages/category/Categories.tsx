@@ -18,12 +18,6 @@ import { useEffect, useMemo, useState } from 'react';
 
 const getCategoryId = (category: ICategory) => category._id;
 
-const getSubCategoryLabel = (level: ICategory['level']) => {
-  if (level === 1) return 'View Sub-categories';
-  if (level === 2) return 'View Product categories';
-  return 'No child categories';
-};
-
 type TSortDirection = '' | 'asc' | 'desc';
 
 const getFilteredAndSortedCategories = (
@@ -228,7 +222,10 @@ const CategoryTable = ({
             <button
               type="button"
               aria-label="Edit category"
-              onClick={() => onEditCategory(row.original._id)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onEditCategory(row.original._id);
+              }}
               className="border-primary/10 bg-smoke-eerie text-primary hover:border-primary/30 grid size-9 cursor-pointer place-items-center rounded-lg border transition-colors"
             >
               <Icon icon="solar:pen-linear" className="size-4.5" />
@@ -236,7 +233,10 @@ const CategoryTable = ({
             <button
               type="button"
               aria-label="Delete category"
-              onClick={() => onDeleteCategory(row.original._id)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onDeleteCategory(row.original._id);
+              }}
               className="border-primary/10 bg-smoke-eerie text-primary hover:border-red-400/50 hover:text-red-500 grid size-9 cursor-pointer place-items-center rounded-lg border transition-colors"
             >
               <Icon icon="solar:trash-bin-trash-linear" className="size-4.5" />
@@ -244,32 +244,8 @@ const CategoryTable = ({
           </div>
         ),
       },
-      {
-        id: 'subCategories',
-        header: 'Sub-categories',
-        cell: ({ row }) => {
-          const isLastLevel = row.original.level >= 3;
-          const isSelected = selectedCategoryId === getCategoryId(row.original);
-
-          return (
-            <button
-              type="button"
-              disabled={isLastLevel}
-              onClick={() => onViewSubCategories(row.original)}
-              className={`inline-flex min-w-40 cursor-pointer items-center justify-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-45 ${
-                isSelected
-                  ? 'border-primary bg-primary text-secondary-invert'
-                  : 'border-primary/10 bg-smoke-eerie text-primary hover:border-primary/30'
-              }`}
-            >
-              <Icon icon="solar:eye-linear" className="size-4" />
-              {getSubCategoryLabel(row.original.level)}
-            </button>
-          );
-        },
-      },
     ],
-    [onDeleteCategory, onEditCategory, onViewSubCategories, selectedCategoryId],
+    [onDeleteCategory, onEditCategory],
   );
 
   const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });
@@ -326,7 +302,15 @@ const CategoryTable = ({
             {table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}
-                className={`transition-colors ${
+                tabIndex={0}
+                onClick={() => onViewSubCategories(row.original)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onViewSubCategories(row.original);
+                  }
+                }}
+                className={`cursor-pointer transition-colors ${
                   selectedCategoryId === getCategoryId(row.original) ? 'bg-primary/5' : 'hover:bg-primary/3'
                 }`}
               >
