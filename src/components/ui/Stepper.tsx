@@ -19,9 +19,7 @@ const Stepper = ({ steps, activeStep, onStepClick, className = '', children }: S
   const currentStep = Math.min(Math.max(activeStep, 0), Math.max(steps.length - 1, 0));
 
   return (
-    <section
-      className={`border-primary/10 bg-smoke-eerie flex w-full flex-col gap-6 rounded-xl border p-4 shadow-sm sm:p-5 lg:p-6 ${className}`}
-    >
+    <section className={`flex w-full flex-col gap-6 p-4 shadow-sm sm:p-5 lg:p-6 ${className}`}>
       <div
         style={{ '--steps-count': steps.length } as CSSProperties}
         className="flex flex-col gap-4 md:grid md:grid-cols-[repeat(var(--steps-count),minmax(0,1fr))] md:gap-0"

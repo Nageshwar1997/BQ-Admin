@@ -1,12 +1,11 @@
-import Navbar from '@/components/layout/navbar';
+import { ModalWrapper } from '@/components/layout/modals/ModalWrapper';
 import Button from '@/components/ui/Button';
 import Stepper, { type StepperStep } from '@/components/ui/Stepper';
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
-import { ROUTES } from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
-import usePathParams from '@/hooks/usePathParams';
+import useQueryParams from '@/hooks/useQueryParams';
 import { addCategorySchema } from '@/schemas/product.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
@@ -43,12 +42,12 @@ const CATEGORY_LEVEL_OPTIONS = [
 const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
   categories?.find((cat) => cat._id === id)?.name || '-';
 
-const AddCategory = () => {
-  const { navigate } = usePathParams();
+const AddCategoryModal = () => {
+  const { queryParams, removeParams } = useQueryParams();
 
   const {
     control,
-    formState: { errors },
+    formState: { errors, isDirty },
     handleSubmit,
     register,
     setValue,
@@ -200,7 +199,7 @@ const AddCategory = () => {
             )}
           </div>
 
-          <div className="border-primary/10 bg-primary-invert grid gap-3 rounded-lg border p-4 sm:grid-cols-[auto_1fr]">
+          <div className="border-primary/10 bg-platinum-black grid gap-3 rounded-lg border p-4 sm:grid-cols-[auto_1fr]">
             <div className="bg-primary/5 text-primary grid size-11 place-items-center rounded-lg">
               <Icon icon="streamline:hierarchy-10" className="size-5" />
             </div>
@@ -216,27 +215,27 @@ const AddCategory = () => {
       title: 'Final review',
       content: (
         <div className="flex flex-col gap-4">
-          <div className="border-primary/10 bg-primary-invert rounded-lg border p-4">
+          <div className="border-primary/10 bg-platinum-black rounded-lg border p-4">
             <p className="text-primary text-sm font-semibold">Ready to save</p>
             <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
-              <p className="text-secondary">
+              <p className="text-tertiary">
                 Name: <span className="text-primary">{categoryValues.name || '-'}</span>
               </p>
-              <p className="text-secondary">
+              <p className="text-tertiary">
                 Level: <span className="text-primary">Level {categoryValues.level || '-'}</span>
               </p>
-              <p className="text-secondary">
+              <p className="text-tertiary">
                 Parent:{' '}
                 <span className="text-primary">
                   {categoryValues.level === '1'
                     ? 'Main category'
                     : categoryValues.level === '2'
                       ? getCategoryName(level1Cats, categoryValues.mainCategory)
-                    : getCategoryName(level2Cats, categoryValues.subCategory)}
+                      : getCategoryName(level2Cats, categoryValues.subCategory)}
                 </span>
               </p>
               {categoryValues.level === '3' && (
-                <p className="text-secondary sm:col-span-2">
+                <p className="text-tertiary sm:col-span-2">
                   Description:{' '}
                   <span className="text-primary">{categoryValues.description || '-'}</span>
                 </p>
@@ -248,6 +247,7 @@ const AddCategory = () => {
             error={errors.confirmDetails?.message}
             content="I confirm the category details are correct"
             checkboxProps={{ name: 'confirmDetails' }}
+            containerClassName="[&_label+*]:whitespace-normal"
           />
         </div>
       ),
@@ -255,65 +255,59 @@ const AddCategory = () => {
   ];
 
   return (
-    <div>
-      <Navbar
-        buttons={[
-          {
-            content: 'Back',
-            pattern: 'outline',
-            className: 'whitespace-nowrap',
-            leftIcon: { icon: 'solar:arrow-left-linear' },
-            buttonProps: { onClick: () => navigate(`/${ROUTES.CATEGORIES.BASE}`) },
-          },
-        ]}
-      />
+    <ModalWrapper
+      isOpen={queryParams.category === 'add'}
+      onClose={() => removeParams(['category'])}
+      header={{ showCloseIcon: true, title: 'Add new category' }}
+      containerProps={{ className: 'p-4!' }}
+      closeOnOutsideClick={false}
+      className="bg-secondary-invert [&>div]:first:bg-secondary-invert [&>div>div]:px-0"
+    >
+      <Stepper
+        steps={ADD_CATEGORY_STEPS}
+        activeStep={activeStep}
+        onStepClick={handleStepChange}
+        className="bg-secondary-invert"
+      >
+        <form onSubmit={handleSubmit(handleSaveCategory)} className="flex flex-col gap-5">
+          <div>
+            <p className="text-primary text-base font-semibold">{stepFields[activeStep].title}</p>
+            <p className="text-secondary mt-1 text-xs">{activeStepData.description}</p>
+          </div>
 
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-5 p-4 md:p-6">
-        <div>
-          <p className="text-secondary text-xs font-semibold tracking-wide uppercase">Categories</p>
-          <h1 className="text-primary mt-1 text-2xl font-semibold">Add Category</h1>
-        </div>
+          {stepFields[activeStep].content}
 
-        <Stepper steps={ADD_CATEGORY_STEPS} activeStep={activeStep} onStepClick={handleStepChange}>
-          <form onSubmit={handleSubmit(handleSaveCategory)} className="flex flex-col gap-5">
-            <div>
-              <p className="text-primary text-base font-semibold">{stepFields[activeStep].title}</p>
-              <p className="text-secondary mt-1 text-xs">{activeStepData.description}</p>
-            </div>
-
-            {stepFields[activeStep].content}
-
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-              <Button
-                pattern="outline"
-                content="Back"
-                leftIcon={{ icon: 'solar:arrow-left-linear' }}
-                buttonProps={{
-                  disabled: activeStep === 0,
-                  onClick: () => setActiveStep(Math.max(activeStep - 1, 0)),
-                }}
-                className="sm:max-w-36"
-              />
-              <Button
-                pattern="primary"
-                content={activeStep === ADD_CATEGORY_STEPS.length - 1 ? 'Save' : 'Next'}
-                rightIcon={
-                  activeStep === ADD_CATEGORY_STEPS.length - 1
-                    ? { icon: 'solar:diskette-linear' }
-                    : { icon: 'solar:arrow-right-linear' }
-                }
-                buttonProps={{
-                  type: activeStep === ADD_CATEGORY_STEPS.length - 1 ? 'submit' : 'button',
-                  onClick: activeStep === ADD_CATEGORY_STEPS.length - 1 ? undefined : handleNext,
-                }}
-                className="sm:max-w-36"
-              />
-            </div>
-          </form>
-        </Stepper>
-      </div>
-    </div>
+          <div className="flex justify-between gap-3">
+            <Button
+              pattern="secondary"
+              content="Back"
+              leftIcon={{ icon: 'solar:arrow-left-linear' }}
+              buttonProps={{
+                disabled: activeStep === 0,
+                onClick: () => setActiveStep(Math.max(activeStep - 1, 0)),
+              }}
+              className="sm:max-w-36"
+            />
+            <Button
+              pattern="primary"
+              content={activeStep === ADD_CATEGORY_STEPS.length - 1 ? 'Save' : 'Next'}
+              rightIcon={
+                activeStep === ADD_CATEGORY_STEPS.length - 1
+                  ? { icon: 'solar:diskette-linear' }
+                  : { icon: 'solar:arrow-right-linear' }
+              }
+              buttonProps={{
+                type: activeStep === ADD_CATEGORY_STEPS.length - 1 ? 'submit' : 'button',
+                onClick: activeStep === ADD_CATEGORY_STEPS.length - 1 ? undefined : handleNext,
+                disabled: !isDirty || !!errors.confirmDetails?.message,
+              }}
+              className="sm:max-w-36"
+            />
+          </div>
+        </form>
+      </Stepper>
+    </ModalWrapper>
   );
 };
 
-export default AddCategory;
+export default AddCategoryModal;

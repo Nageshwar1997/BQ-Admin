@@ -74,7 +74,7 @@ export const ROUTES = {
     FORGOT_PASSWORD: 'forgot-password',
     CHANGE_PASSWORD: 'change-password',
   },
-  CATEGORIES: { BASE: 'categories', ADD: 'add' },
+  CATEGORIES: { BASE: 'categories' },
   PRODUCTS: {
     BASE: 'products',
     ADD: 'add',

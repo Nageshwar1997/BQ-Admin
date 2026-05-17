@@ -12,7 +12,7 @@ const Checkbox = ({
   return (
     <div className={`flex w-full flex-col gap-1.5 ${containerClassName}`}>
       <div className="flex items-center gap-2 sm:gap-3">
-        <label className="relative inline-block h-6 w-12">
+        <label className="relative inline-block h-6 w-12 shrink-0">
           <input
             type="checkbox"
             className="peer sr-only outline-hidden"
@@ -25,7 +25,7 @@ const Checkbox = ({
           />
         </label>
         {content && (
-          <span className="text-primary-50 text-xs font-medium whitespace-nowrap sm:text-[13px] md:text-sm">
+          <span className="text-primary/50 text-xs font-medium whitespace-nowrap sm:text-[13px] md:text-sm">
             {content}
           </span>
         )}

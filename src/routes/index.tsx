@@ -75,23 +75,10 @@ const routes: RouteObject[] = [
       /* ========== CATEGORIES ========== */
       {
         path: CATEGORIES.BASE,
-        element: <Outlet />,
-        children: [
-          {
-            index: true,
-            lazy: async () => {
-              const { default: Categories } = await import('@/pages/category/Categories');
-              return { Component: Categories };
-            },
-          },
-          {
-            path: CATEGORIES.ADD,
-            lazy: async () => {
-              const { default: AddCategory } = await import('@/pages/category/AddCategory');
-              return { Component: AddCategory };
-            },
-          },
-        ],
+        lazy: async () => {
+          const { default: Categories } = await import('@/pages/category/Categories');
+          return { Component: Categories };
+        },
       },
     ],
   },

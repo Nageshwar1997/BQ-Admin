@@ -11,6 +11,7 @@ export const ModalWrapper = ({
   containerProps,
   className = '',
   header,
+  closeOnOutsideClick = true,
 }: IModalWrapper) => {
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -25,7 +26,7 @@ export const ModalWrapper = ({
 
   return (
     <div
-      onClick={onClose}
+      onClick={closeOnOutsideClick ? onClose : undefined}
       {...containerProps}
       className={`bg-primary-invert/50 fixed inset-0 z-100 flex items-center justify-center p-8 backdrop-blur-xs ${
         containerProps?.className || ''

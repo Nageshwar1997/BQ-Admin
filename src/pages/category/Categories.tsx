@@ -2,15 +2,14 @@ import PageWrapper from '@/components/layout/containers/PageWrapper';
 import Navbar from '@/components/layout/navbar';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/inputs/Input';
-import { ROUTES } from '@/constants/common.constants';
-import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
 import type { TClassName } from '@/types/component.type';
 import { debounce } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
+import AddCategoryModal from './children/AddCategoryModal';
 
 type TSortDirection = '' | 'asc' | 'desc';
 
@@ -532,9 +531,8 @@ const CategoryTable = ({
               <LoadingRows />
             ) : (
               data.map((category) => (
-                <>
+                <Fragment key={category._id}>
                   <tr
-                    key={category._id}
                     tabIndex={0}
                     onClick={() => onViewSubCategories(category)}
                     onKeyDown={(event) => {
@@ -567,7 +565,7 @@ const CategoryTable = ({
                     </td>
                   </tr>
                   {selectedCategoryId === category._id && (
-                    <tr key={`${category._id}-children`}>
+                    <tr>
                       <td colSpan={4} className="border-primary/5 border-y p-4">
                         <Level2Table
                           parentCategory={category}
@@ -577,7 +575,7 @@ const CategoryTable = ({
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))
             )}
           </tbody>
@@ -589,7 +587,6 @@ const CategoryTable = ({
 
 const Categories = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
-  const { navigate } = usePathParams();
   const [selectedCategory, setSelectedCategory] = useState<ICategory>();
   const { data: level1CatsData = [], isLoading } = useGetCategoriesByParentLevel({ level: 1 });
   const level1Cats = level1CatsData as ICategory[];
@@ -619,37 +616,40 @@ const Categories = () => {
   );
 
   return (
-    <PageWrapper>
-      <Navbar
-        buttons={[
-          {
-            content: 'Add Category',
-            pattern: 'primary',
-            className: 'whitespace-nowrap',
-            leftIcon: { icon: 'solar:add-circle-linear', className: '*:stroke-[2.5]' },
-            buttonProps: { onClick: () => navigate(ROUTES.CATEGORIES.ADD) },
-          },
-        ]}
-      />
-
-      <div>
-        <CategoryTable
-          data={filteredCategories}
-          totalItems={level1Cats.length}
-          isLoading={isLoading}
-          onDeleteCategory={handleDeleteCategory}
-          onEditCategory={handleEditCategory}
-          onSort={handleLevel1Sort}
-          selectedCategoryId={selectedCategory?._id}
-          sort={level1Sort}
-          onViewSubCategories={(category) =>
-            setSelectedCategory((selected) =>
-              selected?._id === category._id ? undefined : category,
-            )
-          }
+    <>
+      {queryParams.category === 'add' && <AddCategoryModal />}
+      <PageWrapper>
+        <Navbar
+          buttons={[
+            {
+              content: 'Add Category',
+              pattern: 'primary',
+              className: 'whitespace-nowrap',
+              leftIcon: { icon: 'solar:add-circle-linear', className: '*:stroke-[2.5]' },
+              buttonProps: { onClick: () => setParams({ category: 'add' }) },
+            },
+          ]}
         />
-      </div>
-    </PageWrapper>
+
+        <div>
+          <CategoryTable
+            data={filteredCategories}
+            totalItems={level1Cats.length}
+            isLoading={isLoading}
+            onDeleteCategory={handleDeleteCategory}
+            onEditCategory={handleEditCategory}
+            onSort={handleLevel1Sort}
+            selectedCategoryId={selectedCategory?._id}
+            sort={level1Sort}
+            onViewSubCategories={(category) =>
+              setSelectedCategory((selected) =>
+                selected?._id === category._id ? undefined : category,
+              )
+            }
+          />
+        </div>
+      </PageWrapper>
+    </>
   );
 };
 

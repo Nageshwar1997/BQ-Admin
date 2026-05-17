@@ -67,6 +67,7 @@ export interface IModalWrapper extends TClassName {
   children: JSX.Element;
   containerProps?: JSX.IntrinsicElements['div'];
   header?: { title?: string; showCloseIcon?: boolean };
+  closeOnOutsideClick?: boolean;
 }
 
 export interface IFooterOptionList {
