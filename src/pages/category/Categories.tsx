@@ -2,6 +2,7 @@ import Navbar from '@/components/layout/navbar';
 import { ROUTES } from '@/constants/common.constants';
 import usePathParams from '@/hooks/usePathParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
+import { Icon } from '@iconify/react';
 
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
@@ -24,7 +25,7 @@ const Table = () => {
                 {flexRender(header.column.columnDef.header, header.getContext())}
               </th>
             ))}
-            <th>Button</th>
+            <th>Actions</th>
           </tr>
         ))}
       </thead>
@@ -34,7 +35,12 @@ const Table = () => {
             {row.getVisibleCells().map((cell) => (
               <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
             ))}
-            <td>Button</td>
+            <td>
+              <div className="flex">
+                <Icon icon="solar:pen-linear" className="size-5 text-primary" />
+                <Icon icon="solar:trash-bin-trash-linear" className="size-5 text-primary" />
+              </div>
+            </td>
           </tr>
         ))}
       </tbody>
