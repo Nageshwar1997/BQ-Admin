@@ -62,7 +62,7 @@ const SearchInput = ({
       value: value.trimStart(),
       onChange: (event) => onChange(event.target.value),
     }}
-    className={className}
+    className={`bg-silver/10! ${className}`}
     icons={{
       right: { icon: 'solar:magnifer-linear', className: 'text-primary/50 size-4 md:size-5' },
     }}
@@ -291,7 +291,7 @@ const Level3Table = ({
                       Level {category.level}
                     </span>
                   </td>
-                  <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
+                  <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap uppercase">
                     {category.parent || parentCategory.name}
                   </td>
                   <td className="border-primary/5 w-0 border-y px-4 py-4 align-middle text-sm whitespace-nowrap last:pr-5">
@@ -429,7 +429,7 @@ const Level2Table = ({
                         Level {category.level}
                       </span>
                     </td>
-                    <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
+                    <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap uppercase">
                       {category.parent || parentCategory.name}
                     </td>
                     <td className="border-primary/5 w-0 border-y px-4 py-4 align-middle text-sm whitespace-nowrap last:pr-5">
@@ -510,8 +510,8 @@ const CategoryTable = ({
 
   return (
     <div className="border-primary/10 bg-smoke-eerie overflow-hidden rounded-xl border">
-      <div className="bg-smoke-eerie flex items-center gap-4 p-4">
-        <Search className="bg-primary/3! max-w-sm" />
+      <div className="flex items-center gap-4 p-4">
+        <Search className="max-w-md" />
         <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
           {data.length}/{totalItems} items
         </span>
@@ -564,8 +564,8 @@ const CategoryTable = ({
                         Level {category.level}
                       </span>
                     </td>
-                    <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
-                      {category.parent || 'Main category'}
+                    <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap uppercase">
+                      {category.parent || 'N/A'}
                     </td>
                     <td className="border-primary/5 w-0 border-y px-4 py-4 align-middle text-sm whitespace-nowrap last:pr-5">
                       <CategoryActions
