@@ -8,7 +8,7 @@ import type { ICategory } from '@/types/api.type';
 import type { TChildren, TClassName } from '@/types/component.type';
 import { debounce } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState, type TableHTMLAttributes } from 'react';
 import AddCategoryModal from './children/AddCategoryModal';
 
 type TSortDirection = '' | 'asc' | 'desc';
@@ -89,6 +89,36 @@ const THead = ({
     </tr>
   </thead>
 );
+
+const CategoryTr = ({
+  category,
+  onDeleteCategory,
+  onEditCategory,
+  ...trProps
+}: {
+  category: ICategory;
+  onDeleteCategory: (categoryId: string) => void;
+  onEditCategory: (categoryId: string) => void;
+} & TableHTMLAttributes<HTMLTableRowElement>) => {
+  return (
+    <tr tabIndex={0} {...trProps} className={`transition-colors ${trProps?.className || ''}`}>
+      <Td className="text-left">
+        <CategoryInfo category={category} />
+      </Td>
+      <Td>
+        <Badge content={`Level ${category.level}`} />
+      </Td>
+      <Td className="text-primary/65 uppercase">{category.parent || 'N/A'}</Td>
+      <Td>
+        <CategoryActions
+          categoryId={category._id}
+          onDeleteCategory={onDeleteCategory}
+          onEditCategory={onEditCategory}
+        />
+      </Td>
+    </tr>
+  );
+};
 
 const SearchInput = ({
   needRef,
@@ -322,24 +352,12 @@ const Level3Table = ({
               </tr>
             ) : filteredCategories.length ? (
               filteredCategories.map((category) => (
-                <tr key={category._id} className="hover:bg-primary/3 transition-colors">
-                  <Td className="text-left">
-                    <CategoryInfo category={category} />
-                  </Td>
-                  <Td>
-                    <Badge content={`Level ${category.level}`} />
-                  </Td>
-                  <Td className={`text-primary/65 ${category.parent ? 'uppercase' : ''}`}>
-                    {category.parent || parentCategory.name}
-                  </Td>
-                  <Td>
-                    <CategoryActions
-                      categoryId={category._id}
-                      onDeleteCategory={onDeleteCategory}
-                      onEditCategory={onEditCategory}
-                    />
-                  </Td>
-                </tr>
+                <CategoryTr
+                  key={category._id}
+                  category={category}
+                  onDeleteCategory={onDeleteCategory}
+                  onEditCategory={onEditCategory}
+                />
               ))
             ) : (
               <tr>
@@ -422,8 +440,8 @@ const Level2Table = ({
             ) : filteredCategories.length ? (
               filteredCategories.map((category) => (
                 <Fragment key={category._id}>
-                  <tr
-                    tabIndex={0}
+                  <CategoryTr
+                    category={category}
                     onClick={() =>
                       setSelectedCategoryId((selected) =>
                         selected === category._id ? '' : category._id,
@@ -437,27 +455,10 @@ const Level2Table = ({
                         );
                       }
                     }}
-                    className={`cursor-pointer transition-colors ${
-                      selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'
-                    }`}
-                  >
-                    <Td className="text-left">
-                      <CategoryInfo category={category} />
-                    </Td>
-                    <Td>
-                      <Badge content={`Level ${category.level}`} />
-                    </Td>
-                    <Td className={`text-primary/65 ${!category.parent ? 'uppercase' : ''}`}>
-                      {category.parent || parentCategory.name}
-                    </Td>
-                    <Td>
-                      <CategoryActions
-                        categoryId={category._id}
-                        onDeleteCategory={onDeleteCategory}
-                        onEditCategory={onEditCategory}
-                      />
-                    </Td>
-                  </tr>
+                    className={`cursor-pointer ${selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'}`}
+                    onDeleteCategory={onDeleteCategory}
+                    onEditCategory={onEditCategory}
+                  />
                   {selectedCategoryId === category._id && (
                     <tr>
                       <td colSpan={4} className="border-primary/5 border-y p-4">
@@ -543,8 +544,8 @@ const CategoryTable = ({
             ) : (
               data.map((category) => (
                 <Fragment key={category._id}>
-                  <tr
-                    tabIndex={0}
+                  <CategoryTr
+                    category={category}
                     onClick={() => onViewSubCategories(category)}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' || event.key === ' ') {
@@ -552,25 +553,10 @@ const CategoryTable = ({
                         onViewSubCategories(category);
                       }
                     }}
-                    className={`cursor-pointer transition-colors ${
-                      selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'
-                    }`}
-                  >
-                    <Td className="text-left">
-                      <CategoryInfo category={category} />
-                    </Td>
-                    <Td>
-                      <Badge content={`Level ${category.level}`} />
-                    </Td>
-                    <Td className="text-primary/65 uppercase">{category.parent || 'N/A'}</Td>
-                    <Td>
-                      <CategoryActions
-                        categoryId={category._id}
-                        onDeleteCategory={onDeleteCategory}
-                        onEditCategory={onEditCategory}
-                      />
-                    </Td>
-                  </tr>
+                    className={`cursor-pointer ${selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'}`}
+                    onDeleteCategory={onDeleteCategory}
+                    onEditCategory={onEditCategory}
+                  />
                   {selectedCategoryId === category._id && (
                     <tr>
                       <td colSpan={4} className="border-primary/5 border-y p-4">
