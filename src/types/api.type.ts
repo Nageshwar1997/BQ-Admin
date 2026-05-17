@@ -30,4 +30,5 @@ export interface ICategory extends IId {
   slug: string;
   level: 2 | 1 | 3;
   parent?: string | null;
+  description?: string;
 }
