@@ -30,7 +30,7 @@ const ADD_CATEGORY_STEPS: StepperStep[] = [
 ];
 
 const STEP_FIELDS: FieldPath<TAddCategory>[][] = [
-  ['name', 'level', 'mainCategory', 'subCategory'],
+  ['name', 'level', 'mainCategory', 'subCategory', 'description'],
   ['confirmDetails'],
 ];
 
@@ -103,6 +103,7 @@ const AddCategory = () => {
     name: data.name.trim(),
     level: Number(data.level),
     parent: data.level === '3' ? data.subCategory : data.level === '2' ? data.mainCategory : null,
+    description: data.level === '3' ? data.description.trim() : undefined,
   });
 
   const handleSaveCategory = (data: TAddCategory) => {
@@ -117,6 +118,10 @@ const AddCategory = () => {
 
     if (selectedLevel === '2') {
       setValue('subCategory', '', { shouldValidate: true });
+    }
+
+    if (selectedLevel !== '3') {
+      setValue('description', '', { shouldValidate: true });
     }
   };
 
@@ -177,6 +182,18 @@ const AddCategory = () => {
                       : 'Select main category first',
               }}
             />
+            {level === '3' && (
+              <Input
+                label="Description"
+                register={register('description')}
+                error={errors.description?.message}
+                containerClassName="md:col-span-2"
+                inputProps={{
+                  name: 'description',
+                  placeholder: 'Short description for this product category',
+                }}
+              />
+            )}
           </div>
 
           <div className="border-primary/10 bg-primary-invert grid gap-3 rounded-lg border p-4 sm:grid-cols-[auto_1fr]">
@@ -211,9 +228,15 @@ const AddCategory = () => {
                     ? 'Main category'
                     : categoryValues.level === '2'
                       ? getCategoryName(level1Cats, categoryValues.mainCategory)
-                      : getCategoryName(level2Cats, categoryValues.subCategory)}
+                    : getCategoryName(level2Cats, categoryValues.subCategory)}
                 </span>
               </p>
+              {categoryValues.level === '3' && (
+                <p className="text-secondary sm:col-span-2">
+                  Description:{' '}
+                  <span className="text-primary">{categoryValues.description || '-'}</span>
+                </p>
+              )}
             </div>
           </div>
           <Checkbox

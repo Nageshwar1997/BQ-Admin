@@ -41,6 +41,7 @@ export const addCategorySchema = object({
   level: zodEnum(['1', '2', '3'], 'Category level is required.'),
   mainCategory: string().trim(),
   subCategory: string().trim(),
+  description: string().trim(),
   confirmDetails: boolean().refine(Boolean, 'Please confirm category details before saving.'),
 })
   .refine((data) => data.level === '1' || !!data.mainCategory, {
@@ -50,4 +51,8 @@ export const addCategorySchema = object({
   .refine((data) => data.level !== '3' || !!data.subCategory, {
     path: ['subCategory'],
     message: 'Sub-category is required for level 3 categories.',
+  })
+  .refine((data) => data.level !== '3' || data.description.length >= 10, {
+    path: ['description'],
+    message: 'Description is required for level 3 categories and must be at least 10 characters.',
   });
