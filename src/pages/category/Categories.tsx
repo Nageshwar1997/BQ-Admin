@@ -1,5 +1,4 @@
 import Navbar from '@/components/layout/navbar';
-import Button from '@/components/ui/Button';
 import Input from '@/components/ui/inputs/Input';
 import { ROUTES } from '@/constants/common.constants';
 import usePathParams from '@/hooks/usePathParams';
@@ -8,15 +7,7 @@ import { useGetCategoriesByParentLevel } from '@/services/product-service/catego
 import type { ICategory } from '@/types/api.type';
 import { debounce } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
-import {
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  type ColumnDef,
-} from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
-
-const getCategoryId = (category: ICategory) => category._id;
 
 type TSortDirection = '' | 'asc' | 'desc';
 
@@ -43,7 +34,38 @@ const getFilteredAndSortedCategories = (
   });
 };
 
-const SearchAndSort = () => {
+const getNextSort = (sort: TSortDirection): TSortDirection => {
+  if (sort === 'asc') return 'desc';
+  if (sort === 'desc') return '';
+  return 'asc';
+};
+
+const SearchInput = ({
+  needRef,
+  onChange,
+  placeholder,
+  value,
+}: {
+  needRef?: boolean;
+  onChange: (value: string) => void;
+  placeholder: string;
+  value: string;
+}) => (
+  <Input
+    needRef={needRef}
+    inputProps={{
+      name: placeholder,
+      placeholder,
+      value: value.trimStart(),
+      onChange: (event) => onChange(event.target.value),
+    }}
+    icons={{
+      right: { icon: 'solar:magnifer-linear', className: 'text-primary/50 size-4 md:size-5' },
+    }}
+  />
+);
+
+const Search = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const [searchQuery, setSearchQuery] = useState(queryParams?.search || '');
 
@@ -66,83 +88,82 @@ const SearchAndSort = () => {
 
   return (
     <div className="flex items-center justify-between gap-3 md:gap-4">
-      <Input
+      <SearchInput
         needRef
-        inputProps={{
-          name: 'search',
-          placeholder: 'Search categories here...',
-          value: searchQuery.trimStart(),
-          onChange: (e) => setSearchQuery(e.target.value),
-        }}
-        icons={{
-          right: { icon: 'solar:magnifer-linear', className: 'text-primary/50 size-4 md:size-5' },
-        }}
-      />
-      <Button
-        pattern="outline"
-        content={{
-          icon: queryParams.sort === 'asc' ? 'solar:list-arrow-up-linear' : 'solar:list-arrow-down-linear',
-          className: 'size-full',
-          onClick: () => {
-            if (queryParams.sort === 'asc') {
-              setParams({ sort: 'desc' });
-            } else if (queryParams.sort === 'desc') {
-              removeParams(['sort']);
-            } else {
-              setParams({ sort: 'asc' });
-            }
-          },
-        }}
-        className="border-primary/10 bg-smoke-eerie size-10 max-w-fit p-2! lg:size-12"
+        placeholder="Search categories here..."
+        value={searchQuery}
+        onChange={setSearchQuery}
       />
     </div>
   );
 };
 
-const LocalSearchAndSort = ({
-  search,
-  setSearch,
-  setSort,
+const SortableHeader = ({
+  children,
+  onSort,
   sort,
-  placeholder,
 }: {
-  search: string;
-  setSearch: (search: string) => void;
-  setSort: (sort: TSortDirection) => void;
+  children: string;
+  onSort: () => void;
   sort: TSortDirection;
-  placeholder: string;
 }) => (
-  <div className="flex w-full items-center gap-3 sm:max-w-md">
-    <Input
-      inputProps={{
-        name: placeholder,
-        placeholder,
-        value: search.trimStart(),
-        onChange: (e) => setSearch(e.target.value),
-      }}
-      icons={{
-        right: { icon: 'solar:magnifer-linear', className: 'text-primary/50 size-4' },
-      }}
+  <button
+    type="button"
+    onClick={onSort}
+    className="text-primary/65 flex cursor-pointer items-center gap-2 text-left text-xs font-semibold tracking-normal uppercase transition-colors hover:text-primary"
+  >
+    {children}
+    <Icon
+      icon={sort === 'asc' ? 'solar:arrow-up-linear' : sort === 'desc' ? 'solar:arrow-down-linear' : 'solar:sort-linear'}
+      className="size-4"
     />
-    <Button
-      pattern="outline"
-      content={{
-        icon: sort === 'asc' ? 'solar:list-arrow-up-linear' : 'solar:list-arrow-down-linear',
-        className: 'size-full',
+  </button>
+);
+
+const CategoryInfo = ({ category }: { category: ICategory }) => (
+  <div className="flex min-w-52 items-center gap-3">
+    <div className="from-sky-blue-burst/20 to-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg bg-linear-to-br">
+      <Icon icon="solar:hanger-2-linear" className="size-5" />
+    </div>
+    <div className="min-w-0">
+      <p className="text-primary truncate text-sm font-semibold">{category.name}</p>
+      <p className="text-primary/45 truncate text-xs">{category.slug}</p>
+    </div>
+  </div>
+);
+
+const CategoryActions = ({
+  categoryId,
+  onDeleteCategory,
+  onEditCategory,
+}: {
+  categoryId: string;
+  onDeleteCategory: (categoryId: string) => void;
+  onEditCategory: (categoryId: string) => void;
+}) => (
+  <div className="flex items-center gap-2">
+    <button
+      type="button"
+      aria-label="Edit category"
+      onClick={(event) => {
+        event.stopPropagation();
+        onEditCategory(categoryId);
       }}
-      buttonProps={{
-        onClick: () => {
-          if (sort === 'asc') {
-            setSort('desc');
-          } else if (sort === 'desc') {
-            setSort('');
-          } else {
-            setSort('asc');
-          }
-        },
+      className="border-primary/10 bg-smoke-eerie text-primary hover:border-primary/30 grid size-9 cursor-pointer place-items-center rounded-lg border transition-colors"
+    >
+      <Icon icon="solar:pen-linear" className="size-4.5" />
+    </button>
+    <button
+      type="button"
+      aria-label="Delete category"
+      onClick={(event) => {
+        event.stopPropagation();
+        onDeleteCategory(categoryId);
       }}
-      className="border-primary/10 bg-smoke-eerie size-10 max-w-fit p-2! lg:size-12"
-    />
+      className="border-primary/10 bg-smoke-eerie text-primary hover:border-red-400/50 hover:text-red-500 grid size-9 cursor-pointer place-items-center rounded-lg border transition-colors"
+    >
+      <Icon icon="solar:trash-bin-trash-linear" className="size-4.5" />
+    </button>
   </div>
 );
 
@@ -166,98 +187,12 @@ const EmptyState = ({
   </div>
 );
 
-const CategoryTable = ({
-  data,
-  isLoading,
-  onDeleteCategory,
-  onEditCategory,
-  onViewSubCategories,
-  selectedCategoryId,
-}: {
-  data: ICategory[];
-  isLoading: boolean;
-  onDeleteCategory: (categoryId: string) => void;
-  onEditCategory: (categoryId: string) => void;
-  onViewSubCategories: (category: ICategory) => void;
-  selectedCategoryId?: string;
-}) => {
-  const columns = useMemo<ColumnDef<ICategory>[]>(
-    () => [
-      {
-        accessorKey: 'name',
-        header: 'Category',
-        cell: ({ row }) => (
-          <div className="flex min-w-52 items-center gap-3">
-            <div className="from-sky-blue-burst/20 to-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg bg-linear-to-br">
-              <Icon icon="solar:hanger-2-linear" className="size-5" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-primary truncate text-sm font-semibold">{row.original.name}</p>
-              <p className="text-primary/45 truncate text-xs">{row.original.slug}</p>
-            </div>
-          </div>
-        ),
-      },
-      {
-        accessorKey: 'level',
-        header: 'Level',
-        cell: ({ row }) => (
-          <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
-            Level {row.original.level}
-          </span>
-        ),
-      },
-      {
-        accessorKey: 'parent',
-        header: 'Parent',
-        cell: ({ row }) => (
-          <span className="text-primary/65 text-sm">{row.original.parent || 'Main category'}</span>
-        ),
-      },
-      {
-        id: 'actions',
-        header: 'Actions',
-        cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              aria-label="Edit category"
-              onClick={(event) => {
-                event.stopPropagation();
-                onEditCategory(row.original._id);
-              }}
-              className="border-primary/10 bg-smoke-eerie text-primary hover:border-primary/30 grid size-9 cursor-pointer place-items-center rounded-lg border transition-colors"
-            >
-              <Icon icon="solar:pen-linear" className="size-4.5" />
-            </button>
-            <button
-              type="button"
-              aria-label="Delete category"
-              onClick={(event) => {
-                event.stopPropagation();
-                onDeleteCategory(row.original._id);
-              }}
-              className="border-primary/10 bg-smoke-eerie text-primary hover:border-red-400/50 hover:text-red-500 grid size-9 cursor-pointer place-items-center rounded-lg border transition-colors"
-            >
-              <Icon icon="solar:trash-bin-trash-linear" className="size-4.5" />
-            </button>
-          </div>
-        ),
-      },
-    ],
-    [onDeleteCategory, onEditCategory],
-  );
-
-  const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });
-
-  if (isLoading) {
-    return (
-      <div className="border-primary/10 bg-smoke-eerie overflow-hidden rounded-xl border">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <div
-            key={index}
-            className="border-primary/5 flex animate-pulse items-center gap-4 border-b p-4 last:border-b-0"
-          >
+const LoadingRows = ({ rows = 5 }: { rows?: number }) => (
+  <>
+    {Array.from({ length: rows }).map((_, index) => (
+      <tr key={index}>
+        <td className="border-primary/5 border-b px-4 py-4 first:pl-5 last:pr-5" colSpan={4}>
+          <div className="flex animate-pulse items-center gap-4">
             <div className="bg-primary/10 size-10 rounded-lg" />
             <div className="flex-1 space-y-2">
               <div className="bg-primary/10 h-3 w-1/3 rounded" />
@@ -265,12 +200,285 @@ const CategoryTable = ({
             </div>
             <div className="bg-primary/10 h-8 w-28 rounded-lg" />
           </div>
-        ))}
-      </div>
-    );
-  }
+        </td>
+      </tr>
+    ))}
+  </>
+);
 
-  if (!data.length) {
+const Level3Table = ({
+  parentCategory,
+  onDeleteCategory,
+  onEditCategory,
+}: {
+  parentCategory: ICategory;
+  onDeleteCategory: (categoryId: string) => void;
+  onEditCategory: (categoryId: string) => void;
+}) => {
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<TSortDirection>('');
+  const { data: categoriesData = [], isFetching } = useGetCategoriesByParentLevel({
+    level: 3,
+    parentId: parentCategory._id,
+  });
+  const categories = categoriesData as ICategory[];
+  const filteredCategories = useMemo(
+    () => getFilteredAndSortedCategories(categories, search, sort),
+    [categories, search, sort],
+  );
+
+  return (
+    <div className="border-primary/10 bg-primary/3 rounded-lg border p-3">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-primary text-sm font-semibold">{parentCategory.name}</p>
+          <p className="text-primary/50 text-xs">Level 3 categories</p>
+        </div>
+        <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold">
+          {filteredCategories.length}/{categories.length} items
+        </span>
+      </div>
+      <div className="mb-3 max-w-md">
+        <SearchInput
+          placeholder="Search level 3 categories..."
+          value={search}
+          onChange={setSearch}
+        />
+      </div>
+      <div className="overflow-x-auto rounded-lg">
+        <table className="w-full min-w-170 border-separate border-spacing-0">
+          <thead>
+            <tr>
+              <th className="border-primary/10 border-b px-4 py-3 text-left first:pl-5">
+                <SortableHeader sort={sort} onSort={() => setSort(getNextSort(sort))}>
+                  Category
+                </SortableHeader>
+              </th>
+              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase">
+                Level
+              </th>
+              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase">
+                Parent
+              </th>
+              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase last:pr-5">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {isFetching ? (
+              <LoadingRows rows={3} />
+            ) : filteredCategories.length ? (
+              filteredCategories.map((category) => (
+                <tr key={category._id} className="hover:bg-primary/3 transition-colors">
+                  <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm first:pl-5">
+                    <CategoryInfo category={category} />
+                  </td>
+                  <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm">
+                    <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
+                      Level {category.level}
+                    </span>
+                  </td>
+                  <td className="text-primary/65 border-primary/5 border-b px-4 py-4 align-middle text-sm">
+                    {category.parent || parentCategory.name}
+                  </td>
+                  <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm last:pr-5">
+                    <CategoryActions
+                      categoryId={category._id}
+                      onDeleteCategory={onDeleteCategory}
+                      onEditCategory={onEditCategory}
+                    />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="p-4">
+                  <EmptyState
+                    icon="solar:folder-error-linear"
+                    title={categories.length ? 'No matching level 3 categories' : 'No level 3 categories yet'}
+                    description={
+                      categories.length
+                        ? 'Try a different search term.'
+                        : 'This level 2 category does not have child categories.'
+                    }
+                  />
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+const Level2Table = ({
+  parentCategory,
+  onDeleteCategory,
+  onEditCategory,
+}: {
+  parentCategory: ICategory;
+  onDeleteCategory: (categoryId: string) => void;
+  onEditCategory: (categoryId: string) => void;
+}) => {
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState<TSortDirection>('');
+  const { data: categoriesData = [], isFetching } = useGetCategoriesByParentLevel({
+    level: 2,
+    parentId: parentCategory._id,
+  });
+  const categories = categoriesData as ICategory[];
+  const filteredCategories = useMemo(
+    () => getFilteredAndSortedCategories(categories, search, sort),
+    [categories, search, sort],
+  );
+
+  useEffect(() => {
+    setSelectedCategoryId('');
+    setSearch('');
+    setSort('');
+  }, [parentCategory._id]);
+
+  return (
+    <div className="border-primary/10 bg-primary/3 rounded-xl border p-4">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-primary text-base font-semibold">{parentCategory.name}</p>
+          <p className="text-primary/50 text-sm">Level 2 sub-categories</p>
+        </div>
+        <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold">
+          {filteredCategories.length}/{categories.length} items
+        </span>
+      </div>
+      <div className="mb-3 max-w-md">
+        <SearchInput
+          placeholder="Search level 2 categories..."
+          value={search}
+          onChange={setSearch}
+        />
+      </div>
+      <div className="overflow-x-auto rounded-lg">
+        <table className="w-full min-w-190 border-separate border-spacing-0">
+          <thead>
+            <tr>
+              <th className="border-primary/10 border-b px-4 py-3 text-left first:pl-5">
+                <SortableHeader sort={sort} onSort={() => setSort(getNextSort(sort))}>
+                  Category
+                </SortableHeader>
+              </th>
+              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase">
+                Level
+              </th>
+              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase">
+                Parent
+              </th>
+              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase last:pr-5">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {isFetching ? (
+              <LoadingRows rows={3} />
+            ) : filteredCategories.length ? (
+              filteredCategories.map((category) => (
+                <>
+                  <tr
+                    key={category._id}
+                    tabIndex={0}
+                    onClick={() =>
+                      setSelectedCategoryId((selected) =>
+                        selected === category._id ? '' : category._id,
+                      )
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        setSelectedCategoryId((selected) =>
+                          selected === category._id ? '' : category._id,
+                        );
+                      }
+                    }}
+                    className={`cursor-pointer transition-colors ${
+                      selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'
+                    }`}
+                  >
+                    <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm first:pl-5">
+                      <CategoryInfo category={category} />
+                    </td>
+                    <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm">
+                      <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
+                        Level {category.level}
+                      </span>
+                    </td>
+                    <td className="text-primary/65 border-primary/5 border-b px-4 py-4 align-middle text-sm">
+                      {category.parent || parentCategory.name}
+                    </td>
+                    <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm last:pr-5">
+                      <CategoryActions
+                        categoryId={category._id}
+                        onDeleteCategory={onDeleteCategory}
+                        onEditCategory={onEditCategory}
+                      />
+                    </td>
+                  </tr>
+                  {selectedCategoryId === category._id && (
+                    <tr key={`${category._id}-children`}>
+                      <td colSpan={4} className="border-primary/5 border-b p-4">
+                        <Level3Table
+                          parentCategory={category}
+                          onDeleteCategory={onDeleteCategory}
+                          onEditCategory={onEditCategory}
+                        />
+                      </td>
+                    </tr>
+                  )}
+                </>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="p-4">
+                  <EmptyState
+                    icon="solar:folder-error-linear"
+                    title={categories.length ? 'No matching sub-categories' : 'No sub-categories yet'}
+                    description={
+                      categories.length
+                        ? 'Try a different search term.'
+                        : 'This level 1 category does not have child categories.'
+                    }
+                  />
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+const CategoryTable = ({
+  data,
+  isLoading,
+  onDeleteCategory,
+  onEditCategory,
+  onSort,
+  onViewSubCategories,
+  selectedCategoryId,
+  sort,
+}: {
+  data: ICategory[];
+  isLoading: boolean;
+  onDeleteCategory: (categoryId: string) => void;
+  onEditCategory: (categoryId: string) => void;
+  onSort: () => void;
+  onViewSubCategories: (category: ICategory) => void;
+  selectedCategoryId?: string;
+  sort: TSortDirection;
+}) => {
+  if (!isLoading && !data.length) {
     return (
       <EmptyState
         icon="solar:folder-open-linear"
@@ -285,45 +493,76 @@ const CategoryTable = ({
       <div className="overflow-x-auto">
         <table className="w-full min-w-230 border-separate border-spacing-0">
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase first:pl-5 last:pr-5"
-                  >
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
-                ))}
-              </tr>
-            ))}
+            <tr>
+              <th className="border-primary/10 border-b px-4 py-3 text-left first:pl-5">
+                <SortableHeader sort={sort} onSort={onSort}>
+                  Category
+                </SortableHeader>
+              </th>
+              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase">
+                Level
+              </th>
+              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase">
+                Parent
+              </th>
+              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase last:pr-5">
+                Actions
+              </th>
+            </tr>
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                tabIndex={0}
-                onClick={() => onViewSubCategories(row.original)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    onViewSubCategories(row.original);
-                  }
-                }}
-                className={`cursor-pointer transition-colors ${
-                  selectedCategoryId === getCategoryId(row.original) ? 'bg-primary/5' : 'hover:bg-primary/3'
-                }`}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="border-primary/5 border-b px-4 py-4 align-middle text-sm first:pl-5 last:pr-5"
+            {isLoading ? (
+              <LoadingRows />
+            ) : (
+              data.map((category) => (
+                <>
+                  <tr
+                    key={category._id}
+                    tabIndex={0}
+                    onClick={() => onViewSubCategories(category)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        onViewSubCategories(category);
+                      }
+                    }}
+                    className={`cursor-pointer transition-colors ${
+                      selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'
+                    }`}
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
+                    <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm first:pl-5">
+                      <CategoryInfo category={category} />
+                    </td>
+                    <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm">
+                      <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
+                        Level {category.level}
+                      </span>
+                    </td>
+                    <td className="text-primary/65 border-primary/5 border-b px-4 py-4 align-middle text-sm">
+                      {category.parent || 'Main category'}
+                    </td>
+                    <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm last:pr-5">
+                      <CategoryActions
+                        categoryId={category._id}
+                        onDeleteCategory={onDeleteCategory}
+                        onEditCategory={onEditCategory}
+                      />
+                    </td>
+                  </tr>
+                  {selectedCategoryId === category._id && (
+                    <tr key={`${category._id}-children`}>
+                      <td colSpan={4} className="border-primary/5 border-b p-4">
+                        <Level2Table
+                          parentCategory={category}
+                          onDeleteCategory={onDeleteCategory}
+                          onEditCategory={onEditCategory}
+                        />
+                      </td>
+                    </tr>
+                  )}
+                </>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -331,250 +570,13 @@ const CategoryTable = ({
   );
 };
 
-const CategoryActions = ({
-  categoryId,
-  onDeleteCategory,
-  onEditCategory,
-}: {
-  categoryId: string;
-  onDeleteCategory: (categoryId: string) => void;
-  onEditCategory: (categoryId: string) => void;
-}) => (
-  <div className="ml-auto flex shrink-0 items-center gap-2">
-    <button
-      type="button"
-      aria-label="Edit category"
-      onClick={(event) => {
-        event.stopPropagation();
-        onEditCategory(categoryId);
-      }}
-      className="border-primary/10 bg-smoke-eerie text-primary hover:border-primary/30 grid size-8 cursor-pointer place-items-center rounded-lg border transition-colors"
-    >
-      <Icon icon="solar:pen-linear" className="size-4" />
-    </button>
-    <button
-      type="button"
-      aria-label="Delete category"
-      onClick={(event) => {
-        event.stopPropagation();
-        onDeleteCategory(categoryId);
-      }}
-      className="border-primary/10 bg-smoke-eerie text-primary hover:border-red-400/50 hover:text-red-500 grid size-8 cursor-pointer place-items-center rounded-lg border transition-colors"
-    >
-      <Icon icon="solar:trash-bin-trash-linear" className="size-4" />
-    </button>
-  </div>
-);
-
-const SubCategoriesPanel = ({
-  category,
-  onDeleteCategory,
-  onEditCategory,
-}: {
-  category?: ICategory;
-  onDeleteCategory: (categoryId: string) => void;
-  onEditCategory: (categoryId: string) => void;
-}) => {
-  const [selectedSubCategory, setSelectedSubCategory] = useState<ICategory>();
-  const [subCategorySearch, setSubCategorySearch] = useState('');
-  const [subCategorySort, setSubCategorySort] = useState<TSortDirection>('');
-  const [childCategorySearch, setChildCategorySearch] = useState('');
-  const [childCategorySort, setChildCategorySort] = useState<TSortDirection>('');
-  const nextLevel = category?.level ? ((category.level + 1) as ICategory['level']) : undefined;
-  const { data: subCategoriesData = [], isFetching } = useGetCategoriesByParentLevel({
-    level: nextLevel,
-    parentId: category?._id,
-    enabled: !!category && category.level < 3,
-  });
-  const subCategories = subCategoriesData as ICategory[];
-  const { data: childCategoriesData = [], isFetching: isFetchingChildren } =
-    useGetCategoriesByParentLevel({
-      level: selectedSubCategory?.level
-        ? ((selectedSubCategory.level + 1) as ICategory['level'])
-        : undefined,
-      parentId: selectedSubCategory?._id,
-      enabled: !!selectedSubCategory && selectedSubCategory.level < 3,
-    });
-  const childCategories = childCategoriesData as ICategory[];
-  const filteredSubCategories = useMemo(
-    () => getFilteredAndSortedCategories(subCategories, subCategorySearch, subCategorySort),
-    [subCategories, subCategorySearch, subCategorySort],
-  );
-  const filteredChildCategories = useMemo(
-    () => getFilteredAndSortedCategories(childCategories, childCategorySearch, childCategorySort),
-    [childCategories, childCategorySearch, childCategorySort],
-  );
-
-  useEffect(() => {
-    setSelectedSubCategory(undefined);
-    setSubCategorySearch('');
-    setSubCategorySort('');
-  }, [category?._id]);
-
-  useEffect(() => {
-    setChildCategorySearch('');
-    setChildCategorySort('');
-  }, [selectedSubCategory?._id]);
-
-  if (!category) return null;
-
-  return (
-    <section className="border-primary/10 bg-smoke-eerie flex flex-col gap-4 rounded-xl border p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-primary text-base font-semibold">{category.name}</p>
-          <p className="text-primary/50 text-sm">
-            {category.level === 1 ? 'Sub-categories' : 'Product categories'}
-          </p>
-        </div>
-        <span className="border-primary/10 bg-primary/5 text-primary inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold">
-          <Icon icon="solar:folder-with-files-linear" className="size-4" />
-          {filteredSubCategories.length}/{subCategories.length} items
-        </span>
-      </div>
-
-      <LocalSearchAndSort
-        search={subCategorySearch}
-        setSearch={setSubCategorySearch}
-        sort={subCategorySort}
-        setSort={setSubCategorySort}
-        placeholder="Search level 2 categories..."
-      />
-
-      {isFetching ? (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="bg-primary/5 h-18 animate-pulse rounded-lg" />
-          ))}
-        </div>
-      ) : filteredSubCategories.length ? (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {filteredSubCategories.map((item) => (
-            <div
-              key={item._id}
-              role={item.level < 3 ? 'button' : undefined}
-              tabIndex={item.level < 3 ? 0 : undefined}
-              onClick={() => {
-                if (item.level < 3) setSelectedSubCategory(item);
-              }}
-              onKeyDown={(event) => {
-                if (item.level < 3 && (event.key === 'Enter' || event.key === ' ')) {
-                  event.preventDefault();
-                  setSelectedSubCategory(item);
-                }
-              }}
-              className={`flex items-center gap-3 rounded-lg border p-3 text-left transition-all ${
-                selectedSubCategory?._id === item._id
-                  ? 'border-primary bg-primary/7'
-                  : 'border-primary/10 bg-primary/3 hover:border-primary/30'
-              } ${item.level < 3 ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
-            >
-              <div className="bg-primary/8 text-primary grid size-9 shrink-0 place-items-center rounded-lg">
-                <Icon icon="solar:tag-linear" className="size-4.5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-primary truncate text-sm font-semibold">{item.name}</p>
-                <p className="text-primary/45 truncate text-xs">{item.slug}</p>
-              </div>
-              <CategoryActions
-                categoryId={item._id}
-                onDeleteCategory={onDeleteCategory}
-                onEditCategory={onEditCategory}
-              />
-              {item.level < 3 && (
-                <Icon icon="solar:alt-arrow-right-linear" className="text-primary/45 size-4" />
-              )}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <EmptyState
-          icon="solar:folder-error-linear"
-          title={subCategories.length ? 'No matching sub-categories' : 'No sub-categories yet'}
-          description={
-            subCategories.length
-              ? 'Try a different search term or reset the sort.'
-              : 'This category does not have any child categories at the next level.'
-          }
-        />
-      )}
-
-      {selectedSubCategory && (
-        <div className="border-primary/10 border-t pt-4">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-primary text-sm font-semibold">{selectedSubCategory.name}</p>
-              <p className="text-primary/50 text-sm">Level 3 sub-categories</p>
-            </div>
-            <span className="border-primary/10 bg-primary/5 text-primary inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold">
-              <Icon icon="solar:folder-with-files-linear" className="size-4" />
-              {filteredChildCategories.length}/{childCategories.length} items
-            </span>
-          </div>
-
-          <div className="mb-4">
-            <LocalSearchAndSort
-              search={childCategorySearch}
-              setSearch={setChildCategorySearch}
-              sort={childCategorySort}
-              setSort={setChildCategorySort}
-              placeholder="Search level 3 categories..."
-            />
-          </div>
-
-          {isFetchingChildren ? (
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="bg-primary/5 h-18 animate-pulse rounded-lg" />
-              ))}
-            </div>
-          ) : filteredChildCategories.length ? (
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {filteredChildCategories.map((item) => (
-                <div
-                  key={item._id}
-                  className="border-primary/10 bg-primary/3 flex items-center gap-3 rounded-lg border p-3"
-                >
-                  <div className="bg-primary/8 text-primary grid size-9 shrink-0 place-items-center rounded-lg">
-                    <Icon icon="solar:tag-linear" className="size-4.5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-primary truncate text-sm font-semibold">{item.name}</p>
-                    <p className="text-primary/45 truncate text-xs">{item.slug}</p>
-                  </div>
-                  <CategoryActions
-                    categoryId={item._id}
-                    onDeleteCategory={onDeleteCategory}
-                    onEditCategory={onEditCategory}
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              icon="solar:folder-error-linear"
-              title={
-                childCategories.length ? 'No matching level 3 sub-categories' : 'No level 3 sub-categories yet'
-              }
-              description={
-                childCategories.length
-                  ? 'Try a different search term or reset the sort.'
-                  : 'This level 2 sub-category does not have any child categories.'
-              }
-            />
-          )}
-        </div>
-      )}
-    </section>
-  );
-};
-
 const Categories = () => {
-  const { queryParams } = useQueryParams();
+  const { queryParams, setParams, removeParams } = useQueryParams();
   const { navigate } = usePathParams();
   const [selectedCategory, setSelectedCategory] = useState<ICategory>();
   const { data: level1CatsData = [], isLoading } = useGetCategoriesByParentLevel({ level: 1 });
   const level1Cats = level1CatsData as ICategory[];
+  const level1Sort = queryParams.sort === 'asc' || queryParams.sort === 'desc' ? queryParams.sort : '';
 
   const handleEditCategory = (categoryId: string) => {
     console.log('Edit category _id:', categoryId);
@@ -584,10 +586,19 @@ const Categories = () => {
     console.log('Delete category _id:', categoryId);
   };
 
-  const filteredCategories = useMemo(() => {
-    const sort = queryParams.sort === 'asc' || queryParams.sort === 'desc' ? queryParams.sort : '';
-    return getFilteredAndSortedCategories(level1Cats, queryParams.search || '', sort);
-  }, [level1Cats, queryParams.search, queryParams.sort]);
+  const handleLevel1Sort = () => {
+    const nextSort = getNextSort(level1Sort);
+    if (nextSort) {
+      setParams({ sort: nextSort });
+    } else {
+      removeParams(['sort']);
+    }
+  };
+
+  const filteredCategories = useMemo(
+    () => getFilteredAndSortedCategories(level1Cats, queryParams.search || '', level1Sort),
+    [level1Cats, queryParams.search, level1Sort],
+  );
 
   return (
     <div className="flex flex-col gap-5">
@@ -603,7 +614,7 @@ const Categories = () => {
         ]}
         className="[&>:nth-last-child(2)]:border-b-silver/30 [&>:nth-last-child(2)]:border-b [&>div]:py-2"
       >
-        <SearchAndSort />
+        <Search />
       </Navbar>
 
       <CategoryTable
@@ -611,13 +622,12 @@ const Categories = () => {
         isLoading={isLoading}
         onDeleteCategory={handleDeleteCategory}
         onEditCategory={handleEditCategory}
+        onSort={handleLevel1Sort}
         selectedCategoryId={selectedCategory?._id}
-        onViewSubCategories={setSelectedCategory}
-      />
-      <SubCategoriesPanel
-        category={selectedCategory}
-        onDeleteCategory={handleDeleteCategory}
-        onEditCategory={handleEditCategory}
+        sort={level1Sort}
+        onViewSubCategories={(category) =>
+          setSelectedCategory((selected) => (selected?._id === category._id ? undefined : category))
+        }
       />
     </div>
   );
