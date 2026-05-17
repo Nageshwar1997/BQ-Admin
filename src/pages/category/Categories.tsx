@@ -147,7 +147,10 @@ const SearchInput = ({
   />
 );
 
-const Search = ({ className = '' }: TClassName) => {
+const Search = ({
+  className = '',
+  queryKey,
+}: TClassName & { queryKey?: 'q_l1' | 'q_l2' | 'q_l3' }) => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const [searchQuery, setSearchQuery] = useState(queryParams?.search || '');
 
@@ -155,9 +158,9 @@ const Search = ({ className = '' }: TClassName) => {
     () =>
       debounce((value: string) => {
         if (value.trim()) {
-          setParams({ search: value.trim() });
+          setParams({ [queryKey ?? 'search']: value.trim() });
         } else {
-          removeParams(['search']);
+          removeParams([queryKey ?? 'search']);
         }
       }, 500),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -357,6 +360,7 @@ const Level3Table = ({
                   category={category}
                   onDeleteCategory={onDeleteCategory}
                   onEditCategory={onEditCategory}
+                  className="hover:bg-primary/3"
                 />
               ))
             ) : (
@@ -499,6 +503,7 @@ const Level2Table = ({
 const Level1Table = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const [selectedCategory, setSelectedCategory] = useState<ICategory>();
+  const [search, setSearch] = useState('');
   const { data: level1CatsData = [], isLoading } = useGetCategoriesByParentLevel({ level: 1 });
   const level1Cats = level1CatsData as ICategory[];
   const level1Sort =
@@ -522,35 +527,33 @@ const Level1Table = () => {
   };
 
   const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(level1Cats, queryParams.search || '', level1Sort),
-    [level1Cats, queryParams.search, level1Sort],
+    () => getFilteredAndSortedCategories(level1Cats, search, level1Sort),
+    [level1Cats, search, level1Sort],
   );
 
-  if (!isLoading && !filteredCategories.length) {
-    return (
-      <EmptyState
-        icon="solar:folder-open-linear"
-        title="No categories found"
-        description="Try a different search term or add your first category from the button above."
-      />
-    );
-  }
-
   return (
-    <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
-      <div className="flex items-center gap-4 p-4">
-        <Search className="max-w-md" />
+    <div className="border-primary/10 bg-secondary-invert rounded-xl border p-4">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <SearchInput
+          className="max-w-md"
+          placeholder="Search level 1 categories..."
+          value={search}
+          onChange={setSearch}
+        />
         <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
           {filteredCategories.length}/{level1Cats.length} items
         </span>
       </div>
-      <div className="overflow-x-auto">
+      {/* <div className="mb-3 max-w-md">
+
+      </div> */}
+      <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
           <THead sort={level1Sort} setSort={handleLevel1Sort} />
           <tbody>
             {isLoading ? (
-              <LoadingRows />
-            ) : (
+              <LoadingRows rows={3} />
+            ) : filteredCategories.length ? (
               filteredCategories.map((category) => (
                 <Fragment key={category._id}>
                   <CategoryTr
@@ -585,6 +588,16 @@ const Level1Table = () => {
                   )}
                 </Fragment>
               ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="p-4">
+                  <EmptyState
+                    icon="solar:folder-open-linear"
+                    title="No categories found"
+                    description="Try a different search term or add your first category from the button above."
+                  />
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
