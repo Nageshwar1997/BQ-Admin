@@ -48,6 +48,7 @@ const AddCategoryModal = () => {
     formState: { errors, isDirty },
     handleSubmit,
     register,
+    setError,
     setValue,
     trigger,
   } = useForm<TAddCategory>({
@@ -61,6 +62,8 @@ const AddCategoryModal = () => {
   const activeStepData = ADD_CATEGORY_STEPS[activeStep];
   const level = useWatch({ control, name: 'level' });
   const mainCategory = useWatch({ control, name: 'mainCategory' });
+  const subCategory = useWatch({ control, name: 'subCategory' });
+  const name = useWatch({ control, name: 'name' });
 
   const setActiveStep = (step: number) => {
     setValue('activeStep', step, { shouldDirty: false, shouldTouch: false });
@@ -77,6 +80,12 @@ const AddCategoryModal = () => {
     enabled: isL3(level) && !!mainCategory,
   });
 
+  const { data: level3Cats } = useGetCategoriesByParentLevel({
+    level: 3,
+    parentId: subCategory,
+    enabled: isL3(level) && !!subCategory,
+  });
+
   const hierarchyPreview = useMemo(() => {
     if (isL1(level)) return 'This will be created as a main category.';
     if (isL2(level)) {
@@ -88,6 +97,30 @@ const AddCategoryModal = () => {
     )}.`;
   }, [categoryValues.mainCategory, categoryValues.subCategory, level, level1Cats, level2Cats]);
 
+  const isDuplicateCategory = () => {
+    const trimmedName = name.trim().toLowerCase();
+
+    if (!trimmedName) return false;
+
+    let categories: ICategory[] | undefined = [];
+
+    if (isL1(level)) {
+      categories = level1Cats;
+    } else if (isL2(level)) {
+      categories = level2Cats;
+    } else if (isL3(level)) {
+      categories = level3Cats;
+    }
+
+    const isDuplicate = categories?.some((cat) => cat.name.trim().toLowerCase() === trimmedName);
+
+    if (isDuplicate) {
+      setError('name', { message: 'Category already exists.' });
+    }
+
+    return isDuplicate;
+  };
+
   const handleStepChange = async (nextStep: number) => {
     if (nextStep <= activeStep) {
       setActiveStep(nextStep);
@@ -96,12 +129,24 @@ const AddCategoryModal = () => {
 
     const fieldsToValidate = STEP_FIELDS.slice(0, nextStep).flat();
     const isValid = await trigger(fieldsToValidate, { shouldFocus: true });
-    if (isValid) setActiveStep(nextStep);
+
+    const isDuplicate = isDuplicateCategory();
+
+    if (isValid && !isDuplicate) {
+      setActiveStep(nextStep);
+    }
   };
 
   const handleNext = async () => {
-    const isValid = await trigger(STEP_FIELDS[activeStep], { shouldFocus: true });
-    if (isValid) setActiveStep(Math.min(activeStep + 1, ADD_CATEGORY_STEPS.length - 1));
+    const isValid = await trigger(STEP_FIELDS[activeStep], {
+      shouldFocus: true,
+    });
+
+    const isDuplicate = isDuplicateCategory();
+
+    if (isValid && !isDuplicate) {
+      setActiveStep(Math.min(activeStep + 1, ADD_CATEGORY_STEPS.length - 1));
+    }
   };
 
   const getPayload = (data: TAddCategory) => {
