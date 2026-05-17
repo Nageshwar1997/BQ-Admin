@@ -26,6 +26,7 @@ const Table = () => {
               </th>
             ))}
             <th>Actions</th>
+            <th>Sub-categories</th>
           </tr>
         ))}
       </thead>
@@ -37,10 +38,11 @@ const Table = () => {
             ))}
             <td>
               <div className="flex">
-                <Icon icon="solar:pen-linear" className="size-5 text-primary" />
-                <Icon icon="solar:trash-bin-trash-linear" className="size-5 text-primary" />
+                <Icon icon="solar:pen-linear" className="text-primary size-5" />
+                <Icon icon="solar:trash-bin-trash-linear" className="text-primary size-5" />
               </div>
             </td>
+            <td>See Sub-Categories</td>
           </tr>
         ))}
       </tbody>
