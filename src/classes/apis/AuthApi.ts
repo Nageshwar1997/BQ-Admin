@@ -16,7 +16,7 @@ export class AuthApi extends ApiRequest {
     return this.request({
       ...this.routes.login.manual,
       data,
-      headers: { [HEADERS_KEYS.loginRole]: 'SELLER' as TRole },
+      headers: { [HEADERS_KEYS.loginRole]: 'ADMIN' as TRole },
     });
   };
 
