@@ -13,7 +13,7 @@ import type { ICategory } from '@/types/api.type';
 import type { TAddCategory } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useForm, useWatch, type FieldPath } from 'react-hook-form';
 
 const ADD_CATEGORY_STEPS: StepperStep[] = [
@@ -45,8 +45,6 @@ const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
 
 const AddCategory = () => {
   const { navigate } = usePathParams();
-  const [activeStep, setActiveStep] = useState(0);
-  const activeStepData = ADD_CATEGORY_STEPS[activeStep];
 
   const {
     control,
@@ -62,8 +60,14 @@ const AddCategory = () => {
   });
 
   const categoryValues = useWatch({ control });
+  const activeStep = useWatch({ control, name: 'activeStep' });
+  const activeStepData = ADD_CATEGORY_STEPS[activeStep];
   const level = useWatch({ control, name: 'level' });
   const mainCategory = useWatch({ control, name: 'mainCategory' });
+
+  const setActiveStep = (step: number) => {
+    setValue('activeStep', step, { shouldDirty: false, shouldTouch: false });
+  };
 
   const { data: level1Cats } = useGetCategoriesByParentLevel({ level: 1, enabled: level !== '1' });
   const { data: level2Cats } = useGetCategoriesByParentLevel({
@@ -96,7 +100,7 @@ const AddCategory = () => {
 
   const handleNext = async () => {
     const isValid = await trigger(STEP_FIELDS[activeStep], { shouldFocus: true });
-    if (isValid) setActiveStep((step) => Math.min(step + 1, ADD_CATEGORY_STEPS.length - 1));
+    if (isValid) setActiveStep(Math.min(activeStep + 1, ADD_CATEGORY_STEPS.length - 1));
   };
 
   const getPayload = (data: TAddCategory) => ({
@@ -286,7 +290,7 @@ const AddCategory = () => {
                 leftIcon={{ icon: 'solar:arrow-left-linear' }}
                 buttonProps={{
                   disabled: activeStep === 0,
-                  onClick: () => setActiveStep((step) => Math.max(step - 1, 0)),
+                  onClick: () => setActiveStep(Math.max(activeStep - 1, 0)),
                 }}
                 className="sm:max-w-36"
               />

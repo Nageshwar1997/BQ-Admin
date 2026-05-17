@@ -34,6 +34,7 @@ export const FORM_DEFAULT_VALUES = {
     confirmDetails: false,
   },
   addCategory: {
+    activeStep: 0,
     name: '',
     slug: '',
     level: '1',

@@ -1,4 +1,4 @@
-import { boolean, enum as zodEnum, object, string } from 'zod';
+import { boolean, enum as zodEnum, number, object, string } from 'zod';
 
 const requiredText = (field: string, min = 2, max = 100) =>
   string()
@@ -37,6 +37,7 @@ export const addProductSchema = object({
 });
 
 export const addCategorySchema = object({
+  activeStep: number(),
   name: requiredText('Category name', 2, 80),
   level: zodEnum(['1', '2', '3'], 'Category level is required.'),
   mainCategory: string().trim(),
