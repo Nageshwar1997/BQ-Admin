@@ -5,7 +5,7 @@ import Input from '@/components/ui/inputs/Input';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
-import type { TClassName } from '@/types/component.type';
+import type { TChildren, TClassName } from '@/types/component.type';
 import { debounce } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
 import { Fragment, useEffect, useMemo, useState } from 'react';
@@ -44,6 +44,28 @@ const getNextSort = (sort: TSortDirection): TSortDirection => {
   return 'asc';
 };
 
+const Badge = ({ content }: { content: string }) => (
+  <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
+    {content}
+  </span>
+);
+
+const Th = ({ children, className = '' }: TChildren & TClassName) => (
+  <th
+    className={`text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-center text-xs font-semibold tracking-normal whitespace-nowrap uppercase ${className}`}
+  >
+    {children}
+  </th>
+);
+
+const Td = ({ children, className = '' }: TChildren & TClassName) => (
+  <td
+    className={`border-primary/5 w-auto border-y px-4 py-3 text-center align-middle text-sm whitespace-nowrap ${className}`}
+  >
+    {children}
+  </td>
+);
+
 const THead = ({
   sort,
   setSort,
@@ -54,10 +76,7 @@ const THead = ({
   <thead>
     <tr>
       {TH_TITLES.map((title) => (
-        <th
-          key={title}
-          className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase"
-        >
+        <Th key={title}>
           {title === 'Category' ? (
             <SortableHeader sort={sort} onSort={() => setSort(getNextSort(sort))}>
               {title}
@@ -65,7 +84,7 @@ const THead = ({
           ) : (
             title
           )}
-        </th>
+        </Th>
       ))}
     </tr>
   </thead>
@@ -182,7 +201,7 @@ const CategoryActions = ({
   onDeleteCategory: (categoryId: string) => void;
   onEditCategory: (categoryId: string) => void;
 }) => (
-  <div className="flex items-center gap-2">
+  <div className="flex items-center justify-center gap-2">
     <Button
       content={{ icon: 'solar:pen-linear', className: 'size-4.5' }}
       pattern="outline"
@@ -281,28 +300,45 @@ const Level3Table = ({
           <THead sort={sort} setSort={setSort} />
           <tbody>
             {isFetching ? (
-              <LoadingRows rows={3} />
+              <tr className="hover:bg-primary/3 transition-colors">
+                <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap first:pl-5">
+                  {/* <CategoryInfo category={category} /> */}
+                </td>
+                <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
+                  <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
+                    {/* Level {category.level} */}
+                  </span>
+                </td>
+                <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap uppercase">
+                  {/* {category.parent || parentCategory.name} */}
+                </td>
+                <td className="border-primary/5 w-0 border-y px-4 py-4 align-middle text-sm whitespace-nowrap last:pr-5">
+                  {/* <CategoryActions
+                    categoryId={category._id}
+                    onDeleteCategory={onDeleteCategory}
+                    onEditCategory={onEditCategory}
+                  /> */}
+                </td>
+              </tr>
             ) : filteredCategories.length ? (
               filteredCategories.map((category) => (
                 <tr key={category._id} className="hover:bg-primary/3 transition-colors">
-                  <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap first:pl-5">
+                  <Td className="text-left">
                     <CategoryInfo category={category} />
-                  </td>
-                  <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
-                    <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
-                      Level {category.level}
-                    </span>
-                  </td>
-                  <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap uppercase">
+                  </Td>
+                  <Td>
+                    <Badge content={`Level ${category.level}`} />
+                  </Td>
+                  <Td className={`text-primary/65 ${category.parent ? 'uppercase' : ''}`}>
                     {category.parent || parentCategory.name}
-                  </td>
-                  <td className="border-primary/5 w-0 border-y px-4 py-4 align-middle text-sm whitespace-nowrap last:pr-5">
+                  </Td>
+                  <Td>
                     <CategoryActions
                       categoryId={category._id}
                       onDeleteCategory={onDeleteCategory}
                       onEditCategory={onEditCategory}
                     />
-                  </td>
+                  </Td>
                 </tr>
               ))
             ) : (
@@ -406,24 +442,22 @@ const Level2Table = ({
                       selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'
                     }`}
                   >
-                    <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap first:pl-5">
+                    <Td className="text-left">
                       <CategoryInfo category={category} />
-                    </td>
-                    <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
-                      <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
-                        Level {category.level}
-                      </span>
-                    </td>
-                    <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap uppercase">
+                    </Td>
+                    <Td>
+                      <Badge content={`Level ${category.level}`} />
+                    </Td>
+                    <Td className={`text-primary/65 ${!category.parent ? 'uppercase' : ''}`}>
                       {category.parent || parentCategory.name}
-                    </td>
-                    <td className="border-primary/5 w-0 border-y px-4 py-4 align-middle text-sm whitespace-nowrap last:pr-5">
+                    </Td>
+                    <Td>
                       <CategoryActions
                         categoryId={category._id}
                         onDeleteCategory={onDeleteCategory}
                         onEditCategory={onEditCategory}
                       />
-                    </td>
+                    </Td>
                   </tr>
                   {selectedCategoryId === category._id && (
                     <tr key={`${category._id}-children`}>
@@ -523,24 +557,20 @@ const CategoryTable = ({
                       selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'
                     }`}
                   >
-                    <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap first:pl-5">
+                    <Td className="text-left">
                       <CategoryInfo category={category} />
-                    </td>
-                    <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
-                      <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
-                        Level {category.level}
-                      </span>
-                    </td>
-                    <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap uppercase">
-                      {category.parent || 'N/A'}
-                    </td>
-                    <td className="border-primary/5 w-0 border-y px-4 py-4 align-middle text-sm whitespace-nowrap last:pr-5">
+                    </Td>
+                    <Td>
+                      <Badge content={`Level ${category.level}`} />
+                    </Td>
+                    <Td className="text-primary/65 uppercase">{category.parent || 'N/A'}</Td>
+                    <Td>
                       <CategoryActions
                         categoryId={category._id}
                         onDeleteCategory={onDeleteCategory}
                         onEditCategory={onEditCategory}
                       />
-                    </td>
+                    </Td>
                   </tr>
                   {selectedCategoryId === category._id && (
                     <tr>
