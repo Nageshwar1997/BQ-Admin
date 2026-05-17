@@ -1,1 +1,1 @@
-# BQ Admin
+# BQ-Seller

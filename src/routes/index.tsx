@@ -1,62 +1,121 @@
-import { createBrowserRouter } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import LoadingScreen from '@/components/layout/loaders/LoadingScreen';
+import { ROUTES } from '@/constants/common.constants';
+import { authenticate } from '@/middlewares';
+import ErrorBoundary from '@/pages/error/ErrorBoundary';
+import { Outlet, type RouteObject } from 'react-router-dom';
 
-// Lazy load route components
-const Main = lazy(() => import("../pages/main/Main"));
+const { AUTH, DASHBOARD, PRODUCTS } = ROUTES;
 
-import Home from "../pages/home/Home";
-import LoginRedirect from "./LoginRedirect";
-import NotFound from "../pages/error/NotFound";
-import LoadingScreen from "../components/ui/loaders/LoadingScreen";
-import PrivateRoute from "./PrivateRoute";
-import AllProducts from "../pages/products/children/AllProducts";
-import UploadProduct from "../pages/products/children/UploadProduct";
-import Products from "../pages/products/Products";
-import UpdateProduct from "../pages/products/children/UpdateProduct";
-
-const router = createBrowserRouter([
+const routes: RouteObject[] = [
   {
-    path: "/",
-    element: (
-      <Suspense fallback={<LoadingScreen />}>
-        <PrivateRoute>
-          <Main />
-        </PrivateRoute>
-      </Suspense>
-    ),
+    path: DASHBOARD,
+    HydrateFallback: LoadingScreen,
+    ErrorBoundary,
+    middleware: [authenticate],
+    lazy: async () => {
+      const { default: Layout } = await import('@/pages/layout');
+      return { Component: Layout };
+    },
     children: [
       {
         index: true,
-        element: <Home />,
+        lazy: async () => {
+          const { default: Home } = await import('@/pages/home');
+          return { Component: Home };
+        },
       },
       {
-        path: "products",
-        element: <Products />,
+        path: PRODUCTS.BASE,
+        element: <Outlet />,
         children: [
           {
             index: true,
-            element: <AllProducts />,
+            lazy: async () => {
+              const { default: Products } = await import('@/pages/product/Products');
+              return { Component: Products };
+            },
           },
           {
-            path: "upload",
-            element: <UploadProduct />,
-          },
-          {
-            path: "update/:id",
-            element: <UpdateProduct />,
+            path: PRODUCTS.ADD,
+            lazy: async () => {
+              const { default: AddProduct } = await import('@/pages/product/AddProduct');
+              return { Component: AddProduct };
+            },
           },
         ],
+      },
+      {
+        path: `${PRODUCTS.BASE}/${PRODUCTS.PRODUCT_ID}`,
+        lazy: async () => {
+          const { default: ProductDetails } = await import('@/pages/product/ProductDetails');
+          return { Component: ProductDetails };
+        },
+      },
+      {
+        path: `${PRODUCTS.BASE}/${PRODUCTS.CATEGORY_L1}`,
+        lazy: async () => {
+          const { default: CategoryProducts } = await import('@/pages/product/CategoryProducts');
+          return { Component: CategoryProducts };
+        },
+      },
+      {
+        path: `${PRODUCTS.BASE}/${PRODUCTS.CATEGORY_L1}/${PRODUCTS.CATEGORY_L2}`,
+        lazy: async () => {
+          const { default: CategoryProducts } = await import('@/pages/product/CategoryProducts');
+          return { Component: CategoryProducts };
+        },
+      },
+      {
+        path: `${PRODUCTS.BASE}/${PRODUCTS.CATEGORY_L1}/${PRODUCTS.CATEGORY_L2}/${PRODUCTS.CATEGORY_L3}`,
+        lazy: async () => {
+          const { default: CategoryProducts } = await import('@/pages/product/CategoryProducts');
+          return { Component: CategoryProducts };
+        },
       },
     ],
   },
   {
-    path: "login",
-    element: <LoginRedirect />,
+    path: AUTH.BASE,
+    HydrateFallback: LoadingScreen,
+    ErrorBoundary: ErrorBoundary,
+    lazy: async () => {
+      const { default: Auth } = await import('@/pages/auth');
+      return { Component: Auth };
+    },
+    children: [
+      {
+        index: true,
+        lazy: async () => {
+          const { default: Login } = await import('@/pages/auth/Login');
+          return { Component: Login };
+        },
+      },
+
+      {
+        path: AUTH.FORGOT_PASSWORD,
+        lazy: async () => {
+          const { default: ForgotPassword } = await import('@/pages/auth/ForgotPassword');
+          return { Component: ForgotPassword };
+        },
+      },
+      {
+        path: AUTH.CHANGE_PASSWORD,
+        middleware: [authenticate],
+        lazy: async () => {
+          const { default: ChangePassword } = await import('@/pages/auth/ChangePassword');
+
+          return { Component: ChangePassword };
+        },
+      },
+    ],
   },
   {
-    path: "*",
-    element: <NotFound />,
+    path: '*',
+    lazy: async () => {
+      const { default: NotFound } = await import('@/pages/error/NotFound');
+      return { Component: NotFound };
+    },
   },
-]);
+];
 
-export default router;
+export default routes;
