@@ -324,7 +324,7 @@ const AddCategoryModal = () => {
       >
         <form onSubmit={handleSubmit(handleSaveCategory)} className="flex flex-col gap-5">
           <div>
-            <p className="text-primary text-base font-semibold">{stepFields[activeStep].title}</p>
+            <p className="text-primary font-semibold">{stepFields[activeStep].title}</p>
             <p className="text-secondary mt-1 text-xs">{activeStepData.description}</p>
           </div>
 
