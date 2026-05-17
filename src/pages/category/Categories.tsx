@@ -6,6 +6,7 @@ import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
+import type { TClassName } from '@/types/component.type';
 import { debounce } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -46,12 +47,13 @@ const SearchInput = ({
   onChange,
   placeholder,
   value,
+  className = '',
 }: {
   needRef?: boolean;
   onChange: (value: string) => void;
   placeholder: string;
   value: string;
-}) => (
+} & TClassName) => (
   <Input
     needRef={needRef}
     inputProps={{
@@ -60,13 +62,14 @@ const SearchInput = ({
       value: value.trimStart(),
       onChange: (event) => onChange(event.target.value),
     }}
+    className={className}
     icons={{
       right: { icon: 'solar:magnifer-linear', className: 'text-primary/50 size-4 md:size-5' },
     }}
   />
 );
 
-const Search = () => {
+const Search = ({ className = '' }: TClassName) => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const [searchQuery, setSearchQuery] = useState(queryParams?.search || '');
 
@@ -88,14 +91,13 @@ const Search = () => {
   }, [searchQuery, debouncedSetQuery]);
 
   return (
-    <div className="flex items-center justify-between gap-3 md:gap-4">
-      <SearchInput
-        needRef
-        placeholder="Search categories here..."
-        value={searchQuery}
-        onChange={setSearchQuery}
-      />
-    </div>
+    <SearchInput
+      needRef
+      placeholder="Search categories here..."
+      value={searchQuery}
+      onChange={setSearchQuery}
+      className={className}
+    />
   );
 };
 
@@ -128,13 +130,16 @@ const SortableHeader = ({
 );
 
 const CategoryInfo = ({ category }: { category: ICategory }) => (
-  <div className="flex min-w-52 items-center gap-3">
+  <div className="flex items-center gap-3">
     <div className="from-sky-blue-burst/20 to-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg bg-linear-to-br">
       <Icon icon="solar:hanger-2-linear" className="size-5" />
     </div>
-    <div className="min-w-0">
-      <p className="text-primary truncate text-sm font-semibold">{category.name}</p>
-      <p className="text-primary/45 truncate text-xs">{category.slug}</p>
+    <div>
+      <p className="text-primary text-sm font-semibold whitespace-nowrap">{category.name}</p>
+      <p className="text-primary/45 text-xs whitespace-nowrap">{category.slug}</p>
+      {category.description && (
+        <p className="text-primary/30 text-xs whitespace-nowrap">{category.description}</p>
+      )}
     </div>
   </div>
 );
@@ -198,7 +203,7 @@ const LoadingRows = ({ rows = 5 }: { rows?: number }) => (
   <>
     {Array.from({ length: rows }).map((_, index) => (
       <tr key={index}>
-        <td className="border-primary/5 border-b px-4 py-4 first:pl-5 last:pr-5" colSpan={4}>
+        <td className="border-primary/5 border-y px-4 py-4 first:pl-5 last:pr-5" colSpan={4}>
           <div className="flex animate-pulse items-center gap-4">
             <div className="bg-primary/10 size-10 rounded-lg" />
             <div className="flex-1 space-y-2">
@@ -253,21 +258,21 @@ const Level3Table = ({
         />
       </div>
       <div className="overflow-x-auto rounded-lg">
-        <table className="w-full min-w-170 border-separate border-spacing-0">
+        <table className="w-full table-auto border-separate border-spacing-0">
           <thead>
             <tr>
-              <th className="border-primary/10 border-b px-4 py-3 text-left first:pl-5">
+              <th className="border-primary/10 w-auto border-y px-4 py-3 text-left first:pl-5">
                 <SortableHeader sort={sort} onSort={() => setSort(getNextSort(sort))}>
                   Category
                 </SortableHeader>
               </th>
-              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase">
+              <th className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase">
                 Level
               </th>
-              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase">
+              <th className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase">
                 Parent
               </th>
-              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase last:pr-5">
+              <th className="text-primary/55 border-primary/10 w-0 border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase last:pr-5">
                 Actions
               </th>
             </tr>
@@ -278,18 +283,18 @@ const Level3Table = ({
             ) : filteredCategories.length ? (
               filteredCategories.map((category) => (
                 <tr key={category._id} className="hover:bg-primary/3 transition-colors">
-                  <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm first:pl-5">
+                  <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap first:pl-5">
                     <CategoryInfo category={category} />
                   </td>
-                  <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm">
+                  <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
                     <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
                       Level {category.level}
                     </span>
                   </td>
-                  <td className="text-primary/65 border-primary/5 border-b px-4 py-4 align-middle text-sm">
+                  <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
                     {category.parent || parentCategory.name}
                   </td>
-                  <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm last:pr-5">
+                  <td className="border-primary/5 w-0 border-y px-4 py-4 align-middle text-sm whitespace-nowrap last:pr-5">
                     <CategoryActions
                       categoryId={category._id}
                       onDeleteCategory={onDeleteCategory}
@@ -371,21 +376,21 @@ const Level2Table = ({
         />
       </div>
       <div className="overflow-x-auto rounded-lg">
-        <table className="w-full min-w-190 border-separate border-spacing-0">
+        <table className="w-full table-auto border-separate border-spacing-0">
           <thead>
             <tr>
-              <th className="border-primary/10 border-b px-4 py-3 text-left first:pl-5">
+              <th className="border-primary/10 w-auto border-y px-4 py-3 text-left first:pl-5">
                 <SortableHeader sort={sort} onSort={() => setSort(getNextSort(sort))}>
                   Category
                 </SortableHeader>
               </th>
-              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase">
+              <th className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase">
                 Level
               </th>
-              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase">
+              <th className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase">
                 Parent
               </th>
-              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase last:pr-5">
+              <th className="text-primary/55 border-primary/10 w-0 border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase last:pr-5">
                 Actions
               </th>
             </tr>
@@ -416,18 +421,18 @@ const Level2Table = ({
                       selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'
                     }`}
                   >
-                    <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm first:pl-5">
+                    <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap first:pl-5">
                       <CategoryInfo category={category} />
                     </td>
-                    <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm">
+                    <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
                       <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
                         Level {category.level}
                       </span>
                     </td>
-                    <td className="text-primary/65 border-primary/5 border-b px-4 py-4 align-middle text-sm">
+                    <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
                       {category.parent || parentCategory.name}
                     </td>
-                    <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm last:pr-5">
+                    <td className="border-primary/5 w-0 border-y px-4 py-4 align-middle text-sm whitespace-nowrap last:pr-5">
                       <CategoryActions
                         categoryId={category._id}
                         onDeleteCategory={onDeleteCategory}
@@ -437,7 +442,7 @@ const Level2Table = ({
                   </tr>
                   {selectedCategoryId === category._id && (
                     <tr key={`${category._id}-children`}>
-                      <td colSpan={4} className="border-primary/5 border-b p-4">
+                      <td colSpan={4} className="border-primary/5 border-y p-4">
                         <Level3Table
                           parentCategory={category}
                           onDeleteCategory={onDeleteCategory}
@@ -474,6 +479,7 @@ const Level2Table = ({
 
 const CategoryTable = ({
   data,
+  totalItems,
   isLoading,
   onDeleteCategory,
   onEditCategory,
@@ -484,6 +490,7 @@ const CategoryTable = ({
 }: {
   data: ICategory[];
   isLoading: boolean;
+  totalItems: number;
   onDeleteCategory: (categoryId: string) => void;
   onEditCategory: (categoryId: string) => void;
   onSort: () => void;
@@ -503,22 +510,28 @@ const CategoryTable = ({
 
   return (
     <div className="border-primary/10 bg-smoke-eerie overflow-hidden rounded-xl border">
+      <div className="bg-smoke-eerie flex items-center gap-4 p-4">
+        <Search className="bg-primary/3! max-w-sm" />
+        <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
+          {data.length}/{totalItems} items
+        </span>
+      </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-230 border-separate border-spacing-0">
+        <table className="w-full table-auto border-separate border-spacing-0">
           <thead>
             <tr>
-              <th className="border-primary/10 border-b px-4 py-3 text-left first:pl-5">
+              <th className="border-primary/10 w-auto border-y px-4 py-3 text-left first:pl-5">
                 <SortableHeader sort={sort} onSort={onSort}>
                   Category
                 </SortableHeader>
               </th>
-              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase">
+              <th className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase">
                 Level
               </th>
-              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase">
+              <th className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase">
                 Parent
               </th>
-              <th className="text-primary/55 border-primary/10 border-b px-4 py-3 text-left text-xs font-semibold tracking-normal uppercase last:pr-5">
+              <th className="text-primary/55 border-primary/10 w-0 border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase last:pr-5">
                 Actions
               </th>
             </tr>
@@ -543,18 +556,18 @@ const CategoryTable = ({
                       selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'
                     }`}
                   >
-                    <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm first:pl-5">
+                    <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap first:pl-5">
                       <CategoryInfo category={category} />
                     </td>
-                    <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm">
+                    <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
                       <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
                         Level {category.level}
                       </span>
                     </td>
-                    <td className="text-primary/65 border-primary/5 border-b px-4 py-4 align-middle text-sm">
+                    <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
                       {category.parent || 'Main category'}
                     </td>
-                    <td className="border-primary/5 border-b px-4 py-4 align-middle text-sm last:pr-5">
+                    <td className="border-primary/5 w-0 border-y px-4 py-4 align-middle text-sm whitespace-nowrap last:pr-5">
                       <CategoryActions
                         categoryId={category._id}
                         onDeleteCategory={onDeleteCategory}
@@ -564,7 +577,7 @@ const CategoryTable = ({
                   </tr>
                   {selectedCategoryId === category._id && (
                     <tr key={`${category._id}-children`}>
-                      <td colSpan={4} className="border-primary/5 border-b p-4">
+                      <td colSpan={4} className="border-primary/5 border-y p-4">
                         <Level2Table
                           parentCategory={category}
                           onDeleteCategory={onDeleteCategory}
@@ -626,14 +639,12 @@ const Categories = () => {
             buttonProps: { onClick: () => navigate(ROUTES.CATEGORIES.ADD) },
           },
         ]}
-        className="[&>:nth-last-child(2)]:border-b-silver/30 [&>:nth-last-child(2)]:border-b [&>div]:py-2"
-      >
-        <Search />
-      </Navbar>
+      />
 
       <div>
         <CategoryTable
           data={filteredCategories}
+          totalItems={level1Cats.length}
           isLoading={isLoading}
           onDeleteCategory={handleDeleteCategory}
           onEditCategory={handleEditCategory}
