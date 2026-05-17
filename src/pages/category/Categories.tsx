@@ -421,9 +421,8 @@ const Level2Table = ({
               <LoadingRows rows={3} />
             ) : filteredCategories.length ? (
               filteredCategories.map((category) => (
-                <>
+                <Fragment key={category._id}>
                   <tr
-                    key={category._id}
                     tabIndex={0}
                     onClick={() =>
                       setSelectedCategoryId((selected) =>
@@ -460,7 +459,7 @@ const Level2Table = ({
                     </Td>
                   </tr>
                   {selectedCategoryId === category._id && (
-                    <tr key={`${category._id}-children`}>
+                    <tr>
                       <td colSpan={4} className="border-primary/5 border-y p-4">
                         <Level3Table
                           parentCategory={category}
@@ -470,7 +469,7 @@ const Level2Table = ({
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))
             ) : (
               <tr>
