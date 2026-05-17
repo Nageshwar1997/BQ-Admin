@@ -7,6 +7,7 @@ import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
 import type { TChildren, TClassName } from '@/types/component.type';
+import type { IInput } from '@/types/input.type';
 import { debounce } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
 import { Fragment, useEffect, useMemo, useState, type TableHTMLAttributes } from 'react';
@@ -15,6 +16,8 @@ import AddCategoryModal from './children/AddCategoryModal';
 type TSortDirection = '' | 'asc' | 'desc';
 
 const TH_TITLES = ['Category', 'Level', 'Parent', 'Actions'] as const;
+
+const QUERY_CLEAR_MAP = { s_l1: ['s_l2', 's_l3'], s_l2: ['s_l3'], s_l3: [] };
 
 const getFilteredAndSortedCategories = (
   categories: ICategory[],
@@ -200,35 +203,61 @@ const SearchInput = ({
 
 const Search = ({
   className = '',
+  needRef,
   queryKey,
-}: TClassName & { queryKey?: 'q_l1' | 'q_l2' | 'q_l3' }) => {
+  level,
+}: Pick<IInput, 'className' | 'needRef'> &
+  Pick<ICategory, 'level'> & {
+    queryKey: 's_l1' | 's_l2' | 's_l3';
+  }) => {
   const { queryParams, setParams, removeParams } = useQueryParams();
-  const [searchQuery, setSearchQuery] = useState(queryParams?.search || '');
+
+  const [searchQuery, setSearchQuery] = useState(queryParams?.[queryKey] || '');
 
   const debouncedSetQuery = useMemo(
     () =>
       debounce((value: string) => {
-        if (value.trim()) {
-          setParams({ [queryKey ?? 'search']: value.trim() });
+        const trimmedValue = value.trim();
+        const keysToClear = QUERY_CLEAR_MAP[queryKey];
+
+        if (trimmedValue) {
+          setParams({ [queryKey]: trimmedValue });
+
+          if (keysToClear.length) {
+            removeParams(keysToClear);
+          }
         } else {
-          removeParams([queryKey ?? 'search']);
+          removeParams([queryKey]);
         }
       }, 500),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+    [queryKey, removeParams, setParams],
   );
 
   useEffect(() => {
-    debouncedSetQuery(searchQuery);
-  }, [searchQuery, debouncedSetQuery]);
+    return () => debouncedSetQuery.cancel();
+  }, [debouncedSetQuery]);
+
+  useEffect(() => {
+    setSearchQuery(queryParams?.[queryKey] || '');
+  }, [queryKey, queryParams?.[queryKey]]);
 
   return (
-    <SearchInput
-      needRef
-      placeholder="Search categories here..."
-      value={searchQuery}
-      onChange={setSearchQuery}
-      className={className}
+    <Input
+      needRef={needRef}
+      inputProps={{
+        name: queryKey,
+        placeholder: `Search level ${level} categories here...`,
+        value: searchQuery,
+        onChange: ({ currentTarget: { value } }) => {
+          const trimmedValue = value.trimStart();
+          setSearchQuery(trimmedValue);
+          debouncedSetQuery(trimmedValue);
+        },
+      }}
+      className={`bg-silver/10! ${className}`}
+      icons={{
+        right: { icon: 'solar:magnifer-linear', className: 'text-primary/50 size-4 md:size-5' },
+      }}
     />
   );
 };

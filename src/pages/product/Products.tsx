@@ -11,24 +11,29 @@ import { useEffect, useMemo, useState } from 'react';
 const SearchAndSort = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const [searchQuery, setSearchQuery] = useState(queryParams?.search || '');
-  const [_debouncedQuery, setDebouncedQuery] = useState('');
+
   const debouncedSetQuery = useMemo(
     () =>
       debounce((value: string) => {
-        if (value && value?.trim()) {
-          setDebouncedQuery(value.trim());
-          setParams({ ...queryParams, search: value?.trim() });
+        const trimmedValue = value.trim();
+
+        if (trimmedValue) {
+          setParams({ search: trimmedValue });
         } else {
           removeParams(['search']);
         }
-      }, 600),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, 500),
     [],
   );
 
   useEffect(() => {
-    debouncedSetQuery(searchQuery);
-  }, [searchQuery, debouncedSetQuery]);
+    return () => debouncedSetQuery.cancel();
+  }, [debouncedSetQuery]);
+
+  useEffect(() => {
+    setSearchQuery(queryParams?.search || '');
+  }, [queryParams?.search]);
+
   return (
     <div className="flex items-center justify-between gap-3 md:gap-4">
       <Input
@@ -36,8 +41,13 @@ const SearchAndSort = () => {
         inputProps={{
           name: 'search',
           placeholder: 'Search products here...',
-          value: searchQuery?.trimStart(),
-          onChange: (e) => setSearchQuery(e.target.value),
+          value: searchQuery,
+          onChange: (e) => {
+            const value = (e.target.value || '').trimStart();
+
+            setSearchQuery(value);
+            debouncedSetQuery(value);
+          },
           disabled: !queryParams.status || queryParams.status === 'draft',
         }}
         icons={{
