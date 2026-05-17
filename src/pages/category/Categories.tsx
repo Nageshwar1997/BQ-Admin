@@ -1,3 +1,4 @@
+import ApiStatus from '@/components/layout/ApiStatus';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import Navbar from '@/components/layout/navbar';
 import Button from '@/components/ui/Button';
@@ -250,45 +251,6 @@ const CategoryActions = ({
   </div>
 );
 
-const EmptyState = ({
-  icon,
-  title,
-  description,
-}: {
-  icon: string;
-  title: string;
-  description: string;
-}) => (
-  <div className="border-primary/10 bg-smoke-eerie flex min-h-56 flex-col items-center justify-center gap-3 rounded-xl border p-6 text-center">
-    <div className="bg-primary/5 text-primary grid size-12 place-items-center rounded-full">
-      <Icon icon={icon} className="size-6" />
-    </div>
-    <div className="space-y-1">
-      <p className="text-primary text-base font-semibold">{title}</p>
-      <p className="text-primary/55 max-w-md text-sm">{description}</p>
-    </div>
-  </div>
-);
-
-const LoadingRows = ({ rows = 5 }: { rows?: number }) => (
-  <>
-    {Array.from({ length: rows }).map((_, index) => (
-      <tr key={index}>
-        <td className="border-primary/5 border-y px-4 py-4 first:pl-5 last:pr-5" colSpan={4}>
-          <div className="flex animate-pulse items-center gap-4">
-            <div className="bg-primary/10 size-10 rounded-lg" />
-            <div className="flex-1 space-y-2">
-              <div className="bg-primary/10 h-3 w-1/3 rounded" />
-              <div className="bg-primary/5 h-3 w-1/5 rounded" />
-            </div>
-            <div className="bg-primary/10 h-8 w-28 rounded-lg" />
-          </div>
-        </td>
-      </tr>
-    ))}
-  </>
-);
-
 const Level3Table = ({
   parentCategory,
   onDeleteCategory,
@@ -300,7 +262,11 @@ const Level3Table = ({
 }) => {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<TSortDirection>('');
-  const { data: categoriesData = [], isFetching } = useGetCategoriesByParentLevel({
+  const {
+    data: categoriesData = [],
+    isLoading,
+    isError,
+  } = useGetCategoriesByParentLevel({
     level: 3,
     parentId: parentCategory._id,
   });
@@ -332,28 +298,7 @@ const Level3Table = ({
         <table className="w-full table-auto border-separate border-spacing-0">
           <THead sort={sort} setSort={setSort} />
           <tbody>
-            {isFetching ? (
-              <tr className="hover:bg-primary/3 transition-colors">
-                <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap first:pl-5">
-                  {/* <CategoryInfo category={category} /> */}
-                </td>
-                <td className="border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap">
-                  <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
-                    {/* Level {category.level} */}
-                  </span>
-                </td>
-                <td className="text-primary/65 border-primary/5 border-y px-4 py-4 align-middle text-sm whitespace-nowrap uppercase">
-                  {/* {category.parent || parentCategory.name} */}
-                </td>
-                <td className="border-primary/5 w-0 border-y px-4 py-4 align-middle text-sm whitespace-nowrap last:pr-5">
-                  {/* <CategoryActions
-                    categoryId={category._id}
-                    onDeleteCategory={onDeleteCategory}
-                    onEditCategory={onEditCategory}
-                  /> */}
-                </td>
-              </tr>
-            ) : filteredCategories.length ? (
+            {filteredCategories.length ? (
               filteredCategories.map((category) => (
                 <CategoryTr
                   key={category._id}
@@ -365,18 +310,23 @@ const Level3Table = ({
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="p-4">
-                  <EmptyState
-                    icon="solar:folder-error-linear"
+                <td colSpan={4} className="pt-4">
+                  <ApiStatus
+                    className="border-primary/10 bg-smoke-eerie flex rounded-xl border"
+                    status={isLoading ? 'loading' : isError ? 'error' : 'empty'}
                     title={
-                      categories.length
-                        ? 'No matching level 3 categories'
-                        : 'No level 3 categories yet'
+                      isError
+                        ? 'Failed to load categories'
+                        : categories.length
+                          ? 'No matching categories found'
+                          : 'No categories available'
                     }
                     description={
-                      categories.length
-                        ? 'Try a different search term.'
-                        : 'This level 2 category does not have child categories.'
+                      isError
+                        ? 'Something went wrong while fetching level 3 categories. Please try again.'
+                        : categories.length
+                          ? 'Try searching with a different keyword or clear the search.'
+                          : 'No level 3 categories have been added under this category yet.'
                     }
                   />
                 </td>
@@ -401,7 +351,11 @@ const Level2Table = ({
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<TSortDirection>('');
-  const { data: categoriesData = [], isFetching } = useGetCategoriesByParentLevel({
+  const {
+    data: categoriesData = [],
+    isLoading,
+    isError,
+  } = useGetCategoriesByParentLevel({
     level: 2,
     parentId: parentCategory._id,
   });
@@ -439,9 +393,7 @@ const Level2Table = ({
         <table className="w-full table-auto border-separate border-spacing-0">
           <THead sort={sort} setSort={setSort} />
           <tbody>
-            {isFetching ? (
-              <LoadingRows rows={3} />
-            ) : filteredCategories.length ? (
+            {filteredCategories.length ? (
               filteredCategories.map((category) => (
                 <Fragment key={category._id}>
                   <CategoryTr
@@ -479,15 +431,22 @@ const Level2Table = ({
             ) : (
               <tr>
                 <td colSpan={4} className="p-4">
-                  <EmptyState
-                    icon="solar:folder-error-linear"
+                  <ApiStatus
+                    className="border-primary/10 bg-smoke-eerie flex rounded-xl border"
+                    status={isLoading ? 'loading' : isError ? 'error' : 'empty'}
                     title={
-                      categories.length ? 'No matching sub-categories' : 'No sub-categories yet'
+                      isError
+                        ? 'Failed to load categories'
+                        : categories.length
+                          ? 'No matching categories found'
+                          : 'No categories available'
                     }
                     description={
-                      categories.length
-                        ? 'Try a different search term.'
-                        : 'This level 1 category does not have child categories.'
+                      isError
+                        ? 'Something went wrong while fetching level 2 categories. Please try again.'
+                        : categories.length
+                          ? 'Try searching with a different keyword or clear the search.'
+                          : 'No level 2 categories have been added under this category yet.'
                     }
                   />
                 </td>
@@ -504,7 +463,11 @@ const Level1Table = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const [selectedCategory, setSelectedCategory] = useState<ICategory>();
   const [search, setSearch] = useState('');
-  const { data: level1CatsData = [], isLoading } = useGetCategoriesByParentLevel({ level: 1 });
+  const {
+    data: level1CatsData = [],
+    isLoading,
+    isError,
+  } = useGetCategoriesByParentLevel({ level: 1 });
   const level1Cats = level1CatsData as ICategory[];
   const level1Sort =
     queryParams.sort === 'asc' || queryParams.sort === 'desc' ? queryParams.sort : '';
@@ -551,9 +514,7 @@ const Level1Table = () => {
         <table className="w-full table-auto border-separate border-spacing-0">
           <THead sort={level1Sort} setSort={handleLevel1Sort} />
           <tbody>
-            {isLoading ? (
-              <LoadingRows rows={3} />
-            ) : filteredCategories.length ? (
+            {filteredCategories.length ? (
               filteredCategories.map((category) => (
                 <Fragment key={category._id}>
                   <CategoryTr
@@ -590,11 +551,24 @@ const Level1Table = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={4} className="p-4">
-                  <EmptyState
-                    icon="solar:folder-open-linear"
-                    title="No categories found"
-                    description="Try a different search term or add your first category from the button above."
+                <td colSpan={4} className="pt-4">
+                  <ApiStatus
+                    className="border-primary/10 bg-smoke-eerie flex rounded-xl border"
+                    status={isLoading ? 'loading' : isError ? 'error' : 'empty'}
+                    title={
+                      isError
+                        ? 'Failed to load categories'
+                        : level1Cats.length
+                          ? 'No matching categories found'
+                          : 'No categories available'
+                    }
+                    description={
+                      isError
+                        ? 'Something went wrong while fetching level 1 categories. Please try again.'
+                        : level1Cats.length
+                          ? 'Try searching with a different keyword or clear the search.'
+                          : 'No level 1 categories have been added under this category yet.'
+                    }
                   />
                 </td>
               </tr>
