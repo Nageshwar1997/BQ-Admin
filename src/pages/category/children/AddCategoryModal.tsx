@@ -45,7 +45,7 @@ const AddCategoryModal = () => {
 
   const {
     control,
-    formState: { errors, isDirty },
+    formState: { errors },
     handleSubmit,
     register,
     setError,
@@ -353,7 +353,6 @@ const AddCategoryModal = () => {
               buttonProps={{
                 type: activeStep === ADD_CATEGORY_STEPS.length - 1 ? 'submit' : 'button',
                 onClick: activeStep === ADD_CATEGORY_STEPS.length - 1 ? undefined : handleNext,
-                disabled: !isDirty || !!errors.confirmDetails?.message,
               }}
               className="sm:max-w-36"
             />

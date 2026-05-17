@@ -40,7 +40,7 @@ export const FORM_DEFAULT_VALUES = {
     level: '1',
     mainCategory: '',
     subCategory: '',
-    description: '',
+    description: undefined,
     confirmDetails: false,
   },
 } as const;
