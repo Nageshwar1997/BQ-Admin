@@ -33,12 +33,6 @@ const STEP_FIELDS: FieldPath<TAddCategory>[][] = [
   ['confirmDetails'],
 ];
 
-const CATEGORY_LEVEL_OPTIONS = [
-  { label: 'Level 1 - Main category', value: '1' },
-  { label: 'Level 2 - Sub-category', value: '2' },
-  { label: 'Level 3 - Product category', value: '3' },
-];
-
 const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
   categories?.find((cat) => cat._id === id)?.name || '-';
 
@@ -102,28 +96,32 @@ const AddCategoryModal = () => {
     if (isValid) setActiveStep(Math.min(activeStep + 1, ADD_CATEGORY_STEPS.length - 1));
   };
 
-  const getPayload = (data: TAddCategory) => ({
-    name: data.name.trim(),
-    level: Number(data.level),
-    parent: data.level === '3' ? data.subCategory : data.level === '2' ? data.mainCategory : null,
-    description: data.level === '3' ? data.description.trim() : undefined,
-  });
+  const getPayload = (data: TAddCategory) => {
+    const level = Number(data.level);
+    return {
+      name: data.name.trim(),
+      level,
+      parent: level === 3 ? data.subCategory : level === 2 ? data.mainCategory : null,
+      description: level === 3 ? data.description.trim() : undefined,
+    };
+  };
 
   const handleSaveCategory = (data: TAddCategory) => {
     console.log('Add category payload:', getPayload(data));
   };
 
   const resetParentFields = (selectedLevel: string) => {
-    if (selectedLevel === '1') {
+    const level = Number(selectedLevel);
+    if (level === 1) {
       setValue('mainCategory', '', { shouldValidate: true });
       setValue('subCategory', '', { shouldValidate: true });
     }
 
-    if (selectedLevel === '2') {
+    if (level === 2) {
       setValue('subCategory', '', { shouldValidate: true });
     }
 
-    if (selectedLevel !== '3') {
+    if (level !== 3) {
       setValue('description', '', { shouldValidate: true });
     }
   };
@@ -133,7 +131,7 @@ const AddCategoryModal = () => {
       title: 'Category details',
       content: (
         <div className="grid gap-5">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Input
               label="Category name"
               register={register('name')}
@@ -146,7 +144,10 @@ const AddCategoryModal = () => {
             <Select
               label="Category level"
               register={register('level')}
-              options={CATEGORY_LEVEL_OPTIONS}
+              options={['Main', 'Sub', 'Product'].map((name, i) => ({
+                value: String(i + 1),
+                label: `L${i + 1} - ${name} category`,
+              }))}
               error={errors.level?.message}
               selectProps={{
                 name: 'level',
@@ -190,7 +191,7 @@ const AddCategoryModal = () => {
                 label="Description"
                 register={register('description')}
                 error={errors.description?.message}
-                containerClassName="md:col-span-2"
+                containerClassName="sm:col-span-2"
                 inputProps={{
                   name: 'description',
                   placeholder: 'Short description for this product category',
@@ -261,7 +262,7 @@ const AddCategoryModal = () => {
       header={{ showCloseIcon: true, title: 'Add new category' }}
       containerProps={{ className: 'p-4!' }}
       closeOnOutsideClick={false}
-      className="bg-secondary-invert [&>div]:first:bg-secondary-invert [&>div>div]:px-0"
+      className="bg-secondary-invert [&>div]:first:bg-secondary-invert max-w-lg! [&>div>div]:px-0"
     >
       <Stepper
         steps={ADD_CATEGORY_STEPS}
