@@ -1,5 +1,6 @@
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import Navbar from '@/components/layout/navbar';
+import Button from '@/components/ui/Button';
 import Input from '@/components/ui/inputs/Input';
 import { ROUTES } from '@/constants/common.constants';
 import usePathParams from '@/hooks/usePathParams';
@@ -154,28 +155,18 @@ const CategoryActions = ({
   onEditCategory: (categoryId: string) => void;
 }) => (
   <div className="flex items-center gap-2">
-    <button
-      type="button"
-      aria-label="Edit category"
-      onClick={(event) => {
-        event.stopPropagation();
-        onEditCategory(categoryId);
-      }}
-      className="border-primary/10 bg-smoke-eerie text-primary hover:border-primary/30 grid size-9 cursor-pointer place-items-center rounded-lg border transition-colors"
-    >
-      <Icon icon="solar:pen-linear" className="size-4.5" />
-    </button>
-    <button
-      type="button"
-      aria-label="Delete category"
-      onClick={(event) => {
-        event.stopPropagation();
-        onDeleteCategory(categoryId);
-      }}
-      className="border-primary/10 bg-smoke-eerie text-primary grid size-9 cursor-pointer place-items-center rounded-lg border transition-colors hover:border-red-400/50 hover:text-red-500"
-    >
-      <Icon icon="solar:trash-bin-trash-linear" className="size-4.5" />
-    </button>
+    <Button
+      content={{ icon: 'solar:pen-linear', className: 'size-4.5' }}
+      pattern="outline"
+      buttonProps={{ onClick: (event) => (event.stopPropagation(), onEditCategory(categoryId)) }}
+      className="border-primary/20 hover:border-blue-crayola-c/50 hover:text-blue-crayola-c size-9! p-0!"
+    />
+    <Button
+      content={{ icon: 'solar:trash-bin-trash-linear', className: 'size-4.5' }}
+      pattern="outline"
+      buttonProps={{ onClick: (event) => (event.stopPropagation(), onDeleteCategory(categoryId)) }}
+      className="border-primary/20 hover:border-red-c/50 hover:text-red-c size-9! p-0!"
+    />
   </div>
 );
 
@@ -509,7 +500,7 @@ const CategoryTable = ({
   }
 
   return (
-    <div className="border-primary/10 bg-smoke-eerie overflow-hidden rounded-xl border">
+    <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
       <div className="flex items-center gap-4 p-4">
         <Search className="max-w-md" />
         <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
