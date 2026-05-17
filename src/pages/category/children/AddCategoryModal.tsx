@@ -250,7 +250,6 @@ const AddCategoryModal = () => {
               />
             )}
           </div>
-
           <div className="border-primary/10 bg-platinum-black grid gap-3 rounded-lg border p-4 sm:grid-cols-[auto_1fr]">
             <div className="bg-primary/5 text-primary grid size-11 place-items-center rounded-lg">
               <Icon icon="streamline:hierarchy-10" className="size-5" />
