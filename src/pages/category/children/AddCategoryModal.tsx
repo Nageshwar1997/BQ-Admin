@@ -217,7 +217,7 @@ const AddCategoryModal = () => {
                 name: 'mainCategory',
                 value: categoryValues.mainCategory,
                 disabled: isL1(level),
-                placeholder: isL1(level) ? `Not required for level 1` : 'Select main category',
+                placeholder: isL1(level) ? `Not required for L1` : 'Select main category',
                 onChange: () => setValue('subCategory', '', { shouldValidate: true }),
               }}
             />
@@ -231,7 +231,7 @@ const AddCategoryModal = () => {
                 value: categoryValues.subCategory,
                 disabled: !isL3(level) || !mainCategory,
                 placeholder: !isL3(level)
-                  ? 'Only required for level 3'
+                  ? 'Only required for L3'
                   : mainCategory
                     ? 'Select sub-category'
                     : 'Select main category first',

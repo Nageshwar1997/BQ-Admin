@@ -37,7 +37,7 @@ export const FORM_DEFAULT_VALUES = {
     activeStep: 0,
     name: '',
     slug: '',
-    level: '1',
+    level: '3',
     mainCategory: '',
     subCategory: '',
     description: undefined,
