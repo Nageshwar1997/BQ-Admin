@@ -121,6 +121,56 @@ const CategoryTr = ({
   );
 };
 
+const ApiStatusTr = ({
+  isError,
+  isLoading,
+  hasLength,
+  level,
+}: Record<'hasLength' | 'isError' | 'isLoading', boolean> & Pick<ICategory, 'level'>) => {
+  return (
+    <tr>
+      <td colSpan={4} className="pt-4">
+        <ApiStatus
+          className="border-primary/10 bg-smoke-eerie flex rounded-xl border"
+          status={isLoading ? 'loading' : isError ? 'error' : 'empty'}
+          title={
+            isError
+              ? 'Failed to load categories'
+              : hasLength
+                ? 'No matching categories found'
+                : 'No categories available'
+          }
+          description={
+            isError
+              ? `Something went wrong while fetching level ${level} categories. Please try again.`
+              : hasLength
+                ? 'Try searching with a different keyword or clear the search.'
+                : `No level ${level} categories have been added under this category yet.`
+          }
+        />
+      </td>
+    </tr>
+  );
+};
+
+const SubCategoryTableTr = (props: {
+  parentCategory: ICategory;
+  onDeleteCategory: (categoryId: string) => void;
+  onEditCategory: (categoryId: string) => void;
+  table: Exclude<ICategory['level'], 1>;
+}) => {
+  const { table, ...rest } = props;
+
+  const Table = table === 2 ? Level2Table : Level3Table;
+  return (
+    <tr>
+      <td colSpan={4} className="border-primary/5 border-y p-4">
+        <Table {...rest} />
+      </td>
+    </tr>
+  );
+};
+
 const SearchInput = ({
   needRef,
   onChange,
@@ -309,28 +359,12 @@ const Level3Table = ({
                 />
               ))
             ) : (
-              <tr>
-                <td colSpan={4} className="pt-4">
-                  <ApiStatus
-                    className="border-primary/10 bg-smoke-eerie flex rounded-xl border"
-                    status={isLoading ? 'loading' : isError ? 'error' : 'empty'}
-                    title={
-                      isError
-                        ? 'Failed to load categories'
-                        : categories.length
-                          ? 'No matching categories found'
-                          : 'No categories available'
-                    }
-                    description={
-                      isError
-                        ? 'Something went wrong while fetching level 3 categories. Please try again.'
-                        : categories.length
-                          ? 'Try searching with a different keyword or clear the search.'
-                          : 'No level 3 categories have been added under this category yet.'
-                    }
-                  />
-                </td>
-              </tr>
+              <ApiStatusTr
+                hasLength={!!categories.length}
+                isError={isError}
+                isLoading={isLoading}
+                level={3}
+              />
             )}
           </tbody>
         </table>
@@ -416,41 +450,22 @@ const Level2Table = ({
                     onEditCategory={onEditCategory}
                   />
                   {selectedCategoryId === category._id && (
-                    <tr>
-                      <td colSpan={4} className="border-primary/5 border-y p-4">
-                        <Level3Table
-                          parentCategory={category}
-                          onDeleteCategory={onDeleteCategory}
-                          onEditCategory={onEditCategory}
-                        />
-                      </td>
-                    </tr>
+                    <SubCategoryTableTr
+                      table={3}
+                      parentCategory={category}
+                      onDeleteCategory={onDeleteCategory}
+                      onEditCategory={onEditCategory}
+                    />
                   )}
                 </Fragment>
               ))
             ) : (
-              <tr>
-                <td colSpan={4} className="p-4">
-                  <ApiStatus
-                    className="border-primary/10 bg-smoke-eerie flex rounded-xl border"
-                    status={isLoading ? 'loading' : isError ? 'error' : 'empty'}
-                    title={
-                      isError
-                        ? 'Failed to load categories'
-                        : categories.length
-                          ? 'No matching categories found'
-                          : 'No categories available'
-                    }
-                    description={
-                      isError
-                        ? 'Something went wrong while fetching level 2 categories. Please try again.'
-                        : categories.length
-                          ? 'Try searching with a different keyword or clear the search.'
-                          : 'No level 2 categories have been added under this category yet.'
-                    }
-                  />
-                </td>
-              </tr>
+              <ApiStatusTr
+                hasLength={!!categories.length}
+                isError={isError}
+                isLoading={isLoading}
+                level={2}
+              />
             )}
           </tbody>
         </table>
@@ -537,41 +552,22 @@ const Level1Table = () => {
                     onEditCategory={handleEditCategory}
                   />
                   {selectedCategory?._id === category._id && (
-                    <tr>
-                      <td colSpan={4} className="border-primary/5 border-y p-4">
-                        <Level2Table
-                          parentCategory={category}
-                          onDeleteCategory={handleDeleteCategory}
-                          onEditCategory={handleEditCategory}
-                        />
-                      </td>
-                    </tr>
+                    <SubCategoryTableTr
+                      table={2}
+                      parentCategory={category}
+                      onDeleteCategory={handleDeleteCategory}
+                      onEditCategory={handleEditCategory}
+                    />
                   )}
                 </Fragment>
               ))
             ) : (
-              <tr>
-                <td colSpan={4} className="pt-4">
-                  <ApiStatus
-                    className="border-primary/10 bg-smoke-eerie flex rounded-xl border"
-                    status={isLoading ? 'loading' : isError ? 'error' : 'empty'}
-                    title={
-                      isError
-                        ? 'Failed to load categories'
-                        : level1Cats.length
-                          ? 'No matching categories found'
-                          : 'No categories available'
-                    }
-                    description={
-                      isError
-                        ? 'Something went wrong while fetching level 1 categories. Please try again.'
-                        : level1Cats.length
-                          ? 'Try searching with a different keyword or clear the search.'
-                          : 'No level 1 categories have been added under this category yet.'
-                    }
-                  />
-                </td>
-              </tr>
+              <ApiStatusTr
+                hasLength={!!level1Cats.length}
+                isError={isError}
+                isLoading={isLoading}
+                level={3}
+              />
             )}
           </tbody>
         </table>
