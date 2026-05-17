@@ -13,6 +13,8 @@ import AddCategoryModal from './children/AddCategoryModal';
 
 type TSortDirection = '' | 'asc' | 'desc';
 
+const TH_TITLES = ['Category', 'Level', 'Parent', 'Actions'] as const;
+
 const getFilteredAndSortedCategories = (
   categories: ICategory[],
   search: string,
@@ -41,6 +43,33 @@ const getNextSort = (sort: TSortDirection): TSortDirection => {
   if (sort === 'desc') return '';
   return 'asc';
 };
+
+const THead = ({
+  sort,
+  setSort,
+}: {
+  sort: TSortDirection;
+  setSort: (sort: TSortDirection) => void;
+}) => (
+  <thead>
+    <tr>
+      {TH_TITLES.map((title) => (
+        <th
+          key={title}
+          className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase"
+        >
+          {title === 'Category' ? (
+            <SortableHeader sort={sort} onSort={() => setSort(getNextSort(sort))}>
+              {title}
+            </SortableHeader>
+          ) : (
+            title
+          )}
+        </th>
+      ))}
+    </tr>
+  </thead>
+);
 
 const SearchInput = ({
   needRef,
@@ -249,24 +278,7 @@ const Level3Table = ({
       </div>
       <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
-          <thead>
-            <tr>
-              <th className="border-primary/10 w-auto border-y px-4 py-3 text-left first:pl-5">
-                <SortableHeader sort={sort} onSort={() => setSort(getNextSort(sort))}>
-                  Category
-                </SortableHeader>
-              </th>
-              <th className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase">
-                Level
-              </th>
-              <th className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase">
-                Parent
-              </th>
-              <th className="text-primary/55 border-primary/10 w-0 border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase last:pr-5">
-                Actions
-              </th>
-            </tr>
-          </thead>
+          <THead sort={sort} setSort={setSort} />
           <tbody>
             {isFetching ? (
               <LoadingRows rows={3} />
@@ -367,24 +379,7 @@ const Level2Table = ({
       </div>
       <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
-          <thead>
-            <tr>
-              <th className="border-primary/10 w-auto border-y px-4 py-3 text-left first:pl-5">
-                <SortableHeader sort={sort} onSort={() => setSort(getNextSort(sort))}>
-                  Category
-                </SortableHeader>
-              </th>
-              <th className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase">
-                Level
-              </th>
-              <th className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase">
-                Parent
-              </th>
-              <th className="text-primary/55 border-primary/10 w-0 border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase last:pr-5">
-                Actions
-              </th>
-            </tr>
-          </thead>
+          <THead sort={sort} setSort={setSort} />
           <tbody>
             {isFetching ? (
               <LoadingRows rows={3} />
@@ -508,24 +503,7 @@ const CategoryTable = ({
       </div>
       <div className="overflow-x-auto">
         <table className="w-full table-auto border-separate border-spacing-0">
-          <thead>
-            <tr>
-              <th className="border-primary/10 w-auto border-y px-4 py-3 text-left first:pl-5">
-                <SortableHeader sort={sort} onSort={onSort}>
-                  Category
-                </SortableHeader>
-              </th>
-              <th className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase">
-                Level
-              </th>
-              <th className="text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase">
-                Parent
-              </th>
-              <th className="text-primary/55 border-primary/10 w-0 border-y px-4 py-3 text-left text-xs font-semibold tracking-normal whitespace-nowrap uppercase last:pr-5">
-                Actions
-              </th>
-            </tr>
-          </thead>
+          <THead sort={sort} setSort={onSort} />
           <tbody>
             {isLoading ? (
               <LoadingRows />
