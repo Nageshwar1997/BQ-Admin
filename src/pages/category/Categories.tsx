@@ -496,89 +496,7 @@ const Level2Table = ({
   );
 };
 
-const CategoryTable = ({
-  data,
-  totalItems,
-  isLoading,
-  onDeleteCategory,
-  onEditCategory,
-  onSort,
-  onViewSubCategories,
-  selectedCategoryId,
-  sort,
-}: {
-  data: ICategory[];
-  isLoading: boolean;
-  totalItems: number;
-  onDeleteCategory: (categoryId: string) => void;
-  onEditCategory: (categoryId: string) => void;
-  onSort: () => void;
-  onViewSubCategories: (category: ICategory) => void;
-  selectedCategoryId?: string;
-  sort: TSortDirection;
-}) => {
-  if (!isLoading && !data.length) {
-    return (
-      <EmptyState
-        icon="solar:folder-open-linear"
-        title="No categories found"
-        description="Try a different search term or add your first category from the button above."
-      />
-    );
-  }
-
-  return (
-    <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
-      <div className="flex items-center gap-4 p-4">
-        <Search className="max-w-md" />
-        <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
-          {data.length}/{totalItems} items
-        </span>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full table-auto border-separate border-spacing-0">
-          <THead sort={sort} setSort={onSort} />
-          <tbody>
-            {isLoading ? (
-              <LoadingRows />
-            ) : (
-              data.map((category) => (
-                <Fragment key={category._id}>
-                  <CategoryTr
-                    category={category}
-                    onClick={() => onViewSubCategories(category)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault();
-                        onViewSubCategories(category);
-                      }
-                    }}
-                    className={`cursor-pointer ${selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'}`}
-                    onDeleteCategory={onDeleteCategory}
-                    onEditCategory={onEditCategory}
-                  />
-                  {selectedCategoryId === category._id && (
-                    <tr>
-                      <td colSpan={4} className="border-primary/5 border-y p-4">
-                        <Level2Table
-                          parentCategory={category}
-                          onDeleteCategory={onDeleteCategory}
-                          onEditCategory={onEditCategory}
-                        />
-                      </td>
-                    </tr>
-                  )}
-                </Fragment>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-};
-
-const Categories = () => {
+const Level1Table = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const [selectedCategory, setSelectedCategory] = useState<ICategory>();
   const { data: level1CatsData = [], isLoading } = useGetCategoriesByParentLevel({ level: 1 });
@@ -608,8 +526,78 @@ const Categories = () => {
     [level1Cats, queryParams.search, level1Sort],
   );
 
+  if (!isLoading && !filteredCategories.length) {
+    return (
+      <EmptyState
+        icon="solar:folder-open-linear"
+        title="No categories found"
+        description="Try a different search term or add your first category from the button above."
+      />
+    );
+  }
+
   return (
-    <>
+    <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
+      <div className="flex items-center gap-4 p-4">
+        <Search className="max-w-md" />
+        <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
+          {filteredCategories.length}/{level1Cats.length} items
+        </span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full table-auto border-separate border-spacing-0">
+          <THead sort={level1Sort} setSort={handleLevel1Sort} />
+          <tbody>
+            {isLoading ? (
+              <LoadingRows />
+            ) : (
+              filteredCategories.map((category) => (
+                <Fragment key={category._id}>
+                  <CategoryTr
+                    category={category}
+                    onClick={() =>
+                      setSelectedCategory((selected) =>
+                        selected?._id === category._id ? undefined : category,
+                      )
+                    }
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        setSelectedCategory((selected) =>
+                          selected?._id === category._id ? undefined : category,
+                        );
+                      }
+                    }}
+                    className={`cursor-pointer ${selectedCategory?._id === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'}`}
+                    onDeleteCategory={handleDeleteCategory}
+                    onEditCategory={handleEditCategory}
+                  />
+                  {selectedCategory?._id === category._id && (
+                    <tr>
+                      <td colSpan={4} className="border-primary/5 border-y p-4">
+                        <Level2Table
+                          parentCategory={category}
+                          onDeleteCategory={handleDeleteCategory}
+                          onEditCategory={handleEditCategory}
+                        />
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+const Categories = () => {
+  const { queryParams, setParams } = useQueryParams();
+
+  return (
+    <Fragment>
       {queryParams.category === 'add' && <AddCategoryModal />}
       <PageWrapper>
         <Navbar
@@ -625,24 +613,10 @@ const Categories = () => {
         />
 
         <div>
-          <CategoryTable
-            data={filteredCategories}
-            totalItems={level1Cats.length}
-            isLoading={isLoading}
-            onDeleteCategory={handleDeleteCategory}
-            onEditCategory={handleEditCategory}
-            onSort={handleLevel1Sort}
-            selectedCategoryId={selectedCategory?._id}
-            sort={level1Sort}
-            onViewSubCategories={(category) =>
-              setSelectedCategory((selected) =>
-                selected?._id === category._id ? undefined : category,
-              )
-            }
-          />
+          <Level1Table />
         </div>
       </PageWrapper>
-    </>
+    </Fragment>
   );
 };
 
