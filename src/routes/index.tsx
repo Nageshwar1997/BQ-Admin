@@ -4,7 +4,7 @@ import { authenticate } from '@/middlewares';
 import ErrorBoundary from '@/pages/error/ErrorBoundary';
 import { Outlet, type RouteObject } from 'react-router-dom';
 
-const { AUTH, DASHBOARD, PRODUCTS } = ROUTES;
+const { AUTH, CATEGORIES, DASHBOARD, PRODUCTS } = ROUTES;
 
 const routes: RouteObject[] = [
   {
@@ -71,6 +71,27 @@ const routes: RouteObject[] = [
           const { default: CategoryProducts } = await import('@/pages/product/CategoryProducts');
           return { Component: CategoryProducts };
         },
+      },
+      /* ========== CATEGORIES ========== */
+      {
+        path: CATEGORIES.BASE,
+        element: <Outlet />,
+        children: [
+          {
+            index: true,
+            lazy: async () => {
+              const { default: Categories } = await import('@/pages/category/Categories');
+              return { Component: Categories };
+            },
+          },
+          {
+            path: CATEGORIES.ADD,
+            lazy: async () => {
+              const { default: AddCategory } = await import('@/pages/category/AddCategory');
+              return { Component: AddCategory };
+            },
+          },
+        ],
       },
     ],
   },

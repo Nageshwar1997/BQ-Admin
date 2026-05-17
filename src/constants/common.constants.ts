@@ -74,6 +74,7 @@ export const ROUTES = {
     FORGOT_PASSWORD: 'forgot-password',
     CHANGE_PASSWORD: 'change-password',
   },
+  CATEGORIES: { BASE: 'categories', ADD: 'add' },
   PRODUCTS: {
     BASE: 'products',
     ADD: 'add',
@@ -135,6 +136,12 @@ export const SIDEBAR_DATA = [
   {
     title: 'Products',
     icon: 'solar:box-minimalistic-linear',
+    path: `/${ROUTES.PRODUCTS.BASE}`,
+    handler: null,
+  },
+  {
+    title: 'Categories',
+    icon: 'solar:hanger-linear',
     path: `/${ROUTES.PRODUCTS.BASE}`,
     handler: null,
   },
