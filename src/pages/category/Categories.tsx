@@ -1,3 +1,4 @@
+import PageWrapper from '@/components/layout/containers/PageWrapper';
 import Navbar from '@/components/layout/navbar';
 import Input from '@/components/ui/inputs/Input';
 import { ROUTES } from '@/constants/common.constants';
@@ -110,11 +111,17 @@ const SortableHeader = ({
   <button
     type="button"
     onClick={onSort}
-    className="text-primary/65 flex cursor-pointer items-center gap-2 text-left text-xs font-semibold tracking-normal uppercase transition-colors hover:text-primary"
+    className="text-primary/65 hover:text-primary flex cursor-pointer items-center gap-2 text-left text-xs font-semibold tracking-normal uppercase transition-colors"
   >
     {children}
     <Icon
-      icon={sort === 'asc' ? 'solar:arrow-up-linear' : sort === 'desc' ? 'solar:arrow-down-linear' : 'solar:sort-linear'}
+      icon={
+        sort === 'asc'
+          ? 'solar:arrow-up-linear'
+          : sort === 'desc'
+            ? 'solar:arrow-down-linear'
+            : 'solar:sort-linear'
+      }
       className="size-4"
     />
   </button>
@@ -160,7 +167,7 @@ const CategoryActions = ({
         event.stopPropagation();
         onDeleteCategory(categoryId);
       }}
-      className="border-primary/10 bg-smoke-eerie text-primary hover:border-red-400/50 hover:text-red-500 grid size-9 cursor-pointer place-items-center rounded-lg border transition-colors"
+      className="border-primary/10 bg-smoke-eerie text-primary grid size-9 cursor-pointer place-items-center rounded-lg border transition-colors hover:border-red-400/50 hover:text-red-500"
     >
       <Icon icon="solar:trash-bin-trash-linear" className="size-4.5" />
     </button>
@@ -296,7 +303,11 @@ const Level3Table = ({
                 <td colSpan={4} className="p-4">
                   <EmptyState
                     icon="solar:folder-error-linear"
-                    title={categories.length ? 'No matching level 3 categories' : 'No level 3 categories yet'}
+                    title={
+                      categories.length
+                        ? 'No matching level 3 categories'
+                        : 'No level 3 categories yet'
+                    }
                     description={
                       categories.length
                         ? 'Try a different search term.'
@@ -442,7 +453,9 @@ const Level2Table = ({
                 <td colSpan={4} className="p-4">
                   <EmptyState
                     icon="solar:folder-error-linear"
-                    title={categories.length ? 'No matching sub-categories' : 'No sub-categories yet'}
+                    title={
+                      categories.length ? 'No matching sub-categories' : 'No sub-categories yet'
+                    }
                     description={
                       categories.length
                         ? 'Try a different search term.'
@@ -576,7 +589,8 @@ const Categories = () => {
   const [selectedCategory, setSelectedCategory] = useState<ICategory>();
   const { data: level1CatsData = [], isLoading } = useGetCategoriesByParentLevel({ level: 1 });
   const level1Cats = level1CatsData as ICategory[];
-  const level1Sort = queryParams.sort === 'asc' || queryParams.sort === 'desc' ? queryParams.sort : '';
+  const level1Sort =
+    queryParams.sort === 'asc' || queryParams.sort === 'desc' ? queryParams.sort : '';
 
   const handleEditCategory = (categoryId: string) => {
     console.log('Edit category _id:', categoryId);
@@ -601,7 +615,7 @@ const Categories = () => {
   );
 
   return (
-    <div className="flex flex-col gap-5">
+    <PageWrapper>
       <Navbar
         buttons={[
           {
@@ -617,19 +631,23 @@ const Categories = () => {
         <Search />
       </Navbar>
 
-      <CategoryTable
-        data={filteredCategories}
-        isLoading={isLoading}
-        onDeleteCategory={handleDeleteCategory}
-        onEditCategory={handleEditCategory}
-        onSort={handleLevel1Sort}
-        selectedCategoryId={selectedCategory?._id}
-        sort={level1Sort}
-        onViewSubCategories={(category) =>
-          setSelectedCategory((selected) => (selected?._id === category._id ? undefined : category))
-        }
-      />
-    </div>
+      <div>
+        <CategoryTable
+          data={filteredCategories}
+          isLoading={isLoading}
+          onDeleteCategory={handleDeleteCategory}
+          onEditCategory={handleEditCategory}
+          onSort={handleLevel1Sort}
+          selectedCategoryId={selectedCategory?._id}
+          sort={level1Sort}
+          onViewSubCategories={(category) =>
+            setSelectedCategory((selected) =>
+              selected?._id === category._id ? undefined : category,
+            )
+          }
+        />
+      </div>
+    </PageWrapper>
   );
 };
 
