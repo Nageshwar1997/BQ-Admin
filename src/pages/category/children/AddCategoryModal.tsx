@@ -15,6 +15,10 @@ import { Icon } from '@iconify/react';
 import { useMemo } from 'react';
 import { useForm, useWatch, type FieldPath } from 'react-hook-form';
 
+const isL1 = (level: TAddCategory['level']) => Number(level) === 1;
+const isL2 = (level: TAddCategory['level']) => Number(level) === 2;
+const isL3 = (level: TAddCategory['level']) => Number(level) === 3;
+
 const ADD_CATEGORY_STEPS: StepperStep[] = [
   {
     title: 'Category info',
@@ -62,16 +66,20 @@ const AddCategoryModal = () => {
     setValue('activeStep', step, { shouldDirty: false, shouldTouch: false });
   };
 
-  const { data: level1Cats } = useGetCategoriesByParentLevel({ level: 1, enabled: level !== '1' });
+  const { data: level1Cats } = useGetCategoriesByParentLevel({
+    level: 1,
+    enabled: !isL1(level),
+  });
+
   const { data: level2Cats } = useGetCategoriesByParentLevel({
     level: 2,
     parentId: mainCategory,
-    enabled: level === '3' && !!mainCategory,
+    enabled: isL3(level) && !!mainCategory,
   });
 
   const hierarchyPreview = useMemo(() => {
-    if (level === '1') return 'This will be created as a main category.';
-    if (level === '2') {
+    if (isL1(level)) return 'This will be created as a main category.';
+    if (isL2(level)) {
       return `Under ${getCategoryName(level1Cats, categoryValues.mainCategory)}.`;
     }
     return `Under ${getCategoryName(level1Cats, categoryValues.mainCategory)} / ${getCategoryName(
@@ -97,12 +105,11 @@ const AddCategoryModal = () => {
   };
 
   const getPayload = (data: TAddCategory) => {
-    const level = Number(data.level);
     return {
       name: data.name.trim(),
-      level,
-      parent: level === 3 ? data.subCategory : level === 2 ? data.mainCategory : null,
-      description: level === 3 ? data.description.trim() : undefined,
+      level: data.level,
+      parent: isL3(data.level) ? data.subCategory : isL2(data.level) ? data.mainCategory : null,
+      description: isL3(data.level) ? data.description.trim() : undefined,
     };
   };
 
@@ -110,18 +117,17 @@ const AddCategoryModal = () => {
     console.log('Add category payload:', getPayload(data));
   };
 
-  const resetParentFields = (selectedLevel: string) => {
-    const level = Number(selectedLevel);
-    if (level === 1) {
+  const resetParentFields = (selectedLevel: TAddCategory['level']) => {
+    if (isL1(selectedLevel)) {
       setValue('mainCategory', '', { shouldValidate: true });
       setValue('subCategory', '', { shouldValidate: true });
     }
 
-    if (level === 2) {
+    if (isL2(selectedLevel)) {
       setValue('subCategory', '', { shouldValidate: true });
     }
 
-    if (level !== 3) {
+    if (isL3(selectedLevel)) {
       setValue('description', '', { shouldValidate: true });
     }
   };
@@ -153,7 +159,8 @@ const AddCategoryModal = () => {
                 name: 'level',
                 value: level,
                 placeholder: 'Select category level',
-                onChange: ({ currentTarget: { value } }) => resetParentFields(value),
+                onChange: ({ currentTarget: { value } }) =>
+                  resetParentFields(value as TAddCategory['level']),
               }}
             />
             <Select
@@ -164,8 +171,8 @@ const AddCategoryModal = () => {
               selectProps={{
                 name: 'mainCategory',
                 value: categoryValues.mainCategory,
-                disabled: level === '1',
-                placeholder: level === '1' ? 'Not required for level 1' : 'Select main category',
+                disabled: isL1(level),
+                placeholder: isL1(level) ? `Not required for level 1` : 'Select main category',
                 onChange: () => setValue('subCategory', '', { shouldValidate: true }),
               }}
             />
@@ -177,16 +184,15 @@ const AddCategoryModal = () => {
               selectProps={{
                 name: 'subCategory',
                 value: categoryValues.subCategory,
-                disabled: level !== '3' || !mainCategory,
-                placeholder:
-                  level !== '3'
-                    ? 'Only required for level 3'
-                    : mainCategory
-                      ? 'Select sub-category'
-                      : 'Select main category first',
+                disabled: !isL3(level) || !mainCategory,
+                placeholder: !isL3(level)
+                  ? 'Only required for level 3'
+                  : mainCategory
+                    ? 'Select sub-category'
+                    : 'Select main category first',
               }}
             />
-            {level === '3' && (
+            {isL3(level) && (
               <Input
                 label="Description"
                 register={register('description')}
@@ -227,15 +233,17 @@ const AddCategoryModal = () => {
               </p>
               <p className="text-tertiary">
                 Parent:{' '}
-                <span className="text-primary">
-                  {categoryValues.level === '1'
-                    ? 'Main category'
-                    : categoryValues.level === '2'
-                      ? getCategoryName(level1Cats, categoryValues.mainCategory)
-                      : getCategoryName(level2Cats, categoryValues.subCategory)}
-                </span>
+                {categoryValues.level && (
+                  <span className="text-primary">
+                    {isL1(categoryValues.level)
+                      ? 'Main category'
+                      : isL2(categoryValues.level)
+                        ? getCategoryName(level1Cats, categoryValues.mainCategory)
+                        : getCategoryName(level2Cats, categoryValues.subCategory) || '-'}
+                  </span>
+                )}
               </p>
-              {categoryValues.level === '3' && (
+              {categoryValues.level && isL3(categoryValues.level) && (
                 <p className="text-tertiary sm:col-span-2">
                   Description:{' '}
                   <span className="text-primary">{categoryValues.description || '-'}</span>

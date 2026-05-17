@@ -1,5 +1,6 @@
 import { productApi } from '@/classes/apis';
 import { PRODUCT_SERVICE_QUERY_KEYS } from '@/constants/api.constants';
+import type { ICategory } from '@/types/api.type';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 const { get } = PRODUCT_SERVICE_QUERY_KEYS.category;
@@ -10,7 +11,7 @@ export const useGetCategoriesByParentLevel = ({
   parentId,
 }: {
   enabled?: boolean;
-  level?: number;
+  level?: ICategory['level'];
   parentId?: string;
 }) => {
   return useQuery({
