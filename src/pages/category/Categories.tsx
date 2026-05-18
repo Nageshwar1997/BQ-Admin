@@ -16,7 +16,7 @@ import useDebounce from '@/hooks/useDebounce';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
-import type { TSort } from '@/types/component.type';
+import type { TClassName, TSort } from '@/types/component.type';
 import { getFilteredAndSortedCategories } from '@/utils/api.util';
 import { Icon } from '@iconify/react';
 import {
@@ -225,7 +225,8 @@ const SearchInput = ({ level }: Pick<ICategory, 'level'>) => {
         value: searchQuery,
         onChange: ({ target: { value } }) => handleChange(value),
       }}
-      className={`bg-silver/10! max-w-md`}
+      containerClassName="max-w-sm"
+      className="bg-silver/10!"
       icons={{
         right: { icon: 'solar:magnifer-linear', className: 'text-primary/50 size-4 md:size-5' },
       }}
@@ -255,6 +256,32 @@ const CategoryInfo = ({ category }: { category: ICategory }) => (
     </div>
   </div>
 );
+
+const TopDetails = ({
+  name = 'Categories',
+  badgeText,
+  level,
+  className,
+}: TClassName & {
+  name?: string;
+  badgeText: string;
+  level: ICategory['level'];
+}) => {
+  return (
+    <div className={`space-y-3 pb-3 ${className}`}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {name && (
+          <div className="text-left">
+            <p className="text-primary text-sm font-semibold">{name}</p>
+            <p className="text-primary/50 text-xs">Level {level} categories</p>
+          </div>
+        )}
+        <Badge content={badgeText} />
+      </div>
+      <SearchInput level={level} />
+    </div>
+  );
+};
 
 const CategoryActions = ({
   categoryId,
@@ -310,15 +337,12 @@ const Level3Table = ({
 
   return (
     <div className="border-primary/10 bg-primary/3 rounded-lg border p-3">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-primary text-sm font-semibold">{parentCategory.name}</p>
-          <p className="text-primary/50 text-xs">Level 3 categories</p>
-        </div>
-        <Badge content={`${filteredCategories.length}/${categories.length} items`} />
-      </div>
-      <SearchInput level={3} />
-      <div className="mt-3 overflow-x-auto rounded-lg">
+      <TopDetails
+        badgeText={`${filteredCategories.length}/${categories.length} items`}
+        level={3}
+        name={parentCategory.name}
+      />
+      <div className="overflow-x-auto rounded-lg">
         <Table>
           <CategoryHead />
           <TableBody>
@@ -381,15 +405,12 @@ const Level2Table = ({
 
   return (
     <div className="border-primary/10 bg-primary/3 rounded-xl border p-4">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="text-primary text-base font-semibold">{parentCategory.name}</p>
-          <p className="text-primary/50 text-sm">Level 2 sub-categories</p>
-        </div>
-        <Badge content={`${filteredCategories.length}/${categories.length} items`} />
-      </div>
-      <SearchInput level={2} />
-      <div className="mt-3 overflow-x-auto rounded-lg">
+      <TopDetails
+        badgeText={`${filteredCategories.length}/${categories.length} items`}
+        level={2}
+        name={parentCategory.name}
+      />
+      <div className="overflow-x-auto rounded-lg">
         <Table>
           <CategoryHead />
           <TableBody>
@@ -467,14 +488,12 @@ const Level1Table = () => {
 
   return (
     <div className="border-primary/10 bg-secondary-invert rounded-xl border p-4">
-      <div className="flex items-center justify-between gap-3">
-        <SearchInput level={1} />
-        <Badge
-          content={`${filteredCategories.length}/${level1Cats.length} items`}
-          className="whitespace-nowrap"
-        />
-      </div>
-      <div className="mt-3 overflow-x-auto rounded-lg">
+      <TopDetails
+        badgeText={`${filteredCategories.length}/${level1Cats.length} items`}
+        level={1}
+        className="flex w-full flex-row-reverse items-center justify-between space-y-0"
+      />
+      <div className="overflow-x-auto rounded-lg">
         <Table>
           <CategoryHead />
           <TableBody>
