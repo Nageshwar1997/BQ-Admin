@@ -40,6 +40,19 @@ const QUERY_CLEAR_MAP = {
   [q_cat_keys.level.l3]: [],
 };
 
+type TActions = {
+  onEditCategory: (catId: string) => void;
+  onDeleteCategory: (catId: string) => void;
+};
+
+type TCategoryTable = TActions & {
+  category: ICategory;
+};
+
+type TSubCategoryTable = TActions & {
+  parentCategory: ICategory;
+};
+
 const CategoryHead = () => {
   const { queryParams, removeParams, setParams } = useQueryParams();
   return (
@@ -97,11 +110,7 @@ const CategoryRow = ({
   onEditCategory,
   className = '',
   ...trProps
-}: {
-  category: ICategory;
-  onDeleteCategory: (categoryId: string) => void;
-  onEditCategory: (categoryId: string) => void;
-} & ComponentProps<'tr'>) => {
+}: TCategoryTable & ComponentProps<'tr'>) => {
   return (
     <TableRow tabIndex={0} {...trProps} className={`transition-colors duration-100 ${className}`}>
       <TableRowCell className="text-left">
@@ -122,44 +131,41 @@ const CategoryRow = ({
   );
 };
 
-const ApiStatusTr = ({
+const ApiStatusRow = ({
   isError,
   isLoading,
-  hasLength,
+  haveLength,
   level,
-}: Record<'hasLength' | 'isError' | 'isLoading', boolean> & Pick<ICategory, 'level'>) => {
+}: Record<'haveLength' | 'isError' | 'isLoading', boolean> & Pick<ICategory, 'level'>) => {
   return (
-    <tr>
-      <td colSpan={4} className="pt-4">
+    <TableRow>
+      <TableRowCell colSpan={4} className="p-0! pt-4!">
         <ApiStatus
           className="border-primary/10 bg-smoke-eerie flex rounded-xl border"
           status={isLoading ? 'loading' : isError ? 'error' : 'empty'}
           title={
             isError
               ? 'Failed to load categories'
-              : hasLength
+              : haveLength
                 ? 'No matching categories found'
                 : 'No categories available'
           }
           description={
             isError
               ? `Something went wrong while fetching level ${level} categories. Please try again.`
-              : hasLength
+              : haveLength
                 ? 'Try searching with a different keyword or clear the search.'
                 : `No level ${level} categories have been added under this category yet.`
           }
         />
-      </td>
-    </tr>
+      </TableRowCell>
+    </TableRow>
   );
 };
 
-const SubCategoryTableTr = (props: {
-  parentCategory: ICategory;
-  onDeleteCategory: (categoryId: string) => void;
-  onEditCategory: (categoryId: string) => void;
-  level: Exclude<ICategory['level'], 1>;
-}) => {
+const SubCategoryTableTr = (
+  props: TSubCategoryTable & { level: Exclude<ICategory['level'], 1> },
+) => {
   const { level, ...rest } = props;
 
   const Component = level === 2 ? Level2Table : Level3Table;
@@ -234,7 +240,7 @@ const SearchInput = ({ level }: Pick<ICategory, 'level'>) => {
   );
 };
 
-const CategoryInfo = ({ category }: { category: ICategory }) => (
+const CategoryInfo = ({ category }: Pick<TCategoryTable, 'category'>) => (
   <div className="flex items-center gap-3">
     <div
       className={`to-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg bg-linear-to-br ${
@@ -258,7 +264,7 @@ const CategoryInfo = ({ category }: { category: ICategory }) => (
 );
 
 const TopDetails = ({
-  name = 'Categories',
+  name,
   badgeText,
   level,
   className,
@@ -287,11 +293,7 @@ const CategoryActions = ({
   categoryId,
   onDeleteCategory,
   onEditCategory,
-}: {
-  categoryId: string;
-  onDeleteCategory: (categoryId: string) => void;
-  onEditCategory: (categoryId: string) => void;
-}) => (
+}: TActions & { categoryId: string }) => (
   <div className="flex items-center justify-center gap-2">
     <Button
       content={{ icon: 'solar:pen-linear', className: 'size-4.5' }}
@@ -308,15 +310,7 @@ const CategoryActions = ({
   </div>
 );
 
-const Level3Table = ({
-  parentCategory,
-  onDeleteCategory,
-  onEditCategory,
-}: {
-  parentCategory: ICategory;
-  onDeleteCategory: (categoryId: string) => void;
-  onEditCategory: (categoryId: string) => void;
-}) => {
+const Level3Table = ({ parentCategory, onDeleteCategory, onEditCategory }: TSubCategoryTable) => {
   const { queryParams } = useQueryParams();
   const deferredSearch = useDeferredValue(queryParams[q_cat_keys.level.l3]);
   const deferredSort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
@@ -357,8 +351,8 @@ const Level3Table = ({
                 />
               ))
             ) : (
-              <ApiStatusTr
-                hasLength={!!categories.length}
+              <ApiStatusRow
+                haveLength={!!categories.length}
                 isError={isError}
                 isLoading={isLoading}
                 level={3}
@@ -371,15 +365,7 @@ const Level3Table = ({
   );
 };
 
-const Level2Table = ({
-  parentCategory,
-  onDeleteCategory,
-  onEditCategory,
-}: {
-  parentCategory: ICategory;
-  onDeleteCategory: (categoryId: string) => void;
-  onEditCategory: (categoryId: string) => void;
-}) => {
+const Level2Table = ({ parentCategory, onDeleteCategory, onEditCategory }: TSubCategoryTable) => {
   const { queryParams } = useQueryParams();
   const deferredSearch = useDeferredValue(queryParams[q_cat_keys.level.l2]);
   const deferredSort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
@@ -447,8 +433,8 @@ const Level2Table = ({
                 </Fragment>
               ))
             ) : (
-              <ApiStatusTr
-                hasLength={!!categories.length}
+              <ApiStatusRow
+                haveLength={!!categories.length}
                 isError={isError}
                 isLoading={isLoading}
                 level={2}
@@ -530,8 +516,8 @@ const Level1Table = () => {
                 </Fragment>
               ))
             ) : (
-              <ApiStatusTr
-                hasLength={!!level1Cats.length}
+              <ApiStatusRow
+                haveLength={!!level1Cats.length}
                 isError={isError}
                 isLoading={isLoading}
                 level={3}
