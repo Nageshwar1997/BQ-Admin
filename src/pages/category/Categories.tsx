@@ -1,6 +1,14 @@
 import ApiStatus from '@/components/layout/ApiStatus';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import Navbar from '@/components/layout/navbar';
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+  TableRowCell,
+} from '@/components/layout/table';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/inputs/Input';
 import { QUERY_PARAMS_KEY_MAP, SORT_ORDER_MAP } from '@/constants/common.constants';
@@ -8,7 +16,7 @@ import useDebounce from '@/hooks/useDebounce';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
-import type { TChildren, TClassName, TSort } from '@/types/component.type';
+import type { TSort } from '@/types/component.type';
 import { getFilteredAndSortedCategories } from '@/utils/api.util';
 import { Icon } from '@iconify/react';
 import {
@@ -17,7 +25,7 @@ import {
   useEffect,
   useMemo,
   useState,
-  type TableHTMLAttributes,
+  type ComponentProps,
 } from 'react';
 import AddCategoryModal from './children/AddCategoryModal';
 
@@ -32,35 +40,13 @@ const QUERY_CLEAR_MAP = {
   [q_cat_keys.level.l3]: [],
 };
 
-const Badge = ({ content }: { content: string }) => (
-  <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
-    {content}
-  </span>
-);
-
-const Th = ({ children, className = '' }: TChildren & TClassName) => (
-  <th
-    className={`text-primary/55 border-primary/10 w-auto border-y px-4 py-3 text-center text-xs font-semibold tracking-normal whitespace-nowrap uppercase ${className}`}
-  >
-    {children}
-  </th>
-);
-
-const Td = ({ children, className = '' }: TChildren & TClassName) => (
-  <td
-    className={`border-primary/5 w-auto border-y px-4 py-3 text-center align-middle text-sm whitespace-nowrap ${className}`}
-  >
-    {children}
-  </td>
-);
-
-const THead = () => {
+const CategoryHead = () => {
   const { queryParams, removeParams, setParams } = useQueryParams();
   return (
-    <thead>
-      <tr>
+    <TableHead>
+      <TableRow>
         {TH_TITLES.map((title) => (
-          <Th key={title}>
+          <TableHeadCell key={title}>
             {title === 'Category' ? (
               <button
                 type="button"
@@ -90,40 +76,47 @@ const THead = () => {
             ) : (
               title
             )}
-          </Th>
+          </TableHeadCell>
         ))}
-      </tr>
-    </thead>
+      </TableRow>
+    </TableHead>
   );
 };
 
-const CategoryTr = ({
+const Badge = ({ content }: { content: string }) => (
+  <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
+    {content}
+  </span>
+);
+
+const CategoryRow = ({
   category,
   onDeleteCategory,
   onEditCategory,
+  className = '',
   ...trProps
 }: {
   category: ICategory;
   onDeleteCategory: (categoryId: string) => void;
   onEditCategory: (categoryId: string) => void;
-} & TableHTMLAttributes<HTMLTableRowElement>) => {
+} & ComponentProps<'tr'>) => {
   return (
-    <tr tabIndex={0} {...trProps} className={`transition-colors ${trProps?.className || ''}`}>
-      <Td className="text-left">
+    <TableRow tabIndex={0} {...trProps} className={`transition-colors duration-100 ${className}`}>
+      <TableRowCell className="text-left">
         <CategoryInfo category={category} />
-      </Td>
-      <Td>
+      </TableRowCell>
+      <TableRowCell>
         <Badge content={`Level ${category.level}`} />
-      </Td>
-      <Td className="text-primary/65 uppercase">{category.parent || 'N/A'}</Td>
-      <Td>
+      </TableRowCell>
+      <TableRowCell className="text-primary/65 uppercase">{category.parent || 'N/A'}</TableRowCell>
+      <TableRowCell>
         <CategoryActions
           categoryId={category._id}
           onDeleteCategory={onDeleteCategory}
           onEditCategory={onEditCategory}
         />
-      </Td>
-    </tr>
+      </TableRowCell>
+    </TableRow>
   );
 };
 
@@ -163,17 +156,17 @@ const SubCategoryTableTr = (props: {
   parentCategory: ICategory;
   onDeleteCategory: (categoryId: string) => void;
   onEditCategory: (categoryId: string) => void;
-  table: Exclude<ICategory['level'], 1>;
+  level: Exclude<ICategory['level'], 1>;
 }) => {
-  const { table, ...rest } = props;
+  const { level, ...rest } = props;
 
-  const Table = table === 2 ? Level2Table : Level3Table;
+  const Component = level === 2 ? Level2Table : Level3Table;
   return (
-    <tr>
-      <td colSpan={4} className="border-primary/5 border-y p-4">
-        <Table {...rest} />
-      </td>
-    </tr>
+    <TableRow>
+      <TableRowCell colSpan={4} className="border-b-0 pt-4 pb-0">
+        <Component {...rest} />
+      </TableRowCell>
+    </TableRow>
   );
 };
 
@@ -326,12 +319,12 @@ const Level3Table = ({
       </div>
       <SearchInput level={3} />
       <div className="mt-3 overflow-x-auto rounded-lg">
-        <table className="w-full table-auto border-separate border-spacing-0">
-          <THead />
-          <tbody>
+        <Table>
+          <CategoryHead />
+          <TableBody>
             {filteredCategories.length ? (
               filteredCategories.map((category) => (
-                <CategoryTr
+                <CategoryRow
                   key={category._id}
                   category={category}
                   onDeleteCategory={onDeleteCategory}
@@ -347,8 +340,8 @@ const Level3Table = ({
                 level={3}
               />
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
@@ -399,13 +392,13 @@ const Level2Table = ({
       </div>
       <SearchInput level={2} />
       <div className="mt-3 overflow-x-auto rounded-lg">
-        <table className="w-full table-auto border-separate border-spacing-0">
-          <THead />
-          <tbody>
+        <Table>
+          <CategoryHead />
+          <TableBody>
             {filteredCategories.length ? (
               filteredCategories.map((category) => (
                 <Fragment key={category._id}>
-                  <CategoryTr
+                  <CategoryRow
                     category={category}
                     onClick={() =>
                       setSelectedCategoryId((selected) =>
@@ -426,7 +419,7 @@ const Level2Table = ({
                   />
                   {selectedCategoryId === category._id && (
                     <SubCategoryTableTr
-                      table={3}
+                      level={3}
                       parentCategory={category}
                       onDeleteCategory={onDeleteCategory}
                       onEditCategory={onEditCategory}
@@ -442,8 +435,8 @@ const Level2Table = ({
                 level={2}
               />
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
@@ -483,13 +476,13 @@ const Level1Table = () => {
         </span>
       </div>
       <div className="mt-3 overflow-x-auto rounded-lg">
-        <table className="w-full table-auto border-separate border-spacing-0">
-          <THead />
-          <tbody>
+        <Table>
+          <CategoryHead />
+          <TableBody>
             {filteredCategories.length ? (
               filteredCategories.map((category) => (
                 <Fragment key={category._id}>
-                  <CategoryTr
+                  <CategoryRow
                     category={category}
                     onClick={() =>
                       setSelectedCategory((selected) =>
@@ -510,7 +503,7 @@ const Level1Table = () => {
                   />
                   {selectedCategory?._id === category._id && (
                     <SubCategoryTableTr
-                      table={2}
+                      level={2}
                       parentCategory={category}
                       onDeleteCategory={handleDeleteCategory}
                       onEditCategory={handleEditCategory}
@@ -526,8 +519,8 @@ const Level1Table = () => {
                 level={3}
               />
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
