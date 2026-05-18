@@ -9,7 +9,6 @@ import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
 import type { TChildren, TClassName, TSort } from '@/types/component.type';
-import type { IInput } from '@/types/input.type';
 import { getFilteredAndSortedCategories } from '@/utils/api.util';
 import { Icon } from '@iconify/react';
 import {
@@ -178,11 +177,7 @@ const SubCategoryTableTr = (props: {
   );
 };
 
-const SearchInput = ({
-  className = '',
-  needRef,
-  level,
-}: Pick<IInput, 'className' | 'needRef'> & Pick<ICategory, 'level'>) => {
+const SearchInput = ({ level }: Pick<ICategory, 'level'>) => {
   const { queryParams, setParams } = useQueryParams();
 
   const queryKey = `l${level}` as keyof typeof q_cat_keys.level;
@@ -228,14 +223,14 @@ const SearchInput = ({
 
   return (
     <Input
-      needRef={needRef}
+      needRef
       inputProps={{
         name: queryKey,
         placeholder: `Search level ${level} categories here...`,
         value: searchQuery,
         onChange: ({ target: { value } }) => handleChange(value),
       }}
-      className={`bg-silver/10! max-w-md ${className}`}
+      className={`bg-silver/10! max-w-md`}
       icons={{
         right: { icon: 'solar:magnifer-linear', className: 'text-primary/50 size-4 md:size-5' },
       }}
@@ -321,10 +316,8 @@ const Level3Table = ({
           {filteredCategories.length}/{categories.length} items
         </span>
       </div>
-      <div className="mb-3 max-w-md">
-        <SearchInput key={3} level={3} needRef />
-      </div>
-      <div className="overflow-x-auto rounded-lg">
+      <SearchInput level={3} />
+      <div className="mt-3 overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
           <THead />
           <tbody>
@@ -396,10 +389,8 @@ const Level2Table = ({
           {filteredCategories.length}/{categories.length} items
         </span>
       </div>
-      <div className="mb-3 max-w-md">
-        <SearchInput key={2} level={2} needRef />
-      </div>
-      <div className="overflow-x-auto rounded-lg">
+      <SearchInput level={2} />
+      <div className="mt-3 overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
           <THead />
           <tbody>
@@ -477,13 +468,13 @@ const Level1Table = () => {
 
   return (
     <div className="border-primary/10 bg-secondary-invert rounded-xl border p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <SearchInput key={1} level={1} needRef />
+      <div className="flex items-center justify-between gap-3">
+        <SearchInput level={1} />
         <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
           {filteredCategories.length}/{level1Cats.length} items
         </span>
       </div>
-      <div className="overflow-x-auto rounded-lg">
+      <div className="mt-3 overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
           <THead />
           <tbody>
