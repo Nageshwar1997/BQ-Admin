@@ -11,8 +11,6 @@ export const TableHead = (props: ComponentProps<'thead'>) => {
 
 export const TableBody = (props: ComponentProps<'tbody'>) => <tbody {...props} />;
 
-//
-
 export const TableRow = (props: ComponentProps<'tr'>) => {
   const { className = '', ...rest } = props;
   return <tr {...rest} className={`transition-colors duration-100 ${className}`} />;

@@ -152,7 +152,7 @@ const L3Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
   );
 
   return (
-    <div className="border-primary/10 bg-primary/3 rounded-xl border">
+    <div className="border-primary/10 bg-primary/2 rounded-xl border">
       <CategoryTableTopInfo
         badgeText={`${filteredCategories.length}/${categories.length} items`}
         level={3}
@@ -169,7 +169,7 @@ const L3Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
                   category={category}
                   onDelete={onDelete}
                   onEdit={onEdit}
-                  className="hover:bg-primary/3"
+                  className="hover:bg-primary/1"
                 />
               ))
             ) : (
@@ -212,13 +212,13 @@ const L2Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
   }, [parentCategory._id]);
 
   return (
-    <div className="border-primary/10 bg-primary/3 rounded-xl border">
+    <div className="border-primary/10 bg-primary/2 rounded-xl border">
       <CategoryTableTopInfo
         badgeText={`${filteredCategories.length}/${categories.length} items`}
         level={2}
         name={parentCategory.name}
       />
-      <div className="overflow-x-auto rounded-lg">
+      <div className="overflow-x-auto">
         <Table>
           <CategoryHead />
           <TableBody>
@@ -240,7 +240,7 @@ const L2Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
                         );
                       }
                     }}
-                    className={`cursor-pointer ${selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'}`}
+                    className={`cursor-pointer ${selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
                     onDelete={onDelete}
                     onEdit={onEdit}
                   />
@@ -322,7 +322,7 @@ const L1Table = () => {
                         );
                       }
                     }}
-                    className={`cursor-pointer ${selectedCategory?._id === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'}`}
+                    className={`cursor-pointer ${selectedCategory?._id === category._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
                     onDelete={handleDeleteCategory}
                     onEdit={handleEditCategory}
                   />
