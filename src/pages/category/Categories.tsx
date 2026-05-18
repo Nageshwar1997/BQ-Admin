@@ -7,7 +7,7 @@ import useDebounce from '@/hooks/useDebounce';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
-import type { TChildren, TClassName } from '@/types/component.type';
+import type { TChildren, TClassName, TSort } from '@/types/component.type';
 import type { IInput } from '@/types/input.type';
 import { Icon } from '@iconify/react';
 import {
@@ -20,24 +20,15 @@ import {
 } from 'react';
 import AddCategoryModal from './children/AddCategoryModal';
 
-type TSortDirection = '' | 'asc' | 'desc';
-
 const TH_TITLES = ['Category', 'Level', 'Parent', 'Actions'] as const;
 
 const QUERY_CLEAR_MAP = { s_l1: ['s_l2', 's_l3'], s_l2: ['s_l3'], s_l3: [] };
 
-const getFilteredAndSortedCategories = (
-  categories: ICategory[],
-  search: string,
-  sort: TSortDirection,
-) => {
+const getFilteredAndSortedCategories = (categories: ICategory[], search: string, sort: TSort) => {
   const searchValue = search?.toLowerCase().trim();
   const filteredCategories = searchValue
     ? categories.filter((category) =>
-        [category.name, category.slug, category.parent || '']
-          .join(' ')
-          .toLowerCase()
-          .includes(searchValue),
+        [category.name, category.slug].join(' ').toLowerCase().includes(searchValue),
       )
     : categories;
 
@@ -47,12 +38,6 @@ const getFilteredAndSortedCategories = (
     const direction = sort === 'desc' ? -1 : 1;
     return a.name.localeCompare(b.name) * direction;
   });
-};
-
-const getNextSort = (sort: TSortDirection): TSortDirection => {
-  if (sort === 'asc') return 'desc';
-  if (sort === 'desc') return '';
-  return 'asc';
 };
 
 const Badge = ({ content }: { content: string }) => (
@@ -77,29 +62,48 @@ const Td = ({ children, className = '' }: TChildren & TClassName) => (
   </td>
 );
 
-const THead = ({
-  sort,
-  setSort,
-}: {
-  sort: TSortDirection;
-  setSort: (sort: TSortDirection) => void;
-}) => (
-  <thead>
-    <tr>
-      {TH_TITLES.map((title) => (
-        <Th key={title}>
-          {title === 'Category' ? (
-            <SortableHeader sort={sort} onSort={() => setSort(getNextSort(sort))}>
-              {title}
-            </SortableHeader>
-          ) : (
-            title
-          )}
-        </Th>
-      ))}
-    </tr>
-  </thead>
-);
+const THead = () => {
+  const { queryParams, removeParams, setParams } = useQueryParams();
+  return (
+    <thead>
+      <tr>
+        {TH_TITLES.map((title) => (
+          <Th key={title}>
+            {title === 'Category' ? (
+              <button
+                type="button"
+                onClick={() => {
+                  if (queryParams.sort === 'asc') {
+                    setParams({ sort: 'desc' });
+                  } else if (queryParams.sort === 'desc') {
+                    removeParams(['sort']);
+                  } else {
+                    setParams({ sort: 'asc' });
+                  }
+                }}
+                className="text-primary/65 hover:text-primary flex cursor-pointer items-center gap-2 text-left text-xs font-semibold tracking-normal uppercase transition-colors"
+              >
+                {title}
+                <Icon
+                  icon={
+                    queryParams.sort === 'asc'
+                      ? 'solar:arrow-up-linear'
+                      : queryParams.sort === 'desc'
+                        ? 'solar:arrow-down-linear'
+                        : 'solar:sort-linear'
+                  }
+                  className="size-4"
+                />
+              </button>
+            ) : (
+              title
+            )}
+          </Th>
+        ))}
+      </tr>
+    </thead>
+  );
+};
 
 const CategoryTr = ({
   category,
@@ -181,7 +185,7 @@ const SubCategoryTableTr = (props: {
   );
 };
 
-const Search = ({
+const SearchInput = ({
   className = '',
   needRef,
   queryKey,
@@ -206,14 +210,10 @@ const Search = ({
         delete updatedParams[queryKey];
 
         // dependent queries remove
-        keysToClear.forEach((key) => {
-          delete updatedParams[key];
-        });
+        keysToClear.forEach((key) => delete updatedParams[key]);
 
         // new value set
-        if (trimmedValue) {
-          updatedParams[queryKey] = trimmedValue;
-        }
+        if (trimmedValue) updatedParams[queryKey] = trimmedValue;
 
         return updatedParams;
       });
@@ -221,11 +221,19 @@ const Search = ({
     delay: 600,
   });
 
-useEffect(() => {
-  if (!queryParams?.[queryKey] && searchQuery) {
-    setSearchQuery('');
-  }
-}, [queryParams?.[queryKey]]);
+  const handleChange = (value: string) => {
+    const trimmedValue = value.trimStart();
+    // instant ui update
+    setSearchQuery(trimmedValue);
+    // debounced search action
+    handleSearch(trimmedValue);
+  };
+
+  useEffect(() => {
+    if (!queryParams?.[queryKey] && searchQuery) {
+      setSearchQuery('');
+    }
+  }, [queryParams?.[queryKey]]);
 
   return (
     <Input
@@ -234,13 +242,7 @@ useEffect(() => {
         name: queryKey,
         placeholder: `Search level ${level} categories here...`,
         value: searchQuery,
-        onChange: ({ target: { value } }) => {
-          const trimmedValue = value.trimStart();
-          // instant ui update
-          setSearchQuery(trimmedValue);
-          // debounced search action
-          handleSearch(trimmedValue);
-        },
+        onChange: ({ target: { value } }) => handleChange(value),
       }}
       className={`bg-silver/10! max-w-md ${className}`}
       icons={{
@@ -249,34 +251,6 @@ useEffect(() => {
     />
   );
 };
-
-const SortableHeader = ({
-  children,
-  onSort,
-  sort,
-}: {
-  children: string;
-  onSort: () => void;
-  sort: TSortDirection;
-}) => (
-  <button
-    type="button"
-    onClick={onSort}
-    className="text-primary/65 hover:text-primary flex cursor-pointer items-center gap-2 text-left text-xs font-semibold tracking-normal uppercase transition-colors"
-  >
-    {children}
-    <Icon
-      icon={
-        sort === 'asc'
-          ? 'solar:arrow-up-linear'
-          : sort === 'desc'
-            ? 'solar:arrow-down-linear'
-            : 'solar:sort-linear'
-      }
-      className="size-4"
-    />
-  </button>
-);
 
 const CategoryInfo = ({ category }: { category: ICategory }) => (
   <div className="flex items-center gap-3">
@@ -329,8 +303,8 @@ const Level3Table = ({
 }) => {
   const { queryParams } = useQueryParams();
   const deferredSearch = useDeferredValue(queryParams.s_l3);
+  const deferredSort = useDeferredValue(queryParams.sort) as TSort;
 
-  const [sort, setSort] = useState<TSortDirection>('');
   const {
     data: categoriesData = [],
     isLoading,
@@ -341,8 +315,8 @@ const Level3Table = ({
   });
   const categories = categoriesData as ICategory[];
   const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(categories, deferredSearch, sort),
-    [categories, deferredSearch, sort],
+    () => getFilteredAndSortedCategories(categories, deferredSearch, deferredSort),
+    [categories, deferredSearch, deferredSort],
   );
 
   return (
@@ -357,11 +331,11 @@ const Level3Table = ({
         </span>
       </div>
       <div className="mb-3 max-w-md">
-        <Search key={3} level={3} queryKey="s_l3" needRef />
+        <SearchInput key={3} level={3} queryKey="s_l3" needRef />
       </div>
       <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
-          <THead sort={sort} setSort={setSort} />
+          <THead />
           <tbody>
             {filteredCategories.length ? (
               filteredCategories.map((category) => (
@@ -399,9 +373,9 @@ const Level2Table = ({
 }) => {
   const { queryParams } = useQueryParams();
   const deferredSearch = useDeferredValue(queryParams.s_l2);
+  const deferredSort = useDeferredValue(queryParams.sort) as TSort;
 
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
-  const [sort, setSort] = useState<TSortDirection>('');
   const {
     data: categoriesData = [],
     isLoading,
@@ -412,13 +386,12 @@ const Level2Table = ({
   });
   const categories = categoriesData as ICategory[];
   const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(categories, deferredSearch, sort),
-    [categories, deferredSearch, sort],
+    () => getFilteredAndSortedCategories(categories, deferredSearch, deferredSort),
+    [categories, deferredSearch, deferredSort],
   );
 
   useEffect(() => {
     setSelectedCategoryId('');
-    setSort('');
   }, [parentCategory._id]);
 
   return (
@@ -433,11 +406,11 @@ const Level2Table = ({
         </span>
       </div>
       <div className="mb-3 max-w-md">
-        <Search key={2} level={2} queryKey="s_l2" needRef />
+        <SearchInput key={2} level={2} queryKey="s_l2" needRef />
       </div>
       <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
-          <THead sort={sort} setSort={setSort} />
+          <THead />
           <tbody>
             {filteredCategories.length ? (
               filteredCategories.map((category) => (
@@ -487,8 +460,9 @@ const Level2Table = ({
 };
 
 const Level1Table = () => {
-  const { queryParams, setParams, removeParams } = useQueryParams();
+  const { queryParams } = useQueryParams();
   const deferredSearch = useDeferredValue(queryParams.s_l1);
+  const deferredSort = useDeferredValue(queryParams.sort) as TSort;
   const [selectedCategory, setSelectedCategory] = useState<ICategory>();
   const {
     data: level1CatsData = [],
@@ -496,8 +470,6 @@ const Level1Table = () => {
     isError,
   } = useGetCategoriesByParentLevel({ level: 1 });
   const level1Cats = level1CatsData as ICategory[];
-  const level1Sort =
-    queryParams.sort === 'asc' || queryParams.sort === 'desc' ? queryParams.sort : '';
 
   const handleEditCategory = (categoryId: string) => {
     console.log('Edit category _id:', categoryId);
@@ -507,31 +479,22 @@ const Level1Table = () => {
     console.log('Delete category _id:', categoryId);
   };
 
-  const handleLevel1Sort = () => {
-    const nextSort = getNextSort(level1Sort);
-    if (nextSort) {
-      setParams({ sort: nextSort });
-    } else {
-      removeParams(['sort']);
-    }
-  };
-
   const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(level1Cats, deferredSearch, level1Sort),
-    [level1Cats, deferredSearch, level1Sort],
+    () => getFilteredAndSortedCategories(level1Cats, deferredSearch, deferredSort),
+    [level1Cats, deferredSearch, deferredSort],
   );
 
   return (
     <div className="border-primary/10 bg-secondary-invert rounded-xl border p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <Search key={1} level={1} queryKey="s_l1" needRef />
+        <SearchInput key={1} level={1} queryKey="s_l1" needRef />
         <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
           {filteredCategories.length}/{level1Cats.length} items
         </span>
       </div>
       <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
-          <THead sort={level1Sort} setSort={handleLevel1Sort} />
+          <THead />
           <tbody>
             {filteredCategories.length ? (
               filteredCategories.map((category) => (

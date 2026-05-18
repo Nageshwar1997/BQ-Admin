@@ -43,6 +43,8 @@ export interface IResend extends TClassName {
   onResend?: () => void;
 }
 
+export type TSort = 'asc' | 'desc';
+
 export type TTitleDescription = {
   title: string | ReactNode;
   description?: string | ReactNode;
