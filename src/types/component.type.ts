@@ -97,5 +97,5 @@ export type TCategoryTable = TCategoryActions & {
 };
 
 export type TSubCategoryTable = TCategoryActions & {
-  parentCategory: ICategory;
+  parentCat: ICategory;
 };

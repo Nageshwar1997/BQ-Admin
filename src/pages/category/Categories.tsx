@@ -16,7 +16,7 @@ import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
 import type { TCategoryTable, TSort, TSubCategoryTable } from '@/types/component.type';
-import { getFilteredAndSortedCategories } from '@/utils/api.util';
+import { getFilteredAndSortedCats } from '@/utils/api.util';
 import { Icon } from '@iconify/react';
 import {
   Fragment,
@@ -133,37 +133,37 @@ const CategoryRow = (props: TCategoryTable & ComponentProps<'tr'>) => {
   );
 };
 
-const L3Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
+const L3Table = ({ parentCat, onDelete, onEdit }: TSubCategoryTable) => {
   const { queryParams } = useQueryParams();
-  const deferredSearch = useDeferredValue(queryParams[q_cat_keys.level.l3]);
-  const deferredSort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
+  const search = useDeferredValue(queryParams[q_cat_keys.level.l3]);
+  const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
 
   const {
-    data: categoriesData = [],
+    data = [],
     isLoading,
     isError,
   } = useGetCategoriesByParentLevel({
     level: 3,
-    parentId: parentCategory._id,
+    parentId: parentCat._id,
   });
-  const categories = categoriesData as ICategory[];
-  const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(categories, deferredSearch, deferredSort),
-    [categories, deferredSearch, deferredSort],
+  const categories = data as ICategory[];
+  const filteredCats = useMemo(
+    () => getFilteredAndSortedCats(categories, search, sort),
+    [categories, search, sort],
   );
 
   return (
     <div className="border-primary/10 bg-primary/2 rounded-xl border">
       <CategoryTableTopInfo
-        badgeText={`${filteredCategories.length}/${categories.length} items`}
+        badgeText={`${filteredCats.length}/${categories.length} items`}
         level={3}
-        name={parentCategory.name}
+        name={parentCat.name}
       />
       <Table>
         <CategoryHead />
         <TableBody>
-          {filteredCategories.length ? (
-            filteredCategories.map((category) => (
+          {filteredCats.length ? (
+            filteredCats.map((category) => (
               <CategoryRow
                 key={category._id}
                 category={category}
@@ -186,66 +186,61 @@ const L3Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
   );
 };
 
-const L2Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
+const L2Table = ({ parentCat, onDelete, onEdit }: TSubCategoryTable) => {
   const { queryParams } = useQueryParams();
-  const deferredSearch = useDeferredValue(queryParams[q_cat_keys.level.l2]);
-  const deferredSort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
-
-  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const search = useDeferredValue(queryParams[q_cat_keys.level.l2]);
+  const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
+  const [selectedId, setSelectedId] = useState('');
   const {
-    data: categoriesData = [],
+    data = [],
     isLoading,
     isError,
   } = useGetCategoriesByParentLevel({
     level: 2,
-    parentId: parentCategory._id,
+    parentId: parentCat._id,
   });
-  const categories = categoriesData as ICategory[];
-  const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(categories, deferredSearch, deferredSort),
-    [categories, deferredSearch, deferredSort],
+  const categories = data as ICategory[];
+  const filteredCats = useMemo(
+    () => getFilteredAndSortedCats(categories, search, sort),
+    [categories, search, sort],
   );
 
   useEffect(() => {
-    setSelectedCategoryId('');
-  }, [parentCategory._id]);
+    setSelectedId('');
+  }, [parentCat._id]);
 
   return (
     <div className="border-primary/10 bg-primary/2 rounded-xl border">
       <CategoryTableTopInfo
-        badgeText={`${filteredCategories.length}/${categories.length} items`}
+        badgeText={`${filteredCats.length}/${categories.length} items`}
         level={2}
-        name={parentCategory.name}
+        name={parentCat.name}
       />
       <Table>
         <CategoryHead />
         <TableBody>
-          {filteredCategories.length ? (
-            filteredCategories.map((category) => (
+          {filteredCats.length ? (
+            filteredCats.map((category) => (
               <Fragment key={category._id}>
                 <CategoryRow
                   category={category}
                   onClick={() =>
-                    setSelectedCategoryId((selected) =>
-                      selected === category._id ? '' : category._id,
-                    )
+                    setSelectedId((prevId) => (prevId === category._id ? '' : category._id))
                   }
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
-                      setSelectedCategoryId((selected) =>
-                        selected === category._id ? '' : category._id,
-                      );
+                      setSelectedId((prevId) => (prevId === category._id ? '' : category._id));
                     }
                   }}
-                  className={`cursor-pointer ${selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
+                  className={`cursor-pointer ${selectedId === category._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
                   onDelete={onDelete}
                   onEdit={onEdit}
                 />
-                {selectedCategoryId === category._id && (
+                {selectedId === category._id && (
                   <TableRow>
                     <TableRowCell colSpan={4} className="border-b-0 p-0! pt-3!">
-                      <L3Table onDelete={onDelete} onEdit={onEdit} parentCategory={category} />
+                      <L3Table onDelete={onDelete} onEdit={onEdit} parentCat={category} />
                     </TableRowCell>
                   </TableRow>
                 )}
@@ -267,33 +262,29 @@ const L2Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
 
 const L1Table = () => {
   const { queryParams } = useQueryParams();
-  const deferredSearch = useDeferredValue(queryParams[q_cat_keys.level.l1]);
-  const deferredSort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
-  const [selectedCategory, setSelectedCategory] = useState<ICategory>();
-  const {
-    data: level1CatsData = [],
-    isLoading,
-    isError,
-  } = useGetCategoriesByParentLevel({ level: 1 });
-  const level1Cats = level1CatsData as ICategory[];
+  const search = useDeferredValue(queryParams[q_cat_keys.level.l1]);
+  const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
+  const [selectedId, setSelectedId] = useState('');
+  const { data = [], isLoading, isError } = useGetCategoriesByParentLevel({ level: 1 });
+  const categories = data as ICategory[];
 
-  const handleEditCategory = (catId: string) => {
+  const handleEdit = (catId: string) => {
     console.log('Edit category _id:', catId);
   };
 
-  const handleDeleteCategory = (catId: string) => {
+  const handleDelete = (catId: string) => {
     console.log('Delete category _id:', catId);
   };
 
-  const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(level1Cats, deferredSearch, deferredSort),
-    [level1Cats, deferredSearch, deferredSort],
+  const filteredCats = useMemo(
+    () => getFilteredAndSortedCats(categories, search, sort),
+    [categories, search, sort],
   );
 
   return (
     <div className="border-primary/10 bg-secondary-invert rounded-xl border">
       <CategoryTableTopInfo
-        badgeText={`${filteredCategories.length}/${level1Cats.length} items`}
+        badgeText={`${filteredCats.length}/${categories.length} items`}
         level={1}
         className="flex w-full flex-row-reverse items-center justify-between gap-3 space-y-0!"
       />
@@ -304,36 +295,28 @@ const L1Table = () => {
         <Table>
           <CategoryHead />
           <TableBody>
-            {filteredCategories.length ? (
-              filteredCategories.map((category) => (
+            {filteredCats.length ? (
+              filteredCats.map((category) => (
                 <Fragment key={category._id}>
                   <CategoryRow
                     category={category}
                     onClick={() =>
-                      setSelectedCategory((selected) =>
-                        selected?._id === category._id ? undefined : category,
-                      )
+                      setSelectedId((prevId) => (prevId === category._id ? '' : category._id))
                     }
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' || event.key === ' ') {
                         event.preventDefault();
-                        setSelectedCategory((selected) =>
-                          selected?._id === category._id ? undefined : category,
-                        );
+                        setSelectedId((prevId) => (prevId === category._id ? '' : category._id));
                       }
                     }}
-                    className={`cursor-pointer ${selectedCategory?._id === category._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
-                    onDelete={handleDeleteCategory}
-                    onEdit={handleEditCategory}
+                    className={`cursor-pointer ${selectedId === category._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
+                    onDelete={handleDelete}
+                    onEdit={handleEdit}
                   />
-                  {selectedCategory?._id === category._id && (
+                  {selectedId === category._id && (
                     <TableRow>
                       <TableRowCell colSpan={4} className="border-b-0 p-0! pt-3!">
-                        <L2Table
-                          onDelete={handleDeleteCategory}
-                          onEdit={handleEditCategory}
-                          parentCategory={category}
-                        />
+                        <L2Table onDelete={handleDelete} onEdit={handleEdit} parentCat={category} />
                       </TableRowCell>
                     </TableRow>
                   )}
@@ -341,7 +324,7 @@ const L1Table = () => {
               ))
             ) : (
               <ApiStatusRow
-                haveLength={!!level1Cats.length}
+                haveLength={!!categories.length}
                 isError={isError}
                 isLoading={isLoading}
                 level={3}

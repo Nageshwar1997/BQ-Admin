@@ -20,21 +20,17 @@ export const handleApiSuccessToaster = (message: string, title = 'Success') => {
   toaster.success({ title, description: message });
 };
 
-export const getFilteredAndSortedCategories = (
-  categories: ICategory[],
-  search: string,
-  sort?: TSort,
-) => {
-  const searchValue = search?.toLowerCase().trim();
-  const filteredCategories = searchValue
+export const getFilteredAndSortedCats = (categories: ICategory[], search: string, sort?: TSort) => {
+  const value = search?.toLowerCase().trim();
+  const filtered = value
     ? categories.filter((category) =>
-        [category.name, category.slug].join(' ').toLowerCase().includes(searchValue),
+        [category.name, category.slug].join(' ').toLowerCase().includes(value),
       )
     : categories;
 
-  if (!sort) return filteredCategories;
+  if (!sort) return filtered;
 
-  return [...filteredCategories].sort((a, b) => {
+  return [...filtered].sort((a, b) => {
     const direction = sort === SORT_ORDER_MAP.desc ? -1 : 1;
     return a.name.localeCompare(b.name) * direction;
   });
