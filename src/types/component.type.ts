@@ -90,10 +90,7 @@ export interface IBreadcrumb extends TClassName {
   customPaths?: string[];
 }
 
-export type TCategoryActions = {
-  onEditCategory: (catId: string) => void;
-  onDeleteCategory: (catId: string) => void;
-};
+export type TCategoryActions = Record<'onEdit' | 'onDelete', (id: string) => void>;
 
 export type TCategoryTable = TCategoryActions & {
   category: ICategory;

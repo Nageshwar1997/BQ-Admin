@@ -9,20 +9,12 @@ import {
   TableRow,
   TableRowCell,
 } from '@/components/layout/table';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/inputs/Input';
+import Badge from '@/components/ui/Badge';
 import { QUERY_PARAMS_KEY_MAP, SORT_ORDER_MAP } from '@/constants/common.constants';
-import useDebounce from '@/hooks/useDebounce';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
-import type {
-  TCategoryActions,
-  TCategoryTable,
-  TClassName,
-  TSort,
-  TSubCategoryTable,
-} from '@/types/component.type';
+import type { TCategoryTable, TSort, TSubCategoryTable } from '@/types/component.type';
 import { getFilteredAndSortedCategories } from '@/utils/api.util';
 import { Icon } from '@iconify/react';
 import {
@@ -34,53 +26,20 @@ import {
   type ComponentProps,
 } from 'react';
 import AddCategoryModal from './children/AddCategoryModal';
+import CategoryActions from './children/CategoryActions';
+import CategoryInfo from './children/CategoryInfo';
+import CategoryTableTopInfo from './children/CategoryTableTopInfo';
 
 const TH_TITLES = ['Category', 'Level', 'Parent', 'Actions'] as const;
 
 const queryKeys = QUERY_PARAMS_KEY_MAP;
 const q_cat_keys = QUERY_PARAMS_KEY_MAP.category;
 
-const QUERY_CLEAR_MAP = {
-  [q_cat_keys.level.l1]: [q_cat_keys.level.l2, q_cat_keys.level.l3],
-  [q_cat_keys.level.l2]: [q_cat_keys.level.l3],
-  [q_cat_keys.level.l3]: [],
-};
+const ApiStatusRow = (
+  props: Record<'haveLength' | 'isError' | 'isLoading', boolean> & Pick<ICategory, 'level'>,
+) => {
+  const { isError, isLoading, haveLength, level } = props;
 
-const Badge = ({ content = '', className = '' }) => (
-  <span
-    className={`border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${className}`}
-  >
-    {content}
-  </span>
-);
-
-const CategoryActions = ({
-  catId,
-  onDeleteCategory,
-  onEditCategory,
-}: TCategoryActions & { catId: string }) => (
-  <div className="flex items-center justify-center gap-2">
-    <Button
-      content={{ icon: 'solar:pen-linear', className: 'size-4.5' }}
-      pattern="outline"
-      buttonProps={{ onClick: (event) => (event.stopPropagation(), onEditCategory(catId)) }}
-      className="border-primary/20 hover:border-blue-crayola-c/50 hover:text-blue-crayola-c size-9! p-0!"
-    />
-    <Button
-      content={{ icon: 'solar:trash-bin-trash-linear', className: 'size-4.5' }}
-      pattern="outline"
-      buttonProps={{ onClick: (event) => (event.stopPropagation(), onDeleteCategory(catId)) }}
-      className="border-primary/20 hover:border-red-c/50 hover:text-red-c size-9! p-0!"
-    />
-  </div>
-);
-
-const ApiStatusRow = ({
-  isError,
-  isLoading,
-  haveLength,
-  level,
-}: Record<'haveLength' | 'isError' | 'isLoading', boolean> & Pick<ICategory, 'level'>) => {
   return (
     <TableRow>
       <TableRowCell colSpan={4} className="p-0! pt-4!">
@@ -104,117 +63,6 @@ const ApiStatusRow = ({
         />
       </TableRowCell>
     </TableRow>
-  );
-};
-
-const SearchInput = ({ level }: Pick<ICategory, 'level'>) => {
-  const { queryParams, setParams } = useQueryParams();
-
-  const queryKey = `l${level}` as keyof typeof q_cat_keys.level;
-
-  const [searchQuery, setSearchQuery] = useState(queryParams[queryKey] || '');
-
-  const handleSearch = useDebounce({
-    callback: (value: string) => {
-      const trimmedValue = value.trim();
-      const keysToClear = QUERY_CLEAR_MAP[queryKey];
-
-      setParams((prevParams) => {
-        const updatedParams = { ...prevParams };
-
-        // current query remove
-        delete updatedParams[queryKey];
-
-        // dependent queries remove
-        keysToClear.forEach((key) => delete updatedParams[key]);
-
-        // new value set
-        if (trimmedValue) updatedParams[queryKey] = trimmedValue;
-
-        return updatedParams;
-      });
-    },
-    delay: 600,
-  });
-
-  const handleChange = (value: string) => {
-    const trimmedValue = value.trimStart();
-    // instant ui update
-    setSearchQuery(trimmedValue);
-    // debounced search action
-    handleSearch(trimmedValue);
-  };
-
-  useEffect(() => {
-    if (!queryParams[queryKey] && searchQuery) {
-      setSearchQuery('');
-    }
-  }, [queryParams[queryKey]]);
-
-  return (
-    <Input
-      needRef
-      inputProps={{
-        name: queryKey,
-        placeholder: `Search level ${level} categories here...`,
-        value: searchQuery,
-        onChange: ({ target: { value } }) => handleChange(value),
-      }}
-      containerClassName="max-w-sm"
-      className="bg-silver/10!"
-      icons={{
-        right: { icon: 'solar:magnifer-linear', className: 'text-primary/50 size-4 md:size-5' },
-      }}
-    />
-  );
-};
-
-const CategoryInfo = ({ category }: Pick<TCategoryTable, 'category'>) => (
-  <div className="flex items-center gap-3">
-    <div
-      className={`to-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg bg-linear-to-br ${
-        category.level === 1
-          ? 'from-rose-c/25 via-rose-c/10'
-          : category.level === 2
-            ? 'from-jade-c/25 via-jade-c/10'
-            : 'from-blue-crayola-c/25 via-blue-crayola-c/10'
-      }`}
-    >
-      <Icon icon="solar:hanger-2-linear" className="size-5" />
-    </div>
-    <div>
-      <p className="text-primary text-sm font-semibold whitespace-nowrap">{category.name}</p>
-      <p className="text-primary/45 text-xs whitespace-nowrap">{category.slug}</p>
-      {category.description && (
-        <p className="text-primary/30 text-xs whitespace-nowrap">{category.description}</p>
-      )}
-    </div>
-  </div>
-);
-
-const TopDetails = ({
-  name,
-  badgeText,
-  level,
-  className,
-}: TClassName & {
-  name?: string;
-  badgeText: string;
-  level: ICategory['level'];
-}) => {
-  return (
-    <div className={`space-y-3 pb-3 ${className}`}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {name && (
-          <div className="text-left">
-            <p className="text-primary text-sm font-semibold">{name}</p>
-            <p className="text-primary/50 text-xs">Level {level} categories</p>
-          </div>
-        )}
-        <Badge content={badgeText} />
-      </div>
-      <SearchInput level={level} />
-    </div>
   );
 };
 
@@ -261,13 +109,9 @@ const CategoryHead = () => {
   );
 };
 
-const CategoryRow = ({
-  category,
-  onDeleteCategory,
-  onEditCategory,
-  className = '',
-  ...trProps
-}: TCategoryTable & ComponentProps<'tr'>) => {
+const CategoryRow = (props: TCategoryTable & ComponentProps<'tr'>) => {
+  const { category, onDelete, onEdit, className = '', ...trProps } = props;
+
   return (
     <TableRow tabIndex={0} {...trProps} className={`transition-colors duration-100 ${className}`}>
       <TableRowCell className="text-left">
@@ -278,17 +122,13 @@ const CategoryRow = ({
       </TableRowCell>
       <TableRowCell className="text-primary/65 uppercase">{category.parent || 'N/A'}</TableRowCell>
       <TableRowCell>
-        <CategoryActions
-          catId={category._id}
-          onDeleteCategory={onDeleteCategory}
-          onEditCategory={onEditCategory}
-        />
+        <CategoryActions catId={category._id} onDelete={onDelete} onEdit={onEdit} />
       </TableRowCell>
     </TableRow>
   );
 };
 
-const Level3Table = ({ parentCategory, onDeleteCategory, onEditCategory }: TSubCategoryTable) => {
+const L3Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
   const { queryParams } = useQueryParams();
   const deferredSearch = useDeferredValue(queryParams[q_cat_keys.level.l3]);
   const deferredSort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
@@ -309,7 +149,7 @@ const Level3Table = ({ parentCategory, onDeleteCategory, onEditCategory }: TSubC
 
   return (
     <div className="border-primary/10 bg-primary/3 rounded-lg border p-3">
-      <TopDetails
+      <CategoryTableTopInfo
         badgeText={`${filteredCategories.length}/${categories.length} items`}
         level={3}
         name={parentCategory.name}
@@ -323,8 +163,8 @@ const Level3Table = ({ parentCategory, onDeleteCategory, onEditCategory }: TSubC
                 <CategoryRow
                   key={category._id}
                   category={category}
-                  onDeleteCategory={onDeleteCategory}
-                  onEditCategory={onEditCategory}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
                   className="hover:bg-primary/3"
                 />
               ))
@@ -343,7 +183,7 @@ const Level3Table = ({ parentCategory, onDeleteCategory, onEditCategory }: TSubC
   );
 };
 
-const Level2Table = ({ parentCategory, onDeleteCategory, onEditCategory }: TSubCategoryTable) => {
+const L2Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
   const { queryParams } = useQueryParams();
   const deferredSearch = useDeferredValue(queryParams[q_cat_keys.level.l2]);
   const deferredSort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
@@ -369,7 +209,7 @@ const Level2Table = ({ parentCategory, onDeleteCategory, onEditCategory }: TSubC
 
   return (
     <div className="border-primary/10 bg-primary/3 rounded-xl border p-4">
-      <TopDetails
+      <CategoryTableTopInfo
         badgeText={`${filteredCategories.length}/${categories.length} items`}
         level={2}
         name={parentCategory.name}
@@ -397,17 +237,13 @@ const Level2Table = ({ parentCategory, onDeleteCategory, onEditCategory }: TSubC
                       }
                     }}
                     className={`cursor-pointer ${selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'}`}
-                    onDeleteCategory={onDeleteCategory}
-                    onEditCategory={onEditCategory}
+                    onDelete={onDelete}
+                    onEdit={onEdit}
                   />
                   {selectedCategoryId === category._id && (
                     <TableRow>
                       <TableRowCell colSpan={4} className="border-b-0 pt-4 pb-0">
-                        <Level3Table
-                          onDeleteCategory={onDeleteCategory}
-                          onEditCategory={onEditCategory}
-                          parentCategory={category}
-                        />
+                        <L3Table onDelete={onDelete} onEdit={onEdit} parentCategory={category} />
                       </TableRowCell>
                     </TableRow>
                   )}
@@ -428,7 +264,7 @@ const Level2Table = ({ parentCategory, onDeleteCategory, onEditCategory }: TSubC
   );
 };
 
-const Level1Table = () => {
+const L1Table = () => {
   const { queryParams } = useQueryParams();
   const deferredSearch = useDeferredValue(queryParams[q_cat_keys.level.l1]);
   const deferredSort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
@@ -455,7 +291,7 @@ const Level1Table = () => {
 
   return (
     <div className="border-primary/10 bg-secondary-invert rounded-xl border p-4">
-      <TopDetails
+      <CategoryTableTopInfo
         badgeText={`${filteredCategories.length}/${level1Cats.length} items`}
         level={1}
         className="flex w-full flex-row-reverse items-center justify-between space-y-0"
@@ -483,15 +319,15 @@ const Level1Table = () => {
                       }
                     }}
                     className={`cursor-pointer ${selectedCategory?._id === category._id ? 'bg-primary/5' : 'hover:bg-primary/3'}`}
-                    onDeleteCategory={handleDeleteCategory}
-                    onEditCategory={handleEditCategory}
+                    onDelete={handleDeleteCategory}
+                    onEdit={handleEditCategory}
                   />
                   {selectedCategory?._id === category._id && (
                     <TableRow>
                       <TableRowCell colSpan={4} className="border-b-0 pt-4 pb-0">
-                        <Level2Table
-                          onDeleteCategory={handleDeleteCategory}
-                          onEditCategory={handleEditCategory}
+                        <L2Table
+                          onDelete={handleDeleteCategory}
+                          onEdit={handleEditCategory}
                           parentCategory={category}
                         />
                       </TableRowCell>
@@ -533,7 +369,7 @@ const Categories = () => {
           ]}
         />
 
-        <Level1Table />
+        <L1Table />
       </PageWrapper>
     </Fragment>
   );
