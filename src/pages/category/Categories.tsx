@@ -72,7 +72,7 @@ const CategoryHead = () => {
     <TableHead>
       <TableRow>
         {TH_TITLES.map((title) => (
-          <TableHeadCell key={title}>
+          <TableHeadCell className="first:text-left last:text-right" key={title}>
             {title === 'Category' ? (
               <button
                 type="button"
@@ -85,7 +85,7 @@ const CategoryHead = () => {
                     setParams({ [queryKeys.sort]: SORT_ORDER_MAP.asc });
                   }
                 }}
-                className="text-primary/65 hover:text-primary flex cursor-pointer items-center gap-2 text-left text-xs font-semibold tracking-normal uppercase transition-colors"
+                className="hover:text-primary/80 group flex cursor-pointer items-center gap-2"
               >
                 {title}
                 <Icon
@@ -96,7 +96,7 @@ const CategoryHead = () => {
                         ? 'solar:arrow-down-linear'
                         : 'solar:sort-linear'
                   }
-                  className="size-4"
+                  className="group-hover:text-primary/80 size-4"
                 />
               </button>
             ) : (
@@ -113,7 +113,11 @@ const CategoryRow = (props: TCategoryTable & ComponentProps<'tr'>) => {
   const { category, onDelete, onEdit, className = '', ...trProps } = props;
 
   return (
-    <TableRow tabIndex={0} {...trProps} className={`transition-colors duration-100 ${className}`}>
+    <TableRow
+      tabIndex={0}
+      {...trProps}
+      className={`border-y-primary/5 border-y first:border-t-0 last:border-b-0 ${className}`}
+    >
       <TableRowCell className="text-left">
         <CategoryInfo category={category} />
       </TableRowCell>
@@ -121,7 +125,7 @@ const CategoryRow = (props: TCategoryTable & ComponentProps<'tr'>) => {
         <Badge content={`Level ${category.level}`} />
       </TableRowCell>
       <TableRowCell className="text-primary/65 uppercase">{category.parent || 'N/A'}</TableRowCell>
-      <TableRowCell>
+      <TableRowCell className="text-right">
         <CategoryActions catId={category._id} onDelete={onDelete} onEdit={onEdit} />
       </TableRowCell>
     </TableRow>
@@ -148,13 +152,13 @@ const L3Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
   );
 
   return (
-    <div className="border-primary/10 bg-primary/3 rounded-lg border p-3">
+    <div className="border-primary/10 bg-primary/3 rounded-xl border">
       <CategoryTableTopInfo
         badgeText={`${filteredCategories.length}/${categories.length} items`}
         level={3}
         name={parentCategory.name}
       />
-      <div className="overflow-x-auto rounded-lg">
+      <div className="overflow-x-auto">
         <Table>
           <CategoryHead />
           <TableBody>
@@ -208,7 +212,7 @@ const L2Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
   }, [parentCategory._id]);
 
   return (
-    <div className="border-primary/10 bg-primary/3 rounded-xl border p-4">
+    <div className="border-primary/10 bg-primary/3 rounded-xl border">
       <CategoryTableTopInfo
         badgeText={`${filteredCategories.length}/${categories.length} items`}
         level={2}
@@ -242,7 +246,7 @@ const L2Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
                   />
                   {selectedCategoryId === category._id && (
                     <TableRow>
-                      <TableRowCell colSpan={4} className="border-b-0 pt-4 pb-0">
+                      <TableRowCell colSpan={4} className="border-b-0 p-0! pt-3!">
                         <L3Table onDelete={onDelete} onEdit={onEdit} parentCategory={category} />
                       </TableRowCell>
                     </TableRow>
@@ -290,13 +294,13 @@ const L1Table = () => {
   );
 
   return (
-    <div className="border-primary/10 bg-secondary-invert rounded-xl border p-4">
+    <div className="border-primary/10 bg-secondary-invert rounded-xl border">
       <CategoryTableTopInfo
         badgeText={`${filteredCategories.length}/${level1Cats.length} items`}
         level={1}
-        className="flex w-full flex-row-reverse items-center justify-between space-y-0"
+        className="flex w-full flex-row-reverse items-center justify-between gap-3 space-y-0!"
       />
-      <div className="overflow-x-auto rounded-lg">
+      <div className="overflow-x-auto">
         <Table>
           <CategoryHead />
           <TableBody>
@@ -324,7 +328,7 @@ const L1Table = () => {
                   />
                   {selectedCategory?._id === category._id && (
                     <TableRow>
-                      <TableRowCell colSpan={4} className="border-b-0 pt-4 pb-0">
+                      <TableRowCell colSpan={4} className="border-b-0 p-0! pt-3!">
                         <L2Table
                           onDelete={handleDeleteCategory}
                           onEdit={handleEditCategory}
@@ -356,7 +360,7 @@ const Categories = () => {
   return (
     <Fragment>
       {queryParams[q_cat_keys.add] === 'true' && <AddCategoryModal />}
-      <PageWrapper className="[&>div:nth-of-type(2)]:m-4">
+      <PageWrapper>
         <Navbar
           buttons={[
             {
@@ -369,7 +373,9 @@ const Categories = () => {
           ]}
         />
 
-        <L1Table />
+        <div>
+          <L1Table />
+        </div>
       </PageWrapper>
     </Fragment>
   );

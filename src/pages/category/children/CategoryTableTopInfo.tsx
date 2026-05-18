@@ -89,7 +89,7 @@ const CategoryTableTopInfo = ({
   level: ICategory['level'];
 }) => {
   return (
-    <div className={`space-y-3 pb-3 ${className}`}>
+    <div className={`space-y-3 p-4 ${className}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         {name && (
           <div className="text-left">

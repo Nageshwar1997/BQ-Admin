@@ -2,7 +2,7 @@ import Button from '@/components/ui/Button';
 import type { TCategoryActions } from '@/types/component.type';
 
 const CategoryActions = ({ catId, onDelete, onEdit }: TCategoryActions & { catId: string }) => (
-  <div className="flex items-center justify-center gap-2">
+  <div className="inline-flex items-center justify-center gap-2">
     <Button
       content={{ icon: 'solar:pen-linear', className: 'size-4.5' }}
       pattern="outline"
