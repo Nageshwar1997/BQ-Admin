@@ -531,7 +531,7 @@ const Categories = () => {
   return (
     <Fragment>
       {queryParams[q_cat_keys.add] === 'true' && <AddCategoryModal />}
-      <PageWrapper>
+      <PageWrapper className="[&>div:nth-of-type(2)]:m-4">
         <Navbar
           buttons={[
             {
@@ -544,9 +544,7 @@ const Categories = () => {
           ]}
         />
 
-        <div>
-          <Level1Table />
-        </div>
+        <Level1Table />
       </PageWrapper>
     </Fragment>
   );
