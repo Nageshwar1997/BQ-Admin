@@ -2,6 +2,7 @@ import type { SORT_ORDER_MAP } from '@/constants/common.constants';
 import type { FOOTER_CATEGORIES } from '@/constants/footer.constants';
 import type { IconProps } from '@iconify/react';
 import type { ButtonHTMLAttributes, JSX, ReactNode, RefObject, VideoHTMLAttributes } from 'react';
+import type { ICategory } from './api.type';
 import type { TGradientPos, TScrollDirection } from './hook.type';
 
 export type TClassName = { className?: string };
@@ -88,3 +89,16 @@ export interface IBreadcrumb extends TClassName {
   customPath?: string;
   customPaths?: string[];
 }
+
+export type TCategoryActions = {
+  onEditCategory: (catId: string) => void;
+  onDeleteCategory: (catId: string) => void;
+};
+
+export type TCategoryTable = TCategoryActions & {
+  category: ICategory;
+};
+
+export type TSubCategoryTable = TCategoryActions & {
+  parentCategory: ICategory;
+};

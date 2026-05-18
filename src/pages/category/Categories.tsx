@@ -16,7 +16,13 @@ import useDebounce from '@/hooks/useDebounce';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
-import type { TClassName, TSort } from '@/types/component.type';
+import type {
+  TCategoryActions,
+  TCategoryTable,
+  TClassName,
+  TSort,
+  TSubCategoryTable,
+} from '@/types/component.type';
 import { getFilteredAndSortedCategories } from '@/utils/api.util';
 import { Icon } from '@iconify/react';
 import {
@@ -40,62 +46,6 @@ const QUERY_CLEAR_MAP = {
   [q_cat_keys.level.l3]: [],
 };
 
-type TActions = {
-  onEditCategory: (catId: string) => void;
-  onDeleteCategory: (catId: string) => void;
-};
-
-type TCategoryTable = TActions & {
-  category: ICategory;
-};
-
-type TSubCategoryTable = TActions & {
-  parentCategory: ICategory;
-};
-
-const CategoryHead = () => {
-  const { queryParams, removeParams, setParams } = useQueryParams();
-  return (
-    <TableHead>
-      <TableRow>
-        {TH_TITLES.map((title) => (
-          <TableHeadCell key={title}>
-            {title === 'Category' ? (
-              <button
-                type="button"
-                onClick={() => {
-                  if (queryParams[queryKeys.sort] === SORT_ORDER_MAP.asc) {
-                    setParams({ [queryKeys.sort]: SORT_ORDER_MAP.desc });
-                  } else if (queryParams[queryKeys.sort] === SORT_ORDER_MAP.desc) {
-                    removeParams([queryKeys.sort]);
-                  } else {
-                    setParams({ [queryKeys.sort]: SORT_ORDER_MAP.asc });
-                  }
-                }}
-                className="text-primary/65 hover:text-primary flex cursor-pointer items-center gap-2 text-left text-xs font-semibold tracking-normal uppercase transition-colors"
-              >
-                {title}
-                <Icon
-                  icon={
-                    queryParams[queryKeys.sort] === SORT_ORDER_MAP.asc
-                      ? 'solar:arrow-up-linear'
-                      : queryParams[queryKeys.sort] === SORT_ORDER_MAP.desc
-                        ? 'solar:arrow-down-linear'
-                        : 'solar:sort-linear'
-                  }
-                  className="size-4"
-                />
-              </button>
-            ) : (
-              title
-            )}
-          </TableHeadCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-};
-
 const Badge = ({ content = '', className = '' }) => (
   <span
     className={`border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${className}`}
@@ -104,32 +54,26 @@ const Badge = ({ content = '', className = '' }) => (
   </span>
 );
 
-const CategoryRow = ({
-  category,
+const CategoryActions = ({
+  catId,
   onDeleteCategory,
   onEditCategory,
-  className = '',
-  ...trProps
-}: TCategoryTable & ComponentProps<'tr'>) => {
-  return (
-    <TableRow tabIndex={0} {...trProps} className={`transition-colors duration-100 ${className}`}>
-      <TableRowCell className="text-left">
-        <CategoryInfo category={category} />
-      </TableRowCell>
-      <TableRowCell>
-        <Badge content={`Level ${category.level}`} />
-      </TableRowCell>
-      <TableRowCell className="text-primary/65 uppercase">{category.parent || 'N/A'}</TableRowCell>
-      <TableRowCell>
-        <CategoryActions
-          categoryId={category._id}
-          onDeleteCategory={onDeleteCategory}
-          onEditCategory={onEditCategory}
-        />
-      </TableRowCell>
-    </TableRow>
-  );
-};
+}: TCategoryActions & { catId: string }) => (
+  <div className="flex items-center justify-center gap-2">
+    <Button
+      content={{ icon: 'solar:pen-linear', className: 'size-4.5' }}
+      pattern="outline"
+      buttonProps={{ onClick: (event) => (event.stopPropagation(), onEditCategory(catId)) }}
+      className="border-primary/20 hover:border-blue-crayola-c/50 hover:text-blue-crayola-c size-9! p-0!"
+    />
+    <Button
+      content={{ icon: 'solar:trash-bin-trash-linear', className: 'size-4.5' }}
+      pattern="outline"
+      buttonProps={{ onClick: (event) => (event.stopPropagation(), onDeleteCategory(catId)) }}
+      className="border-primary/20 hover:border-red-c/50 hover:text-red-c size-9! p-0!"
+    />
+  </div>
+);
 
 const ApiStatusRow = ({
   isError,
@@ -158,21 +102,6 @@ const ApiStatusRow = ({
                 : `No level ${level} categories have been added under this category yet.`
           }
         />
-      </TableRowCell>
-    </TableRow>
-  );
-};
-
-const SubCategoryTableTr = (
-  props: TSubCategoryTable & { level: Exclude<ICategory['level'], 1> },
-) => {
-  const { level, ...rest } = props;
-
-  const Component = level === 2 ? Level2Table : Level3Table;
-  return (
-    <TableRow>
-      <TableRowCell colSpan={4} className="border-b-0 pt-4 pb-0">
-        <Component {...rest} />
       </TableRowCell>
     </TableRow>
   );
@@ -289,26 +218,75 @@ const TopDetails = ({
   );
 };
 
-const CategoryActions = ({
-  categoryId,
+const CategoryHead = () => {
+  const { queryParams, removeParams, setParams } = useQueryParams();
+  return (
+    <TableHead>
+      <TableRow>
+        {TH_TITLES.map((title) => (
+          <TableHeadCell key={title}>
+            {title === 'Category' ? (
+              <button
+                type="button"
+                onClick={() => {
+                  if (queryParams[queryKeys.sort] === SORT_ORDER_MAP.asc) {
+                    setParams({ [queryKeys.sort]: SORT_ORDER_MAP.desc });
+                  } else if (queryParams[queryKeys.sort] === SORT_ORDER_MAP.desc) {
+                    removeParams([queryKeys.sort]);
+                  } else {
+                    setParams({ [queryKeys.sort]: SORT_ORDER_MAP.asc });
+                  }
+                }}
+                className="text-primary/65 hover:text-primary flex cursor-pointer items-center gap-2 text-left text-xs font-semibold tracking-normal uppercase transition-colors"
+              >
+                {title}
+                <Icon
+                  icon={
+                    queryParams[queryKeys.sort] === SORT_ORDER_MAP.asc
+                      ? 'solar:arrow-up-linear'
+                      : queryParams[queryKeys.sort] === SORT_ORDER_MAP.desc
+                        ? 'solar:arrow-down-linear'
+                        : 'solar:sort-linear'
+                  }
+                  className="size-4"
+                />
+              </button>
+            ) : (
+              title
+            )}
+          </TableHeadCell>
+        ))}
+      </TableRow>
+    </TableHead>
+  );
+};
+
+const CategoryRow = ({
+  category,
   onDeleteCategory,
   onEditCategory,
-}: TActions & { categoryId: string }) => (
-  <div className="flex items-center justify-center gap-2">
-    <Button
-      content={{ icon: 'solar:pen-linear', className: 'size-4.5' }}
-      pattern="outline"
-      buttonProps={{ onClick: (event) => (event.stopPropagation(), onEditCategory(categoryId)) }}
-      className="border-primary/20 hover:border-blue-crayola-c/50 hover:text-blue-crayola-c size-9! p-0!"
-    />
-    <Button
-      content={{ icon: 'solar:trash-bin-trash-linear', className: 'size-4.5' }}
-      pattern="outline"
-      buttonProps={{ onClick: (event) => (event.stopPropagation(), onDeleteCategory(categoryId)) }}
-      className="border-primary/20 hover:border-red-c/50 hover:text-red-c size-9! p-0!"
-    />
-  </div>
-);
+  className = '',
+  ...trProps
+}: TCategoryTable & ComponentProps<'tr'>) => {
+  return (
+    <TableRow tabIndex={0} {...trProps} className={`transition-colors duration-100 ${className}`}>
+      <TableRowCell className="text-left">
+        <CategoryInfo category={category} />
+      </TableRowCell>
+      <TableRowCell>
+        <Badge content={`Level ${category.level}`} />
+      </TableRowCell>
+      <TableRowCell className="text-primary/65 uppercase">{category.parent || 'N/A'}</TableRowCell>
+      <TableRowCell>
+        <CategoryActions
+          catId={category._id}
+          onDeleteCategory={onDeleteCategory}
+          onEditCategory={onEditCategory}
+        />
+      </TableRowCell>
+    </TableRow>
+  );
+};
 
 const Level3Table = ({ parentCategory, onDeleteCategory, onEditCategory }: TSubCategoryTable) => {
   const { queryParams } = useQueryParams();
@@ -423,12 +401,15 @@ const Level2Table = ({ parentCategory, onDeleteCategory, onEditCategory }: TSubC
                     onEditCategory={onEditCategory}
                   />
                   {selectedCategoryId === category._id && (
-                    <SubCategoryTableTr
-                      level={3}
-                      parentCategory={category}
-                      onDeleteCategory={onDeleteCategory}
-                      onEditCategory={onEditCategory}
-                    />
+                    <TableRow>
+                      <TableRowCell colSpan={4} className="border-b-0 pt-4 pb-0">
+                        <Level3Table
+                          onDeleteCategory={onDeleteCategory}
+                          onEditCategory={onEditCategory}
+                          parentCategory={category}
+                        />
+                      </TableRowCell>
+                    </TableRow>
                   )}
                 </Fragment>
               ))
@@ -459,12 +440,12 @@ const Level1Table = () => {
   } = useGetCategoriesByParentLevel({ level: 1 });
   const level1Cats = level1CatsData as ICategory[];
 
-  const handleEditCategory = (categoryId: string) => {
-    console.log('Edit category _id:', categoryId);
+  const handleEditCategory = (catId: string) => {
+    console.log('Edit category _id:', catId);
   };
 
-  const handleDeleteCategory = (categoryId: string) => {
-    console.log('Delete category _id:', categoryId);
+  const handleDeleteCategory = (catId: string) => {
+    console.log('Delete category _id:', catId);
   };
 
   const filteredCategories = useMemo(
@@ -506,12 +487,15 @@ const Level1Table = () => {
                     onEditCategory={handleEditCategory}
                   />
                   {selectedCategory?._id === category._id && (
-                    <SubCategoryTableTr
-                      level={2}
-                      parentCategory={category}
-                      onDeleteCategory={handleDeleteCategory}
-                      onEditCategory={handleEditCategory}
-                    />
+                    <TableRow>
+                      <TableRowCell colSpan={4} className="border-b-0 pt-4 pb-0">
+                        <Level2Table
+                          onDeleteCategory={handleDeleteCategory}
+                          onEditCategory={handleEditCategory}
+                          parentCategory={category}
+                        />
+                      </TableRowCell>
+                    </TableRow>
                   )}
                 </Fragment>
               ))
