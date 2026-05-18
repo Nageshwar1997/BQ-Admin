@@ -3,36 +3,26 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import { ROUTES } from '@/constants/common.constants';
+import useDebounce from '@/hooks/useDebounce';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
-import { debounce } from '@/utils/common.util';
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 
 const SearchAndSort = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const [searchQuery, setSearchQuery] = useState(queryParams?.search || '');
 
-  const debouncedSetQuery = useMemo(
-    () =>
-      debounce((value: string) => {
-        const trimmedValue = value.trim();
-
-        if (trimmedValue) {
-          setParams({ search: trimmedValue });
-        } else {
-          removeParams(['search']);
-        }
-      }, 500),
-    [],
-  );
-
-  useEffect(() => {
-    return () => debouncedSetQuery.cancel();
-  }, [debouncedSetQuery]);
-
-  useEffect(() => {
-    setSearchQuery(queryParams?.search || '');
-  }, [queryParams?.search]);
+  const handleSearch = useDebounce({
+    callback: (value: string) => {
+      const trimmedValue = value.trim();
+      if (trimmedValue) {
+        setParams({ ...queryParams, search: trimmedValue });
+      } else {
+        removeParams(['search']);
+      }
+    },
+    delay: 600,
+  });
 
   return (
     <div className="flex items-center justify-between gap-3 md:gap-4">
@@ -44,9 +34,10 @@ const SearchAndSort = () => {
           value: searchQuery,
           onChange: (e) => {
             const value = (e.target.value || '').trimStart();
-
+            // instant ui update
             setSearchQuery(value);
-            debouncedSetQuery(value);
+            // debounced action
+            handleSearch(value);
           },
           disabled: !queryParams.status || queryParams.status === 'draft',
         }}
