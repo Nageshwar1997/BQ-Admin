@@ -14,7 +14,7 @@ const Layout = () => {
       <AuthModal />
       <div className="flex w-full grow flex-col-reverse md:flex-row">
         <Sidebar />
-        <div className="h-full flex-1 grow">
+        <div className="h-full flex-1 overflow-x-auto grow">
           <Outlet />
           <Footer />
         </div>
