@@ -1,3 +1,4 @@
+import type { SORT_ORDER_MAP } from '@/constants/common.constants';
 import type { FOOTER_CATEGORIES } from '@/constants/footer.constants';
 import type { IconProps } from '@iconify/react';
 import type { ButtonHTMLAttributes, JSX, ReactNode, RefObject, VideoHTMLAttributes } from 'react';
@@ -43,7 +44,7 @@ export interface IResend extends TClassName {
   onResend?: () => void;
 }
 
-export type TSort = 'asc' | 'desc';
+export type TSort = (typeof SORT_ORDER_MAP)[keyof typeof SORT_ORDER_MAP];
 
 export type TTitleDescription = {
   title: string | ReactNode;

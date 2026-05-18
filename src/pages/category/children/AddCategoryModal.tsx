@@ -4,6 +4,7 @@ import Stepper, { type StepperStep } from '@/components/ui/Stepper';
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
+import { QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import { addCategorySchema } from '@/schemas/product.schema';
@@ -309,7 +310,7 @@ const AddCategoryModal = () => {
 
   return (
     <ModalWrapper
-      isOpen={queryParams.category === 'add'}
+      isOpen={queryParams[QUERY_PARAMS_KEY_MAP.category.add] === 'true'}
       onClose={() => removeParams(['category'])}
       header={{ showCloseIcon: true, title: 'Add new category' }}
       containerProps={{ className: 'p-4!' }}

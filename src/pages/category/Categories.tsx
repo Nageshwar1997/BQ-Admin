@@ -3,12 +3,14 @@ import PageWrapper from '@/components/layout/containers/PageWrapper';
 import Navbar from '@/components/layout/navbar';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/inputs/Input';
+import { QUERY_PARAMS_KEY_MAP, SORT_ORDER_MAP } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
 import type { TChildren, TClassName, TSort } from '@/types/component.type';
 import type { IInput } from '@/types/input.type';
+import { getFilteredAndSortedCategories } from '@/utils/api.util';
 import { Icon } from '@iconify/react';
 import {
   Fragment,
@@ -22,22 +24,13 @@ import AddCategoryModal from './children/AddCategoryModal';
 
 const TH_TITLES = ['Category', 'Level', 'Parent', 'Actions'] as const;
 
-const QUERY_CLEAR_MAP = { s_l1: ['s_l2', 's_l3'], s_l2: ['s_l3'], s_l3: [] };
+const queryKeys = QUERY_PARAMS_KEY_MAP;
+const q_cat_keys = QUERY_PARAMS_KEY_MAP.category;
 
-const getFilteredAndSortedCategories = (categories: ICategory[], search: string, sort: TSort) => {
-  const searchValue = search?.toLowerCase().trim();
-  const filteredCategories = searchValue
-    ? categories.filter((category) =>
-        [category.name, category.slug].join(' ').toLowerCase().includes(searchValue),
-      )
-    : categories;
-
-  if (!sort) return filteredCategories;
-
-  return [...filteredCategories].sort((a, b) => {
-    const direction = sort === 'desc' ? -1 : 1;
-    return a.name.localeCompare(b.name) * direction;
-  });
+const QUERY_CLEAR_MAP = {
+  [q_cat_keys.level.l1]: [q_cat_keys.level.l2, q_cat_keys.level.l3],
+  [q_cat_keys.level.l2]: [q_cat_keys.level.l3],
+  [q_cat_keys.level.l3]: [],
 };
 
 const Badge = ({ content }: { content: string }) => (
@@ -73,12 +66,12 @@ const THead = () => {
               <button
                 type="button"
                 onClick={() => {
-                  if (queryParams.sort === 'asc') {
-                    setParams({ sort: 'desc' });
-                  } else if (queryParams.sort === 'desc') {
-                    removeParams(['sort']);
+                  if (queryParams[queryKeys.sort] === SORT_ORDER_MAP.asc) {
+                    setParams({ [queryKeys.sort]: SORT_ORDER_MAP.desc });
+                  } else if (queryParams[queryKeys.sort] === SORT_ORDER_MAP.desc) {
+                    removeParams([queryKeys.sort]);
                   } else {
-                    setParams({ sort: 'asc' });
+                    setParams({ [queryKeys.sort]: SORT_ORDER_MAP.asc });
                   }
                 }}
                 className="text-primary/65 hover:text-primary flex cursor-pointer items-center gap-2 text-left text-xs font-semibold tracking-normal uppercase transition-colors"
@@ -86,9 +79,9 @@ const THead = () => {
                 {title}
                 <Icon
                   icon={
-                    queryParams.sort === 'asc'
+                    queryParams[queryKeys.sort] === SORT_ORDER_MAP.asc
                       ? 'solar:arrow-up-linear'
-                      : queryParams.sort === 'desc'
+                      : queryParams[queryKeys.sort] === SORT_ORDER_MAP.desc
                         ? 'solar:arrow-down-linear'
                         : 'solar:sort-linear'
                   }
@@ -188,15 +181,13 @@ const SubCategoryTableTr = (props: {
 const SearchInput = ({
   className = '',
   needRef,
-  queryKey,
   level,
-}: Pick<IInput, 'className' | 'needRef'> &
-  Pick<ICategory, 'level'> & {
-    queryKey: 's_l1' | 's_l2' | 's_l3';
-  }) => {
+}: Pick<IInput, 'className' | 'needRef'> & Pick<ICategory, 'level'>) => {
   const { queryParams, setParams } = useQueryParams();
 
-  const [searchQuery, setSearchQuery] = useState(queryParams?.[queryKey] || '');
+  const queryKey = `l${level}` as keyof typeof q_cat_keys.level;
+
+  const [searchQuery, setSearchQuery] = useState(queryParams[queryKey] || '');
 
   const handleSearch = useDebounce({
     callback: (value: string) => {
@@ -230,10 +221,10 @@ const SearchInput = ({
   };
 
   useEffect(() => {
-    if (!queryParams?.[queryKey] && searchQuery) {
+    if (!queryParams[queryKey] && searchQuery) {
       setSearchQuery('');
     }
-  }, [queryParams?.[queryKey]]);
+  }, [queryParams[queryKey]]);
 
   return (
     <Input
@@ -302,8 +293,8 @@ const Level3Table = ({
   onEditCategory: (categoryId: string) => void;
 }) => {
   const { queryParams } = useQueryParams();
-  const deferredSearch = useDeferredValue(queryParams.s_l3);
-  const deferredSort = useDeferredValue(queryParams.sort) as TSort;
+  const deferredSearch = useDeferredValue(queryParams[q_cat_keys.level.l3]);
+  const deferredSort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
 
   const {
     data: categoriesData = [],
@@ -331,7 +322,7 @@ const Level3Table = ({
         </span>
       </div>
       <div className="mb-3 max-w-md">
-        <SearchInput key={3} level={3} queryKey="s_l3" needRef />
+        <SearchInput key={3} level={3} needRef />
       </div>
       <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
@@ -372,8 +363,8 @@ const Level2Table = ({
   onEditCategory: (categoryId: string) => void;
 }) => {
   const { queryParams } = useQueryParams();
-  const deferredSearch = useDeferredValue(queryParams.s_l2);
-  const deferredSort = useDeferredValue(queryParams.sort) as TSort;
+  const deferredSearch = useDeferredValue(queryParams[q_cat_keys.level.l2]);
+  const deferredSort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
 
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const {
@@ -406,7 +397,7 @@ const Level2Table = ({
         </span>
       </div>
       <div className="mb-3 max-w-md">
-        <SearchInput key={2} level={2} queryKey="s_l2" needRef />
+        <SearchInput key={2} level={2} needRef />
       </div>
       <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
@@ -461,8 +452,8 @@ const Level2Table = ({
 
 const Level1Table = () => {
   const { queryParams } = useQueryParams();
-  const deferredSearch = useDeferredValue(queryParams.s_l1);
-  const deferredSort = useDeferredValue(queryParams.sort) as TSort;
+  const deferredSearch = useDeferredValue(queryParams[q_cat_keys.level.l1]);
+  const deferredSort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
   const [selectedCategory, setSelectedCategory] = useState<ICategory>();
   const {
     data: level1CatsData = [],
@@ -487,7 +478,7 @@ const Level1Table = () => {
   return (
     <div className="border-primary/10 bg-secondary-invert rounded-xl border p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <SearchInput key={1} level={1} queryKey="s_l1" needRef />
+        <SearchInput key={1} level={1} needRef />
         <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
           {filteredCategories.length}/{level1Cats.length} items
         </span>
@@ -548,7 +539,7 @@ const Categories = () => {
 
   return (
     <Fragment>
-      {queryParams.category === 'add' && <AddCategoryModal />}
+      {queryParams[q_cat_keys.add] === 'true' && <AddCategoryModal />}
       <PageWrapper>
         <Navbar
           buttons={[
