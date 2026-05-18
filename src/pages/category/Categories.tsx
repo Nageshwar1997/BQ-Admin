@@ -240,7 +240,15 @@ const SearchInput = ({ level }: Pick<ICategory, 'level'>) => {
 
 const CategoryInfo = ({ category }: { category: ICategory }) => (
   <div className="flex items-center gap-3">
-    <div className="from-sky-blue-burst/20 to-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg bg-linear-to-br">
+    <div
+      className={`to-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg bg-linear-to-br ${
+        category.level === 1
+          ? 'from-rose-c/25 via-rose-c/10'
+          : category.level === 2
+            ? 'from-jade-c/25 via-jade-c/10'
+            : 'from-blue-crayola-c/25 via-blue-crayola-c/10'
+      }`}
+    >
       <Icon icon="solar:hanger-2-linear" className="size-5" />
     </div>
     <div>
