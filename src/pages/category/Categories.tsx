@@ -1,5 +1,6 @@
 import ApiStatus from '@/components/layout/ApiStatus';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
+import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
 import Navbar from '@/components/layout/navbar';
 import {
   Table,
@@ -296,7 +297,10 @@ const L1Table = () => {
         level={1}
         className="flex w-full flex-row-reverse items-center justify-between gap-3 space-y-0!"
       />
-      <div className="overflow-x-auto">
+      <ScrollableGradientContainer
+        direction="horizontal"
+        gradientClassNames={{ left: 'from-secondary-invert', right: 'from-secondary-invert' }}
+      >
         <Table>
           <CategoryHead />
           <TableBody>
@@ -345,7 +349,7 @@ const L1Table = () => {
             )}
           </TableBody>
         </Table>
-      </div>
+      </ScrollableGradientContainer>
     </div>
   );
 };
