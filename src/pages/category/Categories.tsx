@@ -158,31 +158,29 @@ const L3Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
         level={3}
         name={parentCategory.name}
       />
-      <div className="overflow-x-auto">
-        <Table>
-          <CategoryHead />
-          <TableBody>
-            {filteredCategories.length ? (
-              filteredCategories.map((category) => (
-                <CategoryRow
-                  key={category._id}
-                  category={category}
-                  onDelete={onDelete}
-                  onEdit={onEdit}
-                  className="hover:bg-primary/1"
-                />
-              ))
-            ) : (
-              <ApiStatusRow
-                haveLength={!!categories.length}
-                isError={isError}
-                isLoading={isLoading}
-                level={3}
+      <Table>
+        <CategoryHead />
+        <TableBody>
+          {filteredCategories.length ? (
+            filteredCategories.map((category) => (
+              <CategoryRow
+                key={category._id}
+                category={category}
+                onDelete={onDelete}
+                onEdit={onEdit}
+                className="hover:bg-primary/1"
               />
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            ))
+          ) : (
+            <ApiStatusRow
+              haveLength={!!categories.length}
+              isError={isError}
+              isLoading={isLoading}
+              level={3}
+            />
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 };
@@ -218,52 +216,50 @@ const L2Table = ({ parentCategory, onDelete, onEdit }: TSubCategoryTable) => {
         level={2}
         name={parentCategory.name}
       />
-      <div className="overflow-x-auto">
-        <Table>
-          <CategoryHead />
-          <TableBody>
-            {filteredCategories.length ? (
-              filteredCategories.map((category) => (
-                <Fragment key={category._id}>
-                  <CategoryRow
-                    category={category}
-                    onClick={() =>
+      <Table>
+        <CategoryHead />
+        <TableBody>
+          {filteredCategories.length ? (
+            filteredCategories.map((category) => (
+              <Fragment key={category._id}>
+                <CategoryRow
+                  category={category}
+                  onClick={() =>
+                    setSelectedCategoryId((selected) =>
+                      selected === category._id ? '' : category._id,
+                    )
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
                       setSelectedCategoryId((selected) =>
                         selected === category._id ? '' : category._id,
-                      )
+                      );
                     }
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault();
-                        setSelectedCategoryId((selected) =>
-                          selected === category._id ? '' : category._id,
-                        );
-                      }
-                    }}
-                    className={`cursor-pointer ${selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
-                    onDelete={onDelete}
-                    onEdit={onEdit}
-                  />
-                  {selectedCategoryId === category._id && (
-                    <TableRow>
-                      <TableRowCell colSpan={4} className="border-b-0 p-0! pt-3!">
-                        <L3Table onDelete={onDelete} onEdit={onEdit} parentCategory={category} />
-                      </TableRowCell>
-                    </TableRow>
-                  )}
-                </Fragment>
-              ))
-            ) : (
-              <ApiStatusRow
-                haveLength={!!categories.length}
-                isError={isError}
-                isLoading={isLoading}
-                level={2}
-              />
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                  }}
+                  className={`cursor-pointer ${selectedCategoryId === category._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
+                  onDelete={onDelete}
+                  onEdit={onEdit}
+                />
+                {selectedCategoryId === category._id && (
+                  <TableRow>
+                    <TableRowCell colSpan={4} className="border-b-0 p-0! pt-3!">
+                      <L3Table onDelete={onDelete} onEdit={onEdit} parentCategory={category} />
+                    </TableRowCell>
+                  </TableRow>
+                )}
+              </Fragment>
+            ))
+          ) : (
+            <ApiStatusRow
+              haveLength={!!categories.length}
+              isError={isError}
+              isLoading={isLoading}
+              level={2}
+            />
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 };
