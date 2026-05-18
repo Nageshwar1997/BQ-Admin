@@ -3,14 +3,21 @@ import PageWrapper from '@/components/layout/containers/PageWrapper';
 import Navbar from '@/components/layout/navbar';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/inputs/Input';
+import useDebounce from '@/hooks/useDebounce';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
 import type { TChildren, TClassName } from '@/types/component.type';
 import type { IInput } from '@/types/input.type';
-import { debounce } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
-import { Fragment, useEffect, useMemo, useState, type TableHTMLAttributes } from 'react';
+import {
+  Fragment,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+  type TableHTMLAttributes,
+} from 'react';
 import AddCategoryModal from './children/AddCategoryModal';
 
 type TSortDirection = '' | 'asc' | 'desc';
@@ -183,36 +190,42 @@ const Search = ({
   Pick<ICategory, 'level'> & {
     queryKey: 's_l1' | 's_l2' | 's_l3';
   }) => {
-  const { queryParams, setParams, removeParams } = useQueryParams();
+  const { queryParams, setParams } = useQueryParams();
 
   const [searchQuery, setSearchQuery] = useState(queryParams?.[queryKey] || '');
 
-  const debouncedSetQuery = useMemo(
-    () =>
-      debounce((value: string) => {
-        const trimmedValue = value.trim();
-        const keysToClear = QUERY_CLEAR_MAP[queryKey];
+  const handleSearch = useDebounce({
+    callback: (value: string) => {
+      const trimmedValue = value.trim();
+      const keysToClear = QUERY_CLEAR_MAP[queryKey];
 
+      setParams((prevParams) => {
+        const updatedParams = { ...prevParams };
+
+        // current query remove
+        delete updatedParams[queryKey];
+
+        // dependent queries remove
+        keysToClear.forEach((key) => {
+          delete updatedParams[key];
+        });
+
+        // new value set
         if (trimmedValue) {
-          setParams({ [queryKey]: trimmedValue });
-
-          if (keysToClear.length) {
-            removeParams(keysToClear);
-          }
-        } else {
-          removeParams([queryKey]);
+          updatedParams[queryKey] = trimmedValue;
         }
-      }, 500),
-    [queryKey, removeParams, setParams],
-  );
 
-  useEffect(() => {
-    return () => debouncedSetQuery.cancel();
-  }, [debouncedSetQuery]);
+        return updatedParams;
+      });
+    },
+    delay: 600,
+  });
 
-  useEffect(() => {
-    setSearchQuery(queryParams?.[queryKey] || '');
-  }, [queryKey, queryParams?.[queryKey]]);
+useEffect(() => {
+  if (!queryParams?.[queryKey] && searchQuery) {
+    setSearchQuery('');
+  }
+}, [queryParams?.[queryKey]]);
 
   return (
     <Input
@@ -221,10 +234,12 @@ const Search = ({
         name: queryKey,
         placeholder: `Search level ${level} categories here...`,
         value: searchQuery,
-        onChange: ({ currentTarget: { value } }) => {
+        onChange: ({ target: { value } }) => {
           const trimmedValue = value.trimStart();
+          // instant ui update
           setSearchQuery(trimmedValue);
-          debouncedSetQuery(trimmedValue);
+          // debounced search action
+          handleSearch(trimmedValue);
         },
       }}
       className={`bg-silver/10! max-w-md ${className}`}
@@ -313,6 +328,8 @@ const Level3Table = ({
   onEditCategory: (categoryId: string) => void;
 }) => {
   const { queryParams } = useQueryParams();
+  const deferredSearch = useDeferredValue(queryParams.s_l3);
+
   const [sort, setSort] = useState<TSortDirection>('');
   const {
     data: categoriesData = [],
@@ -324,8 +341,8 @@ const Level3Table = ({
   });
   const categories = categoriesData as ICategory[];
   const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(categories, queryParams.search, sort),
-    [categories, queryParams.search, sort],
+    () => getFilteredAndSortedCategories(categories, deferredSearch, sort),
+    [categories, deferredSearch, sort],
   );
 
   return (
@@ -340,7 +357,7 @@ const Level3Table = ({
         </span>
       </div>
       <div className="mb-3 max-w-md">
-        <Search level={3} queryKey="s_l3" needRef />
+        <Search key={3} level={3} queryKey="s_l3" needRef />
       </div>
       <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
@@ -381,6 +398,8 @@ const Level2Table = ({
   onEditCategory: (categoryId: string) => void;
 }) => {
   const { queryParams } = useQueryParams();
+  const deferredSearch = useDeferredValue(queryParams.s_l2);
+
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [sort, setSort] = useState<TSortDirection>('');
   const {
@@ -393,8 +412,8 @@ const Level2Table = ({
   });
   const categories = categoriesData as ICategory[];
   const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(categories, queryParams.search, sort),
-    [categories, queryParams.search, sort],
+    () => getFilteredAndSortedCategories(categories, deferredSearch, sort),
+    [categories, deferredSearch, sort],
   );
 
   useEffect(() => {
@@ -414,7 +433,7 @@ const Level2Table = ({
         </span>
       </div>
       <div className="mb-3 max-w-md">
-        <Search level={2} queryKey="s_l2" needRef />
+        <Search key={2} level={2} queryKey="s_l2" needRef />
       </div>
       <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
@@ -469,6 +488,7 @@ const Level2Table = ({
 
 const Level1Table = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
+  const deferredSearch = useDeferredValue(queryParams.s_l1);
   const [selectedCategory, setSelectedCategory] = useState<ICategory>();
   const {
     data: level1CatsData = [],
@@ -497,21 +517,18 @@ const Level1Table = () => {
   };
 
   const filteredCategories = useMemo(
-    () => getFilteredAndSortedCategories(level1Cats, queryParams.search, level1Sort),
-    [level1Cats, queryParams.search, level1Sort],
+    () => getFilteredAndSortedCategories(level1Cats, deferredSearch, level1Sort),
+    [level1Cats, deferredSearch, level1Sort],
   );
 
   return (
     <div className="border-primary/10 bg-secondary-invert rounded-xl border p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <Search level={3} queryKey="s_l3" needRef />
+        <Search key={1} level={1} queryKey="s_l1" needRef />
         <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
           {filteredCategories.length}/{level1Cats.length} items
         </span>
       </div>
-      {/* <div className="mb-3 max-w-md">
-
-      </div> */}
       <div className="overflow-x-auto rounded-lg">
         <table className="w-full table-auto border-separate border-spacing-0">
           <THead sort={level1Sort} setSort={handleLevel1Sort} />

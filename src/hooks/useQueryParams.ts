@@ -1,12 +1,12 @@
-import type { TParams } from '@/types/hook.type';
+import type { TStringRecord } from '@/types/hook.type';
 import usePathParams from './usePathParams';
 
 const useQueryParams = () => {
   const { navigate, search, pathname } = usePathParams();
 
-  const getParams = (): TParams => {
+  const getParams = (): TStringRecord => {
     const searchParams = new URLSearchParams(search);
-    const params: TParams = {};
+    const params: TStringRecord = {};
 
     for (const [key, value] of searchParams.entries()) {
       params[key] = value;
@@ -15,13 +15,17 @@ const useQueryParams = () => {
     return params;
   };
 
-  const setParams = (params: TParams): void => {
-    const searchParams = new URLSearchParams(search);
+  const setParams = (
+    params: TStringRecord | ((prevParams: TStringRecord) => TStringRecord),
+  ): void => {
+    const currentParams = getParams();
 
-    Object.entries(params).forEach(([key, value]) => {
-      if (value === undefined || value === null || value === '') {
-        searchParams.delete(key);
-      } else {
+    const updatedParams = typeof params === 'function' ? params(currentParams) : params;
+
+    const searchParams = new URLSearchParams();
+
+    Object.entries(updatedParams).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
         searchParams.set(key, value);
       }
     });
@@ -30,13 +34,15 @@ const useQueryParams = () => {
   };
 
   const removeParams = (keys: string | string[]): void => {
-    const searchParams = new URLSearchParams(search);
+    setParams((prevParams) => {
+      const updatedParams = { ...prevParams };
 
-    (Array.isArray(keys) ? keys : [keys]).forEach((key) => {
-      searchParams.delete(key);
+      (Array.isArray(keys) ? keys : [keys]).forEach((key) => {
+        delete updatedParams[key];
+      });
+
+      return updatedParams;
     });
-
-    navigate({ pathname, search: searchParams.toString() });
   };
 
   const clearParams = (): void => {
