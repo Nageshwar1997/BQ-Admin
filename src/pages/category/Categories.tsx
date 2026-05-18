@@ -1,6 +1,7 @@
 import ApiStatus from '@/components/layout/ApiStatus';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
+import LoadingText from '@/components/layout/loaders/LoadingText';
 import Navbar from '@/components/layout/navbar';
 import {
   Table,
@@ -42,26 +43,30 @@ const ApiStatusRow = (
   const { isError, isLoading, haveLength, level } = props;
 
   return (
-    <TableRow>
-      <TableRowCell colSpan={4} className="p-0! pt-4!">
-        <ApiStatus
-          className="border-primary/10 bg-smoke-eerie flex rounded-xl border"
-          status={isLoading ? 'loading' : isError ? 'error' : 'empty'}
-          title={
-            isError
-              ? 'Failed to load categories'
-              : haveLength
-                ? 'No matching categories found'
-                : 'No categories available'
-          }
-          description={
-            isError
-              ? `Something went wrong while fetching level ${level} categories. Please try again.`
-              : haveLength
-                ? 'Try searching with a different keyword or clear the search.'
-                : `No level ${level} categories have been added under this category yet.`
-          }
-        />
+    <TableRow className="border-y-primary/5 border-y first:border-t-0 last:border-b-0">
+      <TableRowCell colSpan={4}>
+        {isLoading ? (
+          <LoadingText text="Loading..." className="mx-auto my-2" />
+        ) : (
+          <ApiStatus
+            className="min-h-0!"
+            status={isError ? 'error' : 'empty'}
+            title={
+              isError
+                ? 'Failed to load categories'
+                : haveLength
+                  ? 'No matching categories found'
+                  : 'No categories available'
+            }
+            description={
+              isError
+                ? `Something went wrong while fetching level ${level} categories. Please try again.`
+                : haveLength
+                  ? 'Try searching with a different keyword or clear the search.'
+                  : `No level ${level} categories have been added under this category yet.`
+            }
+          />
+        )}
       </TableRowCell>
     </TableRow>
   );
