@@ -83,8 +83,10 @@ const CategoryHead = () => {
   );
 };
 
-const Badge = ({ content }: { content: string }) => (
-  <span className="border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold">
+const Badge = ({ content = '', className = '' }) => (
+  <span
+    className={`border-primary/10 bg-primary/5 text-primary inline-flex w-fit items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${className}`}
+  >
     {content}
   </span>
 );
@@ -313,9 +315,7 @@ const Level3Table = ({
           <p className="text-primary text-sm font-semibold">{parentCategory.name}</p>
           <p className="text-primary/50 text-xs">Level 3 categories</p>
         </div>
-        <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold">
-          {filteredCategories.length}/{categories.length} items
-        </span>
+        <Badge content={`${filteredCategories.length}/${categories.length} items`} />
       </div>
       <SearchInput level={3} />
       <div className="mt-3 overflow-x-auto rounded-lg">
@@ -386,9 +386,7 @@ const Level2Table = ({
           <p className="text-primary text-base font-semibold">{parentCategory.name}</p>
           <p className="text-primary/50 text-sm">Level 2 sub-categories</p>
         </div>
-        <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold">
-          {filteredCategories.length}/{categories.length} items
-        </span>
+        <Badge content={`${filteredCategories.length}/${categories.length} items`} />
       </div>
       <SearchInput level={2} />
       <div className="mt-3 overflow-x-auto rounded-lg">
@@ -471,9 +469,10 @@ const Level1Table = () => {
     <div className="border-primary/10 bg-secondary-invert rounded-xl border p-4">
       <div className="flex items-center justify-between gap-3">
         <SearchInput level={1} />
-        <span className="border-primary/10 bg-primary/5 text-primary rounded-full border px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
-          {filteredCategories.length}/{level1Cats.length} items
-        </span>
+        <Badge
+          content={`${filteredCategories.length}/${level1Cats.length} items`}
+          className="whitespace-nowrap"
+        />
       </div>
       <div className="mt-3 overflow-x-auto rounded-lg">
         <Table>
