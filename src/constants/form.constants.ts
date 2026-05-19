@@ -1,3 +1,5 @@
+import { CATEGORY_LEVELS_MAP } from './common.constants';
+
 const passwords = { password: '', confirmPassword: '' };
 
 const changePassword = { ...passwords, currentPassword: '' };
@@ -36,7 +38,7 @@ export const FORM_DEFAULT_VALUES = {
   category: {
     activeStep: 0,
     name: '',
-    level: 1,
+    level: CATEGORY_LEVELS_MAP.L1,
     mainCategory: '',
     subCategory: '',
     description: undefined,

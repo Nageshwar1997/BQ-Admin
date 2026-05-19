@@ -4,7 +4,11 @@ import Stepper, { type StepperStep } from '@/components/ui/Stepper';
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
-import { CATEGORY_MODAL_STEPS, QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
+import {
+  CATEGORY_LEVELS_MAP,
+  CATEGORY_MODAL_STEPS,
+  QUERY_PARAMS_KEY_MAP,
+} from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import { categorySchema } from '@/schemas/product.schema';
@@ -23,6 +27,10 @@ import { useEffect, useMemo } from 'react';
 import { useForm, useWatch, type FieldPath } from 'react-hook-form';
 
 type TMode = typeof QUERY_PARAMS_KEY_MAP.category.edit | typeof QUERY_PARAMS_KEY_MAP.category.add;
+
+const isL1 = (level: TCategory['level']) => level === CATEGORY_LEVELS_MAP.L1;
+const isL2 = (level: TCategory['level']) => level === CATEGORY_LEVELS_MAP.L2;
+const isL3 = (level: TCategory['level']) => level === CATEGORY_LEVELS_MAP.L3;
 
 const STEP_FIELDS: FieldPath<TCategory>[][] = [
   ['name', 'level', 'mainCategory', 'subCategory', 'description'],
@@ -44,8 +52,8 @@ const getInitialData = (cat: ICategory, mainCatId?: string) => {
     name: cat.name,
     level: cat.level,
     mainCategory:
-      cat.level === 2 && cat.parent ? cat.parent : cat.level === 3 && mainCatId ? mainCatId : '',
-    subCategory: cat.level === 3 && cat.parent ? cat.parent : '',
+      isL2(cat.level) && cat.parent ? cat.parent : isL3(cat.level) && mainCatId ? mainCatId : '',
+    subCategory: isL3(cat.level) && cat.parent ? cat.parent : '',
     description: cat.description || '',
     activeStep: 0,
     confirmDetails: false,
@@ -56,7 +64,7 @@ const getPayload = (data: TCategory) => {
   return {
     name: data.name.trim(),
     level: data.level,
-    parent: data.level === 3 ? data.subCategory : data.level === 2 ? data.mainCategory : null,
+    parent: isL3(data.level) ? data.subCategory : isL2(data.level) ? data.mainCategory : null,
     description: data.description,
   };
 };
@@ -102,25 +110,25 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   const { mutateAsync: editCategoryAsync } = useEditCategory();
 
   const { data: level1Cats } = useGetCategoriesByParentLevel({
-    level: 1,
-    enabled: level !== 1,
+    level: CATEGORY_LEVELS_MAP.L1,
+    enabled: !isL1(level),
   });
 
   const { data: level2Cats } = useGetCategoriesByParentLevel({
-    level: 2,
+    level: CATEGORY_LEVELS_MAP.L2,
     parent: mainCategory,
-    enabled: level === 3 && !!mainCategory,
+    enabled: level === CATEGORY_LEVELS_MAP.L3 && !!mainCategory,
   });
 
   const { data: level3Cats } = useGetCategoriesByParentLevel({
-    level: 3,
+    level: CATEGORY_LEVELS_MAP.L3,
     parent: subCategory,
-    enabled: level === 3 && !!subCategory,
+    enabled: level === CATEGORY_LEVELS_MAP.L3 && !!subCategory,
   });
 
   const hierarchyPreview = useMemo(() => {
-    if (level === 1) return 'This will be created as a main category.';
-    if (level === 2) {
+    if (isL1(level)) return 'This will be created as a main category.';
+    if (isL2(level)) {
       return `Under ${getCategoryName(level1Cats, categoryValues.mainCategory)}.`;
     }
     return `Under ${getCategoryName(level1Cats, categoryValues.mainCategory)} / ${getCategoryName(
@@ -136,11 +144,11 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
 
     let categories: ICategory[] | undefined = [];
 
-    if (level === 1) {
+    if (isL1(level)) {
       categories = level1Cats;
-    } else if (level === 2) {
+    } else if (isL2(level)) {
       categories = level2Cats;
-    } else if (level === 3) {
+    } else if (isL3(level)) {
       categories = level3Cats;
     }
 
@@ -209,16 +217,16 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   };
 
   const resetParentFields = (selectedLevel: TCategory['level']) => {
-    if (selectedLevel === 1) {
+    if (isL1(selectedLevel)) {
       setValue('mainCategory', '', { shouldValidate: true });
       setValue('subCategory', '', { shouldValidate: true });
     }
 
-    if (selectedLevel === 2) {
+    if (isL2(selectedLevel)) {
       setValue('subCategory', '', { shouldValidate: true });
     }
 
-    if (selectedLevel === 3) {
+    if (isL3(selectedLevel)) {
       setValue('description', '', { shouldValidate: true });
     }
   };
@@ -242,8 +250,8 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               label="Category level"
               register={register('level')}
               options={['Main', 'Sub', 'Product'].map((name, i) => ({
-                value: i + 1,
-                label: `L${i + 1} - ${name} category`,
+                value: i + CATEGORY_LEVELS_MAP.L1,
+                label: `L${i + CATEGORY_LEVELS_MAP.L1} - ${name} category`,
               }))}
               error={errors.level?.message}
               selectProps={{
@@ -262,8 +270,10 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               selectProps={{
                 name: 'mainCategory',
                 value: categoryValues.mainCategory,
-                disabled: level === 1,
-                placeholder: level === 1 ? `Not required for L1` : 'Select main category',
+                disabled: isL1(level),
+                placeholder: isL1(level)
+                  ? `Not required for L${CATEGORY_LEVELS_MAP.L1}`
+                  : 'Select main category',
                 onChange: () => setValue('subCategory', '', { shouldValidate: true }),
               }}
             />
@@ -275,16 +285,15 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               selectProps={{
                 name: 'subCategory',
                 value: categoryValues.subCategory,
-                disabled: level !== 3 || !mainCategory,
-                placeholder:
-                  level !== 3
-                    ? 'Only required for L3'
-                    : mainCategory
-                      ? 'Select sub-category'
-                      : 'Select main category first',
+                disabled: !isL3(level) || !mainCategory,
+                placeholder: !isL3(level)
+                  ? `Only required for L${CATEGORY_LEVELS_MAP.L3}`
+                  : mainCategory
+                    ? 'Select sub-category'
+                    : 'Select main category first',
               }}
             />
-            {level === 3 && (
+            {isL3(level) && (
               <Input
                 label="Description"
                 register={register('description')}
@@ -319,21 +328,25 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               <p className="text-tertiary">
                 Level: <span className="text-primary">Level {categoryValues.level || '-'}</span>
               </p>
-              <p className="text-tertiary">
-                Parent:{' '}
-                <span className="text-primary">
-                  {categoryValues.level === 1
-                    ? 'Main category'
-                    : categoryValues.level === 2
-                      ? getCategoryName(level1Cats, categoryValues.mainCategory)
-                      : getCategoryName(level2Cats, categoryValues.subCategory) || '-'}
-                </span>
-              </p>
-              {categoryValues.level === 3 && (
-                <p className="text-tertiary sm:col-span-2">
-                  Description:{' '}
-                  <span className="text-primary">{categoryValues.description || '-'}</span>
-                </p>
+              {categoryValues.level && (
+                <>
+                  <p className="text-tertiary">
+                    Parent:{' '}
+                    <span className="text-primary">
+                      {isL1(categoryValues.level)
+                        ? 'Main category'
+                        : isL2(level)
+                          ? getCategoryName(level1Cats, categoryValues.mainCategory)
+                          : getCategoryName(level2Cats, categoryValues.subCategory) || '-'}
+                    </span>
+                  </p>
+                  {isL3(categoryValues.level) && (
+                    <p className="text-tertiary sm:col-span-2">
+                      Description:{' '}
+                      <span className="text-primary">{categoryValues.description || '-'}</span>
+                    </p>
+                  )}
+                </>
               )}
             </div>
           </div>

@@ -1,3 +1,4 @@
+import { CATEGORY_LEVELS, CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
 import { boolean, literal, number, object, string, union } from 'zod';
 
 const requiredText = (field: string, min = 2, max = 100) =>
@@ -35,27 +36,32 @@ export const addProductSchema = object({
   path: ['salePrice'],
   message: 'Sale price cannot be greater than MRP.',
 });
-
+// CATEGORY_LEVELS_MAP.L
 export const categorySchema = object({
   activeStep: number(),
   name: requiredText('Category name', 2, 80),
-  level: union([literal(1), literal(2), literal(3)], {
-    error: 'Category level is required.',
-  }),
+  level: union(
+    CATEGORY_LEVELS.map((l) => literal(l)),
+    { error: 'Category level is required.' },
+  ),
   mainCategory: string().trim(),
   subCategory: string().trim(),
   description: string().trim().optional().nullable(),
   confirmDetails: boolean().refine(Boolean, 'Please confirm category details before saving.'),
 })
-  .refine((data) => data.level === 1 || !!data.mainCategory, {
+  .refine((data) => data.level === CATEGORY_LEVELS_MAP.L1 || !!data.mainCategory, {
     path: ['mainCategory'],
-    message: 'Main category is required for level 2 and level 3 categories.',
+    message: `Main category is required for level ${CATEGORY_LEVELS_MAP.L2} and level ${CATEGORY_LEVELS_MAP.L3} categories.`,
   })
-  .refine((data) => data.level !== 3 || !!data.subCategory, {
+  .refine((data) => data.level !== CATEGORY_LEVELS_MAP.L3 || !!data.subCategory, {
     path: ['subCategory'],
-    message: 'Sub-category is required for level 3 categories.',
+    message: `Sub-category is required for level ${CATEGORY_LEVELS_MAP.L3} categories.`,
   })
-  .refine((data) => data.level !== 3 || (data.description && data.description.length >= 10), {
-    path: ['description'],
-    message: 'Description is required for level 3 categories and must be at least 10 characters.',
-  });
+  .refine(
+    (data) =>
+      data.level !== CATEGORY_LEVELS_MAP.L3 || (data.description && data.description.length >= 10),
+    {
+      path: ['description'],
+      message: `Description is required for level ${CATEGORY_LEVELS_MAP.L3} categories and must be at least 10 characters.`,
+    },
+  );

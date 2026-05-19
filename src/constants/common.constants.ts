@@ -181,3 +181,6 @@ export const CATEGORY_MODAL_STEPS: StepperStep[] = [
     icon: 'solar:checklist-minimalistic-linear',
   },
 ];
+
+export const CATEGORY_LEVELS_MAP = { L1: 1, L2: 2, L3: 3 } as const;
+export const CATEGORY_LEVELS = Object.values(CATEGORY_LEVELS_MAP);

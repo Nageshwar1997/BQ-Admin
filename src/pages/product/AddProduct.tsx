@@ -4,6 +4,7 @@ import Stepper, { type StepperStep } from '@/components/ui/Stepper';
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
+import { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import { addProductSchema } from '@/schemas/product.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
@@ -65,14 +66,14 @@ const AddProduct = () => {
   const subCategory = useWatch({ control, name: 'subCategory' });
   const productValues = useWatch({ control });
 
-  const { data: level1Cats } = useGetCategoriesByParentLevel({ level: 1 });
+  const { data: level1Cats } = useGetCategoriesByParentLevel({ level: CATEGORY_LEVELS_MAP.L1 });
   const { data: level2Cats } = useGetCategoriesByParentLevel({
-    level: 2,
+    level: CATEGORY_LEVELS_MAP.L2,
     parent: mainCategory,
     enabled: !!mainCategory,
   });
   const { data: level3Cats } = useGetCategoriesByParentLevel({
-    level: 3,
+    level: CATEGORY_LEVELS_MAP.L3,
     parent: subCategory,
     enabled: !!subCategory,
   });
