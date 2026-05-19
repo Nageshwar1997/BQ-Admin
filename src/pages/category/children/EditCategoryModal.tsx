@@ -314,7 +314,7 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
     },
   ];
 
-  useEffect(() => {
+  const handleReset = () => {
     if (category) {
       const level = String(category.level) as TAddCategory['level'];
       reset({
@@ -323,18 +323,20 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
         activeStep: 0,
         confirmDetails: false,
         description: category.description,
-        ...(category.parent &&
-          isL2(level) && {
-            mainCategory: category.parent,
-            subCategory: '',
-          }),
-        ...(category.parent &&
-          isL3(level) && {
-            subCategory: category.parent,
-            mainCategory: mainCatId,
-          }),
+        ...(category.parent && {
+          ...(isL2(level) && { mainCategory: category.parent }),
+          ...(isL3(level) &&
+            mainCatId && { subCategory: category.parent, mainCategory: mainCatId }),
+        }),
       });
+    } else {
+      reset(FORM_DEFAULT_VALUES.addCategory);
     }
+  };
+
+  useEffect(() => {
+    if (!category) return;
+    handleReset();
   }, [category, mainCatId]);
 
   return (
@@ -363,11 +365,13 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
           <div className="flex justify-between gap-3">
             <Button
               pattern="secondary"
-              content="Back"
-              leftIcon={{ icon: 'solar:arrow-left-linear' }}
+              content={activeStep === 0 ? 'Reset' : 'Back'}
+              leftIcon={{
+                icon: activeStep === 0 ? 'solar:restart-linear' : 'solar:arrow-left-linear',
+              }}
               buttonProps={{
-                disabled: activeStep === 0,
-                onClick: () => setActiveStep(Math.max(activeStep - 1, 0)),
+                onClick: () =>
+                  activeStep === 0 ? handleReset() : setActiveStep(Math.max(activeStep - 1, 0)),
               }}
               className="sm:max-w-36"
             />
