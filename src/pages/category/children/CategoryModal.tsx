@@ -24,7 +24,7 @@ import { deepEqual, toaster } from '@/utils/common.util';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo } from 'react';
-import { useForm, useWatch, type FieldPath } from 'react-hook-form';
+import { Controller, useForm, useWatch, type FieldPath } from 'react-hook-form';
 
 type TMode = typeof QUERY_PARAMS_KEY_MAP.category.edit | typeof QUERY_PARAMS_KEY_MAP.category.add;
 
@@ -36,6 +36,8 @@ const STEP_FIELDS: FieldPath<TCategory>[][] = [
   ['name', 'level', 'mainCategory', 'subCategory', 'description'],
   ['confirmDetails'],
 ];
+
+const DEFAULT_VALUES = FORM_DEFAULT_VALUES.category;
 
 const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => (
   <div className="text-left">
@@ -52,9 +54,13 @@ const getInitialData = (cat: ICategory, mainCatId?: string) => {
     name: cat.name,
     level: cat.level,
     mainCategory:
-      isL2(cat.level) && cat.parent ? cat.parent : isL3(cat.level) && mainCatId ? mainCatId : '',
-    subCategory: isL3(cat.level) && cat.parent ? cat.parent : '',
-    description: cat.description || '',
+      isL2(cat.level) && cat.parent
+        ? cat.parent
+        : isL3(cat.level) && mainCatId
+          ? mainCatId
+          : DEFAULT_VALUES.mainCategory,
+    subCategory: isL3(cat.level) && cat.parent ? cat.parent : DEFAULT_VALUES.subCategory,
+    description: cat.description || DEFAULT_VALUES.description,
     activeStep: 0,
     confirmDetails: false,
   };
@@ -65,7 +71,7 @@ const getPayload = (data: TCategory) => {
     name: data.name.trim(),
     level: data.level,
     parent: isL3(data.level) ? data.subCategory : isL2(data.level) ? data.mainCategory : null,
-    description: data.description,
+    description: data.description || DEFAULT_VALUES.description,
   };
 };
 
@@ -89,7 +95,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     trigger,
   } = useForm<TCategory>({
     resolver: zodResolver(categorySchema),
-    defaultValues: FORM_DEFAULT_VALUES.category,
+    defaultValues: DEFAULT_VALUES,
     mode: 'onChange',
   });
 
@@ -217,19 +223,27 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   };
 
   const resetParentFields = (selectedLevel: TCategory['level']) => {
+    console.log('🚀 ~ resetParentFields ~ selectedLevel:', selectedLevel);
     if (isL1(selectedLevel)) {
-      setValue('mainCategory', '', { shouldValidate: true });
-      setValue('subCategory', '', { shouldValidate: true });
+      setValue('description', DEFAULT_VALUES.description, { shouldValidate: true });
+      setValue('subCategory', DEFAULT_VALUES.subCategory, { shouldValidate: true });
+      setValue('mainCategory', DEFAULT_VALUES.mainCategory, { shouldValidate: true });
     }
 
     if (isL2(selectedLevel)) {
-      setValue('subCategory', '', { shouldValidate: true });
+      setValue('description', DEFAULT_VALUES.description, { shouldValidate: true });
+      setValue('subCategory', DEFAULT_VALUES.subCategory, { shouldValidate: true });
+      setValue('mainCategory', '', { shouldValidate: true });
     }
 
     if (isL3(selectedLevel)) {
+      setValue('mainCategory', '', { shouldValidate: true });
+      setValue('subCategory', '', { shouldValidate: true });
       setValue('description', '', { shouldValidate: true });
     }
   };
+
+  console.log('errors', errors);
 
   const stepFields = [
     {
@@ -246,20 +260,31 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
                 placeholder: 'Category name',
               }}
             />
-            <Select
-              label="Category level"
-              register={register('level')}
-              options={['Main', 'Sub', 'Product'].map((name, i) => ({
-                value: i + CATEGORY_LEVELS_MAP.L1,
-                label: `L${i + CATEGORY_LEVELS_MAP.L1} - ${name} category`,
-              }))}
-              error={errors.level?.message}
-              selectProps={{
-                name: 'level',
-                value: level,
-                placeholder: 'Select category level',
-                onChange: ({ currentTarget: { value } }) =>
-                  resetParentFields(Number(value) as TCategory['level']),
+            <Controller
+              name="level"
+              control={control}
+              defaultValue={level}
+              render={({ field: { onChange, value } }) => {
+                return (
+                  <Select
+                    label="Category level"
+                    options={['Main', 'Sub', 'Product'].map((name, i) => ({
+                      value: i + CATEGORY_LEVELS_MAP.L1,
+                      label: `L${i + CATEGORY_LEVELS_MAP.L1} - ${name} category`,
+                      disabled: i + 1 === level,
+                    }))}
+                    error={errors.level?.message}
+                    selectProps={{
+                      name: 'level',
+                      value: value,
+                      placeholder: 'Select category level',
+                      onChange: (event: { target: { value: string } }) => {
+                        onChange(event);
+                        resetParentFields(Number(event.target.value) as TCategory['level']);
+                      },
+                    }}
+                  />
+                );
               }}
             />
             <Select
@@ -274,7 +299,10 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
                 placeholder: isL1(level)
                   ? `Not required for L${CATEGORY_LEVELS_MAP.L1}`
                   : 'Select main category',
-                onChange: () => setValue('subCategory', '', { shouldValidate: true }),
+                onChange: () => {
+                  setValue('subCategory', DEFAULT_VALUES.subCategory, { shouldValidate: true });
+                  setValue('description', DEFAULT_VALUES.description, { shouldValidate: true });
+                },
               }}
             />
             <Select
@@ -366,7 +394,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     if (isEditMode) {
       reset(getInitialData(category, mainCatId));
     } else {
-      reset(FORM_DEFAULT_VALUES.category);
+      reset(DEFAULT_VALUES);
     }
   };
 

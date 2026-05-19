@@ -59,30 +59,33 @@ export const validateString = (props: IZodStringConfigs): ZodString => {
 
   if (nonEmpty) {
     schema = schema.nonempty({ message: `${name} is required.` });
+  }
 
-    if (min !== undefined) {
-      schema = schema.min(min, `${name} must be at least ${min} characters.`);
-    }
+  if (min !== undefined) {
+    schema = schema.min(min, `${name} must be at least ${min} characters.`);
+  }
 
-    if (max !== undefined) {
-      schema = schema.max(max, `${name} must not exceed ${max} characters.`);
-    }
+  if (max !== undefined) {
+    schema = schema.max(max, `${name} must not exceed ${max} characters.`);
+  }
+
+  if (customRegexes?.length) {
+    customRegexes.forEach(({ regex, message }) => {
+      schema = schema.refine((value) => !value || regex.test(value), `${name} ${message}.`);
+    });
+  }
+
+  if (customRegex) {
+    schema = schema.refine(
+      (value) => !value || customRegex.regex.test(value),
+      `${name} ${customRegex.message}.`,
+    );
   }
 
   if (allowSpace === 'singleSpace') {
     schema = schema.regex(REGEX.SINGLE_SPACE, `${name} must not contain multiple spaces.`);
   } else if (allowSpace === 'noSpace') {
     schema = schema.regex(REGEX.NO_SPACE, `${name} must not contain spaces.`);
-  }
-
-  if (customRegexes?.length) {
-    customRegexes.forEach(({ regex, message }) => {
-      schema = schema.regex(regex, `${name} ${message}.`);
-    });
-  }
-
-  if (customRegex) {
-    schema = schema.regex(customRegex.regex, `${name} ${customRegex.message}.`);
   }
 
   if (lowerOrUpper === 'lower') {

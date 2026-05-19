@@ -25,5 +25,5 @@ export const REGEX = {
   ONLY_LETTERS: /^[a-zA-Z]+$/, // All characters are letters
   ONLY_LETTERS_AND_SPACES: /^[a-zA-Z\s]+$/, // All characters are letters and spaces
   ONLY_LETTERS_AND_SPACES_AND_DOTS: /^[a-zA-Z\s.]+$/, // Only letters, spaces, and dots
-  MONGODB_ID: /^[a-fA-F0-9]{24}$/, // MongoDB _id
+  MONGODB_ID: /^[a-f\d]{24}$/i, // MongoDB _id
 } as const;

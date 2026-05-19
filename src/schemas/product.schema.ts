@@ -1,5 +1,7 @@
 import { CATEGORY_LEVELS, CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
-import { boolean, literal, number, object, string, union } from 'zod';
+import { REGEX } from '@/constants/regex.constants';
+import { appendCustomIssue, validateNumber, validateString } from '@/utils/zod.util';
+import { boolean, literal, object, string, union } from 'zod';
 
 const requiredText = (field: string, min = 2, max = 100) =>
   string()
@@ -36,35 +38,68 @@ export const addProductSchema = object({
   path: ['salePrice'],
   message: 'Sale price cannot be greater than MRP.',
 });
-// CATEGORY_LEVELS_MAP.L
+
 export const categorySchema = object({
-  activeStep: number(),
-  name: requiredText('Category name', 2, 80),
+  activeStep: validateNumber({ field: 'activeStep', label: 'Active step', min: 0, max: 1 }),
+  name: validateString({ field: 'name', label: 'Category name', min: 2, max: 120 }),
   level: union(
     CATEGORY_LEVELS.map((l) =>
       literal(l, { message: `Category level must be ${CATEGORY_LEVELS.join('/')}.` }),
     ),
     { error: 'Category level is required.' },
   ),
-  mainCategory: string().trim(),
-  subCategory: string().trim(),
-  description: string().trim().optional().nullable(),
+  mainCategory: validateString({
+    field: 'mainCategory',
+    label: 'Main category',
+    nonEmpty: false,
+    customRegex: { regex: REGEX.MONGODB_ID, message: 'must be valid category' },
+  }).optional(),
+  subCategory: validateString({
+    field: 'subCategory',
+    label: 'Sub-category',
+    nonEmpty: false,
+    customRegex: { regex: REGEX.MONGODB_ID, message: 'must be valid category' },
+  }).optional(),
+  description: validateString({
+    field: 'description',
+    label: 'Description',
+    nonEmpty: false,
+    min: 10,
+    max: 150,
+  }).optional(),
   confirmDetails: boolean().refine(Boolean, 'Please confirm category details before saving.'),
-})
-  .refine((data) => data.level === CATEGORY_LEVELS_MAP.L1 || !!data.mainCategory, {
-    path: ['mainCategory'],
-    message: `Main category is required for level ${CATEGORY_LEVELS_MAP.L2} and level ${CATEGORY_LEVELS_MAP.L3} categories.`,
-  })
-  .refine((data) => data.level !== CATEGORY_LEVELS_MAP.L3 || !!data.subCategory, {
-    path: ['subCategory'],
-    message: `Sub-category is required for level ${CATEGORY_LEVELS_MAP.L3} categories.`,
-  })
-  .refine(
-    (data) =>
-      data.level !== CATEGORY_LEVELS_MAP.L3 ||
-      (!!data.description && data.description.trim().length >= 10),
-    {
-      path: ['description'],
-      message: `Description is required for level ${CATEGORY_LEVELS_MAP.L3} categories and must be at least 10 characters.`,
-    },
-  );
+}).superRefine((data, ctx) => {
+  const { description, mainCategory, subCategory, level } = data;
+  if (level === CATEGORY_LEVELS_MAP.L3) {
+    if (!description) {
+      appendCustomIssue(
+        ctx,
+        `Description is required for level ${CATEGORY_LEVELS_MAP.L3} category.`,
+        'description',
+      );
+    }
+    if (!mainCategory) {
+      appendCustomIssue(
+        ctx,
+        `Main category is required for level ${CATEGORY_LEVELS_MAP.L3} category.`,
+        'mainCategory',
+      );
+    }
+    if (!subCategory) {
+      appendCustomIssue(
+        ctx,
+        `Sub-category is required for level ${CATEGORY_LEVELS_MAP.L3} category.`,
+        'subCategory',
+      );
+    }
+  }
+  if (level === CATEGORY_LEVELS_MAP.L2) {
+    if (!mainCategory) {
+      appendCustomIssue(
+        ctx,
+        `Main category is required for level ${CATEGORY_LEVELS_MAP.L2} category.`,
+        'mainCategory',
+      );
+    }
+  }
+});
