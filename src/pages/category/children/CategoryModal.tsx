@@ -12,6 +12,7 @@ import { useGetCategoriesByParentLevel } from '@/services/product-service/catego
 import type { ICategory } from '@/types/api.type';
 import type { TCatModal } from '@/types/component.type';
 import type { TCategory } from '@/types/schema.type';
+import { deepEqual, toaster } from '@/utils/common.util';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo } from 'react';
@@ -38,6 +39,30 @@ const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => 
 const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
   categories?.find((cat) => cat._id === id)?.name || '-';
 
+const getInitialData = (cat: ICategory, mainCatId?: string) => {
+  const catLevel = String(cat.level) as TCategory['level'];
+
+  return {
+    name: cat.name,
+    level: catLevel,
+    mainCategory:
+      isL2(catLevel) && cat.parent ? cat.parent : isL3(catLevel) && mainCatId ? mainCatId : '',
+    subCategory: isL3(catLevel) && cat.parent ? cat.parent : '',
+    description: cat.description || '',
+    activeStep: 0,
+    confirmDetails: false,
+  };
+};
+
+const getPayload = (data: TCategory) => {
+  return {
+    name: data.name.trim(),
+    level: data.level,
+    parent: isL3(data.level) ? data.subCategory : isL2(data.level) ? data.mainCategory : null,
+    description: isL3(data.level) ? data.description.trim() : undefined,
+  };
+};
+
 const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => {
   const { queryParams, removeParams } = useQueryParams();
   const category = props?.category;
@@ -49,6 +74,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   const {
     control,
     formState: { errors },
+    getValues,
     handleSubmit,
     register,
     reset,
@@ -57,9 +83,11 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     trigger,
   } = useForm<TCategory>({
     resolver: zodResolver(categorySchema),
-    defaultValues: FORM_DEFAULT_VALUES.addCategory,
+    defaultValues: FORM_DEFAULT_VALUES.category,
     mode: 'onChange',
   });
+
+  console.log('props', props);
 
   const categoryValues = useWatch({ control });
   const activeStep = useWatch({ control, name: 'activeStep' });
@@ -116,13 +144,19 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
       categories = level3Cats;
     }
 
-    const isDuplicate = categories?.some((cat) => cat.name.trim().toLowerCase() === trimmedName);
+    const isDuplicate =
+      categories?.some((cat) => cat.name.trim().toLowerCase() === trimmedName) || false;
 
     if (isDuplicate) {
       setError('name', { message: 'Category already exists.' });
     }
 
     return isDuplicate;
+  };
+
+  const hasChanges = (data: TCategory) => {
+    if (!initialPayload) return true;
+    return !deepEqual(getPayload(data), initialPayload);
   };
 
   const handleStepChange = async (nextStep: number) => {
@@ -134,9 +168,14 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     const fieldsToValidate = STEP_FIELDS.slice(0, nextStep).flat();
     const isValid = await trigger(fieldsToValidate, { shouldFocus: true });
 
-    const isDuplicate = isDuplicateCategory();
+    if (!isValid) return;
 
-    if (isValid && !isDuplicate) {
+    if (isEditMode && !hasChanges(getValues())) {
+      return toaster.error({
+        title: 'No changes to save',
+        description: 'Make changes and try again.',
+      });
+    } else if (!isDuplicateCategory()) {
       setActiveStep(nextStep);
     }
   };
@@ -144,24 +183,24 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   const handleNext = async () => {
     const isValid = await trigger(STEP_FIELDS[activeStep], { shouldFocus: true });
 
-    const isDuplicate = isDuplicateCategory();
-
-    if (isValid && !isDuplicate) {
+    if (!isValid) return;
+    if (isEditMode && !hasChanges(getValues())) {
+      return toaster.error({
+        title: 'No changes to save',
+        description: 'Make changes and try again.',
+      });
+    } else if (!isDuplicateCategory()) {
       setActiveStep(Math.min(activeStep + 1, CATEGORY_MODAL_STEPS.length - 1));
     }
   };
 
-  const getPayload = (data: TCategory) => {
-    return {
-      name: data.name.trim(),
-      level: data.level,
-      parent: isL3(data.level) ? data.subCategory : isL2(data.level) ? data.mainCategory : null,
-      description: isL3(data.level) ? data.description.trim() : undefined,
-    };
-  };
+  const initialPayload = useMemo(() => {
+    if (!isEditMode || !category) return null;
+    return getPayload(getInitialData(category, mainCatId));
+  }, [category, mainCatId, isEditMode]);
 
   const handleSave = (data: TCategory) => {
-    console.log('Add category payload:', getPayload(data));
+    console.log('category payload:', getPayload(data));
   };
 
   const resetParentFields = (selectedLevel: TCategory['level']) => {
@@ -308,21 +347,9 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
 
   const handleReset = () => {
     if (isEditMode) {
-      const level = String(category.level) as TCategory['level'];
-      reset({
-        name: category.name,
-        level,
-        activeStep: 0,
-        confirmDetails: false,
-        description: category.description,
-        ...(category.parent && {
-          ...(isL2(level) && { mainCategory: category.parent }),
-          ...(isL3(level) &&
-            mainCatId && { subCategory: category.parent, mainCategory: mainCatId }),
-        }),
-      });
+      reset(getInitialData(category, mainCatId));
     } else {
-      reset(FORM_DEFAULT_VALUES.addCategory);
+      reset(FORM_DEFAULT_VALUES.category);
     }
   };
 

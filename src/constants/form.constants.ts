@@ -33,7 +33,7 @@ export const FORM_DEFAULT_VALUES = {
     imageUrl: '',
     confirmDetails: false,
   },
-  addCategory: {
+  category: {
     activeStep: 0,
     name: '',
     level: '1',
