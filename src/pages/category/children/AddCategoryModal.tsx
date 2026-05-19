@@ -38,6 +38,13 @@ const STEP_FIELDS: FieldPath<TAddCategory>[][] = [
   ['confirmDetails'],
 ];
 
+const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => (
+  <div className="text-left">
+    <p className="text-primary text-sm font-semibold">{title}</p>
+    {description && <p className="text-secondary text-xs">{description}</p>}
+  </div>
+);
+
 const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
   categories?.find((cat) => cat._id === id)?.name || '-';
 
@@ -255,10 +262,7 @@ const AddCategoryModal = () => {
             <div className="bg-primary/5 text-primary grid size-11 place-items-center rounded-lg">
               <Icon icon="streamline:hierarchy-10" className="size-5" />
             </div>
-            <div>
-              <p className="text-primary text-sm font-semibold">Hierarchy preview</p>
-              <p className="text-secondary mt-1 text-xs">{hierarchyPreview}</p>
-            </div>
+            <TitleAndSubtitle title="Hierarchy preview" description={hierarchyPreview} />
           </div>
         </div>
       ),
@@ -310,7 +314,10 @@ const AddCategoryModal = () => {
 
   return (
     <ModalWrapper
-      isOpen={queryParams[QUERY_PARAMS_KEY_MAP.category.add] === 'true'}
+      isOpen={
+        queryParams[QUERY_PARAMS_KEY_MAP.category.add || QUERY_PARAMS_KEY_MAP.category.edit] ===
+        'true'
+      }
       onClose={() => removeParams(['category'])}
       header={{ showCloseIcon: true, title: 'Add new category' }}
       containerProps={{ className: 'p-4!' }}
@@ -324,10 +331,10 @@ const AddCategoryModal = () => {
         className="bg-secondary-invert"
       >
         <form onSubmit={handleSubmit(handleSaveCategory)} className="flex flex-col gap-5">
-          <div>
-            <p className="text-primary font-semibold">{stepFields[activeStep].title}</p>
-            <p className="text-secondary mt-1 text-xs">{activeStepData.description}</p>
-          </div>
+          <TitleAndSubtitle
+            title={stepFields[activeStep].title}
+            description={activeStepData.description}
+          />
 
           {stepFields[activeStep].content}
 

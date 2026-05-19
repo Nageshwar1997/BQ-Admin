@@ -158,6 +158,7 @@ export const EMPTY_ARRAY = [];
 export const QUERY_PARAMS_KEY_MAP = {
   category: {
     add: 'add', // To Open Add Category Modal
+    edit: 'edit', // To Open Edit Category Modal
     level: {
       l1: 'l1', // To Set Search Query for Level 1 Category
       l2: 'l2', // To Set Search Query for Level 2 Category
