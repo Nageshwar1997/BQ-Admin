@@ -1,7 +1,7 @@
-import type { TCategoryTable } from '@/types/component.type';
+import type { TCatTable } from '@/types/component.type';
 import { Icon } from '@iconify/react';
 
-const CategoryInfo = ({ category }: Pick<TCategoryTable, 'category'>) => (
+const CategoryInfo = ({ category }: Pick<TCatTable, 'category'>) => (
   <div className="flex items-center gap-3">
     <div
       className={`to-primary/10 text-primary grid size-10 shrink-0 place-items-center rounded-lg bg-linear-to-br ${

@@ -50,10 +50,10 @@ const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
 
 const EditCategoryModal = ({
   category,
-  mainCategoryId,
+  mainCatId,
 }: {
   category: ICategory;
-  mainCategoryId?: string;
+  mainCatId?: string;
 }) => {
   const { queryParams, removeParams } = useQueryParams();
 
@@ -337,11 +337,11 @@ const EditCategoryModal = ({
         ...(category.parent &&
           isL3(level) && {
             subCategory: category.parent,
-            mainCategory: mainCategoryId,
+            mainCategory: mainCatId,
           }),
       });
     }
-  }, [category, mainCategoryId]);
+  }, [category, mainCatId]);
 
   return (
     <ModalWrapper

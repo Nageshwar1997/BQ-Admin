@@ -16,7 +16,7 @@ import { QUERY_PARAMS_KEY_MAP, SORT_ORDER_MAP } from '@/constants/common.constan
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
-import type { TCategoryTable, TSort, TSubCategoryTable } from '@/types/component.type';
+import type { TCatModal, TCatTable, TSort } from '@/types/component.type';
 import { getFilteredAndSortedCats } from '@/utils/api.util';
 import { Icon } from '@iconify/react';
 import {
@@ -116,8 +116,8 @@ const CategoryHead = () => {
   );
 };
 
-const CategoryRow = (props: TCategoryTable & ComponentProps<'tr'>) => {
-  const { category, mainCategoryId, onDelete, onEdit, className = '', ...trProps } = props;
+const CategoryRow = (props: TCatTable & ComponentProps<'tr'>) => {
+  const { category, mainCatId, onDelete, onEdit, className = '', ...trProps } = props;
 
   return (
     <TableRow
@@ -135,7 +135,7 @@ const CategoryRow = (props: TCategoryTable & ComponentProps<'tr'>) => {
       <TableRowCell className="text-right">
         <CategoryActions
           category={category}
-          mainCategoryId={mainCategoryId}
+          mainCatId={mainCatId}
           onDelete={onDelete}
           onEdit={onEdit}
         />
@@ -144,7 +144,7 @@ const CategoryRow = (props: TCategoryTable & ComponentProps<'tr'>) => {
   );
 };
 
-const L3Table = ({ parentCat, mainCategoryId, onDelete, onEdit }: TSubCategoryTable) => {
+const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable) => {
   const { queryParams } = useQueryParams();
   const search = useDeferredValue(queryParams[q_cat_keys.level.l3]);
   const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
@@ -178,7 +178,7 @@ const L3Table = ({ parentCat, mainCategoryId, onDelete, onEdit }: TSubCategoryTa
               <CategoryRow
                 key={category._id}
                 category={category}
-                mainCategoryId={mainCategoryId}
+                mainCatId={mainCatId}
                 onDelete={onDelete}
                 onEdit={onEdit}
                 className="hover:bg-primary/1"
@@ -198,7 +198,7 @@ const L3Table = ({ parentCat, mainCategoryId, onDelete, onEdit }: TSubCategoryTa
   );
 };
 
-const L2Table = ({ parentCat, onDelete, onEdit }: TSubCategoryTable) => {
+const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
   const { queryParams } = useQueryParams();
   const search = useDeferredValue(queryParams[q_cat_keys.level.l2]);
   const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
@@ -255,8 +255,8 @@ const L2Table = ({ parentCat, onDelete, onEdit }: TSubCategoryTable) => {
                       <L3Table
                         onDelete={onDelete}
                         onEdit={onEdit}
-                        parentCat={category}
-                        mainCategoryId={parentCat._id}
+                        category={category}
+                        mainCatId={parentCat._id}
                       />
                     </TableRowCell>
                   </TableRow>
@@ -282,24 +282,18 @@ const L1Table = () => {
   const search = useDeferredValue(queryParams[q_cat_keys.level.l1]);
   const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
   const [selectedId, setSelectedId] = useState('');
-  const [editData, setEditData] = useState<Pick<
-    TCategoryTable,
-    'category' | 'mainCategoryId'
-  > | null>(null);
+  const [editData, setEditData] = useState<TCatModal | null>(null);
   const { data = [], isLoading, isError } = useGetCategoriesByParentLevel({ level: 1 });
   const categories = data as ICategory[];
 
-  const handleEdit = (category: ICategory, mainCategoryId?: string) => {
-    setEditData({
-      category,
-      mainCategoryId,
-    });
+  const handleEdit = (data: TCatModal) => {
+    setEditData(data);
 
     setParams({ [q_cat_keys.edit]: 'true' });
   };
 
-  const handleDelete = (category: ICategory, mainCategoryId?: string) => {
-    console.log('Delete category:', category, mainCategoryId);
+  const handleDelete = (data: TCatModal) => {
+    console.log('Delete category data:', data);
   };
 
   const filteredCats = useMemo(
@@ -342,7 +336,7 @@ const L1Table = () => {
                   {selectedId === category._id && (
                     <TableRow>
                       <TableRowCell colSpan={4} className="border-b-0 p-0! pt-3!">
-                        <L2Table onDelete={handleDelete} onEdit={handleEdit} parentCat={category} />
+                        <L2Table onDelete={handleDelete} onEdit={handleEdit} category={category} />
                       </TableRowCell>
                     </TableRow>
                   )}
