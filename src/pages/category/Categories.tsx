@@ -132,7 +132,7 @@ const CategoryRow = (props: TCategoryTable & ComponentProps<'tr'>) => {
       </TableRowCell>
       <TableRowCell className="text-primary/65 uppercase">{category.parent || 'N/A'}</TableRowCell>
       <TableRowCell className="text-right">
-        <CategoryActions catId={category._id} onDelete={onDelete} onEdit={onEdit} />
+        <CategoryActions category={category} onDelete={onDelete} onEdit={onEdit} />
       </TableRowCell>
     </TableRow>
   );
