@@ -31,6 +31,7 @@ import AddCategoryModal from './children/AddCategoryModal';
 import CategoryActions from './children/CategoryActions';
 import CategoryInfo from './children/CategoryInfo';
 import CategoryTableTopInfo from './children/CategoryTableTopInfo';
+import EditCategoryModal from './children/EditCategoryModal';
 
 const TH_TITLES = ['Category', 'Level', 'Parent', 'Actions'] as const;
 
@@ -116,7 +117,7 @@ const CategoryHead = () => {
 };
 
 const CategoryRow = (props: TCategoryTable & ComponentProps<'tr'>) => {
-  const { category, onDelete, onEdit, className = '', ...trProps } = props;
+  const { category, mainCategoryId, onDelete, onEdit, className = '', ...trProps } = props;
 
   return (
     <TableRow
@@ -132,13 +133,18 @@ const CategoryRow = (props: TCategoryTable & ComponentProps<'tr'>) => {
       </TableRowCell>
       <TableRowCell className="text-primary/65 uppercase">{category.parent || 'N/A'}</TableRowCell>
       <TableRowCell className="text-right">
-        <CategoryActions category={category} onDelete={onDelete} onEdit={onEdit} />
+        <CategoryActions
+          category={category}
+          mainCategoryId={mainCategoryId}
+          onDelete={onDelete}
+          onEdit={onEdit}
+        />
       </TableRowCell>
     </TableRow>
   );
 };
 
-const L3Table = ({ parentCat, onDelete, onEdit }: TSubCategoryTable) => {
+const L3Table = ({ parentCat, mainCategoryId, onDelete, onEdit }: TSubCategoryTable) => {
   const { queryParams } = useQueryParams();
   const search = useDeferredValue(queryParams[q_cat_keys.level.l3]);
   const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
@@ -172,6 +178,7 @@ const L3Table = ({ parentCat, onDelete, onEdit }: TSubCategoryTable) => {
               <CategoryRow
                 key={category._id}
                 category={category}
+                mainCategoryId={mainCategoryId}
                 onDelete={onDelete}
                 onEdit={onEdit}
                 className="hover:bg-primary/1"
@@ -245,7 +252,12 @@ const L2Table = ({ parentCat, onDelete, onEdit }: TSubCategoryTable) => {
                 {selectedId === category._id && (
                   <TableRow>
                     <TableRowCell colSpan={4} className="border-b-0 p-0! pt-3!">
-                      <L3Table onDelete={onDelete} onEdit={onEdit} parentCat={category} />
+                      <L3Table
+                        onDelete={onDelete}
+                        onEdit={onEdit}
+                        parentCat={category}
+                        mainCategoryId={parentCat._id}
+                      />
                     </TableRowCell>
                   </TableRow>
                 )}
@@ -266,19 +278,28 @@ const L2Table = ({ parentCat, onDelete, onEdit }: TSubCategoryTable) => {
 };
 
 const L1Table = () => {
-  const { queryParams } = useQueryParams();
+  const { queryParams, setParams } = useQueryParams();
   const search = useDeferredValue(queryParams[q_cat_keys.level.l1]);
   const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
   const [selectedId, setSelectedId] = useState('');
+  const [editData, setEditData] = useState<Pick<
+    TCategoryTable,
+    'category' | 'mainCategoryId'
+  > | null>(null);
   const { data = [], isLoading, isError } = useGetCategoriesByParentLevel({ level: 1 });
   const categories = data as ICategory[];
 
-  const handleEdit = (catId: string) => {
-    console.log('Edit category _id:', catId);
+  const handleEdit = (category: ICategory, mainCategoryId?: string) => {
+    setEditData({
+      category,
+      mainCategoryId,
+    });
+
+    setParams({ [q_cat_keys.edit]: 'true' });
   };
 
-  const handleDelete = (catId: string) => {
-    console.log('Delete category _id:', catId);
+  const handleDelete = (category: ICategory, mainCategoryId?: string) => {
+    console.log('Delete category:', category, mainCategoryId);
   };
 
   const filteredCats = useMemo(
@@ -338,6 +359,7 @@ const L1Table = () => {
           </TableBody>
         </Table>
       </ScrollableGradientContainer>
+      {editData && <EditCategoryModal {...editData} />}
     </div>
   );
 };
@@ -356,7 +378,7 @@ const Categories = () => {
               pattern: 'primary',
               className: 'whitespace-nowrap',
               leftIcon: { icon: 'solar:add-circle-linear', className: '*:stroke-[2.5]' },
-              buttonProps: { onClick: () => setParams({ category: 'add' }) },
+              buttonProps: { onClick: () => setParams({ [q_cat_keys.add]: 'true' }) },
             },
           ]}
         />

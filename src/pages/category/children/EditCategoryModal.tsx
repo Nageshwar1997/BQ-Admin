@@ -13,7 +13,7 @@ import type { ICategory } from '@/types/api.type';
 import type { TAddCategory } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm, useWatch, type FieldPath } from 'react-hook-form';
 
 const isL1 = (level: TAddCategory['level']) => Number(level) === 1;
@@ -48,7 +48,13 @@ const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => 
 const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
   categories?.find((cat) => cat._id === id)?.name || '-';
 
-const EditCategoryModal = () => {
+const EditCategoryModal = ({
+  category,
+  mainCategoryId,
+}: {
+  category: ICategory;
+  mainCategoryId?: string;
+}) => {
   const { queryParams, removeParams } = useQueryParams();
 
   const {
@@ -56,6 +62,7 @@ const EditCategoryModal = () => {
     formState: { errors },
     handleSubmit,
     register,
+    reset,
     setError,
     setValue,
     trigger,
@@ -66,6 +73,7 @@ const EditCategoryModal = () => {
   });
 
   const categoryValues = useWatch({ control });
+  console.log('🚀 ~ EditCategoryModal ~ categoryValues:', categoryValues);
   const activeStep = useWatch({ control, name: 'activeStep' });
   const activeStepData = ADD_CATEGORY_STEPS[activeStep];
   const level = useWatch({ control, name: 'level' });
@@ -311,6 +319,29 @@ const EditCategoryModal = () => {
       ),
     },
   ];
+
+  useEffect(() => {
+    if (category) {
+      const level = String(category.level) as TAddCategory['level'];
+      reset({
+        name: category.name,
+        level,
+        activeStep: 0,
+        confirmDetails: false,
+        description: category.description,
+        ...(category.parent &&
+          isL2(level) && {
+            mainCategory: category.parent,
+            subCategory: '',
+          }),
+        ...(category.parent &&
+          isL3(level) && {
+            subCategory: category.parent,
+            mainCategory: mainCategoryId,
+          }),
+      });
+    }
+  }, [category, mainCategoryId]);
 
   return (
     <ModalWrapper
