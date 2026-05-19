@@ -10,6 +10,7 @@ import useQueryParams from '@/hooks/useQueryParams';
 import { addCategorySchema } from '@/schemas/product.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
+import type { TCatModal } from '@/types/component.type';
 import type { TAddCategory } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
@@ -48,13 +49,7 @@ const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => 
 const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
   categories?.find((cat) => cat._id === id)?.name || '-';
 
-const EditCategoryModal = ({
-  category,
-  mainCatId,
-}: {
-  category: ICategory;
-  mainCatId?: string;
-}) => {
+const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
   const { queryParams, removeParams } = useQueryParams();
 
   const {
@@ -73,7 +68,6 @@ const EditCategoryModal = ({
   });
 
   const categoryValues = useWatch({ control });
-  console.log('🚀 ~ EditCategoryModal ~ categoryValues:', categoryValues);
   const activeStep = useWatch({ control, name: 'activeStep' });
   const activeStepData = ADD_CATEGORY_STEPS[activeStep];
   const level = useWatch({ control, name: 'level' });
