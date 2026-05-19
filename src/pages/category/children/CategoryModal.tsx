@@ -87,8 +87,6 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     mode: 'onChange',
   });
 
-  console.log('props', props);
-
   const categoryValues = useWatch({ control });
   const activeStep = useWatch({ control, name: 'activeStep' });
   const activeStepData = CATEGORY_MODAL_STEPS[activeStep];
