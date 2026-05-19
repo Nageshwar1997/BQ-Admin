@@ -1,10 +1,8 @@
 import Button from '@/components/ui/Button';
 import type { TCategoryTable } from '@/types/component.type';
-import AddCategoryModal from './AddCategoryModal';
 
 const CategoryActions = ({ category, onDelete, onEdit }: TCategoryTable) => (
   <>
-    <AddCategoryModal />
     <div className="inline-flex items-center justify-center gap-2">
       <Button
         content={{ icon: 'solar:pen-linear', className: 'size-4.5' }}

@@ -314,10 +314,7 @@ const AddCategoryModal = () => {
 
   return (
     <ModalWrapper
-      isOpen={
-        queryParams[QUERY_PARAMS_KEY_MAP.category.add || QUERY_PARAMS_KEY_MAP.category.edit] ===
-        'true'
-      }
+      isOpen={queryParams[QUERY_PARAMS_KEY_MAP.category.add] === 'true'}
       onClose={() => removeParams(['category'])}
       header={{ showCloseIcon: true, title: 'Add new category' }}
       containerProps={{ className: 'p-4!' }}
