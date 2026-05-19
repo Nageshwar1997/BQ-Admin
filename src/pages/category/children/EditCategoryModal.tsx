@@ -48,7 +48,7 @@ const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => 
 const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
   categories?.find((cat) => cat._id === id)?.name || '-';
 
-const AddCategoryModal = () => {
+const EditCategoryModal = () => {
   const { queryParams, removeParams } = useQueryParams();
 
   const {
@@ -314,8 +314,8 @@ const AddCategoryModal = () => {
 
   return (
     <ModalWrapper
-      isOpen={queryParams[QUERY_PARAMS_KEY_MAP.category.add] === 'true'}
-      onClose={() => removeParams([QUERY_PARAMS_KEY_MAP.category.add])}
+      isOpen={queryParams[QUERY_PARAMS_KEY_MAP.category.edit] === 'true'}
+      onClose={() => removeParams([QUERY_PARAMS_KEY_MAP.category.edit])}
       header={{ showCloseIcon: true, title: 'Add new category' }}
       containerProps={{ className: 'p-4!' }}
       closeOnOutsideClick={false}
@@ -367,4 +367,4 @@ const AddCategoryModal = () => {
   );
 };
 
-export default AddCategoryModal;
+export default EditCategoryModal;
