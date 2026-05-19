@@ -7,19 +7,21 @@ import Select from '@/components/ui/inputs/Select';
 import { QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import useQueryParams from '@/hooks/useQueryParams';
-import { addCategorySchema } from '@/schemas/product.schema';
+import { categorySchema } from '@/schemas/product.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
 import type { TCatModal } from '@/types/component.type';
-import type { TAddCategory } from '@/types/schema.type';
+import type { TCategory } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo } from 'react';
 import { useForm, useWatch, type FieldPath } from 'react-hook-form';
 
-const isL1 = (level: TAddCategory['level']) => Number(level) === 1;
-const isL2 = (level: TAddCategory['level']) => Number(level) === 2;
-const isL3 = (level: TAddCategory['level']) => Number(level) === 3;
+type TMode = typeof QUERY_PARAMS_KEY_MAP.category.edit | typeof QUERY_PARAMS_KEY_MAP.category.add;
+
+const isL1 = (level: TCategory['level']) => Number(level) === 1;
+const isL2 = (level: TCategory['level']) => Number(level) === 2;
+const isL3 = (level: TCategory['level']) => Number(level) === 3;
 
 const ADD_CATEGORY_STEPS: StepperStep[] = [
   {
@@ -34,7 +36,7 @@ const ADD_CATEGORY_STEPS: StepperStep[] = [
   },
 ];
 
-const STEP_FIELDS: FieldPath<TAddCategory>[][] = [
+const STEP_FIELDS: FieldPath<TCategory>[][] = [
   ['name', 'level', 'mainCategory', 'subCategory', 'description'],
   ['confirmDetails'],
 ];
@@ -52,6 +54,9 @@ const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
 const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
   const { queryParams, removeParams } = useQueryParams();
 
+  const mode = queryParams[QUERY_PARAMS_KEY_MAP.category.mode] as TMode;
+  const isEditMode = mode === QUERY_PARAMS_KEY_MAP.category.edit;
+
   const {
     control,
     formState: { errors },
@@ -61,8 +66,8 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
     setError,
     setValue,
     trigger,
-  } = useForm<TAddCategory>({
-    resolver: zodResolver(addCategorySchema),
+  } = useForm<TCategory>({
+    resolver: zodResolver(categorySchema),
     defaultValues: FORM_DEFAULT_VALUES.addCategory,
     mode: 'onChange',
   });
@@ -159,7 +164,7 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
     }
   };
 
-  const getPayload = (data: TAddCategory) => {
+  const getPayload = (data: TCategory) => {
     return {
       name: data.name.trim(),
       level: data.level,
@@ -168,11 +173,11 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
     };
   };
 
-  const handleSaveCategory = (data: TAddCategory) => {
+  const handleSaveCategory = (data: TCategory) => {
     console.log('Add category payload:', getPayload(data));
   };
 
-  const resetParentFields = (selectedLevel: TAddCategory['level']) => {
+  const resetParentFields = (selectedLevel: TCategory['level']) => {
     if (isL1(selectedLevel)) {
       setValue('mainCategory', '', { shouldValidate: true });
       setValue('subCategory', '', { shouldValidate: true });
@@ -215,7 +220,7 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
                 value: level,
                 placeholder: 'Select category level',
                 onChange: ({ currentTarget: { value } }) =>
-                  resetParentFields(value as TAddCategory['level']),
+                  resetParentFields(value as TCategory['level']),
               }}
             />
             <Select
@@ -316,7 +321,7 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
 
   const handleReset = () => {
     if (category) {
-      const level = String(category.level) as TAddCategory['level'];
+      const level = String(category.level) as TCategory['level'];
       reset({
         name: category.name,
         level,
@@ -341,9 +346,13 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
 
   return (
     <ModalWrapper
-      isOpen={queryParams[QUERY_PARAMS_KEY_MAP.category.edit] === 'true'}
-      onClose={() => removeParams([QUERY_PARAMS_KEY_MAP.category.edit])}
-      header={{ showCloseIcon: true, title: 'Add new category' }}
+      isOpen={
+        mode === QUERY_PARAMS_KEY_MAP.category.edit || mode === QUERY_PARAMS_KEY_MAP.category.add
+      }
+      onClose={() =>
+        removeParams([QUERY_PARAMS_KEY_MAP.category.edit, QUERY_PARAMS_KEY_MAP.category.add])
+      }
+      header={{ showCloseIcon: true, title: isEditMode ? 'Edit category' : 'Add new category' }}
       containerProps={{ className: 'p-4!' }}
       closeOnOutsideClick={false}
       className="bg-secondary-invert [&>div]:first:bg-secondary-invert max-w-lg! [&>div>div]:px-0"

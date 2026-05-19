@@ -157,6 +157,7 @@ export const EMPTY_ARRAY = [];
 
 export const QUERY_PARAMS_KEY_MAP = {
   category: {
+    mode: 'mode', // To Set Mode (Edit or Add)
     add: 'add', // To Open Add Category Modal
     edit: 'edit', // To Open Edit Category Modal
     level: {

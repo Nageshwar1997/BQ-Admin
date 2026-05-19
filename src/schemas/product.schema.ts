@@ -36,7 +36,7 @@ export const addProductSchema = object({
   message: 'Sale price cannot be greater than MRP.',
 });
 
-export const addCategorySchema = object({
+export const categorySchema = object({
   activeStep: number(),
   name: requiredText('Category name', 2, 80),
   level: zodEnum(['1', '2', '3'], 'Category level is required.'),
