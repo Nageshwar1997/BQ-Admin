@@ -1,5 +1,5 @@
 import type { AUTH_PROVIDERS, ROLES } from '@/constants/api.constants';
-import type { TEmail, TLogin } from './schema.type';
+import type { TCategory, TEmail, TLogin } from './schema.type';
 
 export type TFieldErrors = Record<string, string[]>;
 
@@ -25,10 +25,7 @@ export interface IUser extends Pick<TLogin, 'password'>, TEmail, IId, ITimeStamp
   phoneNumber: string;
 }
 
-export interface ICategory extends IId {
-  name: string;
+export interface ICategory extends IId, Pick<TCategory, 'level' | 'name' | 'description'> {
   slug: string;
-  level: 2 | 1 | 3;
   parent?: string | null;
-  description?: string;
 }

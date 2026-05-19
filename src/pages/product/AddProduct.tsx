@@ -68,12 +68,12 @@ const AddProduct = () => {
   const { data: level1Cats } = useGetCategoriesByParentLevel({ level: 1 });
   const { data: level2Cats } = useGetCategoriesByParentLevel({
     level: 2,
-    parentId: mainCategory,
+    parent: mainCategory,
     enabled: !!mainCategory,
   });
   const { data: level3Cats } = useGetCategoriesByParentLevel({
     level: 3,
-    parentId: subCategory,
+    parent: subCategory,
     enabled: !!subCategory,
   });
 

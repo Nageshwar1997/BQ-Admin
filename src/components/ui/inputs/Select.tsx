@@ -36,7 +36,7 @@ const Select = ({
     register?.onBlur?.(event);
   };
 
-  const handleOptionClick = (value: string) => {
+  const handleOptionClick = (value: string | number) => {
     if (selectProps.disabled || !selectRef.current) return;
 
     const select = selectRef.current;
@@ -54,7 +54,7 @@ const Select = ({
       },
     } as ChangeEvent<HTMLSelectElement>;
 
-    select.value = value;
+    select.value = value.toString();
     handleChange(changeEvent);
     setIsOpen(false);
   };

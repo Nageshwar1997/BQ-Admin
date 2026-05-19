@@ -36,10 +36,10 @@ export const FORM_DEFAULT_VALUES = {
   category: {
     activeStep: 0,
     name: '',
-    level: '1',
+    level: 1,
     mainCategory: '',
     subCategory: '',
-    description: '',
+    description: undefined,
     confirmDetails: false,
   },
 } as const;

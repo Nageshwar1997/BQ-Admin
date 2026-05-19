@@ -83,11 +83,7 @@ const CategoryTableTopInfo = ({
   badgeText,
   level,
   className,
-}: TClassName & {
-  name?: string;
-  badgeText: string;
-  level: ICategory['level'];
-}) => {
+}: TClassName & Pick<ICategory, 'level' | 'name'> & { badgeText: string }) => {
   return (
     <div className={`space-y-3 p-4 ${className}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">

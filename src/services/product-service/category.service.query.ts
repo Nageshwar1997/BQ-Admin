@@ -1,22 +1,58 @@
 import { productApi } from '@/classes/apis';
 import { PRODUCT_SERVICE_QUERY_KEYS } from '@/constants/api.constants';
 import type { ICategory } from '@/types/api.type';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
+import { toaster } from '@/utils/common.util';
+import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
 
-const { get } = PRODUCT_SERVICE_QUERY_KEYS.category;
+const { get, add, edit } = PRODUCT_SERVICE_QUERY_KEYS.category;
+
+export const useAddCategory = () => {
+  return useMutation({
+    mutationKey: add,
+    mutationFn: productApi.addCategory,
+    onMutate: () => {
+      const toastId = toaster.loading({
+        title: 'Please wait...',
+        description: 'Adding category...',
+      });
+      return { toastId };
+    },
+    onSuccess: async ({ message }) => handleApiSuccessToaster(message),
+    onError: (error) => handleApiErrorToaster(error),
+    onSettled: (_data, _error, _variables, context) => {
+      if (context?.toastId) toaster.remove(context.toastId);
+    },
+  });
+};
+
+export const useEditCategory = () => {
+  return useMutation({
+    mutationKey: edit,
+    mutationFn: productApi.editCategory,
+    onMutate: () => {
+      const toastId = toaster.loading({
+        title: 'Please wait...',
+        description: 'Updating category...',
+      });
+      return { toastId };
+    },
+    onSuccess: async ({ message }) => handleApiSuccessToaster(message),
+    onError: (error) => handleApiErrorToaster(error),
+    onSettled: (_data, _error, _variables, context) => {
+      if (context?.toastId) toaster.remove(context.toastId);
+    },
+  });
+};
 
 export const useGetCategoriesByParentLevel = ({
   enabled = true,
   level,
-  parentId,
-}: {
-  enabled?: boolean;
-  level?: ICategory['level'];
-  parentId?: string;
-}) => {
+  parent,
+}: { enabled?: boolean } & Partial<Pick<ICategory, 'level' | 'parent'>>) => {
   return useQuery({
-    queryKey: [...get.all, level, parentId],
-    queryFn: () => productApi.getCategoriesByParentLevel({ level, parentId }),
+    queryKey: [...get.all, level, parent],
+    queryFn: () => productApi.getCategoriesByParentLevel({ level, parent }),
     staleTime: 5 * 60 * 1000, // 5 min
     gcTime: 15 * 60 * 1000, // 15 min
     enabled: enabled,

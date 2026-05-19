@@ -41,6 +41,8 @@ export const API_METHODS_AND_URLS = {
     },
     product_service: {
       category: {
+        add: { method: METHODS.POST, url: '/category/add' },
+        edit: { method: METHODS.POST, url: '/category/edit' },
         get: {
           byParentLevel: { method: METHODS.GET, url: '/category/by-parent-level' },
         },
@@ -76,6 +78,8 @@ export const USER_SERVICE_QUERY_KEYS = {
 
 export const PRODUCT_SERVICE_QUERY_KEYS = {
   category: {
+    add: ['add_category'],
+    edit: ['edit_category'],
     get: {
       all: ['get_all_categories'],
     },

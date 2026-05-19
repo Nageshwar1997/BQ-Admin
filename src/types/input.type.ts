@@ -36,7 +36,8 @@ export interface IRadio extends TClassName, Pick<IBaseInput, 'error'> {
   options: TOption[];
 }
 
-export interface IDropdownOption extends TOption {
+export interface IDropdownOption extends Pick<TOption, 'label'> {
+  value: TOption['value'] | number;
   disabled?: boolean;
 }
 

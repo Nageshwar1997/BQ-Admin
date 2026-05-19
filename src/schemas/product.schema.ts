@@ -1,4 +1,4 @@
-import { boolean, enum as zodEnum, number, object, string } from 'zod';
+import { boolean, literal, number, object, string, union } from 'zod';
 
 const requiredText = (field: string, min = 2, max = 100) =>
   string()
@@ -39,21 +39,23 @@ export const addProductSchema = object({
 export const categorySchema = object({
   activeStep: number(),
   name: requiredText('Category name', 2, 80),
-  level: zodEnum(['1', '2', '3'], 'Category level is required.'),
+  level: union([literal(1), literal(2), literal(3)], {
+    error: 'Category level is required.',
+  }),
   mainCategory: string().trim(),
   subCategory: string().trim(),
-  description: string().trim(),
+  description: string().trim().optional().nullable(),
   confirmDetails: boolean().refine(Boolean, 'Please confirm category details before saving.'),
 })
-  .refine((data) => data.level === '1' || !!data.mainCategory, {
+  .refine((data) => data.level === 1 || !!data.mainCategory, {
     path: ['mainCategory'],
     message: 'Main category is required for level 2 and level 3 categories.',
   })
-  .refine((data) => data.level !== '3' || !!data.subCategory, {
+  .refine((data) => data.level !== 3 || !!data.subCategory, {
     path: ['subCategory'],
     message: 'Sub-category is required for level 3 categories.',
   })
-  .refine((data) => data.level !== '3' || data.description.length >= 10, {
+  .refine((data) => data.level !== 3 || (data.description && data.description.length >= 10), {
     path: ['description'],
     message: 'Description is required for level 3 categories and must be at least 10 characters.',
   });

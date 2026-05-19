@@ -154,7 +154,7 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
     isError,
   } = useGetCategoriesByParentLevel({
     level: 3,
-    parentId: parentCat._id,
+    parent: parentCat._id,
   });
   const categories = data as ICategory[];
   const filteredCats = useMemo(
@@ -208,7 +208,7 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
     isError,
   } = useGetCategoriesByParentLevel({
     level: 2,
-    parentId: parentCat._id,
+    parent: parentCat._id,
   });
   const categories = data as ICategory[];
   const filteredCats = useMemo(
@@ -282,7 +282,6 @@ const L1Table = () => {
   const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
   const [selectedId, setSelectedId] = useState('');
   const [editData, setEditData] = useState<TCatModal | null>(null);
-  console.log('🚀 ~ L1Table ~ editData:', editData);
   const { data = [], isLoading, isError } = useGetCategoriesByParentLevel({ level: 1 });
   const categories = data as ICategory[];
 
@@ -315,6 +314,7 @@ const L1Table = () => {
       <CategoryTableTopInfo
         badgeText={`${filteredCats.length}/${categories.length} items`}
         level={1}
+        name=""
         className="flex w-full flex-row-reverse items-center justify-between gap-3 space-y-0!"
       />
       <ScrollableGradientContainer
