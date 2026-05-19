@@ -41,7 +41,9 @@ export const categorySchema = object({
   activeStep: number(),
   name: requiredText('Category name', 2, 80),
   level: union(
-    CATEGORY_LEVELS.map((l) => literal(l)),
+    CATEGORY_LEVELS.map((l) =>
+      literal(l, { message: `Category level must be ${CATEGORY_LEVELS.join('/')}.` }),
+    ),
     { error: 'Category level is required.' },
   ),
   mainCategory: string().trim(),
@@ -59,7 +61,8 @@ export const categorySchema = object({
   })
   .refine(
     (data) =>
-      data.level !== CATEGORY_LEVELS_MAP.L3 || (data.description && data.description.length >= 10),
+      data.level !== CATEGORY_LEVELS_MAP.L3 ||
+      (!!data.description && data.description.trim().length >= 10),
     {
       path: ['description'],
       message: `Description is required for level ${CATEGORY_LEVELS_MAP.L3} categories and must be at least 10 characters.`,

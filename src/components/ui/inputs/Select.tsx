@@ -130,6 +130,9 @@ const Select = ({
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
+
+                          if (option.disabled) return;
+
                           handleOptionClick(active ? '' : option.value || '');
                         }}
                       >
