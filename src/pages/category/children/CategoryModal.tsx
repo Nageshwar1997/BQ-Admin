@@ -4,7 +4,7 @@ import Stepper, { type StepperStep } from '@/components/ui/Stepper';
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
-import { QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
+import { CATEGORY_MODAL_STEPS, QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import { categorySchema } from '@/schemas/product.schema';
@@ -23,19 +23,6 @@ const isL1 = (level: TCategory['level']) => Number(level) === 1;
 const isL2 = (level: TCategory['level']) => Number(level) === 2;
 const isL3 = (level: TCategory['level']) => Number(level) === 3;
 
-const ADD_CATEGORY_STEPS: StepperStep[] = [
-  {
-    title: 'Category info',
-    description: 'Name and hierarchy',
-    icon: 'solar:hanger-2-linear',
-  },
-  {
-    title: 'Review',
-    description: 'Confirm before saving',
-    icon: 'solar:checklist-minimalistic-linear',
-  },
-];
-
 const STEP_FIELDS: FieldPath<TCategory>[][] = [
   ['name', 'level', 'mainCategory', 'subCategory', 'description'],
   ['confirmDetails'],
@@ -51,11 +38,13 @@ const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => 
 const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
   categories?.find((cat) => cat._id === id)?.name || '-';
 
-const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
+const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => {
   const { queryParams, removeParams } = useQueryParams();
+  const category = props?.category;
+  const mainCatId = props?.mainCatId;
 
   const mode = queryParams[QUERY_PARAMS_KEY_MAP.category.mode] as TMode;
-  const isEditMode = mode === QUERY_PARAMS_KEY_MAP.category.edit;
+  const isEditMode = mode === QUERY_PARAMS_KEY_MAP.category.edit && !!category;
 
   const {
     control,
@@ -74,7 +63,7 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
 
   const categoryValues = useWatch({ control });
   const activeStep = useWatch({ control, name: 'activeStep' });
-  const activeStepData = ADD_CATEGORY_STEPS[activeStep];
+  const activeStepData = CATEGORY_MODAL_STEPS[activeStep];
   const level = useWatch({ control, name: 'level' });
   const mainCategory = useWatch({ control, name: 'mainCategory' });
   const subCategory = useWatch({ control, name: 'subCategory' });
@@ -153,14 +142,12 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
   };
 
   const handleNext = async () => {
-    const isValid = await trigger(STEP_FIELDS[activeStep], {
-      shouldFocus: true,
-    });
+    const isValid = await trigger(STEP_FIELDS[activeStep], { shouldFocus: true });
 
     const isDuplicate = isDuplicateCategory();
 
     if (isValid && !isDuplicate) {
-      setActiveStep(Math.min(activeStep + 1, ADD_CATEGORY_STEPS.length - 1));
+      setActiveStep(Math.min(activeStep + 1, CATEGORY_MODAL_STEPS.length - 1));
     }
   };
 
@@ -173,7 +160,7 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
     };
   };
 
-  const handleSaveCategory = (data: TCategory) => {
+  const handleSave = (data: TCategory) => {
     console.log('Add category payload:', getPayload(data));
   };
 
@@ -320,7 +307,7 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
   ];
 
   const handleReset = () => {
-    if (category) {
+    if (isEditMode) {
       const level = String(category.level) as TCategory['level'];
       reset({
         name: category.name,
@@ -339,8 +326,13 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
     }
   };
 
+  const handleClose = () => {
+    reset();
+    props?.onClose?.();
+    removeParams([QUERY_PARAMS_KEY_MAP.category.mode]);
+  };
+
   useEffect(() => {
-    if (!category) return;
     handleReset();
   }, [category, mainCatId]);
 
@@ -349,21 +341,19 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
       isOpen={
         mode === QUERY_PARAMS_KEY_MAP.category.edit || mode === QUERY_PARAMS_KEY_MAP.category.add
       }
-      onClose={() =>
-        removeParams([QUERY_PARAMS_KEY_MAP.category.edit, QUERY_PARAMS_KEY_MAP.category.add])
-      }
+      onClose={handleClose}
       header={{ showCloseIcon: true, title: isEditMode ? 'Edit category' : 'Add new category' }}
       containerProps={{ className: 'p-4!' }}
       closeOnOutsideClick={false}
       className="bg-secondary-invert [&>div]:first:bg-secondary-invert max-w-lg! [&>div>div]:px-0"
     >
       <Stepper
-        steps={ADD_CATEGORY_STEPS}
+        steps={CATEGORY_MODAL_STEPS}
         activeStep={activeStep}
         onStepClick={handleStepChange}
         className="bg-secondary-invert"
       >
-        <form onSubmit={handleSubmit(handleSaveCategory)} className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit(handleSave)} className="flex flex-col gap-5">
           <TitleAndSubtitle
             title={stepFields[activeStep].title}
             description={activeStepData.description}
@@ -386,15 +376,15 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
             />
             <Button
               pattern="primary"
-              content={activeStep === ADD_CATEGORY_STEPS.length - 1 ? 'Save' : 'Next'}
+              content={activeStep === CATEGORY_MODAL_STEPS.length - 1 ? 'Save' : 'Next'}
               rightIcon={
-                activeStep === ADD_CATEGORY_STEPS.length - 1
+                activeStep === CATEGORY_MODAL_STEPS.length - 1
                   ? { icon: 'solar:diskette-linear' }
                   : { icon: 'solar:arrow-right-linear' }
               }
               buttonProps={{
-                type: activeStep === ADD_CATEGORY_STEPS.length - 1 ? 'submit' : 'button',
-                onClick: activeStep === ADD_CATEGORY_STEPS.length - 1 ? undefined : handleNext,
+                type: activeStep === CATEGORY_MODAL_STEPS.length - 1 ? 'submit' : 'button',
+                onClick: activeStep === CATEGORY_MODAL_STEPS.length - 1 ? undefined : handleNext,
               }}
               className="sm:max-w-36"
             />
@@ -405,4 +395,4 @@ const EditCategoryModal = ({ category, mainCatId }: TCatModal) => {
   );
 };
 
-export default EditCategoryModal;
+export default CategoryModal;

@@ -1,3 +1,5 @@
+import type { StepperStep } from '@/components/ui/Stepper';
+
 export const LOADING_RINGS_DATA = [
   {
     border: { side: 'borderBottomWidth', color: 'red' },
@@ -170,3 +172,12 @@ export const QUERY_PARAMS_KEY_MAP = {
 } as const;
 
 export const SORT_ORDER_MAP = { asc: 'asc', desc: 'desc' } as const;
+
+export const CATEGORY_MODAL_STEPS: StepperStep[] = [
+  { title: 'Category info', description: 'Name and hierarchy', icon: 'solar:hanger-2-linear' },
+  {
+    title: 'Review',
+    description: 'Confirm before save',
+    icon: 'solar:checklist-minimalistic-linear',
+  },
+];

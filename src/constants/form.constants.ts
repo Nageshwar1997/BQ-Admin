@@ -36,7 +36,7 @@ export const FORM_DEFAULT_VALUES = {
   addCategory: {
     activeStep: 0,
     name: '',
-    level: '3',
+    level: '1',
     mainCategory: '',
     subCategory: '',
     description: undefined,

@@ -27,11 +27,10 @@ import {
   useState,
   type ComponentProps,
 } from 'react';
-import AddCategoryModal from './children/AddCategoryModal';
 import CategoryActions from './children/CategoryActions';
 import CategoryInfo from './children/CategoryInfo';
+import CategoryModal from './children/CategoryModal';
 import CategoryTableTopInfo from './children/CategoryTableTopInfo';
-import EditCategoryModal from './children/EditCategoryModal';
 
 const TH_TITLES = ['Category', 'Level', 'Parent', 'Actions'] as const;
 
@@ -278,28 +277,38 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
 };
 
 const L1Table = () => {
-  const { queryParams, setParams } = useQueryParams();
+  const { queryParams, setParams, removeParams } = useQueryParams();
   const search = useDeferredValue(queryParams[q_cat_keys.level.l1]);
   const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
   const [selectedId, setSelectedId] = useState('');
   const [editData, setEditData] = useState<TCatModal | null>(null);
+  console.log('🚀 ~ L1Table ~ editData:', editData);
   const { data = [], isLoading, isError } = useGetCategoriesByParentLevel({ level: 1 });
   const categories = data as ICategory[];
 
   const handleEdit = (data: TCatModal) => {
     setEditData(data);
 
-    setParams({ [q_cat_keys.edit]: 'true' });
+    setParams({ [q_cat_keys.mode]: q_cat_keys.edit });
   };
 
   const handleDelete = (data: TCatModal) => {
     console.log('Delete category data:', data);
   };
 
+  const handleOnClose = () => {
+    setEditData(null);
+    removeParams([q_cat_keys.mode]);
+  };
+
   const filteredCats = useMemo(
     () => getFilteredAndSortedCats(categories, search, sort),
     [categories, search, sort],
   );
+
+  useEffect(() => {
+    removeParams([q_cat_keys.mode]);
+  }, []);
 
   return (
     <div className="border-primary/10 bg-secondary-invert rounded-xl border">
@@ -353,7 +362,9 @@ const L1Table = () => {
           </TableBody>
         </Table>
       </ScrollableGradientContainer>
-      {editData && <EditCategoryModal {...editData} />}
+      {!!editData && queryParams[q_cat_keys.mode] === q_cat_keys.edit && (
+        <CategoryModal {...editData} onClose={handleOnClose} />
+      )}
     </div>
   );
 };
@@ -363,7 +374,7 @@ const Categories = () => {
 
   return (
     <Fragment>
-      {queryParams[q_cat_keys.add] === 'true' && <AddCategoryModal />}
+      {queryParams[q_cat_keys.mode] === q_cat_keys.add && <CategoryModal />}
       <PageWrapper>
         <Navbar
           buttons={[
@@ -372,7 +383,7 @@ const Categories = () => {
               pattern: 'primary',
               className: 'whitespace-nowrap',
               leftIcon: { icon: 'solar:add-circle-linear', className: '*:stroke-[2.5]' },
-              buttonProps: { onClick: () => setParams({ [q_cat_keys.add]: 'true' }) },
+              buttonProps: { onClick: () => setParams({ [q_cat_keys.mode]: q_cat_keys.add }) },
             },
           ]}
         />
