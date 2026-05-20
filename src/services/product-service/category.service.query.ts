@@ -5,7 +5,7 @@ import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util
 import { toaster } from '@/utils/common.util';
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
 
-const { get, add, edit } = PRODUCT_SERVICE_QUERY_KEYS.category;
+const { get, add, update } = PRODUCT_SERVICE_QUERY_KEYS.category;
 
 export const useAddCategory = () => {
   return useMutation({
@@ -26,10 +26,10 @@ export const useAddCategory = () => {
   });
 };
 
-export const useEditCategory = () => {
+export const useUpdateCategory = () => {
   return useMutation({
-    mutationKey: edit,
-    mutationFn: productApi.editCategory,
+    mutationKey: update,
+    mutationFn: productApi.updateCategory,
     onMutate: () => {
       const toastId = toaster.loading({
         title: 'Please wait...',

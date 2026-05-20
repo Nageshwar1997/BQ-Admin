@@ -12,8 +12,8 @@ import useQueryParams from '@/hooks/useQueryParams';
 import { categorySchema, confirmDetailsSchema } from '@/schemas/product.schema';
 import {
   useAddCategory,
-  useEditCategory,
   useGetCategoriesByParentLevel,
+  useUpdateCategory,
 } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
 import type { TCatModal } from '@/types/component.type';
@@ -112,7 +112,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
 
   const { mutateAsync: addCategoryAsync } = useAddCategory();
 
-  const { mutateAsync: editCategoryAsync } = useEditCategory();
+  const { mutateAsync: updateCategoryAsync } = useUpdateCategory();
 
   const { data: level1Cats } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L1,
@@ -215,7 +215,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     }
 
     if (isEditMode) {
-      await editCategoryAsync(
+      await updateCategoryAsync(
         { ...payload, _id: category._id },
         {
           onSuccess: () => handleClose(),
