@@ -3,7 +3,7 @@ import GradientText from '@/components/ui/GradientText';
 import useQueryParams from '@/hooks/useQueryParams';
 import type { TConfirmModal } from '@/types/component.type';
 import { Icon } from '@iconify/react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { ModalWrapper } from './ModalWrapper';
 
 const cardConfig = (type: TConfirmModal['type']) => {
@@ -33,16 +33,12 @@ export const ConfirmModal = ({
 
   const config = useMemo(() => cardConfig(type), [type]);
 
-  useEffect(() => {
-    removeParams('confirm');
-  }, []);
-
   return (
     <ModalWrapper
       {...modalProps}
       isOpen={modalProps?.isOpen ?? !!queryParams.confirm}
       onClose={() => (modalProps?.onClose, removeParams('confirm'))}
-      className={`max-w-md border-2 ${modalProps?.className || ''}`}
+      className={`max-w-sm border-2 ${modalProps?.className || ''}`}
       containerProps={{
         ...modalProps?.containerProps,
         className: `p-6! ${modalProps?.containerProps?.className || ''}`,
@@ -75,9 +71,9 @@ export const ConfirmModal = ({
                 type="silver"
                 className="block font-semibold text-shadow-lg md:text-lg lg:text-xl"
               />
-              <p className="text-tertiary text-xs font-light md:text-sm lg:text-base">
-                {description}
-              </p>
+              {description && (
+                <p className="text-tertiary text-xs font-light lg:text-sm">{description}</p>
+              )}
             </div>
           </>
         )}

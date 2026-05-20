@@ -168,6 +168,7 @@ export const QUERY_PARAMS_KEY_MAP = {
       l3: 'l3', // To Set Search Query for Level 3 Category
     },
   },
+  confirm: 'confirm', // To Open Confirm Modal
   sort: 'sort', // To Set Sort Order
 } as const;
 

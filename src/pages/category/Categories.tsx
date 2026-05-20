@@ -2,6 +2,7 @@ import ApiStatus from '@/components/layout/ApiStatus';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
 import LoadingText from '@/components/layout/loaders/LoadingText';
+import ConfirmModal from '@/components/layout/modals/ConfirmModal';
 import Navbar from '@/components/layout/navbar';
 import {
   Table,
@@ -289,6 +290,7 @@ const L1Table = () => {
   const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
   const [selectedId, setSelectedId] = useState('');
   const [editData, setEditData] = useState<TCatModal | null>(null);
+  const [deleteId, setDeleteId] = useState('');
   const {
     data = [],
     isLoading,
@@ -304,9 +306,8 @@ const L1Table = () => {
     setParams({ [q_cat_keys.mode]: q_cat_keys.edit });
   };
 
-  const handleDelete = async (categoryId: string) => {
-    console.log('categoryId', categoryId);
-    // await deleteCategoryAsync(categoryId);
+  const handleDelete = async () => {
+    await deleteCategoryAsync(deleteId, { onSuccess: () => setDeleteId('') });
   };
 
   const handleOnClose = () => {
@@ -353,13 +354,17 @@ const L1Table = () => {
                       }
                     }}
                     className={`cursor-pointer ${selectedId === category._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
-                    onDelete={handleDelete}
+                    onDelete={(categoryId) => setDeleteId(categoryId)}
                     onEdit={handleEdit}
                   />
                   {selectedId === category._id && (
                     <TableRow>
                       <TableRowCell colSpan={4} className="border-b-0 p-0! pt-3!">
-                        <L2Table onDelete={handleDelete} onEdit={handleEdit} category={category} />
+                        <L2Table
+                          onDelete={(categoryId) => setDeleteId(categoryId)}
+                          onEdit={handleEdit}
+                          category={category}
+                        />
                       </TableRowCell>
                     </TableRow>
                   )}
@@ -379,6 +384,19 @@ const L1Table = () => {
       {!!editData && queryParams[q_cat_keys.mode] === q_cat_keys.edit && (
         <CategoryModal {...editData} onClose={handleOnClose} />
       )}
+      {!!deleteId && (
+        <ConfirmModal
+          modalProps={{ isOpen: !!deleteId, onClose: () => setDeleteId('') }}
+          type="warning"
+          title="Are you sure?"
+          description="Are you sure you want to delete this category? This action cannot be undone."
+          buttons={{
+            left: { content: 'Cancel', buttonProps: { onClick: () => setDeleteId('') } },
+            right: { content: 'Delete', buttonProps: { onClick: handleDelete } },
+          }}
+        />
+      )}
+      s{' '}
     </div>
   );
 };
