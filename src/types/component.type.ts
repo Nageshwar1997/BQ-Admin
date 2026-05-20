@@ -92,6 +92,9 @@ export interface IBreadcrumb extends TClassName {
 
 export type TCatModal = { category: ICategory; mainCatId?: string };
 
-export type TCatActionHandle = Record<'onEdit' | 'onDelete', (data: TCatModal) => void>;
+export type TCatActionHandle = {
+  onEdit: (data: TCatModal) => void;
+  onDelete: (categoryId: string) => void;
+};
 
 export type TCatTable = TCatActionHandle & TCatModal;

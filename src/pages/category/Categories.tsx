@@ -18,7 +18,10 @@ import {
   SORT_ORDER_MAP,
 } from '@/constants/common.constants';
 import useQueryParams from '@/hooks/useQueryParams';
-import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
+import {
+  useDeleteCategory,
+  useGetCategoriesByParentLevel,
+} from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
 import type { TCatModal, TCatTable, TSort } from '@/types/component.type';
 import { getFilteredAndSortedCats } from '@/utils/api.util';
@@ -291,6 +294,8 @@ const L1Table = () => {
     isLoading,
     isError,
   } = useGetCategoriesByParentLevel({ level: CATEGORY_LEVELS_MAP.L1 });
+
+  const { mutateAsync: deleteCategoryAsync } = useDeleteCategory();
   const categories = data as ICategory[];
 
   const handleEdit = (data: TCatModal) => {
@@ -299,8 +304,9 @@ const L1Table = () => {
     setParams({ [q_cat_keys.mode]: q_cat_keys.edit });
   };
 
-  const handleDelete = (data: TCatModal) => {
-    console.log('Delete category data:', data);
+  const handleDelete = async (categoryId: string) => {
+    console.log('categoryId', categoryId);
+    // await deleteCategoryAsync(categoryId);
   };
 
   const handleOnClose = () => {

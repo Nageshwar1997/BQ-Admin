@@ -16,7 +16,7 @@ const CategoryActions = ({ onDelete, onEdit, ...data }: TCatTable) => (
         content={{ icon: 'solar:trash-bin-trash-linear', className: 'size-4.5' }}
         pattern="outline"
         buttonProps={{
-          onClick: (event) => (event.stopPropagation(), onDelete(data)),
+          onClick: (event) => (event.stopPropagation(), onDelete(data.category._id)),
         }}
         className="border-primary/20 hover:border-red-c/50 hover:text-red-c size-9! p-0!"
       />
