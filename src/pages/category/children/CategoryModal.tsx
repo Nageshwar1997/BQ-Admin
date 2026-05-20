@@ -223,7 +223,6 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   };
 
   const resetParentFields = (selectedLevel: TCategory['level']) => {
-    console.log('🚀 ~ resetParentFields ~ selectedLevel:', selectedLevel);
     if (isL1(selectedLevel)) {
       setValue('description', DEFAULT_VALUES.description, { shouldValidate: true });
       setValue('subCategory', DEFAULT_VALUES.subCategory, { shouldValidate: true });
@@ -242,8 +241,6 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
       setValue('description', '', { shouldValidate: true });
     }
   };
-
-  console.log('errors', errors);
 
   const stepFields = [
     {
@@ -264,62 +261,82 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               name="level"
               control={control}
               defaultValue={level}
-              render={({ field: { onChange, value } }) => {
-                return (
-                  <Select
-                    label="Category level"
-                    options={['Main', 'Sub', 'Product'].map((name, i) => ({
-                      value: i + CATEGORY_LEVELS_MAP.L1,
-                      label: `L${i + CATEGORY_LEVELS_MAP.L1} - ${name} category`,
-                      disabled: i + 1 === level,
-                    }))}
-                    error={errors.level?.message}
-                    selectProps={{
-                      name: 'level',
-                      value: value,
-                      placeholder: 'Select category level',
-                      onChange: (event: { target: { value: string } }) => {
-                        onChange(event);
-                        resetParentFields(Number(event.target.value) as TCategory['level']);
-                      },
-                    }}
-                  />
-                );
-              }}
+              render={({ field: { onChange, value } }) => (
+                <Select
+                  label="Category level"
+                  options={['Main', 'Sub', 'Product'].map((name, i) => ({
+                    value: i + CATEGORY_LEVELS_MAP.L1,
+                    label: `L${i + CATEGORY_LEVELS_MAP.L1} - ${name} category`,
+                    disabled: i + 1 === level,
+                  }))}
+                  error={errors.level?.message}
+                  selectProps={{
+                    value: value,
+                    placeholder: 'Select category level',
+                    onChange: (value) => {
+                      const val = value as TCategory['level'];
+                      onChange(val);
+                      resetParentFields(val);
+                    },
+                  }}
+                />
+              )}
             />
-            <Select
-              label="Main category"
-              register={register('mainCategory')}
-              options={level1Cats?.map((cat: ICategory) => ({ label: cat.name, value: cat._id }))}
-              error={errors.mainCategory?.message}
-              selectProps={{
-                name: 'mainCategory',
-                value: categoryValues.mainCategory,
-                disabled: isL1(level),
-                placeholder: isL1(level)
-                  ? `Not required for L${CATEGORY_LEVELS_MAP.L1}`
-                  : 'Select main category',
-                onChange: () => {
-                  setValue('subCategory', DEFAULT_VALUES.subCategory, { shouldValidate: true });
-                  setValue('description', DEFAULT_VALUES.description, { shouldValidate: true });
-                },
-              }}
+            <Controller
+              name="mainCategory"
+              control={control}
+              defaultValue={mainCategory}
+              render={({ field: { onChange } }) => (
+                <Select
+                  label="Main category"
+                  options={level1Cats?.map((cat: ICategory) => ({
+                    label: cat.name,
+                    value: cat._id,
+                  }))}
+                  error={errors.mainCategory?.message}
+                  selectProps={{
+                    value: mainCategory,
+                    disabled: isL1(level),
+                    placeholder: isL1(level)
+                      ? `Not required for L${CATEGORY_LEVELS_MAP.L1}`
+                      : 'Select main category',
+                    onChange: (value) => {
+                      onChange(value);
+                      setValue('subCategory', DEFAULT_VALUES.subCategory, {
+                        shouldValidate: true,
+                      });
+                      setValue('description', DEFAULT_VALUES.description, {
+                        shouldValidate: true,
+                      });
+                    },
+                  }}
+                />
+              )}
             />
-            <Select
-              label="Sub-category"
-              register={register('subCategory')}
-              options={level2Cats?.map((cat: ICategory) => ({ label: cat.name, value: cat._id }))}
-              error={errors.subCategory?.message}
-              selectProps={{
-                name: 'subCategory',
-                value: categoryValues.subCategory,
-                disabled: !isL3(level) || !mainCategory,
-                placeholder: !isL3(level)
-                  ? `Only required for L${CATEGORY_LEVELS_MAP.L3}`
-                  : mainCategory
-                    ? 'Select sub-category'
-                    : 'Select main category first',
-              }}
+            <Controller
+              name="subCategory"
+              control={control}
+              defaultValue={subCategory}
+              render={({ field: { onChange } }) => (
+                <Select
+                  label="Sub-category"
+                  options={level2Cats?.map((cat: ICategory) => ({
+                    label: cat.name,
+                    value: cat._id,
+                  }))}
+                  error={errors.subCategory?.message}
+                  selectProps={{
+                    value: subCategory,
+                    disabled: !isL3(level) || !mainCategory,
+                    placeholder: !isL3(level)
+                      ? `Only required for L${CATEGORY_LEVELS_MAP.L3}`
+                      : mainCategory
+                        ? 'Select sub-category'
+                        : 'Select main category first',
+                    onChange: onChange,
+                  }}
+                />
+              )}
             />
             {isL3(level) && (
               <Input

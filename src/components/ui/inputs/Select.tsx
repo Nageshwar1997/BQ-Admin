@@ -2,7 +2,7 @@ import { EMPTY_ARRAY } from '@/constants/common.constants';
 import { useOutsideClick } from '@/hooks/useOutsideClick';
 import type { ISelect } from '@/types/input.type';
 import { Icon } from '@iconify/react';
-import { useEffect, useRef, useState, type ChangeEvent, type FocusEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { InputError, InputIcon, InputLabel } from './children';
 
 const Select = ({
@@ -12,7 +12,6 @@ const Select = ({
   containerClassName = '',
   optionsClassName = '',
   icons,
-  register,
   selectProps,
   options = EMPTY_ARRAY,
   optionsPosition = 'bottom',
@@ -20,49 +19,9 @@ const Select = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const containerRef = useOutsideClick<HTMLDivElement>(() => setIsOpen(false), { enabled: isOpen });
-  const selectRef = useRef<HTMLSelectElement | null>(null);
   const selectedOptionRef = useRef<HTMLLIElement | null>(null);
 
   const selected = options.find((opt) => opt.value === selectProps.value);
-
-  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    if (selectProps?.disabled) return;
-    register?.onChange?.(event);
-    selectProps.onChange?.(event);
-  };
-
-  const handleBlur = (event: FocusEvent<HTMLSelectElement>) => {
-    selectProps.onBlur?.(event);
-    register?.onBlur?.(event);
-  };
-
-  const handleOptionClick = (value: string | number) => {
-    if (selectProps.disabled || !selectRef.current) return;
-
-    const select = selectRef.current;
-    const changeEvent = {
-      type: 'change',
-      target: {
-        name: select.name,
-        value,
-        type: select.type,
-      },
-      currentTarget: {
-        name: select.name,
-        value,
-        type: select.type,
-      },
-    } as ChangeEvent<HTMLSelectElement>;
-
-    select.value = value.toString();
-    handleChange(changeEvent);
-    setIsOpen(false);
-  };
-
-  const setSelectRef = (element: HTMLSelectElement | null) => {
-    selectRef.current = element;
-    register?.ref(element);
-  };
 
   useEffect(() => {
     if (isOpen && selectedOptionRef.current) {
@@ -84,7 +43,7 @@ const Select = ({
           {/* Left Icon */}
           <InputIcon {...icons} position="left" />
           {/* Hidden */}
-          <select
+          {/* <select
             {...register}
             {...selectProps}
             ref={setSelectRef}
@@ -98,7 +57,7 @@ const Select = ({
                 {option.label}
               </option>
             ))}
-          </select>
+          </select> */}
           <div
             className={`text-primary line-clamp-1 flex h-full w-full flex-1 items-center justify-between border-none bg-transparent p-3 text-sm font-normal ${selectProps.disabled ? 'cursor-no-drop' : 'cursor-pointer'}`}
             onClick={() => !selectProps?.disabled && setIsOpen((prev) => !prev)}
@@ -131,9 +90,9 @@ const Select = ({
                         onClick={(e) => {
                           e.stopPropagation();
 
-                          if (option.disabled) return;
-
-                          handleOptionClick(active ? '' : option.value || '');
+                          if (option.disabled || selectProps?.disabled) return;
+                          selectProps.onChange?.(active ? '' : option.value || '');
+                          setIsOpen(false);
                         }}
                       >
                         <span>{option.label}</span>
