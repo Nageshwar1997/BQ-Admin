@@ -1,5 +1,4 @@
 import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
-import Theme from '@/components/ui/Theme';
 import { Outlet } from 'react-router-dom';
 
 const Auth = () => {
@@ -13,7 +12,6 @@ const Auth = () => {
           loading="eager"
         />
       </div>
-      <Theme className="bg-secondary-invert stroke-secondary border-primary/30 absolute top-5 right-5 z-10 h-fit rounded-full border p-2 md:p-3" />
       <ScrollableGradientContainer
         direction="vertical"
         className="mx-auto max-w-md"

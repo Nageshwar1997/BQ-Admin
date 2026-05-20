@@ -12,6 +12,7 @@ export const ModalWrapper = ({
   className = '',
   header,
   closeOnOutsideClick = true,
+  style,
 }: IModalWrapper) => {
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -35,6 +36,7 @@ export const ModalWrapper = ({
       <div
         className={`bg-primary-invert border-primary/20 relative flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-xl border shadow-lg ${className}`}
         onClick={(e) => e.stopPropagation()}
+        style={style}
       >
         {/* HEADER */}
         {header && Object.keys(header)?.length > 0 && (

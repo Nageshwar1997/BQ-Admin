@@ -1,9 +1,17 @@
 import type { SORT_ORDER_MAP } from '@/constants/common.constants';
 import type { FOOTER_CATEGORIES } from '@/constants/footer.constants';
 import type { IconProps } from '@iconify/react';
-import type { ButtonHTMLAttributes, JSX, ReactNode, RefObject, VideoHTMLAttributes } from 'react';
+import type {
+  ButtonHTMLAttributes,
+  ComponentProps,
+  JSX,
+  ReactNode,
+  RefObject,
+  VideoHTMLAttributes,
+} from 'react';
 import type { ICategory } from './api.type';
 import type { TGradientPos, TScrollDirection } from './hook.type';
+import type { TToast } from './store.type';
 
 export type TClassName = { className?: string };
 
@@ -72,6 +80,7 @@ export interface IModalWrapper extends TClassName {
   containerProps?: JSX.IntrinsicElements['div'];
   header?: { title?: string; showCloseIcon?: boolean };
   closeOnOutsideClick?: boolean;
+  style?: ComponentProps<'div'>['style'];
 }
 
 export interface IFooterOptionList {
@@ -98,3 +107,22 @@ export type TCatActionHandle = {
 };
 
 export type TCatTable = TCatActionHandle & TCatModal;
+
+type TCustomConfirmModal = TChildren & {
+  type: Extract<TToast['type'], 'custom'>;
+  title?: never;
+  description?: never;
+  buttons?: Partial<Record<'left' | 'right', Omit<IButton, 'pattern'>>>;
+};
+
+type TDefaultConfirmModal = {
+  type: Exclude<TToast['type'], 'custom' | 'loading'>;
+  title: string;
+  children?: never;
+  description?: string;
+  buttons: Partial<Record<'left' | 'right', Omit<IButton, 'pattern'>>>;
+};
+
+export type TConfirmModal = (TCustomConfirmModal | TDefaultConfirmModal) & {
+  modalProps?: Omit<IModalWrapper, 'children' | 'closeOnOutsideClick'>;
+};
