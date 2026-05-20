@@ -69,7 +69,7 @@ export const categorySchema2 = object({
   console.log('data', data);
 });
 
-export const categorySchema = object({
+export const categorySchema3 = object({
   activeStep: validateNumber({ field: 'activeStep', label: 'Active step', min: 0, max: 1 }),
   name: validateString({ field: 'name', label: 'Category name', min: 2, max: 120 }),
   level: union(
@@ -133,3 +133,108 @@ export const categorySchema = object({
     }
   }
 });
+
+/* -------------------------------------------------------------------------- */
+/*                               COMMON SCHEMA                                */
+/* -------------------------------------------------------------------------- */
+
+export const categoryLevelSchema = union(
+  CATEGORY_LEVELS.map((level) =>
+    literal(level, {
+      message: `Category level must be ${CATEGORY_LEVELS.join('/')}.`,
+    }),
+  ),
+  {
+    error: 'Category level is required.',
+  },
+);
+
+const baseCategorySchema = object({
+  activeStep: validateNumber({
+    field: 'activeStep',
+    label: 'Active step',
+    min: 0,
+    max: 1,
+    isPositive: false,
+    isInt: true,
+  }),
+
+  name: validateString({
+    field: 'name',
+    label: 'Category name',
+    min: 2,
+    max: 120,
+  }),
+
+  level: categoryLevelSchema,
+
+  confirmDetails: boolean().refine(Boolean, 'Please confirm category details before saving.'),
+});
+
+/* -------------------------------------------------------------------------- */
+/*                               LEVEL 1 SCHEMA                               */
+/* -------------------------------------------------------------------------- */
+
+export const level1CategorySchema = baseCategorySchema.extend({
+  level: literal(CATEGORY_LEVELS_MAP.L1),
+});
+
+/* -------------------------------------------------------------------------- */
+/*                               LEVEL 2 SCHEMA                               */
+/* -------------------------------------------------------------------------- */
+
+export const level2CategorySchema = baseCategorySchema.extend({
+  level: literal(CATEGORY_LEVELS_MAP.L2),
+
+  mainCategory: validateString({
+    field: 'mainCategory',
+    label: 'Main category',
+    customRegex: {
+      regex: REGEX.MONGODB_ID,
+      message: 'must be valid category',
+    },
+  }),
+});
+
+/* -------------------------------------------------------------------------- */
+/*                               LEVEL 3 SCHEMA                               */
+/* -------------------------------------------------------------------------- */
+
+export const level3CategorySchema = baseCategorySchema.extend({
+  level: literal(CATEGORY_LEVELS_MAP.L3),
+
+  mainCategory: validateString({
+    field: 'mainCategory',
+    label: 'Main category',
+    customRegex: {
+      regex: REGEX.MONGODB_ID,
+      message: 'must be valid category',
+    },
+  }),
+
+  subCategory: validateString({
+    field: 'subCategory',
+    label: 'Sub-category',
+    customRegex: {
+      regex: REGEX.MONGODB_ID,
+      message: 'must be valid category',
+    },
+  }),
+
+  description: validateString({
+    field: 'description',
+    label: 'Description',
+    min: 10,
+    max: 150,
+  }),
+});
+
+/* -------------------------------------------------------------------------- */
+/*                              COMBINED SCHEMA                               */
+/* -------------------------------------------------------------------------- */
+
+export const categorySchema = union([
+  level1CategorySchema,
+  level2CategorySchema,
+  level3CategorySchema,
+]);
