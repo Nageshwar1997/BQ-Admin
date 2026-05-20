@@ -68,3 +68,24 @@ export const OTP_OPTIONS: IZodStringConfigs = {
   allowSpace: 'noSpace',
   customRegex: { regex: REGEX.OTP, message: 'must be 6 digits' },
 };
+
+export const MAIN_CATEGORY_OPTIONS: IZodStringConfigs = {
+  field: 'mainCategory',
+  label: 'Main category',
+  customRegex: { regex: REGEX.MONGODB_ID, message: 'must be valid category' },
+  allowSpace: 'noSpace',
+};
+
+export const SUB_CATEGORY_OPTIONS: IZodStringConfigs = {
+  field: 'subCategory',
+  label: 'Sub-category',
+  customRegex: { regex: REGEX.MONGODB_ID, message: 'must be valid category' },
+  allowSpace: 'noSpace',
+};
+
+export const DESCRIPTION_OPTIONS: IZodStringConfigs = {
+  field: 'description',
+  label: 'Description',
+  min: 10,
+  max: 150,
+};

@@ -313,9 +313,9 @@ const L1Table = () => {
     [categories, search, sort],
   );
 
-  // useEffect(() => {
-  //   removeParams([q_cat_keys.mode]);
-  // }, []);
+  useEffect(() => {
+    removeParams([q_cat_keys.mode]);
+  }, []);
 
   return (
     <div className="border-primary/10 bg-secondary-invert rounded-xl border">

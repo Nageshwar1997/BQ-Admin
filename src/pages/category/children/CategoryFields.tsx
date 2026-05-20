@@ -1,27 +1,36 @@
-/* -------------------------------------------------------------------------- */
-/*                                LEVEL FIELDS                                */
-/* -------------------------------------------------------------------------- */
-
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
 import type { ICategory } from '@/types/api.type';
-import type { TCategory } from '@/types/schema.type';
-import { Controller } from 'react-hook-form';
+import type { TCategory, TLevel2Category, TLevel3Category } from '@/types/schema.type';
+import {
+  Controller,
+  type Control,
+  type FieldErrors,
+  type UseFormRegister,
+  type UseFormSetValue,
+} from 'react-hook-form';
 
-const CommonFields = ({
-  register,
-  errors,
-  control,
-  level,
-  setValue,
-}: {
-  register: any;
-  errors: any;
-  control: any;
+type TCommonFields = {
+  register: UseFormRegister<TCategory>;
+  errors: FieldErrors<TCategory>;
+  control: Control<TCategory>;
   level: TCategory['level'];
-  setValue: any;
-}) => (
+  setValue: UseFormSetValue<TCategory>;
+};
+
+type TLevel1Fields = TCommonFields;
+type TLevel2Fields = TCommonFields & {
+  level1Cats: ICategory[];
+  mainCategory: TLevel2Category['mainCategory'];
+};
+type TLevel3Fields = Omit<TLevel2Fields, 'mainCategory'> & {
+  level2Cats: ICategory[];
+  mainCategory: TLevel3Category['mainCategory'];
+  subCategory: TLevel3Category['subCategory'];
+};
+
+const CommonFields = ({ register, errors, control, level, setValue }: TCommonFields) => (
   <>
     <Input
       label="Category name"
@@ -66,7 +75,7 @@ const CommonFields = ({
 /*                              LEVEL 1 FIELDS                                */
 /* -------------------------------------------------------------------------- */
 
-const Level1Fields = ({ register, errors, control, level, setValue }: any) => {
+export const Level1Fields = ({ register, errors, control, level, setValue }: TLevel1Fields) => {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <CommonFields
@@ -84,7 +93,7 @@ const Level1Fields = ({ register, errors, control, level, setValue }: any) => {
 /*                              LEVEL 2 FIELDS                                */
 /* -------------------------------------------------------------------------- */
 
-const Level2Fields = ({
+export const Level2Fields = ({
   register,
   errors,
   control,
@@ -92,7 +101,7 @@ const Level2Fields = ({
   setValue,
   level1Cats,
   mainCategory,
-}: any) => {
+}: TLevel2Fields) => {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <CommonFields
@@ -102,17 +111,13 @@ const Level2Fields = ({
         level={level}
         setValue={setValue}
       />
-
       <Controller
         name="mainCategory"
         control={control}
         render={({ field: { onChange } }) => (
           <Select
             label="Main category"
-            options={level1Cats?.map((cat: ICategory) => ({
-              label: cat.name,
-              value: cat._id,
-            }))}
+            options={level1Cats?.map((cat: ICategory) => ({ label: cat.name, value: cat._id }))}
             error={errors.mainCategory?.message}
             selectProps={{
               value: mainCategory,
@@ -130,7 +135,7 @@ const Level2Fields = ({
 /*                              LEVEL 3 FIELDS                                */
 /* -------------------------------------------------------------------------- */
 
-const Level3Fields = ({
+export const Level3Fields = ({
   register,
   errors,
   control,
@@ -140,7 +145,7 @@ const Level3Fields = ({
   level2Cats,
   mainCategory,
   subCategory,
-}: any) => {
+}: TLevel3Fields) => {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <CommonFields
@@ -157,10 +162,7 @@ const Level3Fields = ({
         render={({ field: { onChange } }) => (
           <Select
             label="Main category"
-            options={level1Cats?.map((cat: ICategory) => ({
-              label: cat.name,
-              value: cat._id,
-            }))}
+            options={level1Cats?.map((cat: ICategory) => ({ label: cat.name, value: cat._id }))}
             error={errors.mainCategory?.message}
             selectProps={{
               value: mainCategory,
@@ -195,11 +197,10 @@ const Level3Fields = ({
           />
         )}
       />
-
       <Input
         label="Description"
         register={register('description')}
-        error={errors.description?.message}
+        error={'description' in errors ? errors.description?.message : undefined}
         containerClassName="sm:col-span-2"
         inputProps={{
           name: 'description',

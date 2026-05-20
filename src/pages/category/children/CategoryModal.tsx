@@ -2,8 +2,6 @@ import { ModalWrapper } from '@/components/layout/modals/ModalWrapper';
 import Button from '@/components/ui/Button';
 import Stepper, { type StepperStep } from '@/components/ui/Stepper';
 import Checkbox from '@/components/ui/inputs/Checkbox';
-import Input from '@/components/ui/inputs/Input';
-import Select from '@/components/ui/inputs/Select';
 import {
   CATEGORY_LEVELS_MAP,
   CATEGORY_MODAL_STEPS,
@@ -21,210 +19,12 @@ import type { ICategory } from '@/types/api.type';
 import type { TCatModal } from '@/types/component.type';
 import type { TCategory, TConfirmDetails } from '@/types/schema.type';
 import { deepEqual, toaster } from '@/utils/common.util';
+import { setErrorToForm } from '@/utils/form.util';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo } from 'react';
-import { Controller, useForm, useWatch } from 'react-hook-form';
-const CommonFields = ({
-  register,
-  errors,
-  control,
-  level,
-  setValue,
-}: {
-  register: any;
-  errors: any;
-  control: any;
-  level: TCategory['level'];
-  setValue: any;
-}) => (
-  <>
-    <Input
-      label="Category name"
-      register={register('name')}
-      error={errors.name?.message}
-      inputProps={{
-        name: 'name',
-        placeholder: 'Category name',
-      }}
-    />
-
-    <Controller
-      name="level"
-      control={control}
-      render={({ field: { onChange, value } }) => (
-        <Select
-          label="Category level"
-          options={['Main', 'Sub', 'Product'].map((name, i) => ({
-            value: i + CATEGORY_LEVELS_MAP.L1,
-            label: `L${i + CATEGORY_LEVELS_MAP.L1} - ${name} category`,
-            disabled: i + 1 === level,
-          }))}
-          error={errors.level?.message}
-          selectProps={{
-            value,
-            placeholder: 'Select category level',
-            onChange: (value) => {
-              onChange(value);
-
-              setValue('mainCategory', undefined);
-              setValue('subCategory', undefined);
-              setValue('description', undefined);
-            },
-          }}
-        />
-      )}
-    />
-  </>
-);
-
-/* -------------------------------------------------------------------------- */
-/*                              LEVEL 1 FIELDS                                */
-/* -------------------------------------------------------------------------- */
-
-const Level1Fields = ({ register, errors, control, level, setValue }: any) => {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      <CommonFields
-        register={register}
-        errors={errors}
-        control={control}
-        level={level}
-        setValue={setValue}
-      />
-    </div>
-  );
-};
-
-/* -------------------------------------------------------------------------- */
-/*                              LEVEL 2 FIELDS                                */
-/* -------------------------------------------------------------------------- */
-
-const Level2Fields = ({
-  register,
-  errors,
-  control,
-  level,
-  setValue,
-  level1Cats,
-  mainCategory,
-}: any) => {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      <CommonFields
-        register={register}
-        errors={errors}
-        control={control}
-        level={level}
-        setValue={setValue}
-      />
-
-      <Controller
-        name="mainCategory"
-        control={control}
-        render={({ field: { onChange } }) => (
-          <Select
-            label="Main category"
-            options={level1Cats?.map((cat: ICategory) => ({
-              label: cat.name,
-              value: cat._id,
-            }))}
-            error={errors.mainCategory?.message}
-            selectProps={{
-              value: mainCategory,
-              placeholder: 'Select main category',
-              onChange: onChange,
-            }}
-          />
-        )}
-      />
-    </div>
-  );
-};
-
-/* -------------------------------------------------------------------------- */
-/*                              LEVEL 3 FIELDS                                */
-/* -------------------------------------------------------------------------- */
-
-const Level3Fields = ({
-  register,
-  errors,
-  control,
-  level,
-  setValue,
-  level1Cats,
-  level2Cats,
-  mainCategory,
-  subCategory,
-}: any) => {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      <CommonFields
-        register={register}
-        errors={errors}
-        control={control}
-        level={level}
-        setValue={setValue}
-      />
-
-      <Controller
-        name="mainCategory"
-        control={control}
-        render={({ field: { onChange } }) => (
-          <Select
-            label="Main category"
-            options={level1Cats?.map((cat: ICategory) => ({
-              label: cat.name,
-              value: cat._id,
-            }))}
-            error={errors.mainCategory?.message}
-            selectProps={{
-              value: mainCategory,
-              placeholder: 'Select main category',
-              onChange: (value) => {
-                onChange(value);
-
-                setValue('subCategory', undefined);
-              },
-            }}
-          />
-        )}
-      />
-
-      <Controller
-        name="subCategory"
-        control={control}
-        render={({ field: { onChange } }) => (
-          <Select
-            label="Sub-category"
-            options={level2Cats?.map((cat: ICategory) => ({
-              label: cat.name,
-              value: cat._id,
-            }))}
-            error={errors.subCategory?.message}
-            selectProps={{
-              value: subCategory,
-              placeholder: 'Select sub-category',
-              disabled: !mainCategory,
-              onChange,
-            }}
-          />
-        )}
-      />
-
-      <Input
-        label="Description"
-        register={register('description')}
-        error={errors.description?.message}
-        containerClassName="sm:col-span-2"
-        inputProps={{
-          name: 'description',
-          placeholder: 'Short description for this product category',
-        }}
-      />
-    </div>
-  );
-};
+import { useForm, useWatch } from 'react-hook-form';
+import { Level1Fields, Level2Fields, Level3Fields } from './CategoryFields';
 
 type TMode = typeof QUERY_PARAMS_KEY_MAP.category.edit | typeof QUERY_PARAMS_KEY_MAP.category.add;
 
@@ -331,6 +131,11 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     enabled: level === CATEGORY_LEVELS_MAP.L3 && !!subCategory,
   });
 
+  const initialPayload = useMemo(() => {
+    if (!isEditMode || !category) return null;
+    return getPayload(getInitialData(category, mainCatId));
+  }, [category, mainCatId, isEditMode]);
+
   const hierarchyPreview = useMemo(() => {
     switch (level) {
       case CATEGORY_LEVELS_MAP.L1:
@@ -379,6 +184,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     if (!initialPayload) return true;
     return !deepEqual(getPayload(data), initialPayload);
   };
+
   const handleNext = async (data: TCategory) => {
     const payload = getPayload(data);
     if ((isEditMode && !hasChanges(detailsForm.getValues())) || !payload) {
@@ -391,10 +197,12 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     }
   };
 
-  const initialPayload = useMemo(() => {
-    if (!isEditMode || !category) return null;
-    return getPayload(getInitialData(category, mainCatId));
-  }, [category, mainCatId, isEditMode]);
+  const handleClose = () => {
+    detailsForm.reset();
+    confirmForm.reset();
+    props?.onClose?.();
+    removeParams([QUERY_PARAMS_KEY_MAP.category.mode]);
+  };
 
   const handleSave = async () => {
     const values = detailsForm.getValues();
@@ -407,9 +215,24 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     }
 
     if (isEditMode) {
-      await editCategoryAsync({ ...payload, _id: category._id });
+      await editCategoryAsync(
+        { ...payload, _id: category._id },
+        {
+          onSuccess: () => handleClose(),
+          onError: ({ fieldErrors }) => {
+            setErrorToForm(detailsForm.setError, fieldErrors);
+            detailsForm.setValue('activeStep', 0);
+          },
+        },
+      );
     } else {
-      await addCategoryAsync(payload);
+      await addCategoryAsync(payload, {
+        onSuccess: () => handleClose(),
+        onError: ({ fieldErrors }) => {
+          setErrorToForm(detailsForm.setError, fieldErrors);
+          detailsForm.setValue('activeStep', 0);
+        },
+      });
     }
   };
 
@@ -440,7 +263,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               level={level}
               setValue={detailsForm.setValue}
               level1Cats={level1Cats}
-              mainCategory={mainCategory}
+              mainCategory={mainCategory || ''}
             />
           )}
 
@@ -453,8 +276,8 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               setValue={detailsForm.setValue}
               level1Cats={level1Cats}
               level2Cats={level2Cats}
-              mainCategory={mainCategory}
-              subCategory={subCategory}
+              mainCategory={mainCategory || ''}
+              subCategory={subCategory || ''}
             />
           )}
 
@@ -522,13 +345,6 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     } else {
       detailsForm.reset(DEFAULT_VALUES);
     }
-  };
-
-  const handleClose = () => {
-    detailsForm.reset();
-    confirmForm.reset();
-    props?.onClose?.();
-    removeParams([QUERY_PARAMS_KEY_MAP.category.mode]);
   };
 
   useEffect(() => {
