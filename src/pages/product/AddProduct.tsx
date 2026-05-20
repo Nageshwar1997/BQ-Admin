@@ -3,7 +3,7 @@ import Button from '@/components/ui/Button';
 import Stepper, { type StepperStep } from '@/components/ui/Stepper';
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Input from '@/components/ui/inputs/Input';
-import Select from '@/components/ui/inputs/Select';
+// import Select from '@/components/ui/inputs/Select';
 import { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import { addProductSchema } from '@/schemas/product.schema';
@@ -54,7 +54,7 @@ const AddProduct = () => {
     getValues,
     handleSubmit,
     register,
-    setValue,
+    // setValue,
     trigger,
   } = useForm<TAddProduct>({
     resolver: zodResolver(addProductSchema),
@@ -133,7 +133,7 @@ const AddProduct = () => {
             error={errors.brand?.message}
             inputProps={{ name: 'brand', placeholder: 'Brand name' }}
           />
-          <Select
+          {/* <Select
             key={'Main Category'}
             label="Main category"
             register={register('mainCategory')}
@@ -151,8 +151,8 @@ const AddProduct = () => {
                 setValue('productCategory', '');
               },
             }}
-          />
-          <Select
+          /> */}
+          {/* <Select
             key={'Sub Category'}
             label="Sub-category"
             register={register('subCategory')}
@@ -168,8 +168,8 @@ const AddProduct = () => {
               placeholder: mainCategory ? 'Select sub-category' : 'Select main category first',
               onChange: () => setValue('productCategory', ''),
             }}
-          />
-          <Select
+          /> */}
+          {/* <Select
             key={'Product Category'}
             label="Product category"
             register={register('productCategory')}
@@ -184,7 +184,7 @@ const AddProduct = () => {
               disabled: !subCategory,
               placeholder: subCategory ? 'Select product category' : 'Select sub-category first',
             }}
-          />
+          /> */}
         </div>
       ),
     },

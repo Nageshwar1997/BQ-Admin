@@ -90,14 +90,14 @@ const Products = () => {
             ]}
             selectProps={{
               value: queryParams.status || 'all',
-              onChange: ({ currentTarget: { value } }) => {
+              onChange: (value) => {
                 if (!value || value === 'all') {
                   removeParams(['status', 'search']);
                 } else if (value) {
                   if (value === 'draft') {
                     removeParams(['search']);
                   }
-                  setParams({ status: value });
+                  setParams({ status: value.toString() });
                 }
               },
             }}
