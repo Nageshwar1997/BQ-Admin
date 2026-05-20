@@ -232,13 +232,13 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     if (isL2(selectedLevel)) {
       setValue('description', DEFAULT_VALUES.description, { shouldValidate: true });
       setValue('subCategory', DEFAULT_VALUES.subCategory, { shouldValidate: true });
-      setValue('mainCategory', '', { shouldValidate: true });
+      setValue('mainCategory', DEFAULT_VALUES.mainCategory, { shouldValidate: true });
     }
 
     if (isL3(selectedLevel)) {
-      setValue('mainCategory', '', { shouldValidate: true });
-      setValue('subCategory', '', { shouldValidate: true });
-      setValue('description', '', { shouldValidate: true });
+      setValue('description', DEFAULT_VALUES.description, { shouldValidate: true });
+      setValue('subCategory', DEFAULT_VALUES.subCategory, { shouldValidate: true });
+      setValue('mainCategory', DEFAULT_VALUES.mainCategory, { shouldValidate: true });
     }
   };
 
@@ -338,18 +338,17 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
                 />
               )}
             />
-            {isL3(level) && (
-              <Input
-                label="Description"
-                register={register('description')}
-                error={errors.description?.message}
-                containerClassName="sm:col-span-2"
-                inputProps={{
-                  name: 'description',
-                  placeholder: 'Short description for this product category',
-                }}
-              />
-            )}
+            <Input
+              label="Description"
+              register={register('description')}
+              error={errors.description?.message}
+              containerClassName="sm:col-span-2"
+              inputProps={{
+                name: 'description',
+                disabled: !isL3(level),
+                placeholder: 'Short description for this product category',
+              }}
+            />
           </div>
           <div className="border-primary/10 bg-platinum-black grid gap-3 rounded-lg border p-4 sm:grid-cols-[auto_1fr]">
             <div className="bg-primary/5 text-primary grid size-11 place-items-center rounded-lg">
