@@ -39,9 +39,9 @@ export const FORM_DEFAULT_VALUES = {
     activeStep: 0,
     name: '',
     level: CATEGORY_LEVELS_MAP.L1,
-    mainCategory: undefined,
-    subCategory: undefined,
-    description: undefined,
+    mainCategory: '',
+    subCategory: '',
+    description: '',
     confirmDetails: false,
   },
 } as const;

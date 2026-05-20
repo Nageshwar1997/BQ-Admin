@@ -15,7 +15,6 @@ import {
   enum as z_enum,
   ZodArray,
   ZodNumber,
-  ZodString,
   ZodType,
   type RefinementCtx,
 } from 'zod';
@@ -34,7 +33,7 @@ export const appendCustomIssue = (
   return ctx.addIssue({ path, code: 'custom', message });
 };
 
-export const validateString = (props: IZodStringConfigs): ZodString => {
+export const validateString = (props: IZodStringConfigs) => {
   const {
     field,
     label,
@@ -62,11 +61,17 @@ export const validateString = (props: IZodStringConfigs): ZodString => {
   }
 
   if (min !== undefined) {
-    schema = schema.min(min, `${name} must be at least ${min} characters.`);
+    schema = schema.refine(
+      (value) => !value || value.length >= min,
+      `${name} must be at least ${min} characters.`,
+    );
   }
 
   if (max !== undefined) {
-    schema = schema.max(max, `${name} must not exceed ${max} characters.`);
+    schema = schema.refine(
+      (value) => !value || value.length <= max,
+      `${name} must not exceed ${max} characters.`,
+    );
   }
 
   if (customRegexes?.length) {
@@ -83,9 +88,15 @@ export const validateString = (props: IZodStringConfigs): ZodString => {
   }
 
   if (allowSpace === 'singleSpace') {
-    schema = schema.regex(REGEX.SINGLE_SPACE, `${name} must not contain multiple spaces.`);
+    schema = schema.refine(
+      (value) => !value || REGEX.SINGLE_SPACE.test(value),
+      `${name} must not contain multiple spaces.`,
+    );
   } else if (allowSpace === 'noSpace') {
-    schema = schema.regex(REGEX.NO_SPACE, `${name} must not contain spaces.`);
+    schema = schema.refine(
+      (value) => !value || REGEX.NO_SPACE.test(value),
+      `${name} must not contain spaces.`,
+    );
   }
 
   if (lowerOrUpper === 'lower') {
@@ -169,7 +180,7 @@ export const validateEnum = <T extends readonly [string, ...string[]]>({
   });
 };
 
-export const validateUrl = (props: Omit<IZodStringConfigs, 'customRegexes'>): ZodString => {
+export const validateUrl = (props: Omit<IZodStringConfigs, 'customRegexes'>) => {
   return validateString({
     ...props,
     customRegexes: [

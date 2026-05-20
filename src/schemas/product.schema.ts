@@ -1,7 +1,7 @@
 import { CATEGORY_LEVELS, CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
 import { REGEX } from '@/constants/regex.constants';
 import { appendCustomIssue, validateNumber, validateString } from '@/utils/zod.util';
-import { boolean, literal, object, string, union } from 'zod';
+import { boolean, literal, number, object, string, union } from 'zod';
 
 const requiredText = (field: string, min = 2, max = 100) =>
   string()
@@ -38,6 +38,36 @@ export const addProductSchema = object({
   path: ['salePrice'],
   message: 'Sale price cannot be greater than MRP.',
 });
+export const categorySchema2 = object({
+  activeStep: number('Active step is required.')
+    .min(0, 'Active step must be at least 0.')
+    .max(1, 'Active step must not exceed 1.'),
+  name: string('Category name is required.')
+    .min(2, 'Category name must be at least 2 characters.')
+    .max(120, 'Category name must not exceed 120 characters.'),
+  level: union(
+    CATEGORY_LEVELS.map((l) =>
+      literal(l, { message: `Category level must be ${CATEGORY_LEVELS.join('/')}.` }),
+    ),
+    { error: 'Category level is required.' },
+  ),
+  mainCategory: string('Main category is required.')
+    .trim()
+    .regex(REGEX.MONGODB_ID, 'Main category must be valid category.')
+    .optional(),
+  subCategory: string('Sub-category is required.')
+    .trim()
+    .regex(REGEX.MONGODB_ID, 'Sub-category must be valid category.')
+    .optional(),
+  description: string('Description is required.')
+    .trim()
+    .min(10, 'Description must be at least 10 characters.')
+    .max(500, 'Description must not exceed 500 characters.')
+    .optional(),
+  confirmDetails: boolean('Please confirm category details before publishing.'),
+}).superRefine((data) => {
+  console.log('data', data);
+});
 
 export const categorySchema = object({
   activeStep: validateNumber({ field: 'activeStep', label: 'Active step', min: 0, max: 1 }),
@@ -53,20 +83,20 @@ export const categorySchema = object({
     label: 'Main category',
     nonEmpty: false,
     customRegex: { regex: REGEX.MONGODB_ID, message: 'must be valid category' },
-  }).optional(),
+  })?.optional(),
   subCategory: validateString({
     field: 'subCategory',
     label: 'Sub-category',
     nonEmpty: false,
     customRegex: { regex: REGEX.MONGODB_ID, message: 'must be valid category' },
-  }).optional(),
+  })?.optional(),
   description: validateString({
     field: 'description',
     label: 'Description',
     nonEmpty: false,
     min: 10,
     max: 150,
-  }).optional(),
+  })?.optional(),
   confirmDetails: boolean().refine(Boolean, 'Please confirm category details before saving.'),
 }).superRefine((data, ctx) => {
   const { description, mainCategory, subCategory, level } = data;
