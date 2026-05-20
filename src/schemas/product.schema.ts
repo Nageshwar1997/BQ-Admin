@@ -165,10 +165,6 @@ const baseCategorySchema = object({
     min: 2,
     max: 120,
   }),
-
-  level: categoryLevelSchema,
-
-  confirmDetails: boolean().refine(Boolean, 'Please confirm category details before saving.'),
 });
 
 /* -------------------------------------------------------------------------- */
@@ -238,3 +234,11 @@ export const categorySchema = union([
   level2CategorySchema,
   level3CategorySchema,
 ]);
+
+/* -------------------------------------------------------------------------- */
+/*                              CONFIRM DETAILS SCHEMA                               */
+/* -------------------------------------------------------------------------- */
+
+export const confirmDetailsSchema = object({
+  confirm: boolean().refine(Boolean, 'Please confirm details before saving.'),
+});

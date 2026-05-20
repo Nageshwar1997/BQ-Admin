@@ -11,7 +11,7 @@ import {
 } from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import useQueryParams from '@/hooks/useQueryParams';
-import { categorySchema } from '@/schemas/product.schema';
+import { categorySchema, confirmDetailsSchema } from '@/schemas/product.schema';
 import {
   useAddCategory,
   useEditCategory,
@@ -19,12 +19,12 @@ import {
 } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
 import type { TCatModal } from '@/types/component.type';
-import type { TCategory } from '@/types/schema.type';
+import type { TCategory, TConfirmDetails } from '@/types/schema.type';
 import { deepEqual, toaster } from '@/utils/common.util';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo } from 'react';
-import { Controller, useForm, useWatch, type FieldPath } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 const CommonFields = ({
   register,
   errors,
@@ -232,11 +232,6 @@ const isL1 = (level: TCategory['level']) => level === CATEGORY_LEVELS_MAP.L1;
 const isL2 = (level: TCategory['level']) => level === CATEGORY_LEVELS_MAP.L2;
 const isL3 = (level: TCategory['level']) => level === CATEGORY_LEVELS_MAP.L3;
 
-const STEP_FIELDS: FieldPath<TCategory>[][] = [
-  ['name', 'level', 'mainCategory', 'subCategory', 'description'],
-  ['confirmDetails'],
-];
-
 const DEFAULT_VALUES = FORM_DEFAULT_VALUES.category;
 
 const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => (
@@ -250,73 +245,38 @@ const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
   categories?.find((cat) => cat._id === id)?.name || '-';
 
 const getInitialData = (cat: ICategory, mainCatId?: string): TCategory => {
+  const base = { activeStep: 0, name: cat.name };
   switch (cat.level) {
-    case CATEGORY_LEVELS_MAP.L1:
-      return {
-        activeStep: 0,
-        confirmDetails: false,
-
-        name: cat.name,
-        level: CATEGORY_LEVELS_MAP.L1,
-      };
-
     case CATEGORY_LEVELS_MAP.L2:
-      return {
-        activeStep: 0,
-        confirmDetails: false,
-
-        name: cat.name,
-        level: CATEGORY_LEVELS_MAP.L2,
-
-        mainCategory: cat.parent || '',
-      };
+      return { ...base, level: CATEGORY_LEVELS_MAP.L2, mainCategory: cat.parent || '' };
 
     case CATEGORY_LEVELS_MAP.L3:
       return {
-        activeStep: 0,
-        confirmDetails: false,
-
-        name: cat.name,
+        ...base,
         level: CATEGORY_LEVELS_MAP.L3,
-
         mainCategory: mainCatId || '',
         subCategory: cat.parent || '',
         description: cat.description || '',
       };
 
+    case CATEGORY_LEVELS_MAP.L1:
     default:
-      throw new Error('Invalid category level');
+      return { ...base, level: CATEGORY_LEVELS_MAP.L1 };
   }
 };
 
 const getPayload = (data: TCategory) => {
-  switch (data.level) {
-    case CATEGORY_LEVELS_MAP.L1:
-      return {
-        name: data.name,
-        level: data.level,
-        parent: null,
-        description: undefined,
-      };
-
+  const { level, name } = data;
+  switch (level) {
     case CATEGORY_LEVELS_MAP.L2:
-      return {
-        name: data.name,
-        level: data.level,
-        parent: data.mainCategory,
-        description: undefined,
-      };
+      return { name, level, parent: data.mainCategory, description: undefined };
 
     case CATEGORY_LEVELS_MAP.L3:
-      return {
-        name: data.name,
-        level: data.level,
-        parent: data.subCategory,
-        description: data.description,
-      };
+      return { name, level, parent: data.subCategory, description: data.description };
 
+    case CATEGORY_LEVELS_MAP.L1:
     default:
-      return null;
+      return { name, level, parent: null, description: undefined };
   }
 };
 
@@ -328,34 +288,26 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   const mode = queryParams[QUERY_PARAMS_KEY_MAP.category.mode] as TMode;
   const isEditMode = mode === QUERY_PARAMS_KEY_MAP.category.edit && !!category;
 
-  const {
-    control,
-    formState: { errors, isValid },
-    getValues,
-    handleSubmit,
-    register,
-    reset,
-    setError,
-    setValue,
-    trigger,
-  } = useForm<TCategory>({
+  const detailsForm = useForm<TCategory>({
     resolver: zodResolver(categorySchema),
     defaultValues: DEFAULT_VALUES,
   });
 
-  console.log("errors",errors)
-console.log('isValid', isValid);
-  const categoryValues = useWatch({ control });
-  const activeStep = useWatch({ control, name: 'activeStep' });
-  console.log("🚀 ~ CategoryModal ~ activeStep:", activeStep)
+  const confirmForm = useForm<TConfirmDetails>({
+    resolver: zodResolver(confirmDetailsSchema),
+    defaultValues: { confirm: false },
+  });
+
+  const categoryValues = useWatch({ control: detailsForm.control });
+  const activeStep = useWatch({ control: detailsForm.control, name: 'activeStep' });
   const activeStepData = CATEGORY_MODAL_STEPS[activeStep];
-  const level = useWatch({ control, name: 'level' });
-  const mainCategory = useWatch({ control, name: 'mainCategory' });
-  const subCategory = useWatch({ control, name: 'subCategory' });
-  const name = useWatch({ control, name: 'name' });
+  const level = useWatch({ control: detailsForm.control, name: 'level' });
+  const mainCategory = useWatch({ control: detailsForm.control, name: 'mainCategory' });
+  const subCategory = useWatch({ control: detailsForm.control, name: 'subCategory' });
+  const name = useWatch({ control: detailsForm.control, name: 'name' });
 
   const setActiveStep = (step: number) => {
-    setValue('activeStep', step, { shouldDirty: false, shouldTouch: false });
+    detailsForm.setValue('activeStep', step, { shouldDirty: false, shouldTouch: false });
   };
 
   const { mutateAsync: addCategoryAsync } = useAddCategory();
@@ -417,7 +369,7 @@ console.log('isValid', isValid);
       categories?.some((cat) => cat.name.trim().toLowerCase() === trimmedName) || false;
 
     if (isDuplicate) {
-      setError('name', { message: 'Category already exists.' });
+      detailsForm.setError('name', { message: 'Category already exists.' });
     }
 
     return isDuplicate;
@@ -427,33 +379,9 @@ console.log('isValid', isValid);
     if (!initialPayload) return true;
     return !deepEqual(getPayload(data), initialPayload);
   };
-
-  const handleStepChange = async (nextStep: number) => {
-    if (nextStep <= activeStep) {
-      setActiveStep(nextStep);
-      return;
-    }
-
-    const fieldsToValidate = STEP_FIELDS.slice(0, nextStep).flat();
-    const isValid = await trigger(fieldsToValidate, { shouldFocus: true });
-
-    if (!isValid) return;
-
-    if (isEditMode && !hasChanges(getValues())) {
-      return toaster.error({
-        title: 'No changes to save',
-        description: 'Make changes and try again.',
-      });
-    } else if (!isDuplicateCategory()) {
-      setActiveStep(nextStep);
-    }
-  };
-
-  const handleNext = async () => {
-    const isValid = await trigger(STEP_FIELDS[activeStep], { shouldFocus: true });
-
-    if (!isValid) return;
-    if (isEditMode && !hasChanges(getValues())) {
+  const handleNext = async (data: TCategory) => {
+    const payload = getPayload(data);
+    if ((isEditMode && !hasChanges(detailsForm.getValues())) || !payload) {
       return toaster.error({
         title: 'No changes to save',
         description: 'Make changes and try again.',
@@ -468,8 +396,9 @@ console.log('isValid', isValid);
     return getPayload(getInitialData(category, mainCatId));
   }, [category, mainCatId, isEditMode]);
 
-  const handleSave = async (data: TCategory) => {
-    const payload = getPayload(data);
+  const handleSave = async () => {
+    const values = detailsForm.getValues();
+    const payload = getPayload(values);
     if (!payload) {
       return toaster.error({
         title: 'No changes to save',
@@ -488,24 +417,28 @@ console.log('isValid', isValid);
     {
       title: 'Category details',
       content: (
-        <div className="grid gap-5">
+        <form
+          id="category-details-form"
+          onSubmit={detailsForm.handleSubmit(handleNext)}
+          className="grid gap-5"
+        >
           {isL1(level) && (
             <Level1Fields
-              register={register}
-              errors={errors}
-              control={control}
+              register={detailsForm.register}
+              errors={detailsForm.formState.errors}
+              control={detailsForm.control}
               level={level}
-              setValue={setValue}
+              setValue={detailsForm.setValue}
             />
           )}
 
           {isL2(level) && (
             <Level2Fields
-              register={register}
-              errors={errors}
-              control={control}
+              register={detailsForm.register}
+              errors={detailsForm.formState.errors}
+              control={detailsForm.control}
               level={level}
-              setValue={setValue}
+              setValue={detailsForm.setValue}
               level1Cats={level1Cats}
               mainCategory={mainCategory}
             />
@@ -513,11 +446,11 @@ console.log('isValid', isValid);
 
           {isL3(level) && (
             <Level3Fields
-              register={register}
-              errors={errors}
-              control={control}
+              register={detailsForm.register}
+              errors={detailsForm.formState.errors}
+              control={detailsForm.control}
               level={level}
-              setValue={setValue}
+              setValue={detailsForm.setValue}
               level1Cats={level1Cats}
               level2Cats={level2Cats}
               mainCategory={mainCategory}
@@ -532,13 +465,17 @@ console.log('isValid', isValid);
 
             <TitleAndSubtitle title="Hierarchy preview" description={hierarchyPreview} />
           </div>
-        </div>
+        </form>
       ),
     },
     {
       title: 'Final review',
       content: (
-        <div className="flex flex-col gap-4">
+        <form
+          id="confirm-details-form"
+          onSubmit={confirmForm.handleSubmit(handleSave)}
+          className="flex flex-col gap-4"
+        >
           <div className="border-primary/10 bg-platinum-black rounded-lg border p-4">
             <p className="text-primary text-sm font-semibold">Ready to save</p>
             <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
@@ -548,50 +485,48 @@ console.log('isValid', isValid);
               <p className="text-tertiary">
                 Level: <span className="text-primary">Level {categoryValues.level || '-'}</span>
               </p>
-              {level && (
-                <>
-                  <p className="text-tertiary">
-                    Parent:{' '}
-                    <span className="text-primary">
-                      {isL1(level)
-                        ? 'Main category'
-                        : isL2(level)
-                          ? getCategoryName(level1Cats, mainCategory)
-                          : getCategoryName(level2Cats, subCategory) || '-'}
-                    </span>
-                  </p>
-                  {isL3(level) && 'description' in categoryValues && (
-                    <p className="text-tertiary sm:col-span-2">
-                      Description:{' '}
-                      <span className="text-primary">{categoryValues.description || '-'}</span>
-                    </p>
-                  )}
-                </>
+              <p className="text-tertiary">
+                Parent:{' '}
+                <span className="text-primary">
+                  {isL1(level)
+                    ? 'Main category'
+                    : isL2(level)
+                      ? getCategoryName(level1Cats, mainCategory)
+                      : getCategoryName(level2Cats, subCategory) || '-'}
+                </span>
+              </p>
+              {isL3(level) && 'description' in categoryValues && (
+                <p className="text-tertiary sm:col-span-2">
+                  Description:{' '}
+                  <span className="text-primary">{categoryValues.description || '-'}</span>
+                </p>
               )}
             </div>
           </div>
           <Checkbox
-            register={register('confirmDetails')}
-            error={errors.confirmDetails?.message}
+            register={confirmForm.register('confirm')}
+            error={confirmForm.formState.errors.confirm?.message}
             content="I confirm the category details are correct"
-            checkboxProps={{ name: 'confirmDetails' }}
+            checkboxProps={{ name: 'confirm' }}
             containerClassName="[&_label+*]:whitespace-normal"
           />
-        </div>
+        </form>
       ),
     },
   ];
 
   const handleReset = () => {
+    confirmForm.reset();
     if (isEditMode) {
-      reset(getInitialData(category, mainCatId));
+      detailsForm.reset(getInitialData(category, mainCatId));
     } else {
-      reset(DEFAULT_VALUES);
+      detailsForm.reset(DEFAULT_VALUES);
     }
   };
 
   const handleClose = () => {
-    reset();
+    detailsForm.reset();
+    confirmForm.reset();
     props?.onClose?.();
     removeParams([QUERY_PARAMS_KEY_MAP.category.mode]);
   };
@@ -611,13 +546,8 @@ console.log('isValid', isValid);
       closeOnOutsideClick={false}
       className="bg-secondary-invert [&>div]:first:bg-secondary-invert max-w-lg! [&>div>div]:px-0"
     >
-      <Stepper
-        steps={CATEGORY_MODAL_STEPS}
-        activeStep={activeStep}
-        onStepClick={handleStepChange}
-        className="bg-secondary-invert"
-      >
-        <form onSubmit={handleSubmit(handleSave)} className="flex flex-col gap-5">
+      <Stepper steps={CATEGORY_MODAL_STEPS} activeStep={activeStep} className="bg-secondary-invert">
+        <div className="flex flex-col gap-5">
           <TitleAndSubtitle
             title={stepFields[activeStep].title}
             description={activeStepData.description}
@@ -647,14 +577,13 @@ console.log('isValid', isValid);
                   : { icon: 'solar:arrow-right-linear' }
               }
               buttonProps={{
-                // type: activeStep === CATEGORY_MODAL_STEPS.length - 1 ? 'submit' : 'button',
                 type: 'submit',
-                // onClick: activeStep === CATEGORY_MODAL_STEPS.length - 1 ? undefined : handleNext,
+                form: activeStep === 0 ? 'category-details-form' : 'confirm-details-form',
               }}
               className="sm:max-w-36"
             />
           </div>
-        </form>
+        </div>
       </Stepper>
     </ModalWrapper>
   );

@@ -1,6 +1,7 @@
 import type {
   addProductSchema,
   categorySchema,
+  confirmDetailsSchema,
   level1CategorySchema,
   level2CategorySchema,
   level3CategorySchema,
@@ -33,3 +34,5 @@ export type TLevel2Category = zodInfer<typeof level2CategorySchema>;
 export type TLevel3Category = zodInfer<typeof level3CategorySchema>;
 
 export type TCategory = zodInfer<typeof categorySchema>;
+
+export type TConfirmDetails = zodInfer<typeof confirmDetailsSchema>;

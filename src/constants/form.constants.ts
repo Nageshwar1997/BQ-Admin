@@ -42,6 +42,5 @@ export const FORM_DEFAULT_VALUES = {
     mainCategory: '',
     subCategory: '',
     description: '',
-    confirmDetails: false,
   },
 } as const;
