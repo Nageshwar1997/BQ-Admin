@@ -5,7 +5,7 @@ import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util
 import { toaster } from '@/utils/common.util';
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
 
-const { get, add, update } = PRODUCT_SERVICE_QUERY_KEYS.category;
+const { get, add, update, delete: remove } = PRODUCT_SERVICE_QUERY_KEYS.category;
 
 export const useAddCategory = () => {
   return useMutation({
@@ -18,7 +18,7 @@ export const useAddCategory = () => {
       });
       return { toastId };
     },
-    onSuccess: async ({ message }) => handleApiSuccessToaster(message),
+    onSuccess: ({ message }) => handleApiSuccessToaster(message),
     onError: (error) => handleApiErrorToaster(error),
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
@@ -37,7 +37,26 @@ export const useUpdateCategory = () => {
       });
       return { toastId };
     },
-    onSuccess: async ({ message }) => handleApiSuccessToaster(message),
+    onSuccess: ({ message }) => handleApiSuccessToaster(message),
+    onError: (error) => handleApiErrorToaster(error),
+    onSettled: (_data, _error, _variables, context) => {
+      if (context?.toastId) toaster.remove(context.toastId);
+    },
+  });
+};
+
+export const useDeleteCategory = () => {
+  return useMutation({
+    mutationKey: remove,
+    mutationFn: productApi.deleteCategory,
+    onMutate: () => {
+      const toastId = toaster.loading({
+        title: 'Please wait...',
+        description: 'Deleting category...',
+      });
+      return { toastId };
+    },
+    onSuccess: ({ message }) => handleApiSuccessToaster(message),
     onError: (error) => handleApiErrorToaster(error),
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);

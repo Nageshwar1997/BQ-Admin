@@ -21,6 +21,13 @@ export class ProductApi extends ApiRequest {
     return this.request({ ...this.routes.category.update, data });
   };
 
+  /* ===================== DELETE API ===================== */
+
+  public deleteCategory = (categoryId: string) => {
+    const { method, url } = this.routes.category.delete;
+    return this.request({ method, url: `${url}/${categoryId}` });
+  };
+
   /* ===================== GET API ===================== */
 
   public getCategoriesByParentLevel = (params: Partial<Pick<ICategory, 'level' | 'parent'>>) => {

@@ -43,6 +43,7 @@ export const API_METHODS_AND_URLS = {
       category: {
         add: { method: METHODS.POST, url: '/category/add' },
         update: { method: METHODS.PATCH, url: '/category/update' },
+        delete: { method: METHODS.DELETE, url: '/category/delete' },
         get: {
           byParentLevel: { method: METHODS.GET, url: '/category/by-parent-level' },
         },
@@ -80,6 +81,7 @@ export const PRODUCT_SERVICE_QUERY_KEYS = {
   category: {
     add: ['add_category'],
     update: ['update_category'],
+    delete: ['delete_category'],
     get: {
       all: ['get_all_categories'],
     },
