@@ -1,5 +1,6 @@
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
+import Tooltip from '@/components/ui/Tooltip';
 import { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
 import type { ICategory } from '@/types/api.type';
 import type { TCategory, TLevel2Category, TLevel3Category } from '@/types/schema.type';
@@ -17,6 +18,7 @@ type TCommonFields = {
   control: Control<TCategory>;
   level: TCategory['level'];
   setValue: UseFormSetValue<TCategory>;
+  isLevelDisabled: boolean;
 };
 
 type TLevel1Fields = TCommonFields;
@@ -30,7 +32,14 @@ type TLevel3Fields = Omit<TLevel2Fields, 'mainCategory'> & {
   subCategory: TLevel3Category['subCategory'];
 };
 
-const CommonFields = ({ register, errors, control, level, setValue }: TCommonFields) => (
+const CommonFields = ({
+  register,
+  errors,
+  control,
+  level,
+  setValue,
+  isLevelDisabled,
+}: TCommonFields) => (
   <>
     <Input
       label="Category name"
@@ -42,32 +51,35 @@ const CommonFields = ({ register, errors, control, level, setValue }: TCommonFie
       }}
     />
 
-    <Controller
-      name="level"
-      control={control}
-      render={({ field: { onChange, value } }) => (
-        <Select
-          label="Category level"
-          options={['Main', 'Sub', 'Product'].map((name, i) => ({
-            value: i + CATEGORY_LEVELS_MAP.L1,
-            label: `L${i + CATEGORY_LEVELS_MAP.L1} - ${name} category`,
-            disabled: i + 1 === level,
-          }))}
-          error={errors.level?.message}
-          selectProps={{
-            value,
-            placeholder: 'Select category level',
-            onChange: (value) => {
-              onChange(value);
+    <Tooltip title="Cannot change category level" required={isLevelDisabled}>
+      <Controller
+        name="level"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Select
+            label="Category level"
+            options={['Main', 'Sub', 'Product'].map((name, i) => ({
+              value: i + CATEGORY_LEVELS_MAP.L1,
+              label: `L${i + CATEGORY_LEVELS_MAP.L1} - ${name} category`,
+              disabled: i + 1 === level,
+            }))}
+            error={errors.level?.message}
+            selectProps={{
+              value,
+              placeholder: 'Select category level',
+              disabled: isLevelDisabled,
+              onChange: (value) => {
+                onChange(value);
 
-              setValue('mainCategory', undefined);
-              setValue('subCategory', undefined);
-              setValue('description', undefined);
-            },
-          }}
-        />
-      )}
-    />
+                setValue('mainCategory', undefined);
+                setValue('subCategory', undefined);
+                setValue('description', undefined);
+              },
+            }}
+          />
+        )}
+      />
+    </Tooltip>
   </>
 );
 
@@ -75,7 +87,14 @@ const CommonFields = ({ register, errors, control, level, setValue }: TCommonFie
 /*                              LEVEL 1 FIELDS                                */
 /* -------------------------------------------------------------------------- */
 
-export const Level1Fields = ({ register, errors, control, level, setValue }: TLevel1Fields) => {
+export const Level1Fields = ({
+  register,
+  errors,
+  control,
+  level,
+  setValue,
+  isLevelDisabled,
+}: TLevel1Fields) => {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <CommonFields
@@ -84,6 +103,7 @@ export const Level1Fields = ({ register, errors, control, level, setValue }: TLe
         control={control}
         level={level}
         setValue={setValue}
+        isLevelDisabled={isLevelDisabled}
       />
     </div>
   );
@@ -101,6 +121,7 @@ export const Level2Fields = ({
   setValue,
   level1Cats,
   mainCategory,
+  isLevelDisabled,
 }: TLevel2Fields) => {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -110,6 +131,7 @@ export const Level2Fields = ({
         control={control}
         level={level}
         setValue={setValue}
+        isLevelDisabled={isLevelDisabled}
       />
       <Controller
         name="mainCategory"
@@ -145,6 +167,7 @@ export const Level3Fields = ({
   level2Cats,
   mainCategory,
   subCategory,
+  isLevelDisabled,
 }: TLevel3Fields) => {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -154,6 +177,7 @@ export const Level3Fields = ({
         control={control}
         level={level}
         setValue={setValue}
+        isLevelDisabled={isLevelDisabled}
       />
 
       <Controller

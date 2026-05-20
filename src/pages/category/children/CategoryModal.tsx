@@ -252,6 +252,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               control={detailsForm.control}
               level={level}
               setValue={detailsForm.setValue}
+              isLevelDisabled={isEditMode}
             />
           )}
 
@@ -264,6 +265,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               setValue={detailsForm.setValue}
               level1Cats={level1Cats}
               mainCategory={mainCategory || ''}
+              isLevelDisabled={isEditMode}
             />
           )}
 
@@ -278,6 +280,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               level2Cats={level2Cats}
               mainCategory={mainCategory || ''}
               subCategory={subCategory || ''}
+              isLevelDisabled={isEditMode}
             />
           )}
 
