@@ -258,7 +258,7 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
                 />
                 {selectedId === category._id && (
                   <TableRow>
-                    <TableRowCell colSpan={4} className="border-b-0 p-0! pt-3!">
+                    <TableRowCell colSpan={4} className="border-b-0 px-1!">
                       <L3Table
                         onDelete={onDelete}
                         onEdit={onEdit}
@@ -359,7 +359,7 @@ const L1Table = () => {
                   />
                   {selectedId === category._id && (
                     <TableRow>
-                      <TableRowCell colSpan={4} className="border-b-0 p-0! pt-3!">
+                      <TableRowCell colSpan={4} className="border-b-0 px-1!">
                         <L2Table
                           onDelete={(categoryId) => setDeleteId(categoryId)}
                           onEdit={handleEdit}

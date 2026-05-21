@@ -3,11 +3,13 @@ import { PRODUCT_SERVICE_QUERY_KEYS } from '@/constants/api.constants';
 import type { ICategory } from '@/types/api.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const { get, add, update, delete: remove } = PRODUCT_SERVICE_QUERY_KEYS.category;
 
 export const useAddCategory = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: add,
     mutationFn: productApi.addCategory,
@@ -18,7 +20,11 @@ export const useAddCategory = () => {
       });
       return { toastId };
     },
-    onSuccess: ({ message }) => handleApiSuccessToaster(message),
+    onSuccess: async ({ message }) => {
+      handleApiSuccessToaster(message);
+      await queryClient.invalidateQueries({ queryKey: get.all });
+    },
+
     onError: (error) => handleApiErrorToaster(error),
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
@@ -27,6 +33,8 @@ export const useAddCategory = () => {
 };
 
 export const useUpdateCategory = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: update,
     mutationFn: productApi.updateCategory,
@@ -37,7 +45,10 @@ export const useUpdateCategory = () => {
       });
       return { toastId };
     },
-    onSuccess: ({ message }) => handleApiSuccessToaster(message),
+    onSuccess: async ({ message }) => {
+      handleApiSuccessToaster(message);
+      await queryClient.invalidateQueries({ queryKey: get.all });
+    },
     onError: (error) => handleApiErrorToaster(error),
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
@@ -46,6 +57,8 @@ export const useUpdateCategory = () => {
 };
 
 export const useDeleteCategory = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: remove,
     mutationFn: productApi.deleteCategory,
@@ -56,7 +69,10 @@ export const useDeleteCategory = () => {
       });
       return { toastId };
     },
-    onSuccess: ({ message }) => handleApiSuccessToaster(message),
+    onSuccess: async ({ message }) => {
+      handleApiSuccessToaster(message);
+      await queryClient.invalidateQueries({ queryKey: get.all });
+    },
     onError: (error) => handleApiErrorToaster(error),
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
