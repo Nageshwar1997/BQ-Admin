@@ -7,20 +7,19 @@ import type { ICategory } from '@/types/api.type';
 import type { TClassName } from '@/types/component.type';
 import { useEffect, useState } from 'react';
 
+const q_cat_keys = QUERY_PARAMS_KEY_MAP.category;
+
 const QUERY_CLEAR_MAP = {
-  [QUERY_PARAMS_KEY_MAP.category.level.l1]: [
-    QUERY_PARAMS_KEY_MAP.category.level.l2,
-    QUERY_PARAMS_KEY_MAP.category.level.l3,
-  ],
-  [QUERY_PARAMS_KEY_MAP.category.level.l2]: [QUERY_PARAMS_KEY_MAP.category.level.l3],
-  [QUERY_PARAMS_KEY_MAP.category.level.l3]: [],
+  [q_cat_keys.level.l1.search]: [q_cat_keys.level.l2.search, q_cat_keys.level.l3.search],
+  [q_cat_keys.level.l2.search]: [q_cat_keys.level.l3.search],
+  [q_cat_keys.level.l3.search]: [],
 };
 
 const CategorySearchInput = ({ level }: Pick<ICategory, 'level'>) => {
   const { queryParams, setParams } = useQueryParams();
 
-  const queryKey = `l${level}` as keyof typeof QUERY_PARAMS_KEY_MAP.category.level;
-
+  const queryKey =
+    `search_${level}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['search'];
   const [searchQuery, setSearchQuery] = useState(queryParams[queryKey] || '');
 
   const handleSearch = useDebounce({

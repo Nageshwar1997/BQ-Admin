@@ -163,9 +163,9 @@ export const QUERY_PARAMS_KEY_MAP = {
     add: 'add', // To Open Add Category Modal
     edit: 'edit', // To Open Edit Category Modal
     level: {
-      l1: 'l1', // To Set Search Query for Level 1 Category
-      l2: 'l2', // To Set Search Query for Level 2 Category
-      l3: 'l3', // To Set Search Query for Level 3 Category
+      l1: { search: 'search_1', sort: 'sort_1' }, // To Set Filter Query for Level 1 Category
+      l2: { search: 'search_2', sort: 'sort_2' }, // To Set Filter Query for Level 2 Category
+      l3: { search: 'search_3', sort: 'sort_3' }, // To Set Filter Query for Level 3 Category
     },
   },
   confirm: 'confirm', // To Open Confirm Modal

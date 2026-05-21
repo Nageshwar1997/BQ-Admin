@@ -42,7 +42,6 @@ import CategoryTableTopInfo from './children/CategoryTableTopInfo';
 
 const TH_TITLES = ['Category', 'Level', 'Parent', 'Actions'] as const;
 
-const queryKeys = QUERY_PARAMS_KEY_MAP;
 const q_cat_keys = QUERY_PARAMS_KEY_MAP.category;
 
 const ApiStatusRow = (
@@ -80,8 +79,20 @@ const ApiStatusRow = (
   );
 };
 
-const CategoryHead = () => {
+const CategoryHead = ({ level }: { level: ICategory['level'] }) => {
   const { queryParams, removeParams, setParams } = useQueryParams();
+  const sortKey =
+    `sort_${level}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['sort'];
+
+  const handleSort = () => {
+    if (queryParams[sortKey] === SORT_ORDER_MAP.asc) {
+      setParams({ ...queryParams, [sortKey]: SORT_ORDER_MAP.desc });
+    } else if (queryParams[sortKey] === SORT_ORDER_MAP.desc) {
+      removeParams([sortKey]);
+    } else {
+      setParams({ ...queryParams, [sortKey]: SORT_ORDER_MAP.asc });
+    }
+  };
   return (
     <TableHead>
       <TableRow>
@@ -90,23 +101,15 @@ const CategoryHead = () => {
             {title === 'Category' ? (
               <button
                 type="button"
-                onClick={() => {
-                  if (queryParams[queryKeys.sort] === SORT_ORDER_MAP.asc) {
-                    setParams({ [queryKeys.sort]: SORT_ORDER_MAP.desc });
-                  } else if (queryParams[queryKeys.sort] === SORT_ORDER_MAP.desc) {
-                    removeParams([queryKeys.sort]);
-                  } else {
-                    setParams({ [queryKeys.sort]: SORT_ORDER_MAP.asc });
-                  }
-                }}
+                onClick={handleSort}
                 className="hover:text-primary/80 group flex cursor-pointer items-center gap-2"
               >
                 {title}
                 <Icon
                   icon={
-                    queryParams[queryKeys.sort] === SORT_ORDER_MAP.asc
+                    queryParams[sortKey] === SORT_ORDER_MAP.asc
                       ? 'solar:arrow-up-linear'
-                      : queryParams[queryKeys.sort] === SORT_ORDER_MAP.desc
+                      : queryParams[sortKey] === SORT_ORDER_MAP.desc
                         ? 'solar:arrow-down-linear'
                         : 'solar:sort-linear'
                   }
@@ -153,8 +156,8 @@ const CategoryRow = (props: TCatTable & ComponentProps<'tr'>) => {
 
 const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable) => {
   const { queryParams } = useQueryParams();
-  const search = useDeferredValue(queryParams[q_cat_keys.level.l3]);
-  const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
+  const search = useDeferredValue(queryParams[q_cat_keys.level.l3.search]);
+  const sort = useDeferredValue(queryParams[q_cat_keys.level.l3.sort]) as TSort;
 
   const {
     data = [],
@@ -178,7 +181,7 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
         name={parentCat.name}
       />
       <Table>
-        <CategoryHead />
+        <CategoryHead level={CATEGORY_LEVELS_MAP.L3} />
         <TableBody>
           {filteredCats.length ? (
             filteredCats.map((category) => (
@@ -207,8 +210,8 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
 
 const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
   const { queryParams } = useQueryParams();
-  const search = useDeferredValue(queryParams[q_cat_keys.level.l2]);
-  const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
+  const search = useDeferredValue(queryParams[q_cat_keys.level.l2.search]);
+  const sort = useDeferredValue(queryParams[q_cat_keys.level.l2.sort]) as TSort;
   const [selectedId, setSelectedId] = useState('');
   const {
     data = [],
@@ -236,7 +239,7 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
         name={parentCat.name}
       />
       <Table>
-        <CategoryHead />
+        <CategoryHead level={CATEGORY_LEVELS_MAP.L2} />
         <TableBody>
           {filteredCats.length ? (
             filteredCats.map((category) => (
@@ -286,8 +289,8 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
 
 const L1Table = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
-  const search = useDeferredValue(queryParams[q_cat_keys.level.l1]);
-  const sort = useDeferredValue(queryParams[queryKeys.sort]) as TSort;
+  const search = useDeferredValue(queryParams[q_cat_keys.level.l1.search]);
+  const sort = useDeferredValue(queryParams[q_cat_keys.level.l2.sort]) as TSort;
   const [selectedId, setSelectedId] = useState('');
   const [editData, setEditData] = useState<TCatModal | null>(null);
   const [deleteId, setDeleteId] = useState('');
@@ -306,15 +309,15 @@ const L1Table = () => {
     setParams({ [q_cat_keys.mode]: q_cat_keys.edit });
   };
 
-const handleDelete = async () => {
-  await deleteCategoryAsync(deleteId, {
-    onSettled: () => {
-      setDeleteId('');
+  const handleDelete = async () => {
+    await deleteCategoryAsync(deleteId, {
+      onSettled: () => {
+        setDeleteId('');
 
-      setSelectedId((prev) => (prev === deleteId ? '' : prev));
-    },
-  });
-};
+        setSelectedId((prev) => (prev === deleteId ? '' : prev));
+      },
+    });
+  };
 
   const handleOnClose = () => {
     setEditData(null);
@@ -343,7 +346,7 @@ const handleDelete = async () => {
         gradientClassNames={{ left: 'from-secondary-invert', right: 'from-secondary-invert' }}
       >
         <Table>
-          <CategoryHead />
+          <CategoryHead level={CATEGORY_LEVELS_MAP.L1} />
           <TableBody>
             {filteredCats.length ? (
               filteredCats.map((category) => (
