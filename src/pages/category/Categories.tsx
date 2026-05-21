@@ -306,9 +306,15 @@ const L1Table = () => {
     setParams({ [q_cat_keys.mode]: q_cat_keys.edit });
   };
 
-  const handleDelete = async () => {
-    await deleteCategoryAsync(deleteId, { onSettled: () => setDeleteId('') });
-  };
+const handleDelete = async () => {
+  await deleteCategoryAsync(deleteId, {
+    onSettled: () => {
+      setDeleteId('');
+
+      setSelectedId((prev) => (prev === deleteId ? '' : prev));
+    },
+  });
+};
 
   const handleOnClose = () => {
     setEditData(null);
