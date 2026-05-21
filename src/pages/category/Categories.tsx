@@ -410,7 +410,7 @@ const L1Table = () => {
 };
 
 const Categories = () => {
-  const { queryParams, setParams } = useQueryParams();
+  const { queryParams, setParams, clearParams } = useQueryParams();
 
   return (
     <Fragment>
@@ -419,9 +419,14 @@ const Categories = () => {
         <Navbar
           buttons={[
             {
-              content: 'Add Category',
+              content: 'Clear',
+              pattern: 'secondary',
+              leftIcon: { icon: 'solar:eraser-linear', className: '*:stroke-[2.5]' },
+              buttonProps: { onClick: clearParams },
+            },
+            {
+              content: 'Add',
               pattern: 'primary',
-              className: 'whitespace-nowrap',
               leftIcon: { icon: 'solar:add-circle-linear', className: '*:stroke-[2.5]' },
               buttonProps: { onClick: () => setParams({ [q_cat_keys.mode]: q_cat_keys.add }) },
             },
