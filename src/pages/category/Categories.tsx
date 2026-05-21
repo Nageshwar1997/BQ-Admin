@@ -307,7 +307,7 @@ const L1Table = () => {
   };
 
   const handleDelete = async () => {
-    await deleteCategoryAsync(deleteId, { onSuccess: () => setDeleteId('') });
+    await deleteCategoryAsync(deleteId, { onSettled: () => setDeleteId('') });
   };
 
   const handleOnClose = () => {
