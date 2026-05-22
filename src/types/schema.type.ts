@@ -2,9 +2,9 @@ import type {
   addProductSchema,
   categorySchema,
   confirmDetailsSchema,
-  level1CategorySchema,
-  level2CategorySchema,
-  level3CategorySchema,
+  l1CategorySchema,
+  l2CategorySchema,
+  l3CategorySchema,
 } from '@/schemas/product.schema';
 import type {
   changePasswordSchema,
@@ -27,11 +27,11 @@ export type TLogin = zodInfer<typeof loginSchema>;
 
 export type TAddProduct = zodInfer<typeof addProductSchema>;
 
-export type TLevel1Category = zodInfer<typeof level1CategorySchema>;
+export type TL1Category = zodInfer<typeof l1CategorySchema>;
 
-export type TLevel2Category = zodInfer<typeof level2CategorySchema>;
+export type TL2Category = zodInfer<typeof l2CategorySchema>;
 
-export type TLevel3Category = zodInfer<typeof level3CategorySchema>;
+export type TL3Category = zodInfer<typeof l3CategorySchema>;
 
 export type TCategory = zodInfer<typeof categorySchema>;
 

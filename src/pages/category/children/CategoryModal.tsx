@@ -76,7 +76,7 @@ const getPayload = (data: TCategory) => {
 
     case CATEGORY_LEVELS_MAP.L1:
     default:
-      return { name, level, parent: null, description: undefined };
+      return { name, level, parent: undefined, description: undefined };
   }
 };
 
@@ -215,8 +215,24 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     }
 
     if (isEditMode) {
+      const updatedPayload: Partial<Omit<ICategory, 'slug' | '_id'>> = {};
+
+      Object.keys(payload).forEach((itemKey) => {
+        const key = itemKey as keyof Omit<ICategory, 'slug' | '_id'>;
+        if (!deepEqual(payload[key], initialPayload?.[key])) {
+          (updatedPayload[key] as unknown) = payload[key];
+        }
+      });
+
+      if (Object.keys(updatedPayload).length === 0) {
+        return toaster.error({
+          title: 'No changes to save',
+          description: 'Make changes and try again.',
+        });
+      }
+
       await updateCategoryAsync(
-        { ...payload, _id: category._id },
+        { ...updatedPayload, _id: category._id },
         {
           onSuccess: () => handleClose(),
           onError: ({ fieldErrors }) => {

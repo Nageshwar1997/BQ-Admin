@@ -72,7 +72,7 @@ const baseCategorySchema = object({
 /*                               LEVEL 1 SCHEMA                               */
 /* -------------------------------------------------------------------------- */
 
-export const level1CategorySchema = baseCategorySchema.extend({
+export const l1CategorySchema = baseCategorySchema.extend({
   level: literal(CATEGORY_LEVELS_MAP.L1),
 });
 
@@ -80,7 +80,7 @@ export const level1CategorySchema = baseCategorySchema.extend({
 /*                               LEVEL 2 SCHEMA                               */
 /* -------------------------------------------------------------------------- */
 
-export const level2CategorySchema = baseCategorySchema.extend({
+export const l2CategorySchema = baseCategorySchema.extend({
   level: literal(CATEGORY_LEVELS_MAP.L2),
 
   mainCategory: validateString(MAIN_CATEGORY_OPTIONS),
@@ -90,7 +90,7 @@ export const level2CategorySchema = baseCategorySchema.extend({
 /*                               LEVEL 3 SCHEMA                               */
 /* -------------------------------------------------------------------------- */
 
-export const level3CategorySchema = baseCategorySchema.extend({
+export const l3CategorySchema = baseCategorySchema.extend({
   level: literal(CATEGORY_LEVELS_MAP.L3),
   mainCategory: validateString(MAIN_CATEGORY_OPTIONS),
   subCategory: validateString(SUB_CATEGORY_OPTIONS),
@@ -102,9 +102,9 @@ export const level3CategorySchema = baseCategorySchema.extend({
 /* -------------------------------------------------------------------------- */
 
 export const categorySchema = union([
-  level1CategorySchema,
-  level2CategorySchema,
-  level3CategorySchema,
+  l1CategorySchema,
+  l2CategorySchema,
+  l3CategorySchema,
 ]);
 
 /* -------------------------------------------------------------------------- */

@@ -25,8 +25,7 @@ export interface IUser extends Pick<TLogin, 'password'>, TEmail, IId, ITimeStamp
   phoneNumber: string;
 }
 
-export interface ICategory extends IId, Pick<TCategory, 'level' | 'name'> {
+export interface ICategory extends IId, Pick<TCategory, 'level' | 'name' | 'description'> {
   slug: string;
-  parent?: string | null;
-  description?: string | null;
+  parent?: string;
 }

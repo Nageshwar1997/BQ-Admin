@@ -1,5 +1,5 @@
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
-import type { ICategory } from '@/types/api.type';
+import type { ICategory, IId } from '@/types/api.type';
 import { ApiRequest } from '../ApiRequest';
 
 export class ProductApi extends ApiRequest {
@@ -17,7 +17,7 @@ export class ProductApi extends ApiRequest {
 
   /* ===================== POST API ===================== */
 
-  public updateCategory = ({ _id, ...data }: Omit<ICategory, 'slug'>) => {
+  public updateCategory = ({ _id, ...data }: Partial<Omit<ICategory, 'slug'>> & IId) => {
     const { method, url } = this.routes.category.update;
     return this.request({ method, url: `${url}/${_id}`, data });
   };
