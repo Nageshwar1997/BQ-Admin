@@ -412,6 +412,17 @@ const L1Table = () => {
 const Categories = () => {
   const { queryParams, setParams, clearParams } = useQueryParams();
 
+  const params = useMemo(() => {
+    return [
+      queryParams[q_cat_keys.level.l1.search],
+      queryParams[q_cat_keys.level.l1.sort],
+      queryParams[q_cat_keys.level.l2.search],
+      queryParams[q_cat_keys.level.l2.sort],
+      queryParams[q_cat_keys.level.l3.search],
+      queryParams[q_cat_keys.level.l3.sort],
+    ].filter(Boolean);
+  }, [queryParams]);
+
   return (
     <Fragment>
       {queryParams[q_cat_keys.mode] === q_cat_keys.add && <CategoryModal />}
@@ -423,6 +434,7 @@ const Categories = () => {
               pattern: 'secondary',
               leftIcon: { icon: 'solar:eraser-linear', className: '*:stroke-[2.5]' },
               buttonProps: { onClick: clearParams },
+              className: !params.length ? 'hidden' : '',
             },
             {
               content: 'Add',
