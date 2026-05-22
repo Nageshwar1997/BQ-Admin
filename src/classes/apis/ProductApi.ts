@@ -17,8 +17,9 @@ export class ProductApi extends ApiRequest {
 
   /* ===================== POST API ===================== */
 
-  public updateCategory = (data: Omit<ICategory, 'slug'>) => {
-    return this.request({ ...this.routes.category.update, data });
+  public updateCategory = ({ _id, ...data }: Omit<ICategory, 'slug'>) => {
+    const { method, url } = this.routes.category.update;
+    return this.request({ method, url: `${url}/${_id}`, data });
   };
 
   /* ===================== DELETE API ===================== */
