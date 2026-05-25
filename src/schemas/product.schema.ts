@@ -1,4 +1,4 @@
-import { array, boolean, discriminatedUnion, literal, number, object, string } from 'zod';
+import { array, boolean, literal, number, object, string, enum as z_enum } from 'zod';
 
 /* -------------------------------------------------------------------------- */
 /*                             STEP 1 : BASIC INFO                            */
@@ -77,59 +77,110 @@ export const productDescriptionSchema = object({
 /*                  STEP 5 : VARIANTS & SPECIFICATIONS                        */
 /* -------------------------------------------------------------------------- */
 
-const colorVariantSchema = object({
-  type: literal('color'),
-
-  label: string()
-    .min(2, 'Color label must be at least 2 characters.')
-    .max(50, 'Color label cannot exceed 50 characters.'),
-
-  value: string().regex(/^#([0-9A-F]{3}){1,2}$/i, 'Invalid hex color code.'),
-
-  sku: string()
-    .min(3, 'SKU must be at least 3 characters.')
-    .max(100, 'SKU cannot exceed 100 characters.'),
-
-  price: number().min(1, 'Price must be greater than 0.'),
-
-  discountedPrice: number().min(0, 'Discounted price cannot be negative.').optional(),
-
-  stock: number().min(0, 'Stock cannot be negative.'),
-
-  images: array(string()).optional(),
-}).refine((data) => data.discountedPrice === undefined || data.discountedPrice <= data.price, {
-  path: ['discountedPrice'],
-  message: 'Discounted price cannot be greater than actual price.',
-});
-
-const textVariantSchema = object({
-  type: literal('text'),
-
-  value: string()
-    .min(1, 'Variant value is required.')
-    .max(50, 'Variant value cannot exceed 50 characters.'),
-
-  sku: string()
-    .min(3, 'SKU must be at least 3 characters.')
-    .max(100, 'SKU cannot exceed 100 characters.'),
-
-  price: number().min(1, 'Price must be greater than 0.'),
-
-  discountedPrice: number().min(0, 'Discounted price cannot be negative.').optional(),
-
-  stock: number().min(0, 'Stock cannot be negative.'),
-
-  images: array(string()).optional(),
-}).refine((data) => data.discountedPrice === undefined || data.discountedPrice <= data.price, {
-  path: ['discountedPrice'],
-  message: 'Discounted price cannot be greater than actual price.',
-});
-
 export const productVariantsSchema = object({
-  variants: array(discriminatedUnion('type', [colorVariantSchema, textVariantSchema])).min(
-    1,
-    'At least one variant is required.',
-  ),
+  variants: array(
+    object({
+      type: z_enum(['color', 'text']),
+
+      label: string().optional(),
+
+      value: string(),
+
+      sku: string()
+        .min(3, 'SKU must be at least 3 characters.')
+        .max(100, 'SKU cannot exceed 100 characters.'),
+
+      price: number().min(1, 'Price must be greater than 0.'),
+
+      discountedPrice: number().min(0, 'Discounted price cannot be negative.').optional(),
+
+      stock: number().min(0, 'Stock cannot be negative.'),
+
+      images: array(string()).optional(),
+    }).superRefine((data, ctx) => {
+      /* -------------------------------------------------------------------------- */
+      /*                               COMMON CHECKS                                 */
+      /* -------------------------------------------------------------------------- */
+
+      if (data.discountedPrice !== undefined && data.discountedPrice > data.price) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['discountedPrice'],
+          message: 'Discounted price cannot be greater than actual price.',
+        });
+      }
+
+      /* -------------------------------------------------------------------------- */
+      /*                               COLOR VARIANT                                */
+      /* -------------------------------------------------------------------------- */
+
+      if (data.type === 'color') {
+        if (!data.label) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['label'],
+            message: 'Color label is required.',
+          });
+        } else {
+          if (data.label.length < 2) {
+            ctx.addIssue({
+              code: 'custom',
+              path: ['label'],
+              message: 'Color label must be at least 2 characters.',
+            });
+          }
+
+          if (data.label.length > 50) {
+            ctx.addIssue({
+              code: 'custom',
+              path: ['label'],
+              message: 'Color label cannot exceed 50 characters.',
+            });
+          }
+        }
+
+        const isValidHex = /^#([0-9A-F]{3}){1,2}$/i.test(data.value);
+
+        if (!isValidHex) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['value'],
+            message: 'Invalid hex color code.',
+          });
+        }
+      }
+
+      /* -------------------------------------------------------------------------- */
+      /*                                TEXT VARIANT                                */
+      /* -------------------------------------------------------------------------- */
+
+      if (data.type === 'text') {
+        if (!data.value.trim()) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['value'],
+            message: 'Variant value is required.',
+          });
+        }
+
+        if (data.value.length < 1) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['value'],
+            message: 'Variant value must be at least 1 character.',
+          });
+        }
+
+        if (data.value.length > 50) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['value'],
+            message: 'Variant value cannot exceed 50 characters.',
+          });
+        }
+      }
+    }),
+  ).min(1, 'At least one variant is required.'),
 
   specifications: array(
     object({
