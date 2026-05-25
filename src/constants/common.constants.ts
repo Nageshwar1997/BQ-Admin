@@ -155,43 +155,50 @@ export const CATEGORY_MODAL_STEPS: StepperStep[] = [
 
 export const ADD_PRODUCT_STEPS: StepperStep[] = [
   {
-    title: 'Step 1',
-    description: 'Basic information',
+    title: 'Basic information',
+    description: 'Set product type, pricing and brand details',
     icon: 'solar:tag-price-linear',
   },
+
   {
-    title: 'Step 2',
-    description: 'Category and inventory',
+    title: 'Category and inventory',
+    description: 'Manage categories, stock and publish settings',
     icon: 'solar:box-linear',
   },
+
   {
-    title: 'Step 3',
-    description: 'Media and gallery',
+    title: 'Media and gallery',
+    description: 'Upload thumbnails, product images and videos',
     icon: 'solar:gallery-linear',
   },
+
   {
-    title: 'Step 4',
-    description: 'Description and details',
+    title: 'Description and details',
+    description: 'Add descriptions, usage instructions and ingredients',
     icon: 'solar:document-text-linear',
   },
+
   {
-    title: 'Step 5',
-    description: 'Variants and specifications',
+    title: 'Variants and pricing',
+    description: 'Configure variants, pricing and stock',
     icon: 'solar:list-check-linear',
   },
+
   {
-    title: 'Step 6',
-    description: 'TryOn configuration',
+    title: 'TryOn configuration',
+    description: 'Setup TryOn model and related assets',
     icon: 'solar:face-scan-square-linear',
   },
+
   {
-    title: 'Step 7',
-    description: 'SEO and visibility',
+    title: 'SEO and visibility',
+    description: 'Optimize search visibility and metadata',
     icon: 'solar:global-linear',
   },
+
   {
-    title: 'Step 8',
-    description: 'Confirm before save',
+    title: 'Review and confirm',
+    description: 'Verify all details before saving product',
     icon: 'solar:check-circle-linear',
   },
 ];

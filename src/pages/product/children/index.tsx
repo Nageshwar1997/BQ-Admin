@@ -20,7 +20,6 @@ import { Controller, useFieldArray, type UseFormReturn } from 'react-hook-form';
 
 export const BasicInfoFields = ({ form }: { form: UseFormReturn<TProductBasicInfo> }) => {
   const {
-    control,
     register,
     formState: { errors },
   } = form;
@@ -43,35 +42,6 @@ export const BasicInfoFields = ({ form }: { form: UseFormReturn<TProductBasicInf
         inputProps={{
           placeholder: 'Brand name',
         }}
-      />
-
-      <Input
-        label="Base SKU"
-        register={register('baseSku')}
-        error={errors.baseSku?.message}
-        inputProps={{
-          placeholder: 'PRD-1001',
-        }}
-      />
-
-      <Controller
-        name="productType"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            label="Product type"
-            error={errors.productType?.message}
-            options={[
-              { label: 'Without variants', value: 'without-variants' },
-              { label: 'With variants', value: 'with-variants' },
-            ]}
-            selectProps={{
-              value,
-              onChange,
-              placeholder: 'Select product type',
-            }}
-          />
-        )}
       />
 
       <Input
@@ -119,34 +89,51 @@ export const CategoryInventoryFields = ({
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <Controller
-        name="mainCategory"
+        name="l1Category"
         control={control}
         render={({ field: { onChange, value } }) => (
           <Select
             label="Main category"
-            error={errors.mainCategory?.message}
+            error={errors.l1Category?.message}
             options={[]}
             selectProps={{
               value,
               onChange,
-              placeholder: 'Select main category',
+              placeholder: 'Select (L1) main category',
             }}
           />
         )}
       />
 
       <Controller
-        name="subCategory"
+        name="l2Category"
         control={control}
         render={({ field: { onChange, value } }) => (
           <Select
             label="Sub-category"
-            error={errors.subCategory?.message}
+            error={errors.l2Category?.message}
             options={[]}
             selectProps={{
               value,
               onChange,
-              placeholder: 'Select sub-category',
+              placeholder: 'Select (L2) sub-category',
+            }}
+          />
+        )}
+      />
+
+      <Controller
+        name="l3Category"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Select
+            label="Product category"
+            error={errors.l3Category?.message}
+            options={[]}
+            selectProps={{
+              value,
+              onChange,
+              placeholder: 'Select (L3) product category',
             }}
           />
         )}
@@ -164,7 +151,7 @@ export const CategoryInventoryFields = ({
         }}
       />
 
-      <Input
+      {/* <Input
         label="Low stock threshold"
         register={register('lowStockThreshold', {
           valueAsNumber: true,
@@ -174,16 +161,7 @@ export const CategoryInventoryFields = ({
           type: 'number',
           placeholder: '10',
         }}
-      />
-
-      <Checkbox
-        register={register('isPublished')}
-        error={errors.isPublished?.message}
-        content="Publish product"
-        checkboxProps={{
-          name: 'isPublished',
-        }}
-      />
+      /> */}
     </div>
   );
 };
@@ -359,15 +337,6 @@ export const VariantsFields = ({ form }: { form: UseFormReturn<TProductVariants>
             />
 
             <Input
-              label="SKU"
-              register={register(`variants.${index}.sku`)}
-              error={errors.variants?.[index]?.sku?.message}
-              inputProps={{
-                placeholder: 'PRD-1001-BLK',
-              }}
-            />
-
-            <Input
               label="Price"
               register={register(`variants.${index}.price`, {
                 valueAsNumber: true,
@@ -428,7 +397,6 @@ export const VariantsFields = ({ form }: { form: UseFormReturn<TProductVariants>
               type: 'text',
               label: '',
               value: '',
-              sku: '',
               price: 0,
               discountedPrice: 0,
               stock: 0,

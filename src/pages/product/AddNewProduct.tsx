@@ -42,7 +42,6 @@ const AddNewProduct = () => {
     resolver: zodResolver(productBasicInfoSchema),
     defaultValues: {
       title: '',
-      baseSku: '',
       brand: '',
       discountedPrice: 0,
       price: 0,
@@ -52,12 +51,10 @@ const AddNewProduct = () => {
   const form2 = useForm<TProductCategoryInventory>({
     resolver: zodResolver(productCategoryInventorySchema),
     defaultValues: {
-      childCategory: '',
-      isPublished: false,
-      lowStockThreshold: 0,
-      mainCategory: '',
       stock: 0,
-      subCategory: '',
+      l1Category: '',
+      l2Category: '',
+      l3Category: '',
     },
   });
 
@@ -181,7 +178,6 @@ const AddNewProduct = () => {
         </form>
       ),
     },
-
     {
       title: 'Variants and specifications',
       description: 'Product variants and specs',

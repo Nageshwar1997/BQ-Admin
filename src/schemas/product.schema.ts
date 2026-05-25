@@ -13,13 +13,7 @@ export const productBasicInfoSchema = object({
     .min(2, 'Brand must be at least 2 characters.')
     .max(80, 'Brand cannot exceed 80 characters.'),
 
-  baseSku: string()
-    .min(3, 'Base SKU must be at least 3 characters.')
-    .max(50, 'Base SKU cannot exceed 50 characters.'),
-
   price: number().min(1, 'Price must be greater than 0.'),
-
-  productType: z_enum(['with-variants', 'without-variants']),
 
   discountedPrice: number().min(0, 'Discounted price cannot be negative.').optional(),
 }).refine((data) => data.discountedPrice === undefined || data.discountedPrice <= data.price, {
@@ -32,17 +26,10 @@ export const productBasicInfoSchema = object({
 /* -------------------------------------------------------------------------- */
 
 export const productCategoryInventorySchema = object({
-  mainCategory: string().min(1, 'Main category is required.'),
-
-  subCategory: string(),
-
-  childCategory: string(),
-
+  l1Category: string().min(1, '(L1) Main category is required.'),
+  l2Category: string().min(1, '(L2) Sub-category is required.'),
+  l3Category: string().min(1, '(L3) Product category is required.'),
   stock: number().min(0, 'Stock cannot be negative.'),
-
-  lowStockThreshold: number().min(0, 'Low stock threshold cannot be negative.'),
-
-  isPublished: boolean(),
 });
 
 /* -------------------------------------------------------------------------- */
@@ -87,10 +74,6 @@ export const productVariantsSchema = object({
       label: string(),
 
       value: string(),
-
-      sku: string()
-        .min(3, 'SKU must be at least 3 characters.')
-        .max(100, 'SKU cannot exceed 100 characters.'),
 
       price: number().min(1, 'Price must be greater than 0.'),
 

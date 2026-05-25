@@ -16,7 +16,7 @@ interface StepperProps {
 }
 
 const Stepper = ({ steps, activeStep, onStepClick, className = '', children }: StepperProps) => {
-  const currentStep = Math.min(Math.max(activeStep, 0), Math.max(steps.length - 1, 0));
+  const currentStep = Math.min(Math.max(activeStep, 0), Math.max(steps?.length - 1, 0));
 
   return (
     <section className={`flex w-full flex-col gap-6 p-4 shadow-sm sm:p-5 lg:p-6 ${className}`}>
@@ -44,7 +44,7 @@ const Stepper = ({ steps, activeStep, onStepClick, className = '', children }: S
               {hasNextStep && (
                 <span
                   className={`absolute top-10 left-5 h-4 w-0.5 -translate-x-1/2 md:top-5 md:left-[calc(50%+1.375rem)] md:h-0.5 md:w-[calc(100%-2.75rem)] md:translate-x-0 ${
-                    nextCompleted ? 'bg-accent-duo' : 'bg-primary/10'
+                    nextCompleted ? 'bg-accent-duo' : 'bg-primary/20'
                   }`}
                 />
               )}
@@ -55,7 +55,7 @@ const Stepper = ({ steps, activeStep, onStepClick, className = '', children }: S
                     ? 'border-blue-crayola-c bg-accent-duo text-white shadow-[0_8px_24px_rgba(var(--blue-crayola-c-rgb),0.28)]'
                     : active
                       ? 'border-blue-crayola-c bg-primary-invert text-primary shadow-[0_0_0_5px_rgba(var(--blue-crayola-c-rgb),0.12)]'
-                      : 'border-primary/10 bg-primary-invert text-primary/40'
+                      : 'border-primary/20 bg-primary-invert text-primary/60'
                 }`}
               >
                 {completed ? (
@@ -77,7 +77,7 @@ const Stepper = ({ steps, activeStep, onStepClick, className = '', children }: S
                 </span>
                 {step.description && (
                   <span
-                    className={`line-clamp-2 text-xs leading-4 ${
+                    className={`line-clamp-1 md:line-clamp-2 text-xs leading-4 ${
                       active ? 'text-secondary' : 'text-primary/35'
                     }`}
                   >
