@@ -1,4 +1,4 @@
-import { productApi } from '@/classes/apis';
+import { categoryApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
 import type { ICategory } from '@/types/api.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
@@ -12,7 +12,7 @@ export const useAddCategory = () => {
 
   return useMutation({
     mutationKey: add,
-    mutationFn: productApi.addCategory,
+    mutationFn: categoryApi.addCategory,
     onMutate: () => {
       const toastId = toaster.loading({
         title: 'Please wait...',
@@ -37,7 +37,7 @@ export const useUpdateCategory = ({ categoryId = '' }) => {
 
   return useMutation({
     mutationKey: update({ categoryId }),
-    mutationFn: productApi.updateCategory,
+    mutationFn: categoryApi.updateCategory,
     onMutate: () => {
       const toastId = toaster.loading({
         title: 'Please wait...',
@@ -61,7 +61,7 @@ export const useDeleteCategory = ({ categoryId = '' }) => {
 
   return useMutation({
     mutationKey: remove({ categoryId }),
-    mutationFn: productApi.deleteCategory,
+    mutationFn: categoryApi.deleteCategory,
     onMutate: () => {
       const toastId = toaster.loading({
         title: 'Please wait...',
@@ -87,7 +87,7 @@ export const useGetCategoriesByParentLevel = ({
 }: { enabled?: boolean } & Partial<Pick<ICategory, 'level' | 'parent'>>) => {
   return useQuery({
     queryKey: [...get.byParentLevel, level, parent],
-    queryFn: () => productApi.getCategoriesByParentLevel({ level, parent }),
+    queryFn: () => categoryApi.getCategoriesByParentLevel({ level, parent }),
     staleTime: 5 * 60 * 1000, // 5 min
     gcTime: 15 * 60 * 1000, // 15 min
     enabled: enabled,
