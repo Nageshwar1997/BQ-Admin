@@ -101,16 +101,4 @@ export const l3CategorySchema = baseCategorySchema.extend({
 /*                              COMBINED SCHEMA                               */
 /* -------------------------------------------------------------------------- */
 
-export const categorySchema = union([
-  l1CategorySchema,
-  l2CategorySchema,
-  l3CategorySchema,
-]);
-
-/* -------------------------------------------------------------------------- */
-/*                              CONFIRM DETAILS SCHEMA                               */
-/* -------------------------------------------------------------------------- */
-
-export const confirmDetailsSchema = object({
-  confirm: boolean().refine(Boolean, 'Please confirm details before saving.'),
-});
+export const categorySchema = union([l1CategorySchema, l2CategorySchema, l3CategorySchema]);

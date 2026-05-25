@@ -9,7 +9,8 @@ import {
 } from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import useQueryParams from '@/hooks/useQueryParams';
-import { categorySchema, confirmDetailsSchema } from '@/schemas/category.schema';
+import { categorySchema } from '@/schemas/category.schema';
+import { confirmDetailsSchema } from '@/schemas/shared.schema';
 import {
   useAddCategory,
   useGetCategoriesByParentLevel,
