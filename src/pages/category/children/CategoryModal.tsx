@@ -112,7 +112,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
 
   const { mutateAsync: addCategoryAsync } = useAddCategory();
 
-  const { mutateAsync: updateCategoryAsync } = useUpdateCategory();
+  const { mutateAsync: updateCategoryAsync } = useUpdateCategory({categoryId: category?._id});
 
   const { data: level1Cats } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L1,

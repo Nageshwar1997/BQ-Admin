@@ -3,11 +3,7 @@ import type { ICategory, IId } from '@/types/api.type';
 import { ApiRequest } from '../ApiRequest';
 
 export class ProductApi extends ApiRequest {
-  private routes = API_METHODS_AND_URLS.gateway.product_service;
-
-  constructor() {
-    super('gateway-product-service');
-  }
+  private routes = API_METHODS_AND_URLS.product_service;
 
   /* ===================== POST API ===================== */
 
@@ -19,14 +15,14 @@ export class ProductApi extends ApiRequest {
 
   public updateCategory = ({ _id, ...data }: Partial<Omit<ICategory, 'slug'>> & IId) => {
     const { method, url } = this.routes.category.update;
-    return this.request({ method, url: `${url}/${_id}`, data });
+    return this.request({ method, url: url({ categoryId: _id }), data });
   };
 
   /* ===================== DELETE API ===================== */
 
   public deleteCategory = (categoryId: string) => {
     const { method, url } = this.routes.category.delete;
-    return this.request({ method, url: `${url}/${categoryId}` });
+    return this.request({ method, url: url({ categoryId }) });
   };
 
   /* ===================== GET API ===================== */

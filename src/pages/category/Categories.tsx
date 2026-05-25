@@ -300,7 +300,7 @@ const L1Table = () => {
     isError,
   } = useGetCategoriesByParentLevel({ level: CATEGORY_LEVELS_MAP.L1 });
 
-  const { mutateAsync: deleteCategoryAsync } = useDeleteCategory();
+  const { mutateAsync: deleteCategoryAsync } = useDeleteCategory({ categoryId: deleteId });
   const categories = data as ICategory[];
 
   const handleEdit = (data: TCatModal) => {

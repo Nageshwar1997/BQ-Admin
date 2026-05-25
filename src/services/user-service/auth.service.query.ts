@@ -1,16 +1,16 @@
 import { authApi } from '@/classes/apis';
-import { USER_SERVICE_QUERY_KEYS } from '@/constants/api.constants';
+import { API_QUERY_KEYS } from '@/constants/api.constants';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
 import { useMutation } from '@tanstack/react-query';
 
-const QUERY_KEY = USER_SERVICE_QUERY_KEYS.auth;
+const { login, password } = API_QUERY_KEYS.user_service.auth;
 
 /* ===================== LOGIN QUERIES ===================== */
 
 export const useLogin = () => {
   return useMutation({
-    mutationKey: QUERY_KEY.login,
+    mutationKey: login.manual,
     mutationFn: authApi.login,
     onMutate: () => {
       const toastId = toaster.loading({ title: 'Please wait...', description: 'Logging in...' });
@@ -28,7 +28,7 @@ export const useLogin = () => {
 
 export const useForgotPasswordSendOtp = () => {
   return useMutation({
-    mutationKey: QUERY_KEY.password.forgot.send_otp,
+    mutationKey: password.forgot.sendOtp,
     mutationFn: authApi.forgotPasswordSendOtp,
     onMutate: () => {
       const toastId = toaster.loading({
@@ -48,7 +48,7 @@ export const useForgotPasswordSendOtp = () => {
 
 export const useForgotPasswordResendOtp = () => {
   return useMutation({
-    mutationKey: QUERY_KEY.password.forgot.resend_otp,
+    mutationKey: password.forgot.resendOtp,
     mutationFn: authApi.forgotPasswordResendOtp,
     onMutate: () => {
       const toastId = toaster.loading({
@@ -67,7 +67,7 @@ export const useForgotPasswordResendOtp = () => {
 
 export const useForgotPasswordVerifyOtp = () => {
   return useMutation({
-    mutationKey: QUERY_KEY.password.forgot.verify_otp,
+    mutationKey: password.forgot.verifyOtp,
     mutationFn: authApi.forgotPasswordVerifyOtp,
     onMutate: () => {
       const toastId = toaster.loading({
@@ -86,7 +86,7 @@ export const useForgotPasswordVerifyOtp = () => {
 
 export const useForgotPasswordSave = () => {
   return useMutation({
-    mutationKey: QUERY_KEY.password.forgot.save,
+    mutationKey: password.forgot.save,
     mutationFn: authApi.forgotPasswordSave,
     onMutate: () => {
       const toastId = toaster.loading({
@@ -105,7 +105,7 @@ export const useForgotPasswordSave = () => {
 
 export const useChangePassword = () => {
   return useMutation({
-    mutationKey: QUERY_KEY.password.change,
+    mutationKey: password.change,
     mutationFn: authApi.changePassword,
     onMutate: () => {
       const toastId = toaster.loading({
