@@ -9,7 +9,7 @@ import {
 } from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import useQueryParams from '@/hooks/useQueryParams';
-import { categorySchema, confirmDetailsSchema } from '@/schemas/product.schema';
+import { categorySchema, confirmDetailsSchema } from '@/schemas/category.schema';
 import {
   useAddCategory,
   useGetCategoriesByParentLevel,
@@ -112,7 +112,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
 
   const { mutateAsync: addCategoryAsync } = useAddCategory();
 
-  const { mutateAsync: updateCategoryAsync } = useUpdateCategory({categoryId: category?._id});
+  const { mutateAsync: updateCategoryAsync } = useUpdateCategory({ categoryId: category?._id });
 
   const { data: level1Cats } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L1,

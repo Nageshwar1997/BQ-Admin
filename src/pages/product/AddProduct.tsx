@@ -6,7 +6,7 @@ import Input from '@/components/ui/inputs/Input';
 // import Select from '@/components/ui/inputs/Select';
 import { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
-import { addProductSchema } from '@/schemas/product.schema';
+import { addProductSchema } from '@/schemas/category.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { ICategory } from '@/types/api.type';
 import type { TAddProduct } from '@/types/schema.type';

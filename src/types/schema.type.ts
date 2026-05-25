@@ -5,7 +5,7 @@ import type {
   l1CategorySchema,
   l2CategorySchema,
   l3CategorySchema,
-} from '@/schemas/product.schema';
+} from '@/schemas/category.schema';
 import type {
   changePasswordSchema,
   emailSchema,
