@@ -1,6 +1,6 @@
 import LoadingScreen from '@/components/layout/loaders/LoadingScreen';
 import { ROUTES } from '@/constants/common.constants';
-import { authenticate } from '@/middlewares';
+// import { authenticate } from '@/middlewares';
 import ErrorBoundary from '@/pages/error/ErrorBoundary';
 import { Outlet, type RouteObject } from 'react-router-dom';
 
@@ -11,7 +11,7 @@ const routes: RouteObject[] = [
     path: DASHBOARD,
     HydrateFallback: LoadingScreen,
     ErrorBoundary,
-    middleware: [authenticate],
+    // middleware: [authenticate],
     lazy: async () => {
       const { default: Layout } = await import('@/pages/layout');
       return { Component: Layout };
@@ -108,7 +108,7 @@ const routes: RouteObject[] = [
       },
       {
         path: AUTH.CHANGE_PASSWORD,
-        middleware: [authenticate],
+        // middleware: [authenticate],
         lazy: async () => {
           const { default: ChangePassword } = await import('@/pages/auth/ChangePassword');
 
