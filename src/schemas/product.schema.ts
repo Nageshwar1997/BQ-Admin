@@ -19,6 +19,8 @@ export const productBasicInfoSchema = object({
 
   price: number().min(1, 'Price must be greater than 0.'),
 
+  productType: z_enum(['with-variants', 'without-variants']),
+
   discountedPrice: number().min(0, 'Discounted price cannot be negative.').optional(),
 }).refine((data) => data.discountedPrice === undefined || data.discountedPrice <= data.price, {
   path: ['discountedPrice'],
@@ -82,7 +84,7 @@ export const productVariantsSchema = object({
     object({
       type: z_enum(['color', 'text']),
 
-      label: string().optional(),
+      label: string(),
 
       value: string(),
 
@@ -181,18 +183,6 @@ export const productVariantsSchema = object({
       }
     }),
   ).min(1, 'At least one variant is required.'),
-
-  specifications: array(
-    object({
-      key: string()
-        .min(1, 'Specification key is required.')
-        .max(100, 'Specification key cannot exceed 100 characters.'),
-
-      value: string()
-        .min(1, 'Specification value is required.')
-        .max(500, 'Specification value cannot exceed 500 characters.'),
-    }),
-  ).optional(),
 });
 
 /* -------------------------------------------------------------------------- */

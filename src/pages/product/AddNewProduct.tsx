@@ -22,9 +22,18 @@ import type {
   TProductVariants,
 } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { BasicInfoFields, CategoryInventoryFields, ConfirmFields, DescriptionFields, MediaFields, SeoFields, TryOnFields, VariantsFields } from './children';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import {
+  BasicInfoFields,
+  CategoryInventoryFields,
+  ConfirmFields,
+  DescriptionFields,
+  MediaFields,
+  SeoFields,
+  TryOnFields,
+  VariantsFields,
+} from './children';
 
 const AddNewProduct = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -74,7 +83,6 @@ const AddNewProduct = () => {
   const form5 = useForm<TProductVariants>({
     resolver: zodResolver(productVariantsSchema),
     defaultValues: {
-      specifications: [],
       variants: [],
     },
   });
@@ -115,7 +123,6 @@ const AddNewProduct = () => {
 
     setActiveStep((prev) => Math.min(prev + 1, ADD_PRODUCT_STEPS.length - 1));
   };
-// const test = form1.getValues();
   const handleBack = () => {
     setActiveStep((prev) => Math.max(prev - 1, 0));
   };
@@ -228,7 +235,11 @@ const AddNewProduct = () => {
   ];
 
   return (
-    <Stepper steps={ADD_PRODUCT_STEPS} activeStep={activeStep}>
+    <Stepper
+      steps={ADD_PRODUCT_STEPS}
+      activeStep={activeStep}
+      onStepClick={(step) => setActiveStep(step)}
+    >
       <div className="flex flex-col gap-5">
         <div>
           <p className="text-primary text-sm font-semibold">{stepFields[activeStep].title}</p>

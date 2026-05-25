@@ -1,3 +1,4 @@
+import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
@@ -11,7 +12,7 @@ import type {
   TProductTryOn,
   TProductVariants,
 } from '@/types/schema.type';
-import { Controller, type UseFormReturn } from 'react-hook-form';
+import { Controller, useFieldArray, type UseFormReturn } from 'react-hook-form';
 
 /* -------------------------------------------------------------------------- */
 /*                          STEP 1 : BASIC INFO                               */
@@ -19,6 +20,7 @@ import { Controller, type UseFormReturn } from 'react-hook-form';
 
 export const BasicInfoFields = ({ form }: { form: UseFormReturn<TProductBasicInfo> }) => {
   const {
+    control,
     register,
     formState: { errors },
   } = form;
@@ -50,6 +52,26 @@ export const BasicInfoFields = ({ form }: { form: UseFormReturn<TProductBasicInf
         inputProps={{
           placeholder: 'PRD-1001',
         }}
+      />
+
+      <Controller
+        name="productType"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Select
+            label="Product type"
+            error={errors.productType?.message}
+            options={[
+              { label: 'Without variants', value: 'without-variants' },
+              { label: 'With variants', value: 'with-variants' },
+            ]}
+            selectProps={{
+              value,
+              onChange,
+              placeholder: 'Select product type',
+            }}
+          />
+        )}
       />
 
       <Input
@@ -265,92 +287,153 @@ export const DescriptionFields = ({ form }: { form: UseFormReturn<TProductDescri
 
 export const VariantsFields = ({ form }: { form: UseFormReturn<TProductVariants> }) => {
   const {
-    register,
     control,
+    register,
     watch,
     formState: { errors },
   } = form;
 
-  const type = watch('variants.0.type');
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'variants',
+  });
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      <Controller
-        name="variants.0.type"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            label="Variant type"
-            error={errors.variants?.[0]?.type?.message}
-            options={[
-              {
-                label: 'Color',
-                value: 'color',
-              },
-              {
-                label: 'Text',
-                value: 'text',
-              },
-            ]}
-            selectProps={{
-              value,
-              onChange,
-              placeholder: 'Select variant type',
-            }}
-          />
-        )}
-      />
+    <div className="flex flex-col gap-6">
+      {fields.map((field, index) => {
+        const type = watch(`variants.${index}.type`);
 
-      {type === 'color' && (
-        <Input
-          label="Color label"
-          register={register('variants.0.label')}
-          error={errors.variants?.[0]?.label?.message}
-          inputProps={{
-            placeholder: 'Black',
-          }}
-        />
-      )}
+        return (
+          <div
+            key={field.id}
+            className="border-border grid gap-4 rounded-xl border p-4 sm:grid-cols-2"
+          >
+            <Controller
+              name={`variants.${index}.type`}
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Select
+                  label="Variant type"
+                  error={errors.variants?.[index]?.type?.message}
+                  options={[
+                    {
+                      label: 'Color',
+                      value: 'color',
+                    },
+                    {
+                      label: 'Text',
+                      value: 'text',
+                    },
+                  ]}
+                  selectProps={{
+                    value,
+                    onChange,
+                    placeholder: 'Select variant type',
+                  }}
+                />
+              )}
+            />
 
-      <Input
-        label={type === 'color' ? 'Hex code' : 'Variant value'}
-        register={register('variants.0.value')}
-        error={errors.variants?.[0]?.value?.message}
-        inputProps={{
-          placeholder: type === 'color' ? '#000000' : '50ml',
-        }}
-      />
+            {type === 'color' && (
+              <Input
+                label="Color label"
+                register={register(`variants.${index}.label`)}
+                error={
+                  'label' in (errors.variants?.[index] || {})
+                    ? errors.variants?.[index]?.label?.message
+                    : undefined
+                }
+                inputProps={{
+                  placeholder: 'Black',
+                }}
+              />
+            )}
 
-      <Input
-        label="SKU"
-        register={register('variants.0.sku')}
-        error={errors.variants?.[0]?.sku?.message}
-        inputProps={{
-          placeholder: 'PRD-1001',
-        }}
-      />
+            <Input
+              label={type === 'color' ? 'Hex code' : 'Variant value'}
+              register={register(`variants.${index}.value`)}
+              error={errors.variants?.[index]?.value?.message}
+              inputProps={{
+                placeholder: type === 'color' ? '#000000' : '50ml',
+              }}
+            />
 
-      <Input
-        label="Price"
-        register={register('variants.0.price', {
-          valueAsNumber: true,
-        })}
-        error={errors.variants?.[0]?.price?.message}
-        inputProps={{
-          type: 'number',
-          placeholder: '999',
-        }}
-      />
+            <Input
+              label="SKU"
+              register={register(`variants.${index}.sku`)}
+              error={errors.variants?.[index]?.sku?.message}
+              inputProps={{
+                placeholder: 'PRD-1001-BLK',
+              }}
+            />
 
-      <Input
-        label="Stock"
-        register={register('variants.0.stock', {
-          valueAsNumber: true,
-        })}
-        error={errors.variants?.[0]?.stock?.message}
-        inputProps={{
-          type: 'number',
-          placeholder: '100',
+            <Input
+              label="Price"
+              register={register(`variants.${index}.price`, {
+                valueAsNumber: true,
+              })}
+              error={errors.variants?.[index]?.price?.message}
+              inputProps={{
+                type: 'number',
+                placeholder: '999',
+              }}
+            />
+
+            <Input
+              label="Discounted price"
+              register={register(`variants.${index}.discountedPrice`, {
+                valueAsNumber: true,
+              })}
+              error={errors.variants?.[index]?.discountedPrice?.message}
+              inputProps={{
+                type: 'number',
+                placeholder: '799',
+              }}
+            />
+
+            <Input
+              label="Stock"
+              register={register(`variants.${index}.stock`, {
+                valueAsNumber: true,
+              })}
+              error={errors.variants?.[index]?.stock?.message}
+              inputProps={{
+                type: 'number',
+                placeholder: '100',
+              }}
+            />
+
+            <div className="flex justify-end sm:col-span-2">
+              <Button
+                pattern="secondary"
+                content="Remove variant"
+                buttonProps={{
+                  type: 'button',
+                  disabled: fields.length === 1,
+                  onClick: () => remove(index),
+                }}
+              />
+            </div>
+          </div>
+        );
+      })}
+
+      <Button
+        pattern="primary"
+        content="Add variant"
+        buttonProps={{
+          type: 'button',
+          onClick: () =>
+            append({
+              type: 'text',
+              label: '',
+              value: '',
+              sku: '',
+              price: 0,
+              discountedPrice: 0,
+              stock: 0,
+              images: [],
+            }),
         }}
       />
     </div>
