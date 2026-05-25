@@ -1,4 +1,15 @@
-import { array, boolean, literal, number, object, string, enum as z_enum } from 'zod';
+import {
+  array,
+  boolean,
+  custom,
+  literal,
+  number,
+  object,
+  string,
+  union,
+  url,
+  enum as z_enum,
+} from 'zod';
 
 /* -------------------------------------------------------------------------- */
 /*                             STEP 1 : BASIC INFO                            */
@@ -36,12 +47,16 @@ export const productCategoryInventorySchema = object({
 /*                           STEP 3 : MEDIA & GALLERY                         */
 /* -------------------------------------------------------------------------- */
 
+const fileSchema = custom<File>((value) => value instanceof File, { message: 'Invalid file.' });
+
+const fileOrUrlSchema = union([url({ message: 'Invalid URL.' }), fileSchema]);
+
 export const productMediaSchema = object({
-  thumbnail: string().min(1, 'Thumbnail is required.'),
+  thumbnail: fileOrUrlSchema,
 
-  images: array(string()).min(1, 'At least one image is required.'),
+  images: array(fileOrUrlSchema).min(1, 'At least one image is required.'),
 
-  videos: array(string()).optional(),
+  videos: array(fileOrUrlSchema).optional(),
 });
 
 /* -------------------------------------------------------------------------- */
