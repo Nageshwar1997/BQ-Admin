@@ -3,7 +3,7 @@ import Select from '@/components/ui/inputs/Select';
 import Tooltip from '@/components/ui/Tooltip';
 import { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
 import type { ICategory } from '@/types/api.type';
-import type { TCategory, TLevel2Category, TLevel3Category } from '@/types/schema.type';
+import type { TCategory, TL2Category, TL3Category } from '@/types/schema.type';
 import {
   Controller,
   type Control,
@@ -24,12 +24,12 @@ type TCommonFields = {
 type TLevel1Fields = TCommonFields;
 type TLevel2Fields = TCommonFields & {
   level1Cats: ICategory[];
-  mainCategory: TLevel2Category['mainCategory'];
+  mainCategory: TL2Category['mainCategory'];
 };
 type TLevel3Fields = Omit<TLevel2Fields, 'mainCategory'> & {
   level2Cats: ICategory[];
-  mainCategory: TLevel3Category['mainCategory'];
-  subCategory: TLevel3Category['subCategory'];
+  mainCategory: TL3Category['mainCategory'];
+  subCategory: TL3Category['subCategory'];
 };
 
 const CommonFields = ({
