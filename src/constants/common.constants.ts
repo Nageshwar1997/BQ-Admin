@@ -89,11 +89,8 @@ export const ROUTES = {
   },
 } as const;
 
-
 export const TOOLTIP_GAP = 15 as const;
 export const TOOLTIP_ANIMATION_DURATION = 400 as const;
-
-
 
 export const SIDEBAR_DATA = [
   {
@@ -153,6 +150,49 @@ export const CATEGORY_MODAL_STEPS: StepperStep[] = [
     title: 'Review',
     description: 'Confirm before save',
     icon: 'solar:checklist-minimalistic-linear',
+  },
+];
+
+export const ADD_PRODUCT_STEPS: StepperStep[] = [
+  {
+    title: 'Step 1',
+    description: 'Basic information',
+    icon: 'solar:tag-price-linear',
+  },
+  {
+    title: 'Step 2',
+    description: 'Category and inventory',
+    icon: 'solar:box-linear',
+  },
+  {
+    title: 'Step 3',
+    description: 'Media and gallery',
+    icon: 'solar:gallery-linear',
+  },
+  {
+    title: 'Step 4',
+    description: 'Description and details',
+    icon: 'solar:document-text-linear',
+  },
+  {
+    title: 'Step 5',
+    description: 'Variants and specifications',
+    icon: 'solar:list-check-linear',
+  },
+  {
+    title: 'Step 6',
+    description: 'TryOn configuration',
+    icon: 'solar:face-scan-square-linear',
+  },
+  {
+    title: 'Step 7',
+    description: 'SEO and visibility',
+    icon: 'solar:global-linear',
+  },
+  {
+    title: 'Step 8',
+    description: 'Confirm before save',
+    icon: 'solar:check-circle-linear',
   },
 ];
 
