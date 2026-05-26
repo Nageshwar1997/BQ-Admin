@@ -29,7 +29,7 @@ const MediaCarousel = ({
             }
           }}
           onClick={() => onClick(i)}
-          className={`group relative size-14 shrink-0 overflow-hidden rounded border shadow-xs transition-colors duration-300 hover:opacity-100 md:size-16 lg:size-20 ${
+          className={`group relative size-14 shrink-0 overflow-hidden rounded-lg border shadow-xs transition-colors duration-300 hover:opacity-100 md:size-16 lg:size-20 ${
             i === selected ? 'border-tertiary opacity-100' : 'border-primary/30 opacity-90'
           } ${item.type === 'video' ? 'relative' : ''}`}
         >
