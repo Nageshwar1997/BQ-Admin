@@ -12,7 +12,7 @@ const MediaCarousel = ({
   handleRemove,
   gradientClassNames,
 }: IMediaCarousel) => {
-  if (media?.length === 0) return null;
+  if (!media || media?.length === 0) return null;
 
   return (
     <ScrollableGradientContainer
@@ -20,7 +20,7 @@ const MediaCarousel = ({
       className={`w-full [&>div]:justify-start ${className}`}
       gradientClassNames={gradientClassNames}
     >
-      {media?.map((item, i) => (
+      {media.map((item, i) => (
         <div
           key={i}
           ref={(el) => {
@@ -30,7 +30,11 @@ const MediaCarousel = ({
           }}
           onClick={() => onClick(i)}
           className={`group relative size-14 shrink-0 overflow-hidden rounded-lg border shadow-xs transition-colors duration-300 hover:opacity-100 md:size-16 lg:size-20 ${
-            i === selected ? 'border-tertiary opacity-100' : 'border-primary/30 opacity-90'
+            item.hasError
+              ? 'border-red-c'
+              : i === selected
+                ? 'border-tertiary opacity-100'
+                : 'border-primary/30 opacity-90'
           } ${item.type === 'video' ? 'relative' : ''}`}
         >
           {item.type === 'video' ? (
@@ -63,7 +67,7 @@ const MediaCarousel = ({
           {handleRemove && (
             <button
               type="button"
-              className="bg-tertiary/80 cursor-pointer absolute top-0.5 right-0.5 z-1 size-4 rounded-full"
+              className="bg-tertiary/80 absolute top-0.5 right-0.5 z-1 size-4 cursor-pointer rounded-full"
               onClick={(e) => {
                 e.stopPropagation();
                 handleRemove(i);

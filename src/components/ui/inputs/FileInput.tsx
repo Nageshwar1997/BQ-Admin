@@ -112,7 +112,7 @@ const FileInput = ({
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
 
   return (
-    <div className={`flex w-full flex-col gap-1.5 ${containerClassName}`}>
+    <div className={`flex min-w-0 max-w-full flex-col gap-1.5 ${containerClassName}`}>
       <div className="relative h-10 lg:h-12">
         <InputLabel children={label} htmlFor={fileInputProps.name} />
         <MainSection fileInputProps={fileInputProps} {...props} />

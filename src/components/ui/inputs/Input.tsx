@@ -25,7 +25,7 @@ const Input = ({
   }, [needRef]);
 
   return (
-    <div className={`flex w-full flex-col gap-1.5 ${containerClassName}`}>
+    <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
       <div className="relative h-10 lg:h-12">
         <InputLabel children={label} htmlFor={inputProps?.name} />
         <div

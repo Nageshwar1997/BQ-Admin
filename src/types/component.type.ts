@@ -129,7 +129,7 @@ export type TConfirmModal = (TCustomConfirmModal | TDefaultConfirmModal) & {
 
 export type TMediaResource = 'image' | 'video';
 
-export type TMediaOption = { type: TMediaResource; url: string };
+export type TMediaOption = { type: TMediaResource; url: string; hasError?: boolean };
 
 export interface IVideo {
   videoProps: VideoHTMLAttributes<HTMLVideoElement>;

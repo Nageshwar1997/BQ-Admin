@@ -34,7 +34,10 @@ const Select = ({
   }, [isOpen]);
 
   return (
-    <div ref={containerRef} className={`flex w-full flex-col gap-1.5 ${containerClassName}`}>
+    <div
+      ref={containerRef}
+      className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}
+    >
       <div className="relative h-10 lg:h-12">
         <InputLabel children={label} onClick={() => setIsOpen((prev) => !prev)} className="z-2" />
         <div

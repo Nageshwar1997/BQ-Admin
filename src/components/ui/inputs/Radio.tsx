@@ -6,7 +6,7 @@ const Radio = ({ value, onChange, options, className = '', error }: IRadio) => {
   const translatePercent = `${index * 100}%`;
 
   return (
-    <div className="flex w-full flex-col gap-1.5">
+    <div className="flex max-w-full min-w-0 flex-col gap-1.5">
       <div
         className={`border-battleship-davys-gray mx-auto flex w-full items-center justify-center gap-4 rounded-full border ${className}`}
       >

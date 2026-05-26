@@ -26,16 +26,18 @@ const ScrollableGradientContainer = ({
     .map(([key]) => key as TGradientPos);
 
   return (
-    <div className={`relative flex h-full w-full flex-col overflow-hidden ${containerClassName}`}>
+    <div
+      className={`relative flex flex-col overflow-hidden ${isVertical ? 'h-full w-fit' : 'h-fit w-full'} ${isHorizontal ? 'h-full w-fit' : 'h-fit w-full'} ${containerClassName}`}
+    >
       {gradientKeys.map((key) => (
         <LinearGradient key={key} position={key} className={gradientClassNames[key] || ''} />
       ))}
       <div
         ref={containerRef}
-        className={`relative w-full flex-1 scroll-smooth ${isVertical ? 'overflow-y-auto' : ''} ${isHorizontal ? 'overflow-x-auto whitespace-nowrap' : ''} ${className} `}
+        className={`relative scroll-smooth ${isVertical ? 'flex-1 overflow-y-auto' : ''} ${isHorizontal ? 'grow overflow-x-auto whitespace-nowrap' : ''} ${className} `}
       >
         <div
-          className={`flex w-full gap-2 ${isVertical ? 'min-h-full flex-col' : 'min-w-full flex-row'} ${
+          className={`flex h-full w-full gap-2 ${isVertical ? 'min-h-full flex-col' : ''} ${isHorizontal ? 'min-w-full flex-row' : ''} ${
             isScrollable ? 'items-start justify-start' : 'items-center justify-center'
           }`}
         >

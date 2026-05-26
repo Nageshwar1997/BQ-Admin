@@ -177,7 +177,7 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
     register,
     formState: { errors },
   } = form;
-    console.log("🚀 ~ MediaFields ~ errors:", errors)
+  console.log('🚀 ~ MediaFields ~ errors:', errors);
 
   const images = useWatch({ control, name: 'images' });
   const videos = useWatch({ control, name: 'videos' });
@@ -189,46 +189,62 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
     return media instanceof FileList ? Array.from(media) : media;
   };
 
-  const imagePreviews = normalizeMedia(images).map((image) => ({
+  const getErrorMessages = (fieldErrors: any) => {
+    if (!fieldErrors) return [];
+
+    return Object.keys(fieldErrors)
+      .filter((key) => !Number.isNaN(Number(key)))
+      .map((key) => fieldErrors[key]?.message)
+      .filter(Boolean);
+  };
+
+  const imagePreviews = normalizeMedia(images).map((image, index) => ({
     type: 'image' as const,
     url: image instanceof File ? URL.createObjectURL(image) : image,
+    hasError: !!errors.images?.[index],
   }));
-  console.log('🚀 ~ MediaFields ~ imagePreviews:', imagePreviews);
 
-  const thumbnailPreviews = normalizeMedia(thumbnail).map((image) => ({
+  const thumbnailPreviews = normalizeMedia(thumbnail).map((image, index) => ({
     type: 'image' as const,
     url: image instanceof File ? URL.createObjectURL(image) : image,
+    hasError: !!errors.thumbnail?.[index],
   }));
 
-  const videosPreviews = normalizeMedia(videos).map((image) => ({
+  const videoPreviews = normalizeMedia(videos).map((video, index) => ({
     type: 'video' as const,
-    url: image instanceof File ? URL.createObjectURL(image) : image,
+    url: video instanceof File ? URL.createObjectURL(video) : video,
+    hasError: !!errors.videos?.[index],
   }));
-  console.log('🚀 ~ MediaFields ~ thumbnailPreviews:', thumbnailPreviews);
+
   return (
     <div className="grid gap-4">
       <FileInput
         fileInputProps={{ name: 'thumbnail', placeholder: 'Thumbnail', multiple: false }}
         register={register('thumbnail')}
         previews={thumbnailPreviews}
-        handleRemoveImage={()=> {}}
-        />
+        errors={getErrorMessages(errors.thumbnail)}
+        handleRemoveImage={() => {}}
+      />
+
       <FileInput
         fileInputProps={{ name: 'images', placeholder: 'Images', multiple: true }}
         register={register('images')}
         previews={imagePreviews}
-        handleRemoveImage={()=> {}}
-        />
+        errors={getErrorMessages(errors.images)}
+        handleRemoveImage={() => {}}
+      />
+
       <FileInput
         fileInputProps={{
           name: 'videos',
           placeholder: 'Videos',
-          multiple: false,
+          multiple: true,
           accept: 'video/*',
         }}
         register={register('videos')}
-        previews={videosPreviews}
-        handleRemoveImage={()=> {}}
+        previews={videoPreviews}
+        errors={getErrorMessages(errors.videos)}
+        handleRemoveImage={() => {}}
       />
     </div>
   );

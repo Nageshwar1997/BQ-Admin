@@ -46,18 +46,42 @@ export const productCategoryInventorySchema = object({
 /* -------------------------------------------------------------------------- */
 /*                           STEP 3 : MEDIA & GALLERY                         */
 /* -------------------------------------------------------------------------- */
+
+
+const IMAGE_MAX_SIZE = 1 * 1024 * 1024;
+const VIDEO_MAX_SIZE = 20 * 1024 * 1024;
+
 const fileListSchema = custom<FileList>((value) => value instanceof FileList && value.length > 0, {
   message: 'At least one file is required.',
 });
 
 const urlArraySchema = array(url({ message: 'Invalid URL.' }));
 
-const fileListOrUrlArraySchema = union([fileListSchema, urlArraySchema]);
+const formatFileSize = (bytes: number) => {
+  return `${(bytes / 1024 / 1024).toFixed(2)}MB`;
+};
+
+const createMediaSchema = (maxSize: number, type: 'image' | 'video') =>
+  union([fileListSchema, urlArraySchema]).superRefine((value, ctx) => {
+    if (!(value instanceof FileList)) return;
+
+    Array.from(value).forEach((file, index) => {
+      if (file.size > maxSize) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [index],
+          message: `${type} ${index + 1} size is ${formatFileSize(
+            file.size,
+          )}. Maximum allowed size is ${formatFileSize(maxSize)}.`,
+        });
+      }
+    });
+  });
 
 export const productMediaSchema = object({
-  thumbnail: fileListOrUrlArraySchema,
-  images: fileListOrUrlArraySchema,
-  videos: fileListOrUrlArraySchema.optional(),
+  thumbnail: createMediaSchema(IMAGE_MAX_SIZE, 'image'),
+  images: createMediaSchema(IMAGE_MAX_SIZE, 'image'),
+  videos: createMediaSchema(VIDEO_MAX_SIZE, 'video').optional(),
 });
 
 /* -------------------------------------------------------------------------- */

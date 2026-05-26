@@ -10,7 +10,7 @@ const Checkbox = ({
   error,
 }: ICheckbox) => {
   return (
-    <div className={`flex w-full flex-col gap-1.5 ${containerClassName}`}>
+    <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
       <div className="flex items-center gap-2 sm:gap-3">
         <label className="relative inline-block h-6 w-12 shrink-0">
           <input
