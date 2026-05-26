@@ -126,3 +126,26 @@ type TDefaultConfirmModal = {
 export type TConfirmModal = (TCustomConfirmModal | TDefaultConfirmModal) & {
   modalProps?: Omit<IModalWrapper, 'children' | 'closeOnOutsideClick'>;
 };
+
+export type TMediaResource = 'image' | 'video';
+
+export type TMediaOption = { type: TMediaResource; url: string };
+
+export interface IVideo {
+  videoProps: VideoHTMLAttributes<HTMLVideoElement>;
+  ref?: RefObject<HTMLVideoElement | null>;
+}
+
+export interface IMediaCarousel
+  extends TClassName, Pick<IScrollableGradientContainer, 'gradientClassNames'> {
+  media: TMediaOption[];
+  selected?: number | null;
+  onClick: (index: number) => void;
+  thumbnailRefs?: RefObject<(HTMLDivElement | null)[]>;
+  handleRemove?: (index: number) => void;
+}
+
+export interface IMediaCarouselWithParent
+  extends TClassName, IVideo, Pick<IMediaCarousel, 'media' | 'selected' | 'handleRemove'> {
+  needButtonControls?: boolean;
+}

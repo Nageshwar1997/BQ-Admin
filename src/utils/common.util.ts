@@ -1,4 +1,4 @@
-import { TOOLTIP_GAP } from '@/constants/common.constants';
+import { DEFAULT_POSTER, TOOLTIP_GAP } from '@/constants/common.constants';
 import useToastStore from '@/stores/toast.store';
 import type { IButton, ITooltip } from '@/types/component.type';
 import type { ICustomToast, IDefaultToast, ILoadingToast } from '@/types/store.type';
@@ -119,3 +119,84 @@ export const deepEqual = <T>(obj1: T, obj2: T): boolean => {
 
   return keys1.every((key) => deepEqual(obj1[key], obj2[key]));
 };
+
+function getPosterFromBlobVideo(blobVideoUrl: string, timeInSeconds = 0): Promise<string> {
+  return new Promise((resolve) => {
+    let posterCreated = false;
+    let isCancelled = false;
+
+    const video = document.createElement('video');
+    video.src = blobVideoUrl;
+    video.crossOrigin = 'anonymous';
+    video.muted = true;
+    video.playsInline = true;
+
+    video.addEventListener('loadeddata', () => {
+      if (!isCancelled) video.currentTime = timeInSeconds;
+    });
+
+    video.addEventListener('seeked', () => {
+      if (isCancelled) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(DEFAULT_POSTER);
+        return;
+      }
+
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      posterCreated = true;
+      resolve(canvas.toDataURL('image/png'));
+      video.src = '';
+    });
+
+    video.addEventListener('error', () => {
+      if (!posterCreated && !isCancelled) {
+        resolve(DEFAULT_POSTER); // no console.error to avoid noise
+      }
+    });
+
+    // Cancel function for cleanup
+    return () => {
+      isCancelled = true;
+      video.src = '';
+    };
+  });
+}
+
+export function convertVideoToPoster(videoUrl: string): Promise<string> {
+  return new Promise((resolve) => {
+    if (!videoUrl) {
+      resolve(DEFAULT_POSTER);
+      return;
+    }
+
+    try {
+      // Case 1: Cloudinary URL → instant
+      if (videoUrl.includes('/upload/')) {
+        const [base, versionAndPath] = videoUrl.split('/upload/');
+        const cleanedPath = versionAndPath.replace(/^.*?(\/v\d+)/, '$1');
+        const posterPath = cleanedPath.replace(/\.(m3u8|mp4|webm|ogg|mov)$/, '.webp');
+        resolve(`${base}/upload/so_0${posterPath}`);
+        return;
+      }
+
+      // Case 2: Blob URL or direct video file → async extract
+      if (videoUrl.startsWith('blob:') || /\.(mp4|webm|ogg|m3u8|mov)$/i.test(videoUrl)) {
+        getPosterFromBlobVideo(videoUrl)
+          .then((poster) => resolve(poster || DEFAULT_POSTER))
+          .catch(() => resolve(DEFAULT_POSTER));
+        return;
+      }
+
+      // Fallback
+      resolve(DEFAULT_POSTER);
+    } catch (error) {
+      console.error('Failed to create poster URL', error);
+      resolve(DEFAULT_POSTER);
+    }
+  });
+}
