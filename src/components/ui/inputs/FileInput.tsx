@@ -112,7 +112,7 @@ const FileInput = ({
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
 
   return (
-    <div className={`flex min-w-0 max-w-full flex-col gap-1.5 ${containerClassName}`}>
+    <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
       <div className="relative h-10 lg:h-12">
         <InputLabel children={label} htmlFor={fileInputProps.name} />
         <MainSection fileInputProps={fileInputProps} {...props} />
@@ -126,8 +126,11 @@ const FileInput = ({
       )}
       {previews?.length > 0 && (
         <MediaCarousel
-          className={`border-primary/10 bg-smoke-eerie rounded-lg border p-2 ${mediaCarouselClassName}`}
-          gradientClassNames={{ left: 'w-10! lg:w-20!', right: 'w-10! lg:w-20!' }}
+          className={`border-primary/10 bg-smoke-eerie rounded-lg border ${mediaCarouselClassName}`}
+          gradientClassNames={{
+            left: 'from-smoke-eerie left-px inset-y-px rounded-l-[7px]',
+            right: 'from-smoke-eerie right-px inset-y-px rounded-r-[7px]',
+          }}
           media={previews}
           onClick={(i) => {
             setCurrentIndex(i);
