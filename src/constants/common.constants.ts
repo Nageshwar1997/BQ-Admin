@@ -205,3 +205,13 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
 
 export const CATEGORY_LEVELS_MAP = { L1: 1, L2: 2, L3: 3 } as const;
 export const CATEGORY_LEVELS = Object.values(CATEGORY_LEVELS_MAP);
+
+export const MB = 1024 ** 2;
+export const MAX_IMAGE_FILE_SIZE = 2 * MB; // 2MB
+export const MAX_VIDEO_FILE_SIZE = 50 * MB; // 50MB
+export const FILE_MIME = {
+  image: ['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'image/svg+xml'],
+  video: ['video/mp4', 'video/webm', 'video/quicktime'],
+} as const;
+
+export const DEFAULT_POSTER = '/images/logo/BQ_gradient_logo.webp';

@@ -36,7 +36,7 @@ import {
 } from './children';
 
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(2);
 
   const form1 = useForm<TProductBasicInfo>({
     resolver: zodResolver(productBasicInfoSchema),
@@ -62,7 +62,7 @@ const AddNewProduct = () => {
     resolver: zodResolver(productMediaSchema),
     defaultValues: {
       images: [],
-      thumbnail: '',
+      thumbnail: [],
       videos: [],
     },
   });

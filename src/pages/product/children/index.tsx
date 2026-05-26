@@ -1,5 +1,6 @@
 import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/inputs/Checkbox';
+import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import type {
@@ -12,7 +13,7 @@ import type {
   TProductTryOn,
   TProductVariants,
 } from '@/types/schema.type';
-import { Controller, useFieldArray, type UseFormReturn } from 'react-hook-form';
+import { Controller, useFieldArray, useWatch, type UseFormReturn } from 'react-hook-form';
 
 /* -------------------------------------------------------------------------- */
 /*                          STEP 1 : BASIC INFO                               */
@@ -172,37 +173,62 @@ export const CategoryInventoryFields = ({
 
 export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) => {
   const {
+    control,
     register,
     formState: { errors },
   } = form;
+    console.log("🚀 ~ MediaFields ~ errors:", errors)
 
+  const images = useWatch({ control, name: 'images' });
+  const videos = useWatch({ control, name: 'videos' });
+  const thumbnail = useWatch({ control, name: 'thumbnail' });
+
+  const normalizeMedia = (media?: FileList | string[]) => {
+    if (!media) return [];
+
+    return media instanceof FileList ? Array.from(media) : media;
+  };
+
+  const imagePreviews = normalizeMedia(images).map((image) => ({
+    type: 'image' as const,
+    url: image instanceof File ? URL.createObjectURL(image) : image,
+  }));
+  console.log('🚀 ~ MediaFields ~ imagePreviews:', imagePreviews);
+
+  const thumbnailPreviews = normalizeMedia(thumbnail).map((image) => ({
+    type: 'image' as const,
+    url: image instanceof File ? URL.createObjectURL(image) : image,
+  }));
+
+  const videosPreviews = normalizeMedia(videos).map((image) => ({
+    type: 'video' as const,
+    url: image instanceof File ? URL.createObjectURL(image) : image,
+  }));
+  console.log('🚀 ~ MediaFields ~ thumbnailPreviews:', thumbnailPreviews);
   return (
     <div className="grid gap-4">
-      <Input
-        label="Thumbnail"
+      <FileInput
+        fileInputProps={{ name: 'thumbnail', placeholder: 'Thumbnail', multiple: false }}
         register={register('thumbnail')}
-        error={errors.thumbnail?.message}
-        inputProps={{
-          placeholder: 'Thumbnail URL',
+        previews={thumbnailPreviews}
+        handleRemoveImage={()=> {}}
+        />
+      <FileInput
+        fileInputProps={{ name: 'images', placeholder: 'Images', multiple: true }}
+        register={register('images')}
+        previews={imagePreviews}
+        handleRemoveImage={()=> {}}
+        />
+      <FileInput
+        fileInputProps={{
+          name: 'videos',
+          placeholder: 'Videos',
+          multiple: false,
+          accept: 'video/*',
         }}
-      />
-
-      <Input
-        label="Images"
-        register={register('images.0')}
-        error={errors.images?.message}
-        inputProps={{
-          placeholder: 'Image URL',
-        }}
-      />
-
-      <Input
-        label="Videos"
-        register={register('videos.0')}
-        error={errors.videos?.message}
-        inputProps={{
-          placeholder: 'Video URL',
-        }}
+        register={register('videos')}
+        previews={videosPreviews}
+        handleRemoveImage={()=> {}}
       />
     </div>
   );

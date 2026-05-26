@@ -46,17 +46,18 @@ export const productCategoryInventorySchema = object({
 /* -------------------------------------------------------------------------- */
 /*                           STEP 3 : MEDIA & GALLERY                         */
 /* -------------------------------------------------------------------------- */
+const fileListSchema = custom<FileList>((value) => value instanceof FileList && value.length > 0, {
+  message: 'At least one file is required.',
+});
 
-const fileSchema = custom<File>((value) => value instanceof File, { message: 'Invalid file.' });
+const urlArraySchema = array(url({ message: 'Invalid URL.' }));
 
-const fileOrUrlSchema = union([url({ message: 'Invalid URL.' }), fileSchema]);
+const fileListOrUrlArraySchema = union([fileListSchema, urlArraySchema]);
 
 export const productMediaSchema = object({
-  thumbnail: fileOrUrlSchema,
-
-  images: array(fileOrUrlSchema).min(1, 'At least one image is required.'),
-
-  videos: array(fileOrUrlSchema).optional(),
+  thumbnail: fileListOrUrlArraySchema,
+  images: fileListOrUrlArraySchema,
+  videos: fileListOrUrlArraySchema.optional(),
 });
 
 /* -------------------------------------------------------------------------- */
