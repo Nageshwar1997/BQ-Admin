@@ -1,6 +1,6 @@
 import type { IMediaCarousel } from '@/types/component.type';
 import { Icon } from '@iconify/react';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import ScrollableGradientContainer from '../containers/ScrollableGradientContainer';
 import VideoPlayer from '../media/VideoPlayer';
 
@@ -16,7 +16,6 @@ const MediaCarousel = ({
 }: IMediaCarousel) => {
   const dragIndexRef = useRef<number | null>(null);
   const didDragRef = useRef(false);
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   if (!media || media?.length === 0) return null;
 
@@ -24,7 +23,6 @@ const MediaCarousel = ({
 
   const handleDragEnd = () => {
     dragIndexRef.current = null;
-    setDraggedIndex(null);
     window.setTimeout(() => {
       didDragRef.current = false;
     }, 0);
@@ -36,7 +34,7 @@ const MediaCarousel = ({
       className={`w-full [&>div]:justify-start ${className}`}
       gradientClassNames={gradientClassNames}
     >
-      <div className="flex gap-2 items-center p-2">
+      <div className="flex items-center gap-2 p-2">
         {media.map((item, i) => (
           <div
             key={item.url}
@@ -51,7 +49,6 @@ const MediaCarousel = ({
 
               dragIndexRef.current = i;
               didDragRef.current = true;
-              setDraggedIndex(i);
               e.dataTransfer.effectAllowed = 'move';
               e.dataTransfer.setData('text/plain', String(i));
             }}
@@ -71,7 +68,6 @@ const MediaCarousel = ({
 
               onReorder?.(fromIndex, i);
               dragIndexRef.current = i;
-              setDraggedIndex(i);
             }}
             onDrop={(e) => {
               if (!isDraggable) return;
@@ -94,8 +90,8 @@ const MediaCarousel = ({
                   ? 'border-tertiary opacity-100'
                   : 'border-primary/30 opacity-90'
             } ${isDraggable ? 'cursor-grab active:cursor-grabbing' : ''} ${
-              draggedIndex === i ? 'opacity-50' : ''
-            } ${item.type === 'video' ? 'relative' : ''}`}
+              item.type === 'video' ? 'relative' : ''
+            }`}
           >
             {item.type === 'video' ? (
               <>
