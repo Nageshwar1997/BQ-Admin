@@ -47,13 +47,20 @@ export const productCategoryInventorySchema = object({
 /*                           STEP 3 : MEDIA & GALLERY                         */
 /* -------------------------------------------------------------------------- */
 
-
 const IMAGE_MAX_SIZE = 1 * 1024 * 1024;
 const VIDEO_MAX_SIZE = 20 * 1024 * 1024;
 
 const fileListSchema = custom<FileList>((value) => value instanceof FileList && value.length > 0, {
   message: 'At least one file is required.',
 });
+
+const fileArraySchema = custom<File[]>(
+  (value) =>
+    Array.isArray(value) && value.length > 0 && value.every((file) => file instanceof File),
+  {
+    message: 'At least one file is required.',
+  },
+);
 
 const urlArraySchema = array(url({ message: 'Invalid URL.' }));
 
@@ -62,10 +69,15 @@ const formatFileSize = (bytes: number) => {
 };
 
 const createMediaSchema = (maxSize: number, type: 'image' | 'video') =>
-  union([fileListSchema, urlArraySchema]).superRefine((value, ctx) => {
-    if (!(value instanceof FileList)) return;
+  union([fileListSchema, fileArraySchema, urlArraySchema]).superRefine((value, ctx) => {
+    const files =
+      value instanceof FileList
+        ? Array.from(value)
+        : Array.isArray(value) && value.every((file) => file instanceof File)
+          ? value
+          : [];
 
-    Array.from(value).forEach((file, index) => {
+    files.forEach((file, index) => {
       if (file.size > maxSize) {
         ctx.addIssue({
           code: 'custom',

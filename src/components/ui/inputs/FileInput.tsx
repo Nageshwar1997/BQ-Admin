@@ -110,6 +110,7 @@ const FileInput = ({
   errors = [],
   previews = [],
   handleRemoveImage,
+  handleReorderMedia,
   fileInputProps = {},
   ...props
 }: IFileInput) => {
@@ -137,6 +138,7 @@ const FileInput = ({
             right: 'from-smoke-eerie right-px inset-y-px rounded-r-[7px]',
           }}
           media={previews}
+          onReorder={handleReorderMedia}
           onClick={(i) => {
             setCurrentIndex(i);
             setShowImageModal(true);
