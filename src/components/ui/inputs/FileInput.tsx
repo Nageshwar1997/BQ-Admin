@@ -1,11 +1,37 @@
 import MediaCarousel from '@/components/layout/carousels/MediaCarousel';
 import { MediaModal } from '@/components/layout/modals/MediaModal';
 import { FILE_MIME } from '@/constants/common.constants';
-import type { TChildren } from '@/types/component.type';
+import type { TChildren, TMediaResource } from '@/types/component.type';
 import type { IFileInput } from '@/types/input.type';
 import { Icon } from '@iconify/react';
-import { useState, type ChangeEvent } from 'react';
+import { useMemo, useState, type ChangeEvent } from 'react';
 import { InputError, InputIcon, InputLabel } from './children';
+
+const getMediaType = (value: File | string): TMediaResource => {
+  if (value instanceof File) {
+    if (value.type.startsWith('image/')) return 'image';
+    if (value.type.startsWith('video/')) return 'video';
+    throw new Error('Invalid file type.');
+  }
+
+  const cleanUrl = value.split('?')[0].split('#')[0];
+
+  const extension = cleanUrl.split('.').pop()?.toLowerCase();
+
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'];
+
+  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'mkv', 'm3u8'];
+
+  if (extension && imageExtensions.includes(extension)) {
+    return 'image';
+  }
+
+  if (extension && videoExtensions.includes(extension)) {
+    return 'video';
+  }
+
+  throw new Error('Invalid file type.');
+};
 
 const InputWrapper = ({ children, icons }: TChildren & Pick<IFileInput, 'icons'>) => (
   <>
@@ -109,14 +135,33 @@ const FileInput = ({
   mediaModalClassName = '',
   mediaCarouselClassName = '',
   errors = [],
-  previews = [],
+  value = [],
   handleRemoveImage,
-  handleReorderMedia,
   fileInputProps = {},
   ...props
 }: IFileInput) => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+
+  const previews = useMemo(() => {
+    if (!value) return [];
+
+    const files = value instanceof FileList ? Array.from(value) : value;
+
+    return files
+      .map((item) => {
+        const type = getMediaType(item);
+
+        if (item instanceof File) {
+          return { url: URL.createObjectURL(item), type };
+        } else if (typeof item === 'string') {
+          return { url: item, type };
+        } else {
+          return null;
+        }
+      })
+      .filter(Boolean) as { url: string; type: TMediaResource }[];
+  }, [value]);
 
   return (
     <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
@@ -136,7 +181,7 @@ const FileInput = ({
           <div className="sticky left-0 mr-1 ml-2 flex items-center justify-start gap-3">
             <div
               onClick={() => {}}
-              className="cursor-pointer border-primary/50 bg-tertiary-invert hover:border-tertiary flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-md border shadow-xs transition-colors duration-300 md:size-16 lg:size-20"
+              className="border-primary/50 bg-tertiary-invert hover:border-tertiary flex size-14 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md border shadow-xs transition-colors duration-300 md:size-16 lg:size-20"
             >
               <Icon icon="solar:gallery-add-linear" className="text-primary size-[40%]" />
             </div>
@@ -149,7 +194,6 @@ const FileInput = ({
               right: 'from-smoke-eerie rounded-r-[7px] z-2',
             }}
             media={previews}
-            onReorder={handleReorderMedia}
             onClick={(i) => {
               setCurrentIndex(i);
               setShowImageModal(true);

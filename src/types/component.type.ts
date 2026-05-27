@@ -141,7 +141,6 @@ export interface IMediaCarousel
   media: TMediaOption[];
   selected?: number | null;
   onClick: (index: number) => void;
-  onReorder?: (fromIndex: number, toIndex: number) => void;
   thumbnailRefs?: RefObject<(HTMLDivElement | null)[]>;
   handleRemove?: (index: number) => void;
 }

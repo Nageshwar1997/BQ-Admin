@@ -1,7 +1,7 @@
 import type { IconProps } from '@iconify/react';
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
-import type { TClassName, TContainerClassName, TMediaOption } from './component.type';
+import type { TClassName, TContainerClassName } from './component.type';
 
 type LeftIcon = { left: IconProps | string; right?: never };
 
@@ -56,8 +56,7 @@ export interface IFileInput extends Omit<IBaseInput, 'error'> {
   fileInputProps: Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
   errors?: string[];
   handleRemoveImage?: (index: number) => void;
-  handleReorderMedia?: (fromIndex: number, toIndex: number) => void;
-  previews?: TMediaOption[];
+  value?: FileList | (File | string)[];
   mediaModalClassName?: string;
   mediaCarouselClassName?: string;
 }

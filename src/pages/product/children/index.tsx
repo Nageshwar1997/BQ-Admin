@@ -193,19 +193,9 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
     };
   }, []);
 
-  const getMediaUrl = (media: File | string) => {
-    if (typeof media === 'string') return media;
-
-    const cachedUrl = objectUrlMapRef.current.get(media);
-    if (cachedUrl) return cachedUrl;
-
-    const url = URL.createObjectURL(media);
-    objectUrlMapRef.current.set(media, url);
-
-    return url;
-  };
-
-  const getMediaSetter = (fieldName: keyof Pick<TProductMedia, 'images' | 'thumbnail' | 'videos'>) => {
+  const getMediaSetter = (
+    fieldName: keyof Pick<TProductMedia, 'images' | 'thumbnail' | 'videos'>,
+  ) => {
     if (fieldName === 'thumbnail') return setThumbnailMedia;
     if (fieldName === 'images') return setImageMedia;
 
@@ -250,28 +240,11 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
     fieldName: keyof Pick<TProductMedia, 'images' | 'thumbnail' | 'videos'>,
     currentMedia: (File | string)[],
   ) => {
-    console.log('Handle remove called');
     return (index: number) => {
       updateMedia(
         fieldName,
         currentMedia.filter((_, mediaIndex) => mediaIndex !== index),
       );
-    };
-  };
-
-  const reorderMedia = (
-    fieldName: keyof Pick<TProductMedia, 'images' | 'thumbnail' | 'videos'>,
-    currentMedia: (File | string)[],
-  ) => {
-    return (fromIndex: number, toIndex: number) => {
-      const movedItem = currentMedia[fromIndex];
-
-      if (!movedItem) return;
-
-      const nextMedia = currentMedia.filter((_, mediaIndex) => mediaIndex !== fromIndex);
-      nextMedia.splice(toIndex, 0, movedItem);
-
-      updateMedia(fieldName, nextMedia);
     };
   };
 
@@ -284,25 +257,6 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
       .filter(Boolean);
   };
 
-  const imagePreviews = imageMedia.map((image, index) => ({
-    type: 'image' as const,
-    url: getMediaUrl(image),
-    hasError: !!errors.images?.[index],
-  }));
-  console.log('🚀 ~ MediaFields ~ imagePreviews:', imagePreviews);
-
-  const thumbnailPreviews = thumbnailMedia.map((image, index) => ({
-    type: 'image' as const,
-    url: getMediaUrl(image),
-    hasError: !!errors.thumbnail?.[index],
-  }));
-
-  const videoPreviews = videoMedia.map((video, index) => ({
-    type: 'video' as const,
-    url: getMediaUrl(video),
-    hasError: !!errors.videos?.[index],
-  }));
-
   return (
     <div className="grid gap-4">
       <FileInput
@@ -312,10 +266,9 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
           multiple: false,
           onChange: mergeSelectedFiles('thumbnail', thumbnailMedia, true),
         }}
-        previews={thumbnailPreviews}
+        value={thumbnailMedia}
         errors={getErrorMessages(errors.thumbnail)}
         handleRemoveImage={removeMedia('thumbnail', thumbnailMedia)}
-        handleReorderMedia={reorderMedia('thumbnail', thumbnailMedia)}
       />
 
       <FileInput
@@ -325,10 +278,9 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
           multiple: true,
           onChange: mergeSelectedFiles('images', imageMedia),
         }}
-        previews={imagePreviews}
+        value={imageMedia}
         errors={getErrorMessages(errors.images)}
         handleRemoveImage={removeMedia('images', imageMedia)}
-        handleReorderMedia={reorderMedia('images', imageMedia)}
       />
 
       <FileInput
@@ -339,10 +291,9 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
           accept: 'video/*',
           onChange: mergeSelectedFiles('videos', videoMedia),
         }}
-        previews={videoPreviews}
+        value={videoMedia}
         errors={getErrorMessages(errors.videos)}
         handleRemoveImage={removeMedia('videos', videoMedia)}
-        handleReorderMedia={reorderMedia('videos', videoMedia)}
       />
     </div>
   );
