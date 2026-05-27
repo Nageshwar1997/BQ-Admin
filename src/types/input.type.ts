@@ -55,7 +55,7 @@ export interface ISelect extends Omit<IBaseInput, 'needRef' | 'register'> {
 export interface IFileInput extends Omit<IBaseInput, 'error'> {
   fileInputProps: Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
   errors?: string[];
-  handleRemoveImage?: (index: number) => void;
+  handleRemove?: (index: number) => void;
   value?: FileList | (File | string)[];
   mediaModalClassName?: string;
   mediaCarouselClassName?: string;

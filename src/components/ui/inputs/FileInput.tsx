@@ -136,7 +136,7 @@ const FileInput = ({
   mediaCarouselClassName = '',
   errors = [],
   value = [],
-  handleRemoveImage,
+  handleRemove,
   fileInputProps = {},
   ...props
 }: IFileInput) => {
@@ -198,7 +198,7 @@ const FileInput = ({
               setCurrentIndex(i);
               setShowImageModal(true);
             }}
-            handleRemove={handleRemoveImage}
+            handleRemove={handleRemove}
           />
         </div>
       )}
@@ -210,7 +210,7 @@ const FileInput = ({
           opened={showImageModal}
           media={previews}
           setCurrentIndex={setCurrentIndex}
-          handleRemove={handleRemoveImage}
+          handleRemove={handleRemove}
         />
       )}
     </div>
