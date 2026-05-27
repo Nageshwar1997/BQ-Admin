@@ -146,10 +146,11 @@ const FileInput = ({
   const previews = useMemo(() => {
     if (!value) return [];
 
-    const files = value instanceof FileList ? Array.from(value) : value;
+    const files = value;
+    console.log('🚀 ~ FileInput ~ files:', files);
 
     return files
-      .map((item) => {
+      ?.map((item) => {
         const type = getMediaType(item);
 
         if (item instanceof File) {

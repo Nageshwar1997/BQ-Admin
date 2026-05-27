@@ -56,7 +56,7 @@ export interface IFileInput extends Omit<IBaseInput, 'error'> {
   fileInputProps: Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
   errors?: string[];
   handleRemove?: (index: number) => void;
-  value?: FileList | (File | string)[];
+  value?: (File | string)[];
   mediaModalClassName?: string;
   mediaCarouselClassName?: string;
 }

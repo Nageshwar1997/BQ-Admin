@@ -1,7 +1,6 @@
 import {
   array,
   boolean,
-  custom,
   literal,
   number,
   object,
@@ -9,6 +8,7 @@ import {
   union,
   url,
   enum as z_enum,
+  instanceof as z_instanceof,
 } from 'zod';
 
 /* -------------------------------------------------------------------------- */
@@ -50,50 +50,110 @@ export const productCategoryInventorySchema = object({
 const IMAGE_MAX_SIZE = 1 * 1024 * 1024;
 const VIDEO_MAX_SIZE = 20 * 1024 * 1024;
 
-const fileListSchema = custom<FileList>((value) => value instanceof FileList && value.length > 0, {
-  message: 'At least one file is required.',
-});
-
-const fileArraySchema = custom<File[]>(
-  (value) =>
-    Array.isArray(value) && value.length > 0 && value.every((file) => file instanceof File),
-  {
-    message: 'At least one file is required.',
-  },
-);
-
-const urlArraySchema = array(url({ message: 'Invalid URL.' }));
-
 const formatFileSize = (bytes: number) => {
   return `${(bytes / 1024 / 1024).toFixed(2)}MB`;
 };
 
-const createMediaSchema = (maxSize: number, type: 'image' | 'video') =>
-  union([fileListSchema, fileArraySchema, urlArraySchema]).superRefine((value, ctx) => {
-    const files =
-      value instanceof FileList
-        ? Array.from(value)
-        : Array.isArray(value) && value.every((file) => file instanceof File)
-          ? value
-          : [];
+const mediaArraySchema = array(union([z_instanceof(File), url({ message: 'Invalid URL.' })]));
 
-    files.forEach((file, index) => {
-      if (file.size > maxSize) {
-        ctx.addIssue({
-          code: 'custom',
-          path: [index],
-          message: `${type} ${index + 1} size is ${formatFileSize(
-            file.size,
-          )}. Maximum allowed size is ${formatFileSize(maxSize)}.`,
-        });
-      }
+const validateMedia = (
+  value: (File | string)[] | undefined,
+  ctx: any,
+  {
+    type,
+    maxSize,
+    field,
+    required,
+  }: {
+    type: 'image' | 'video';
+    maxSize: number;
+    field: string;
+    required?: boolean;
+  },
+) => {
+  // Required validation
+  if (required && (!value || value.length === 0)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: `At least one ${field} is required.`,
     });
+
+    return;
+  }
+
+  if (!value || value.length === 0) return;
+
+  const files = value.filter((item): item is File => item instanceof File);
+
+  files.forEach((file, index) => {
+    const isImage = file.type.startsWith('image/');
+    const isVideo = file.type.startsWith('video/');
+
+    // Type validation
+    if (type === 'image' && !isImage) {
+      ctx.addIssue({
+        code: 'custom',
+        path: [index],
+        message: `File ${index + 1} must be an image.`,
+      });
+
+      return;
+    }
+
+    if (type === 'video' && !isVideo) {
+      ctx.addIssue({
+        code: 'custom',
+        path: [index],
+        message: `File ${index + 1} must be a video.`,
+      });
+
+      return;
+    }
+
+    // Size validation
+    if (file.size > maxSize) {
+      ctx.addIssue({
+        code: 'custom',
+        path: [index],
+        message: `${type} ${index + 1} size is ${formatFileSize(
+          file.size,
+        )}. Maximum allowed size is ${formatFileSize(maxSize)}.`,
+      });
+    }
   });
+};
+
+export const thumbnailSchema = mediaArraySchema.superRefine((value, ctx) => {
+  validateMedia(value, ctx, {
+    type: 'image',
+    maxSize: IMAGE_MAX_SIZE,
+    required: true,
+    field: 'thumbnail',
+  });
+});
+
+export const imagesSchema = mediaArraySchema.superRefine((value, ctx) => {
+  validateMedia(value, ctx, {
+    type: 'image',
+    maxSize: IMAGE_MAX_SIZE,
+    required: true,
+    field: 'images',
+  });
+});
+
+export const videosSchema = mediaArraySchema.optional().superRefine((value, ctx) => {
+  validateMedia(value, ctx, {
+    type: 'video',
+    maxSize: VIDEO_MAX_SIZE,
+    required: false,
+    field: 'videos',  
+  });
+});
 
 export const productMediaSchema = object({
-  thumbnail: createMediaSchema(IMAGE_MAX_SIZE, 'image'),
-  images: createMediaSchema(IMAGE_MAX_SIZE, 'image'),
-  videos: createMediaSchema(VIDEO_MAX_SIZE, 'video').optional(),
+  thumbnail: thumbnailSchema,
+  images: imagesSchema,
+  videos: videosSchema,
 });
 
 /* -------------------------------------------------------------------------- */

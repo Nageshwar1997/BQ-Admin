@@ -63,7 +63,7 @@ const AddNewProduct = () => {
     defaultValues: {
       images: [],
       thumbnail: [],
-      videos: [],
+      videos: undefined,
     },
   });
 

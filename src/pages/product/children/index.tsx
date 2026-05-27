@@ -174,58 +174,128 @@ export const CategoryInventoryFields = ({
 export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) => {
   const {
     control,
-    register,
     formState: { errors },
+    setValue,
   } = form;
   console.log('🚀 ~ MediaFields ~ errors:', errors);
 
-  const thumbnail = useWatch({ control, name: 'thumbnail' });
-  const images = useWatch({ control, name: 'images' });
-  const videos = useWatch({ control, name: 'videos' });
+  const fields = useWatch({ control });
 
-  const getErrorMessages = (fieldErrors: any) => {
+  const getErrorMessages = (fieldErrors: any): string[] => {
     if (!fieldErrors) return [];
 
+    // Direct message object
+    if (
+      typeof fieldErrors === 'object' &&
+      'message' in fieldErrors &&
+      typeof fieldErrors.message === 'string'
+    ) {
+      return [fieldErrors.message];
+    }
+
+    // Array/object indexed errors
     return Object.keys(fieldErrors)
-      .filter((key) => !Number.isNaN(Number(key)))
-      .map((key) => fieldErrors[key]?.message)
-      .filter(Boolean);
+      .map((key) => {
+        const error = fieldErrors[key];
+
+        if (
+          error &&
+          typeof error === 'object' &&
+          'message' in error &&
+          typeof error.message === 'string'
+        ) {
+          return error.message;
+        }
+
+        return null;
+      })
+      .filter(Boolean) as string[];
+  };
+
+  const handleRemove = (fieldName: keyof TProductMedia) => (index: number) => {
+    const currentValue = fields[fieldName];
+
+    if (!currentValue) return;
+
+    const currentArray = currentValue;
+
+    const nextValue = currentArray.filter((_, currentIndex) => currentIndex !== index);
+
+    setValue(
+      fieldName,
+      nextValue,
+      { shouldValidate: true },
+      // { shouldDirty: true, shouldTouch: true, shouldValidate: true }
+    );
   };
 
   return (
     <div className="grid gap-4">
-      <FileInput
-        fileInputProps={{
-          name: 'thumbnail',
-          placeholder: 'Thumbnail',
-          multiple: false,
-        }}
-        register={register('thumbnail')}
-        value={thumbnail}
-        errors={getErrorMessages(errors.thumbnail)}
+      <Controller
+        control={control}
+        name="thumbnail"
+        render={({ field: { name, onChange, value } }) => (
+          <FileInput
+            fileInputProps={{
+              name,
+              placeholder: 'Thumbnail',
+              multiple: false,
+              onChange: (event) => {
+                const files = Array.from(event.target.files || []);
+
+                onChange(files);
+              },
+            }}
+            value={value}
+            errors={getErrorMessages(errors.thumbnail)}
+            handleRemove={handleRemove('thumbnail')}
+          />
+        )}
       />
 
-      <FileInput
-        fileInputProps={{
-          name: 'images',
-          placeholder: 'Images',
-          multiple: true,
-        }}
-        value={images}
-        register={register('images')}
-        errors={getErrorMessages(errors.images)}
+      <Controller
+        control={control}
+        name="images"
+        render={({ field: { name, onChange, value } }) => (
+          <FileInput
+            fileInputProps={{
+              name,
+              placeholder: 'Images',
+              multiple: true,
+              onChange: (event) => {
+                const files = Array.from(event.target.files || []);
+
+                onChange(files);
+              },
+            }}
+            value={value}
+            errors={getErrorMessages(errors.images)}
+            handleRemove={handleRemove('images')}
+          />
+        )}
       />
 
-      <FileInput
-        fileInputProps={{
-          name: 'videos',
-          placeholder: 'Videos',
-          multiple: true,
-          accept: 'video/*',
-        }}
-        value={videos}
-        register={register('videos')}
-        errors={getErrorMessages(errors.videos)}
+      <Controller
+        control={control}
+        name="videos"
+        render={({ field }) => (
+          <FileInput
+            fileInputProps={{
+              name: field.name,
+              placeholder: 'Videos',
+              multiple: true,
+              accept: 'video/*',
+              onChange: (event) => {
+                const files = Array.from(event.target.files || []);
+
+                field.onChange(files);
+              },
+            }}
+            value={field.value}
+            errors={getErrorMessages(errors.videos)}
+            handleRemove={handleRemove('videos')}
+          />
+        )}
       />
     </div>
   );
