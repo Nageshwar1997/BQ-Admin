@@ -175,11 +175,13 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
   const {
     control,
     register,
+    setValue,
     formState: { errors },
   } = form;
   console.log('🚀 ~ MediaFields ~ errors:', errors);
 
   const images = useWatch({ control, name: 'images' });
+  console.log("🚀 ~ MediaFields ~ images:", images)
   const videos = useWatch({ control, name: 'videos' });
   const thumbnail = useWatch({ control, name: 'thumbnail' });
 
@@ -187,6 +189,58 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
     if (!media) return [];
 
     return media instanceof FileList ? Array.from(media) : media;
+  };
+
+  const createFileList = (files: File[]) => {
+    const dataTransfer = new DataTransfer();
+
+    files.forEach((file) => dataTransfer.items.add(file));
+
+    return dataTransfer.files;
+  };
+
+  const mergeSelectedFiles = (
+    fieldName: keyof Pick<TProductMedia, 'images' | 'thumbnail' | 'videos'>,
+    currentMedia: TProductMedia[typeof fieldName],
+    replace = false,
+  ) => {
+    return (event: React.ChangeEvent<HTMLInputElement>) => {
+      const selectedFiles = Array.from(event.target.files || []);
+      if (selectedFiles.length === 0) return;
+
+      const existingFiles = normalizeMedia(currentMedia).filter(
+        (media): media is File => media instanceof File,
+      );
+      const mergedFiles = replace ? selectedFiles : [...existingFiles, ...selectedFiles];
+
+      setValue(fieldName, createFileList(mergedFiles), {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+
+      event.target.value = '';
+    };
+  };
+
+  const removeMedia = (
+    fieldName: keyof Pick<TProductMedia, 'images' | 'thumbnail' | 'videos'>,
+    currentMedia: TProductMedia[typeof fieldName],
+  ) => {
+    return (index: number) => {
+      const nextMedia = normalizeMedia(currentMedia).filter((_, mediaIndex) => mediaIndex !== index);
+      const nextFiles = nextMedia.filter((media): media is File => media instanceof File);
+      const value =
+        nextFiles.length === nextMedia.length
+          ? createFileList(nextFiles)
+          : nextMedia.filter((media): media is string => typeof media === 'string');
+
+      setValue(fieldName, value, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+    };
   };
 
   const getErrorMessages = (fieldErrors: any) => {
@@ -203,6 +257,7 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
     url: image instanceof File ? URL.createObjectURL(image) : image,
     hasError: !!errors.images?.[index],
   }));
+  console.log("🚀 ~ MediaFields ~ imagePreviews:", imagePreviews)
 
   const thumbnailPreviews = normalizeMedia(thumbnail).map((image, index) => ({
     type: 'image' as const,
@@ -219,19 +274,29 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
   return (
     <div className="grid gap-4">
       <FileInput
-        fileInputProps={{ name: 'thumbnail', placeholder: 'Thumbnail', multiple: false }}
+        fileInputProps={{
+          name: 'thumbnail',
+          placeholder: 'Thumbnail',
+          multiple: false,
+          onChange: mergeSelectedFiles('thumbnail', thumbnail, true),
+        }}
         register={register('thumbnail')}
         previews={thumbnailPreviews}
         errors={getErrorMessages(errors.thumbnail)}
-        handleRemoveImage={() => {}}
+        handleRemoveImage={removeMedia('thumbnail', thumbnail)}
       />
 
       <FileInput
-        fileInputProps={{ name: 'images', placeholder: 'Images', multiple: true }}
+        fileInputProps={{
+          name: 'images',
+          placeholder: 'Images',
+          multiple: true,
+          onChange: mergeSelectedFiles('images', images),
+        }}
         register={register('images')}
         previews={imagePreviews}
         errors={getErrorMessages(errors.images)}
-        handleRemoveImage={() => {}}
+        handleRemoveImage={removeMedia('images', images)}
       />
 
       <FileInput
@@ -240,11 +305,12 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
           placeholder: 'Videos',
           multiple: true,
           accept: 'video/*',
+          onChange: mergeSelectedFiles('videos', videos),
         }}
         register={register('videos')}
         previews={videoPreviews}
         errors={getErrorMessages(errors.videos)}
-        handleRemoveImage={() => {}}
+        handleRemoveImage={removeMedia('videos', videos)}
       />
     </div>
   );

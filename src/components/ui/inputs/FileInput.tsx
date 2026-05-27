@@ -53,7 +53,12 @@ const CenterContent = ({
 }: Pick<IFileInput, 'fileInputProps' | 'register'>) => {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (fileInputProps?.disabled) return;
-    fileInputProps.onChange?.(event);
+
+    if (fileInputProps.onChange) {
+      fileInputProps.onChange(event);
+      return;
+    }
+
     register?.onChange?.(event);
   };
   return (
