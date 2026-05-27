@@ -3,6 +3,7 @@ import { MediaModal } from '@/components/layout/modals/MediaModal';
 import { FILE_MIME } from '@/constants/common.constants';
 import type { TChildren } from '@/types/component.type';
 import type { IFileInput } from '@/types/input.type';
+import { Icon } from '@iconify/react';
 import { useState, type ChangeEvent } from 'react';
 import { InputError, InputIcon, InputLabel } from './children';
 
@@ -131,20 +132,31 @@ const FileInput = ({
         </div>
       )}
       {previews?.length > 0 && (
-        <MediaCarousel
-          className={`border-primary/10 bg-smoke-eerie rounded-lg border ${mediaCarouselClassName}`}
-          gradientClassNames={{
-            left: 'from-smoke-eerie left-px inset-y-px rounded-l-[7px]',
-            right: 'from-smoke-eerie right-px inset-y-px rounded-r-[7px]',
-          }}
-          media={previews}
-          onReorder={handleReorderMedia}
-          onClick={(i) => {
-            setCurrentIndex(i);
-            setShowImageModal(true);
-          }}
-          handleRemove={handleRemoveImage}
-        />
+        <div className="border-primary/10 bg-smoke-eerie relative flex rounded-lg border">
+          <div className="sticky left-0 mr-1 ml-2 flex items-center justify-start gap-3">
+            <div
+              onClick={() => {}}
+              className="cursor-pointer border-primary/50 bg-tertiary-invert hover:border-tertiary flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-md border shadow-xs transition-colors duration-300 md:size-16 lg:size-20"
+            >
+              <Icon icon="solar:gallery-add-linear" className="text-primary size-[40%]" />
+            </div>
+            <div className="group bg-hr-line my-2 h-14 w-px shrink-0 md:h-16 lg:h-20" />
+          </div>
+          <MediaCarousel
+            className={` ${mediaCarouselClassName}`}
+            gradientClassNames={{
+              left: 'from-smoke-eerie rounded-l-[7px] z-2',
+              right: 'from-smoke-eerie rounded-r-[7px] z-2',
+            }}
+            media={previews}
+            onReorder={handleReorderMedia}
+            onClick={(i) => {
+              setCurrentIndex(i);
+              setShowImageModal(true);
+            }}
+            handleRemove={handleRemoveImage}
+          />
+        </div>
       )}
       {showImageModal && currentIndex !== null && (
         <MediaModal
