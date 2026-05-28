@@ -1,3 +1,4 @@
+import Navbar from '@/components/layout/navbar';
 import Button from '@/components/ui/Button';
 import Stepper from '@/components/ui/Stepper';
 import { ADD_PRODUCT_STEPS } from '@/constants/common.constants';
@@ -227,39 +228,43 @@ const AddNewProduct = () => {
   ];
 
   return (
-    <Stepper
-      steps={ADD_PRODUCT_STEPS}
-      activeStep={activeStep}
-      onStepClick={(step) => setActiveStep(step)}
-    >
-      <div className="flex flex-col gap-5">
-        <div>
-          <p className="text-primary text-sm font-semibold">{stepFields[activeStep].title}</p>
+    <div className="">
+      <Navbar buttons={[{ content: 'Save Draft', leftIcon: { icon: 'solar:diskette-linear' } }]} />
+      <Stepper
+        steps={ADD_PRODUCT_STEPS}
+        activeStep={activeStep}
+        onStepClick={(step) => setActiveStep(step)}
+        className='p-4! mt-4'
+      >
+        <div className="flex flex-col gap-5">
+          <div>
+            <p className="text-primary text-sm font-semibold">{stepFields[activeStep].title}</p>
 
-          <p className="text-secondary text-xs">{stepFields[activeStep].description}</p>
+            <p className="text-secondary text-xs">{stepFields[activeStep].description}</p>
+          </div>
+
+          {stepFields[activeStep].content}
+
+          <div className="flex justify-between gap-3">
+            <Button
+              pattern="secondary"
+              content={activeStep === 0 ? 'Save draft' : 'Back'}
+              buttonProps={{
+                onClick: activeStep === 0 ? handleSaveDraft : handleBack,
+              }}
+            />
+
+            <Button
+              pattern="primary"
+              content={activeStep === ADD_PRODUCT_STEPS.length - 1 ? 'Save' : 'Next'}
+              buttonProps={{
+                onClick: activeStep === ADD_PRODUCT_STEPS.length - 1 ? handleSaveDraft : handleNext,
+              }}
+            />
+          </div>
         </div>
-
-        {stepFields[activeStep].content}
-
-        <div className="flex justify-between gap-3">
-          <Button
-            pattern="secondary"
-            content={activeStep === 0 ? 'Save draft' : 'Back'}
-            buttonProps={{
-              onClick: activeStep === 0 ? handleSaveDraft : handleBack,
-            }}
-          />
-
-          <Button
-            pattern="primary"
-            content={activeStep === ADD_PRODUCT_STEPS.length - 1 ? 'Save' : 'Next'}
-            buttonProps={{
-              onClick: activeStep === ADD_PRODUCT_STEPS.length - 1 ? handleSaveDraft : handleNext,
-            }}
-          />
-        </div>
-      </div>
-    </Stepper>
+      </Stepper>
+    </div>
   );
 };
 

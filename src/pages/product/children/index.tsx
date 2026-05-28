@@ -219,6 +219,8 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
   console.log('🚀 ~ MediaFields ~ errors:', errors);
 
   const images = useWatch({ control, name: 'images' });
+  const thumbnail = useWatch({ control, name: 'thumbnail' });
+  const video = useWatch({ control, name: 'video' });
 
   return (
     <div className="grid gap-4">
@@ -229,7 +231,7 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
           <FileInput
             fileInputProps={{
               name,
-              placeholder: 'Thumbnail',
+              placeholder: !!thumbnail ? 'Change thumbnail' : 'Select thumbnail',
               onChange: ({ target: { files } }) => onChange(files?.[0]),
               value,
             }}
@@ -246,10 +248,12 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
           <FileInput
             fileInputProps={{
               name,
-              placeholder: 'Images',
+              placeholder: images.length ? 'Change images' : 'Select images',
               multiple: true,
+              disabled: images.length >= 10,
               onChange: (event) => {
-                const files = Array.from(event.target.files || []);
+                const newFiles = Array.from(event.target.files || []);
+                const files = [...images, ...newFiles];
                 onChange(files);
               },
               value,
@@ -275,7 +279,7 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
           <FileInput
             fileInputProps={{
               name,
-              placeholder: 'Videos',
+              placeholder: !!video ? 'Change video' : 'Select video',
               accept: FILE_MIME.video.join(','),
               onChange: ({ target: { files } }) => onChange(files?.[0]),
               value,

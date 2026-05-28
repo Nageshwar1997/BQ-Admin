@@ -117,7 +117,7 @@ const CenterContent = ({
 
   return (
     <div
-      className={`flex h-full w-full flex-1 cursor-pointer items-center justify-start border-none bg-transparent p-3 text-sm font-normal outline-hidden focus:border-none focus:outline-hidden ${fileInputProps?.className || ''}`}
+      className={`flex h-full w-full flex-1 items-center justify-start border-none bg-transparent p-3 text-sm font-normal outline-hidden focus:border-none focus:outline-hidden ${fileInputProps?.disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${fileInputProps?.className || ''}`}
     >
       <p className="text-primary/30 line-clamp-1 text-xs">
         {fileInputProps?.placeholder
@@ -211,7 +211,7 @@ const FileInput = ({
             <div className="sticky left-0 mr-1 ml-2 flex items-center justify-start gap-3">
               <label
                 htmlFor={fileInputProps.name}
-                className="border-primary/50 bg-tertiary-invert hover:border-tertiary flex size-14 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md border shadow-xs transition-colors duration-300 md:size-16 lg:size-20"
+                className={`border-primary/50 bg-tertiary-invert hover:border-tertiary flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-md border shadow-xs transition-colors duration-300 md:size-16 lg:size-20 ${fileInputProps?.disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <Icon icon="solar:gallery-add-linear" className="text-primary size-[40%]" />
               </label>
