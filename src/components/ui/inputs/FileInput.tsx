@@ -33,6 +33,24 @@ const getMediaType = (value: File | string): TMediaResource => {
   throw new Error('Invalid file type.');
 };
 
+const MediaErrorStyle = ({ errors }: Pick<IFileInput, 'errors'>) => {
+  if (!errors || !errors.length) return null;
+  return (
+    <style>
+      {errors
+        .map((error) => {
+          const match = error.match(/\d+/);
+
+          if (!match) return '';
+
+          const index = Number(match[0]);
+          return `.media-carousel > div:nth-child(${index}) { border-color: var(--color-red-c);}`;
+        })
+        .join('\n')}
+    </style>
+  );
+};
+
 const InputWrapper = ({ children, icons }: TChildren & Pick<IFileInput, 'icons'>) => (
   <>
     {/* Left Icon */}
@@ -146,10 +164,7 @@ const FileInput = ({
   const previews = useMemo(() => {
     if (!value) return [];
 
-    const files = value;
-    console.log('🚀 ~ FileInput ~ files:', files);
-
-    return files
+    return value
       ?.map((item) => {
         const type = getMediaType(item);
 
@@ -188,8 +203,9 @@ const FileInput = ({
             </div>
             <div className="group bg-hr-line my-2 h-14 w-px shrink-0 md:h-16 lg:h-20" />
           </div>
+          <MediaErrorStyle errors={errors} />
           <MediaCarousel
-            className={` ${mediaCarouselClassName}`}
+            className={`${mediaCarouselClassName}`}
             gradientClassNames={{
               left: 'from-smoke-eerie rounded-l-[7px] z-2',
               right: 'from-smoke-eerie rounded-r-[7px] z-2',

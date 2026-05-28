@@ -20,7 +20,7 @@ const MediaCarousel = ({
       className={`w-full [&>div]:justify-start ${className}`}
       gradientClassNames={gradientClassNames}
     >
-      <div className="flex items-center gap-2 p-2">
+      <div className="flex items-center gap-2 p-2 media-carousel">
         {media.map((item, i) => (
           <div
             key={`${item.url}-${i}`}
