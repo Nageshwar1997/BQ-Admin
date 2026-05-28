@@ -1,4 +1,12 @@
 import {
+  FILE_EXTENSIONS,
+  FILE_MIME,
+  MAX_IMAGE_FILE_SIZE,
+  MAX_VIDEO_FILE_SIZE,
+  MB,
+} from '@/constants/common.constants';
+import { REGEX } from '@/constants/regex.constants';
+import {
   array,
   boolean,
   literal,
@@ -47,95 +55,84 @@ export const productCategoryInventorySchema = object({
 /*                           STEP 3 : MEDIA & GALLERY                         */
 /* -------------------------------------------------------------------------- */
 
-const IMAGE_MAX_SIZE = 1 * 1024 * 1024;
-const VIDEO_MAX_SIZE = 20 * 1024 * 1024;
-
-const formatFileSize = (bytes: number) => {
-  return `${(bytes / 1024 / 1024).toFixed(2)}MB`;
-};
-
-const mediaArraySchema = array(union([z_instanceof(File), url({ message: 'Invalid URL.' })]));
-
-const validateMedia = (
-  value: (File | string)[] | undefined,
-  ctx: any,
-  {
-    type,
-    maxSize,
-    field,
-    required,
-  }: {
-    type: 'image' | 'video';
-    maxSize: number;
-    field: string;
-    required?: boolean;
-  },
-) => {
-  // Required validation
-  if (required && (!value || value.length === 0)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: `At least one ${field} is required.`,
-    });
-
-    return;
-  }
-
-  if (!value || value.length === 0) return;
-
-  const files = value.filter((item): item is File => item instanceof File);
-
-  files.forEach((file, index) => {
-    const isImage = file.type.startsWith('image/');
-    const isVideo = file.type.startsWith('video/');
-
-    // Type validation
-    if (type === 'image' && !isImage) {
+const createFileSchema = ({
+  maxFileSize,
+  mimeTypes,
+  extensions,
+  field = 'file',
+  path = [],
+}: {
+  maxFileSize: number;
+  mimeTypes: readonly string[];
+  extensions: readonly string[];
+  field?: string;
+  path?: (string | number)[];
+}) =>
+  z_instanceof(File).superRefine((file, ctx) => {
+    if (file.size > maxFileSize) {
       ctx.addIssue({
         code: 'custom',
-        path: [index],
-        message: `File ${index + 1} must be an image.`,
+        path,
+        message: `Selected ${field} size is ${(file.size / MB).toFixed(2)}MB. Maximum allowed size is ${(maxFileSize / MB).toFixed(2)}MB.`,
       });
-
-      return;
     }
 
-    if (type === 'video' && !isVideo) {
+    if (!mimeTypes.includes(file.type)) {
       ctx.addIssue({
         code: 'custom',
-        path: [index],
-        message: `File ${index + 1} must be a video.`,
-      });
-
-      return;
-    }
-
-    // Size validation
-    if (file.size > maxSize) {
-      ctx.addIssue({
-        code: 'custom',
-        path: [index],
-        message: `${type} ${index + 1} size is ${formatFileSize(
-          file.size,
-        )}. Maximum allowed size is ${formatFileSize(maxSize)}.`,
+        path,
+        message: `Selected ${field} type must be one of: ${extensions.join(', ')}.`,
       });
     }
   });
-};
 
-export const imagesSchema = mediaArraySchema.superRefine((value, ctx) => {
-  validateMedia(value, ctx, {
-    type: 'image',
-    maxSize: IMAGE_MAX_SIZE,
-    required: true,
-    field: 'images',
-  });
+export const imageFileSchema = createFileSchema({
+  maxFileSize: MAX_IMAGE_FILE_SIZE,
+  mimeTypes: FILE_MIME.image,
+  extensions: FILE_EXTENSIONS.image,
 });
 
+export const videoFileSchema = createFileSchema({
+  maxFileSize: MAX_VIDEO_FILE_SIZE,
+  mimeTypes: FILE_MIME.video,
+  extensions: FILE_EXTENSIONS.video,
+});
+
+export const thumbnailSchema = union([
+  imageFileSchema,
+  url({ message: 'Invalid thumbnail URL.', normalize: true, pattern: REGEX.URL }),
+])
+  .optional()
+  .superRefine((value, ctx) => {
+    if (!value) {
+      ctx.addIssue({ code: 'custom', message: 'Thumbnail is required.' });
+    }
+  });
+
+export const videoSchema = union([
+  videoFileSchema,
+  url({ message: 'Invalid video URL.', normalize: true, pattern: REGEX.URL }),
+]);
+
+export const imageItemSchema = union([
+  imageFileSchema,
+  url({ message: 'Invalid image URL.', normalize: true, pattern: REGEX.URL }),
+]);
+
+export const imagesSchema = array(imageItemSchema)
+  .min(1, { message: 'At least one image is required.' })
+  .superRefine((items, ctx) => {
+    items.forEach((item, index) => {
+      if (typeof item === 'string' && item.trim() === '') {
+        ctx.addIssue({ code: 'custom', path: [index], message: 'Image URL cannot be empty.' });
+      }
+    });
+  });
+
 export const productMediaSchema = object({
-  thumbnail: union([z_instanceof(File), url({ message: 'Invalid URL.' })]),
+  thumbnail: thumbnailSchema,
   images: imagesSchema,
-  video: union([z_instanceof(File), url({ message: 'Invalid URL.' })]).optional(),
+  video: videoSchema.optional(),
 });
 
 /* -------------------------------------------------------------------------- */

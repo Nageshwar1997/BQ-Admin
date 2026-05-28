@@ -63,7 +63,7 @@ const MediaCarousel = ({
             {handleRemove && (
               <button
                 type="button"
-                className="bg-tertiary/80 absolute top-0.5 right-0.5 z-1 flex size-4 items-center justify-center rounded-full"
+                className="bg-tertiary/80 absolute top-0.5 right-0.5 z-1 flex size-4 items-center justify-center cursor-pointer rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRemove(i);
