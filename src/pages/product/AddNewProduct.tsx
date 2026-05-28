@@ -36,10 +36,21 @@ import {
   VariantsFields,
 } from './children';
 
-const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState(2);
+const FORM_IDS = [
+  'product-basic-info-form',
+  'product-category-inventory-form',
+  'product-media-form',
+  'product-description-form',
+  'product-variants-form',
+  'product-tryon-form',
+  'product-seo-form',
+  'product-confirm-form',
+] as const;
 
-  const form1 = useForm<TProductBasicInfo>({
+const AddNewProduct = () => {
+  const [activeStep, setActiveStep] = useState(0);
+
+  const basicInfoForm = useForm<TProductBasicInfo>({
     resolver: zodResolver(productBasicInfoSchema),
     defaultValues: {
       title: '',
@@ -49,7 +60,7 @@ const AddNewProduct = () => {
     },
   });
 
-  const form2 = useForm<TProductCategoryInventory>({
+  const categoryInventoryForm = useForm<TProductCategoryInventory>({
     resolver: zodResolver(productCategoryInventorySchema),
     defaultValues: {
       stock: 0,
@@ -59,12 +70,12 @@ const AddNewProduct = () => {
     },
   });
 
-  const form3 = useForm<TProductMedia>({
+  const mediaForm = useForm<TProductMedia>({
     resolver: zodResolver(productMediaSchema),
     defaultValues: { images: [], thumbnail: undefined, video: undefined },
   });
 
-  const form4 = useForm<TProductDescription>({
+  const descriptionForm = useForm<TProductDescription>({
     resolver: zodResolver(productDescriptionSchema),
     defaultValues: {
       description: '',
@@ -74,14 +85,14 @@ const AddNewProduct = () => {
     },
   });
 
-  const form5 = useForm<TProductVariants>({
+  const variantsForm = useForm<TProductVariants>({
     resolver: zodResolver(productVariantsSchema),
     defaultValues: {
       variants: [],
     },
   });
 
-  const form6 = useForm<TProductTryOn>({
+  const tryOnForm = useForm<TProductTryOn>({
     resolver: zodResolver(productTryOnSchema),
     defaultValues: {
       assets: [],
@@ -90,7 +101,7 @@ const AddNewProduct = () => {
     },
   });
 
-  const form7 = useForm<TProductSeo>({
+  const seoFOrm = useForm<TProductSeo>({
     resolver: zodResolver(productSeoSchema),
     defaultValues: {
       seoDescription: '',
@@ -99,37 +110,28 @@ const AddNewProduct = () => {
     },
   });
 
-  const form8 = useForm<TConfirmDetails>({
+  const confirmForm = useForm<TConfirmDetails>({
     resolver: zodResolver(confirmDetailsSchema),
-    defaultValues: {
-      confirm: false,
-    },
+    defaultValues: { confirm: false },
   });
 
-  const forms = [form1, form2, form3, form4, form5, form6, form7, form8];
-
-  const handleNext = async () => {
-    const currentForm = forms[activeStep];
-
-    const isValid = await currentForm.trigger();
-
-    if (!isValid) return;
-
+  const handleNext = () => {
     setActiveStep((prev) => Math.min(prev + 1, ADD_PRODUCT_STEPS.length - 1));
   };
+
   const handleBack = () => {
     setActiveStep((prev) => Math.max(prev - 1, 0));
   };
 
   const handleSaveDraft = async () => {
     const payload = {
-      basicInfo: form1.getValues(),
-      categoryInventory: form2.getValues(),
-      media: form3.getValues(),
-      description: form4.getValues(),
-      variants: form5.getValues(),
-      tryOn: form6.getValues(),
-      seo: form7.getValues(),
+      basicInfo: basicInfoForm.getValues(),
+      categoryInventory: categoryInventoryForm.getValues(),
+      media: mediaForm.getValues(),
+      description: descriptionForm.getValues(),
+      variants: variantsForm.getValues(),
+      tryOn: tryOnForm.getValues(),
+      seo: seoFOrm.getValues(),
     };
 
     console.log(payload);
@@ -140,8 +142,8 @@ const AddNewProduct = () => {
       title: 'Basic information',
       description: 'Product title, brand and pricing',
       content: (
-        <form id="product-basic-info-form">
-          <BasicInfoFields form={form1} />
+        <form onSubmit={basicInfoForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+          <BasicInfoFields form={basicInfoForm} />
         </form>
       ),
     },
@@ -150,8 +152,8 @@ const AddNewProduct = () => {
       title: 'Category and inventory',
       description: 'Category and stock details',
       content: (
-        <form id="product-category-inventory-form">
-          <CategoryInventoryFields form={form2} />
+        <form onSubmit={categoryInventoryForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+          <CategoryInventoryFields form={categoryInventoryForm} />
         </form>
       ),
     },
@@ -160,8 +162,8 @@ const AddNewProduct = () => {
       title: 'Media and gallery',
       description: 'Upload product media',
       content: (
-        <form id="product-media-form">
-          <MediaFields form={form3} />
+        <form onSubmit={mediaForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+          <MediaFields form={mediaForm} />
         </form>
       ),
     },
@@ -170,8 +172,8 @@ const AddNewProduct = () => {
       title: 'Description and details',
       description: 'Product descriptions and usage',
       content: (
-        <form id="product-description-form">
-          <DescriptionFields form={form4} />
+        <form onSubmit={descriptionForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+          <DescriptionFields form={descriptionForm} />
         </form>
       ),
     },
@@ -179,8 +181,8 @@ const AddNewProduct = () => {
       title: 'Variants and specifications',
       description: 'Product variants and specs',
       content: (
-        <form id="product-variants-form">
-          <VariantsFields form={form5} />
+        <form onSubmit={variantsForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+          <VariantsFields form={variantsForm} />
         </form>
       ),
     },
@@ -189,8 +191,8 @@ const AddNewProduct = () => {
       title: 'TryOn configuration',
       description: 'Configure TryOn assets',
       content: (
-        <form id="product-tryon-form">
-          <TryOnFields form={form6} />
+        <form onSubmit={tryOnForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+          <TryOnFields form={tryOnForm} />
         </form>
       ),
     },
@@ -199,8 +201,8 @@ const AddNewProduct = () => {
       title: 'SEO and visibility',
       description: 'SEO related settings',
       content: (
-        <form id="product-seo-form">
-          <SeoFields form={form7} />
+        <form onSubmit={seoFOrm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+          <SeoFields form={seoFOrm} />
         </form>
       ),
     },
@@ -209,17 +211,17 @@ const AddNewProduct = () => {
       title: 'Confirm before save',
       description: 'Review all details',
       content: (
-        <form id="product-confirm-form">
+        <form onSubmit={confirmForm.handleSubmit(handleSaveDraft)} id={FORM_IDS[activeStep]}>
           <ConfirmFields
-            form={form8}
+            form={confirmForm}
             values={{
-              basicInfo: form1.getValues(),
-              categoryInventory: form2.getValues(),
-              media: form3.getValues(),
-              description: form4.getValues(),
-              variants: form5.getValues(),
-              tryOn: form6.getValues(),
-              seo: form7.getValues(),
+              basicInfo: basicInfoForm.getValues(),
+              categoryInventory: categoryInventoryForm.getValues(),
+              media: mediaForm.getValues(),
+              description: descriptionForm.getValues(),
+              variants: variantsForm.getValues(),
+              tryOn: tryOnForm.getValues(),
+              seo: seoFOrm.getValues(),
             }}
           />
         </form>
@@ -234,7 +236,7 @@ const AddNewProduct = () => {
         steps={ADD_PRODUCT_STEPS}
         activeStep={activeStep}
         onStepClick={(step) => setActiveStep(step)}
-        className='p-4! mt-4'
+        className="mt-4 p-4!"
       >
         <div className="flex flex-col gap-5">
           <div>
@@ -249,17 +251,13 @@ const AddNewProduct = () => {
             <Button
               pattern="secondary"
               content={activeStep === 0 ? 'Save draft' : 'Back'}
-              buttonProps={{
-                onClick: activeStep === 0 ? handleSaveDraft : handleBack,
-              }}
+              buttonProps={{ onClick: activeStep === 0 ? handleSaveDraft : handleBack }}
             />
 
             <Button
               pattern="primary"
               content={activeStep === ADD_PRODUCT_STEPS.length - 1 ? 'Save' : 'Next'}
-              buttonProps={{
-                onClick: activeStep === ADD_PRODUCT_STEPS.length - 1 ? handleSaveDraft : handleNext,
-              }}
+              buttonProps={{ type: 'submit', form: FORM_IDS[activeStep] }}
             />
           </div>
         </div>
