@@ -54,34 +54,32 @@ export const productCategoryInventorySchema = object({
 /* -------------------------------------------------------------------------- */
 /*                           STEP 3 : MEDIA & GALLERY                         */
 /* -------------------------------------------------------------------------- */
+const sizeFormat = (size: number) => {
+  const value = size / MB;
 
+  return `${Number.isInteger(value) ? value : value.toFixed(2)}MB`;
+};
 const createFileSchema = ({
   maxFileSize,
   mimeTypes,
   extensions,
-  field = 'file',
-  path = [],
 }: {
   maxFileSize: number;
   mimeTypes: readonly string[];
   extensions: readonly string[];
-  field?: string;
-  path?: (string | number)[];
 }) =>
   z_instanceof(File).superRefine((file, ctx) => {
     if (file.size > maxFileSize) {
       ctx.addIssue({
         code: 'custom',
-        path,
-        message: `Selected ${field} size is ${(file.size / MB).toFixed(2)}MB. Maximum allowed size is ${(maxFileSize / MB).toFixed(2)}MB.`,
+        message: `Selected file size is ${sizeFormat(file.size)}. Max allowed size is ${sizeFormat(maxFileSize)}.`,
       });
     }
 
     if (!mimeTypes.includes(file.type)) {
       ctx.addIssue({
         code: 'custom',
-        path,
-        message: `Selected ${field} type must be one of: ${extensions.join(', ')}.`,
+        message: `File type must be one of: ${extensions.join(', ')}.`,
       });
     }
   });

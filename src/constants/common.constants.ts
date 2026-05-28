@@ -207,7 +207,7 @@ export const CATEGORY_LEVELS_MAP = { L1: 1, L2: 2, L3: 3 } as const;
 export const CATEGORY_LEVELS = Object.values(CATEGORY_LEVELS_MAP);
 
 export const MB = 1024 ** 2;
-export const MAX_IMAGE_FILE_SIZE = 0.02 * MB; // 2MB
+export const MAX_IMAGE_FILE_SIZE = 0.01 * MB; // 2MB
 export const MAX_VIDEO_FILE_SIZE = 50 * MB; // 50MB
 export const FILE_MIME = {
   image: [
