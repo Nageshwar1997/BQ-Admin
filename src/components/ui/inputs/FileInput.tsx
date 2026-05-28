@@ -11,6 +11,7 @@ const getMediaType = (value: File | string): TMediaResource => {
   if (value instanceof File) {
     if (value.type.startsWith('image/')) return 'image';
     if (value.type.startsWith('video/')) return 'video';
+
     throw new Error('Invalid file type.');
   }
 
@@ -35,6 +36,7 @@ const getMediaType = (value: File | string): TMediaResource => {
 
 const MediaErrorStyle = ({ errors }: Pick<IFileInput, 'errors'>) => {
   if (!errors || !errors.length) return null;
+
   return (
     <style>
       {errors
@@ -44,7 +46,8 @@ const MediaErrorStyle = ({ errors }: Pick<IFileInput, 'errors'>) => {
           if (!match) return '';
 
           const index = Number(match[0]);
-          return `.media-carousel > div:nth-child(${index}) { border-color: var(--color-red-c);}`;
+
+          return `.media-carousel > div:nth-child(${index}) { border-color: var(--color-red-c) !important; }`;
         })
         .join('\n')}
     </style>
@@ -75,6 +78,7 @@ const InputWithoutIconClick = ({
     <InputWrapper icons={icons}>{children}</InputWrapper>
   </label>
 );
+
 const InputWithIconClick = ({
   fileInputProps,
   className,
@@ -106,6 +110,7 @@ const CenterContent = ({
 
     register?.onChange?.(event);
   };
+
   return (
     <div
       className={`flex h-full w-full flex-1 cursor-pointer items-center justify-start border-none bg-transparent p-3 text-sm font-normal outline-hidden focus:border-none focus:outline-hidden ${fileInputProps?.className || ''}`}
@@ -164,17 +169,21 @@ const FileInput = ({
   const previews = useMemo(() => {
     if (!value) return [];
 
-    return value
-      ?.map((item) => {
+    const files = Array.isArray(value) ? value : [value];
+
+    return files
+      .map((item) => {
         const type = getMediaType(item);
 
         if (item instanceof File) {
           return { url: URL.createObjectURL(item), type };
-        } else if (typeof item === 'string') {
-          return { url: item, type };
-        } else {
-          return null;
         }
+
+        if (typeof item === 'string') {
+          return { url: item, type };
+        }
+
+        return null;
       })
       .filter(Boolean) as { url: string; type: TMediaResource }[];
   }, [value]);
@@ -186,7 +195,7 @@ const FileInput = ({
         <MainSection fileInputProps={fileInputProps} {...props} />
       </div>
       {errors?.length > 0 && (
-        <div className="flex flex-col gap-1">
+        <div className="space-y-1">
           {errors?.map((error, index) => (
             <InputError key={index} error={error} />
           ))}
@@ -194,15 +203,17 @@ const FileInput = ({
       )}
       {previews?.length > 0 && (
         <div className="border-primary/10 bg-smoke-eerie relative flex rounded-lg border">
-          <div className="sticky left-0 mr-1 ml-2 flex items-center justify-start gap-3">
-            <div
-              onClick={() => {}}
-              className="border-primary/50 bg-tertiary-invert hover:border-tertiary flex size-14 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md border shadow-xs transition-colors duration-300 md:size-16 lg:size-20"
-            >
-              <Icon icon="solar:gallery-add-linear" className="text-primary size-[40%]" />
+          {fileInputProps?.multiple && (
+            <div className="sticky left-0 mr-1 ml-2 flex items-center justify-start gap-3">
+              <div
+                onClick={() => {}}
+                className="border-primary/50 bg-tertiary-invert hover:border-tertiary flex size-14 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md border shadow-xs transition-colors duration-300 md:size-16 lg:size-20"
+              >
+                <Icon icon="solar:gallery-add-linear" className="text-primary size-[40%]" />
+              </div>
+              <div className="group bg-hr-line my-2 h-14 w-px shrink-0 md:h-16 lg:h-20" />
             </div>
-            <div className="group bg-hr-line my-2 h-14 w-px shrink-0 md:h-16 lg:h-20" />
-          </div>
+          )}
           <MediaErrorStyle errors={errors} />
           <MediaCarousel
             className={`${mediaCarouselClassName}`}

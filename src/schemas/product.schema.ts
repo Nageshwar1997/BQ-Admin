@@ -123,15 +123,6 @@ const validateMedia = (
   });
 };
 
-export const thumbnailSchema = mediaArraySchema.superRefine((value, ctx) => {
-  validateMedia(value, ctx, {
-    type: 'image',
-    maxSize: IMAGE_MAX_SIZE,
-    required: true,
-    field: 'thumbnail',
-  });
-});
-
 export const imagesSchema = mediaArraySchema.superRefine((value, ctx) => {
   validateMedia(value, ctx, {
     type: 'image',
@@ -141,19 +132,10 @@ export const imagesSchema = mediaArraySchema.superRefine((value, ctx) => {
   });
 });
 
-export const videosSchema = mediaArraySchema.optional().superRefine((value, ctx) => {
-  validateMedia(value, ctx, {
-    type: 'video',
-    maxSize: VIDEO_MAX_SIZE,
-    required: false,
-    field: 'videos',  
-  });
-});
-
 export const productMediaSchema = object({
-  thumbnail: thumbnailSchema,
+  thumbnail: union([z_instanceof(File), url({ message: 'Invalid URL.' })]),
   images: imagesSchema,
-  videos: videosSchema,
+  video: union([z_instanceof(File), url({ message: 'Invalid URL.' })]).optional(),
 });
 
 /* -------------------------------------------------------------------------- */

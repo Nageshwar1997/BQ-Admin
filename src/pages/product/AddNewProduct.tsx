@@ -60,11 +60,7 @@ const AddNewProduct = () => {
 
   const form3 = useForm<TProductMedia>({
     resolver: zodResolver(productMediaSchema),
-    defaultValues: {
-      images: [],
-      thumbnail: [],
-      videos: undefined,
-    },
+    defaultValues: { images: [], thumbnail: undefined, video: undefined },
   });
 
   const form4 = useForm<TProductDescription>({

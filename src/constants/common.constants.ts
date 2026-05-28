@@ -168,7 +168,7 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
 
   {
     title: 'Media and gallery',
-    description: 'Upload thumbnails, product images and videos',
+    description: 'Upload thumbnail, product images and video',
     icon: 'solar:gallery-linear',
   },
 

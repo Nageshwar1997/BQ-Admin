@@ -3,6 +3,7 @@ import Checkbox from '@/components/ui/inputs/Checkbox';
 import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
+import { FILE_MIME } from '@/constants/common.constants';
 import type {
   TConfirmDetails,
   TProductBasicInfo,
@@ -13,7 +14,44 @@ import type {
   TProductTryOn,
   TProductVariants,
 } from '@/types/schema.type';
-import { Controller, useFieldArray, useWatch, type UseFormReturn } from 'react-hook-form';
+import {
+  Controller,
+  useFieldArray,
+  useWatch,
+  type FieldErrors,
+  type UseFormReturn,
+} from 'react-hook-form';
+
+const getErrorMessages = (fieldErrors?: FieldErrors<TProductMedia>): string[] | undefined => {
+  if (!fieldErrors) return undefined;
+
+  // Direct message object
+  if (
+    typeof fieldErrors === 'object' &&
+    'message' in fieldErrors &&
+    typeof fieldErrors.message === 'string'
+  ) {
+    return [fieldErrors.message];
+  }
+
+  // Array/object indexed errors
+  return (Object.keys(fieldErrors) as Array<keyof TProductMedia>)
+    .map((key) => {
+      const error = fieldErrors[key];
+
+      if (
+        error &&
+        typeof error === 'object' &&
+        'message' in error &&
+        typeof error.message === 'string'
+      ) {
+        return error.message;
+      }
+
+      return null;
+    })
+    .filter(Boolean) as string[];
+};
 
 /* -------------------------------------------------------------------------- */
 /*                          STEP 1 : BASIC INFO                               */
@@ -175,59 +213,12 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
   const {
     control,
     formState: { errors },
+    resetField,
     setValue,
   } = form;
   console.log('🚀 ~ MediaFields ~ errors:', errors);
 
-  const fields = useWatch({ control });
-
-  const getErrorMessages = (fieldErrors: any): string[] => {
-    if (!fieldErrors) return [];
-
-    // Direct message object
-    if (
-      typeof fieldErrors === 'object' &&
-      'message' in fieldErrors &&
-      typeof fieldErrors.message === 'string'
-    ) {
-      return [fieldErrors.message];
-    }
-
-    // Array/object indexed errors
-    return Object.keys(fieldErrors)
-      .map((key) => {
-        const error = fieldErrors[key];
-
-        if (
-          error &&
-          typeof error === 'object' &&
-          'message' in error &&
-          typeof error.message === 'string'
-        ) {
-          return error.message;
-        }
-
-        return null;
-      })
-      .filter(Boolean) as string[];
-  };
-
-  const handleRemove = (fieldName: keyof TProductMedia) => (index: number) => {
-    const currentValue = fields[fieldName];
-
-    if (!currentValue) return;
-
-    const currentArray = currentValue;
-
-    const nextValue = currentArray.filter((_, currentIndex) => currentIndex !== index);
-
-    setValue(
-      fieldName,
-      nextValue,
-      { shouldValidate: true },
-      // { shouldDirty: true, shouldTouch: true, shouldValidate: true }
-    );
-  };
+  const images = useWatch({ control, name: 'images' });
 
   return (
     <div className="grid gap-4">
@@ -239,16 +230,11 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
             fileInputProps={{
               name,
               placeholder: 'Thumbnail',
-              multiple: false,
-              onChange: (event) => {
-                const files = Array.from(event.target.files || []);
-
-                onChange(files);
-              },
+              onChange: ({ target: { files } }) => onChange(files?.[0]),
             }}
             value={value}
             errors={getErrorMessages(errors.thumbnail)}
-            handleRemove={handleRemove('thumbnail')}
+            handleRemove={() => resetField('thumbnail', { defaultValue: undefined })}
           />
         )}
       />
@@ -264,36 +250,38 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
               multiple: true,
               onChange: (event) => {
                 const files = Array.from(event.target.files || []);
-
                 onChange(files);
               },
             }}
             value={value}
             errors={getErrorMessages(errors.images)}
-            handleRemove={handleRemove('images')}
+            handleRemove={(index) => {
+              const nextValue = images.filter((_, currentIndex) => currentIndex !== index);
+
+              setValue('images', nextValue, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              });
+            }}
           />
         )}
       />
 
       <Controller
         control={control}
-        name="videos"
-        render={({ field }) => (
+        name="video"
+        render={({ field: { name, value, onChange } }) => (
           <FileInput
             fileInputProps={{
-              name: field.name,
+              name,
               placeholder: 'Videos',
-              multiple: true,
-              accept: 'video/*',
-              onChange: (event) => {
-                const files = Array.from(event.target.files || []);
-
-                field.onChange(files);
-              },
+              accept: FILE_MIME.video.join(','),
+              onChange: ({ target: { files } }) => onChange(files?.[0]),
             }}
-            value={field.value}
-            errors={getErrorMessages(errors.videos)}
-            handleRemove={handleRemove('videos')}
+            value={value}
+            errors={getErrorMessages(errors.video)}
+            handleRemove={() => resetField('video', { defaultValue: undefined })}
           />
         )}
       />
