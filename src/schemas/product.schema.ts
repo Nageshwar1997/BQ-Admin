@@ -132,6 +132,7 @@ export const imagesSchema = array(
   ]),
 )
   .min(1, { message: 'At least one image is required.' })
+  .max(10, { message: 'Maximum of 10 images are allowed.' })
   .superRefine((items, ctx) => {
     items.forEach((item, index) => {
       const imageLabel = `Image ${index + 1}`;

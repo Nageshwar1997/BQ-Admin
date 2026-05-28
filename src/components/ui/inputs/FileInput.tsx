@@ -41,11 +41,13 @@ const MediaErrorStyle = ({ errors }: Pick<IFileInput, 'errors'>) => {
     <style>
       {errors
         .map((error) => {
-          const match = error.match(/\d+/);
+          const secondWord = error.split(' ')[1];
 
-          if (!match) return '';
+          if (!secondWord || Number.isNaN(Number(secondWord))) {
+            return '';
+          }
 
-          const index = Number(match[0]);
+          const index = Number(secondWord);
 
           return `.media-carousel > div:nth-child(${index}) { border-color: var(--color-red-c) !important; }`;
         })
