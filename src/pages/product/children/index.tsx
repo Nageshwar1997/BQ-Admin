@@ -59,9 +59,13 @@ const getErrorMessages = (fieldErrors?: FieldErrors<TProductMedia>): string[] | 
 
 export const BasicInfoFields = ({ form }: { form: UseFormReturn<TProductBasicInfo> }) => {
   const {
+    control,
     register,
     formState: { errors },
   } = form;
+
+  const values = useWatch({ control });
+  console.log("🚀 ~ BasicInfoFields ~ values:", values)
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">

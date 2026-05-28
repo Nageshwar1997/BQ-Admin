@@ -52,67 +52,34 @@ const AddNewProduct = () => {
 
   const basicInfoForm = useForm<TProductBasicInfo>({
     resolver: zodResolver(productBasicInfoSchema),
-    defaultValues: {
-      title: '',
-      brand: '',
-      discountedPrice: 0,
-      price: 0,
-    },
   });
 
   const categoryInventoryForm = useForm<TProductCategoryInventory>({
     resolver: zodResolver(productCategoryInventorySchema),
-    defaultValues: {
-      stock: 0,
-      l1Category: '',
-      l2Category: '',
-      l3Category: '',
-    },
   });
 
   const mediaForm = useForm<TProductMedia>({
     resolver: zodResolver(productMediaSchema),
-    defaultValues: { images: [], thumbnail: undefined, video: undefined },
   });
 
   const descriptionForm = useForm<TProductDescription>({
     resolver: zodResolver(productDescriptionSchema),
-    defaultValues: {
-      description: '',
-      ingredients: '',
-      shortDescription: '',
-      usageInstructions: '',
-    },
   });
 
   const variantsForm = useForm<TProductVariants>({
     resolver: zodResolver(productVariantsSchema),
-    defaultValues: {
-      variants: [],
-    },
   });
 
   const tryOnForm = useForm<TProductTryOn>({
     resolver: zodResolver(productTryOnSchema),
-    defaultValues: {
-      assets: [],
-      enableTryOn: false,
-      model: '',
-    },
   });
 
   const seoFOrm = useForm<TProductSeo>({
     resolver: zodResolver(productSeoSchema),
-    defaultValues: {
-      seoDescription: '',
-      seoKeywords: [],
-      seoTitle: '',
-    },
   });
 
   const confirmForm = useForm<TConfirmDetails>({
     resolver: zodResolver(confirmDetailsSchema),
-    defaultValues: { confirm: false },
   });
 
   const handleNext = () => {
