@@ -1,16 +1,23 @@
 import MediaCarousel from '@/components/layout/carousels/MediaCarousel';
 import { MediaModal } from '@/components/layout/modals/MediaModal';
-import { FILE_MIME } from '@/constants/common.constants';
+import { FILE_EXTENSIONS, FILE_MIME } from '@/constants/common.constants';
 import type { TChildren, TMediaResource } from '@/types/component.type';
 import type { IFileInput } from '@/types/input.type';
 import { Icon } from '@iconify/react';
-import { useMemo, useRef, useState, type ChangeEvent } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { InputError, InputIcon, InputLabel } from './children';
 
 const getMediaType = (value: File | string): TMediaResource => {
   if (value instanceof File) {
-    if (value.type.startsWith('image/')) return 'image';
-    if (value.type.startsWith('video/')) return 'video';
+    const imgMime: readonly string[] = FILE_MIME.image;
+    const vidMime: readonly string[] = FILE_MIME.video;
+    if (imgMime.includes(value.type)) {
+      return 'image';
+    }
+
+    if (vidMime.includes(value.type)) {
+      return 'video';
+    }
 
     throw new Error('Invalid file type.');
   }
@@ -19,15 +26,18 @@ const getMediaType = (value: File | string): TMediaResource => {
 
   const extension = cleanUrl.split('.').pop()?.toLowerCase();
 
-  const imageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'];
+  if (!extension) {
+    throw new Error('Invalid file type.');
+  }
 
-  const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'mkv', 'm3u8'];
+  const imgExtensions: readonly string[] = FILE_EXTENSIONS.image;
+  const vidExtensions: readonly string[] = FILE_EXTENSIONS.video;
 
-  if (extension && imageExtensions.includes(extension)) {
+  if (imgExtensions.includes(extension)) {
     return 'image';
   }
 
-  if (extension && videoExtensions.includes(extension)) {
+  if (vidExtensions.includes(extension)) {
     return 'video';
   }
 
@@ -165,28 +175,42 @@ const FileInput = ({
 }: IFileInput) => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
+  const [previews, setPreviews] = useState<
+    { url: string; type: TMediaResource; isBlob?: boolean }[]
+  >([]);
 
-  const previews = useMemo(() => {
+  useEffect(() => {
     const value = fileInputProps.value;
-    if (!value) return [];
+
+    if (!value) {
+      setPreviews([]);
+      return;
+    }
 
     const files = Array.isArray(value) ? value : [value];
 
-    return files
+    const nextPreviews = files
       .map((item) => {
         const type = getMediaType(item);
 
         if (item instanceof File) {
-          return { url: URL.createObjectURL(item), type };
+          return { url: URL.createObjectURL(item), type, isBlob: true };
         }
-
-        if (typeof item === 'string') {
-          return { url: item, type };
-        }
+        if (typeof item === 'string') return { url: item, type, isBlob: false };
 
         return null;
       })
-      .filter(Boolean) as { url: string; type: TMediaResource }[];
+      .filter(Boolean) as typeof previews;
+
+    setPreviews(nextPreviews);
+
+    return () => {
+      nextPreviews.forEach((preview) => {
+        if (preview.isBlob) {
+          URL.revokeObjectURL(preview.url);
+        }
+      });
+    };
   }, [fileInputProps.value]);
 
   return (
