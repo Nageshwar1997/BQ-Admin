@@ -231,8 +231,8 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
               name,
               placeholder: 'Thumbnail',
               onChange: ({ target: { files } }) => onChange(files?.[0]),
+              value,
             }}
-            value={value}
             errors={getErrorMessages(errors.thumbnail)}
             handleRemove={() => resetField('thumbnail', { defaultValue: undefined })}
           />
@@ -252,8 +252,8 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
                 const files = Array.from(event.target.files || []);
                 onChange(files);
               },
+              value,
             }}
-            value={value}
             errors={getErrorMessages(errors.images)}
             handleRemove={(index) => {
               const nextValue = images.filter((_, currentIndex) => currentIndex !== index);
@@ -278,8 +278,8 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
               placeholder: 'Videos',
               accept: FILE_MIME.video.join(','),
               onChange: ({ target: { files } }) => onChange(files?.[0]),
+              value,
             }}
-            value={value}
             errors={getErrorMessages(errors.video)}
             handleRemove={() => resetField('video', { defaultValue: undefined })}
           />

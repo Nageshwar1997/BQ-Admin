@@ -100,6 +100,8 @@ const CenterContent = ({
   fileInputProps,
   register,
 }: Pick<IFileInput, 'fileInputProps' | 'register'>) => {
+  const { value: _, ...inputProps } = fileInputProps;
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (fileInputProps?.disabled) return;
 
@@ -126,7 +128,7 @@ const CenterContent = ({
       <input
         aria-autocomplete="none"
         {...register}
-        {...fileInputProps}
+        {...inputProps}
         id={fileInputProps.id || fileInputProps.name}
         accept={fileInputProps?.accept ?? FILE_MIME.image.join(', ')}
         type="file"
@@ -158,7 +160,6 @@ const FileInput = ({
   mediaModalClassName = '',
   mediaCarouselClassName = '',
   errors = [],
-  value = [],
   handleRemove,
   fileInputProps = {},
   ...props
@@ -167,6 +168,7 @@ const FileInput = ({
   const [currentIndex, setCurrentIndex] = useState<number | null>(null);
 
   const previews = useMemo(() => {
+    const value = fileInputProps.value;
     if (!value) return [];
 
     const files = Array.isArray(value) ? value : [value];
@@ -186,7 +188,7 @@ const FileInput = ({
         return null;
       })
       .filter(Boolean) as { url: string; type: TMediaResource }[];
-  }, [value]);
+  }, [fileInputProps.value]);
 
   return (
     <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>

@@ -53,10 +53,11 @@ export interface ISelect extends Omit<IBaseInput, 'needRef' | 'register'> {
 }
 
 export interface IFileInput extends Omit<IBaseInput, 'error'> {
-  fileInputProps: Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
+  fileInputProps: Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value'> & {
+    value?: (File | string) | (File | string)[];
+  };
   errors?: string[];
   handleRemove?: (index: number) => void;
-  value?: (File | string) | (File | string)[];
   mediaModalClassName?: string;
   mediaCarouselClassName?: string;
 }
