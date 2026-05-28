@@ -4,7 +4,7 @@ import { FILE_MIME } from '@/constants/common.constants';
 import type { TChildren, TMediaResource } from '@/types/component.type';
 import type { IFileInput } from '@/types/input.type';
 import { Icon } from '@iconify/react';
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { InputError, InputIcon, InputLabel } from './children';
 
 const getMediaType = (value: File | string): TMediaResource => {
@@ -98,10 +98,8 @@ const InputWithIconClick = ({
   </div>
 );
 
-const CenterContent = ({
-  fileInputProps,
-  register,
-}: Pick<IFileInput, 'fileInputProps' | 'register'>) => {
+const CenterContent = ({ fileInputProps }: Pick<IFileInput, 'fileInputProps'>) => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const { value: _, ...inputProps } = fileInputProps;
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -109,10 +107,9 @@ const CenterContent = ({
 
     if (fileInputProps.onChange) {
       fileInputProps.onChange(event);
-      return;
     }
 
-    register?.onChange?.(event);
+    event.target.value = '';
   };
 
   return (
@@ -128,8 +125,8 @@ const CenterContent = ({
       </p>
       {/* Input */}
       <input
+        ref={inputRef}
         aria-autocomplete="none"
-        {...register}
         {...inputProps}
         id={fileInputProps.id || fileInputProps.name}
         accept={fileInputProps?.accept ?? FILE_MIME.image.join(', ')}
@@ -144,7 +141,7 @@ const CenterContent = ({
 const MainSection = ({
   icons,
   ...props
-}: Pick<IFileInput, 'fileInputProps' | 'className' | 'icons' | 'register'>) => {
+}: Pick<IFileInput, 'fileInputProps' | 'className' | 'icons'>) => {
   return (typeof icons?.left === 'object' && icons?.left?.onClick) || icons?.right?.onClick ? (
     <InputWithIconClick {...props} icons={icons}>
       <CenterContent {...props} />

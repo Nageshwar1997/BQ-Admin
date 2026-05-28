@@ -216,7 +216,6 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
     resetField,
     setValue,
   } = form;
-  console.log('🚀 ~ MediaFields ~ errors:', errors);
 
   const images = useWatch({ control, name: 'images' });
   const thumbnail = useWatch({ control, name: 'thumbnail' });

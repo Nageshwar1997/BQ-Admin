@@ -52,7 +52,7 @@ export interface ISelect extends Omit<IBaseInput, 'needRef' | 'register'> {
   optionsPosition?: 'top' | 'bottom';
 }
 
-export interface IFileInput extends Omit<IBaseInput, 'error'> {
+export interface IFileInput extends Omit<IBaseInput, 'error' | 'register'> {
   fileInputProps: Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value'> & {
     value?: (File | string) | (File | string)[];
   };
