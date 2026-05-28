@@ -54,75 +54,118 @@ export const productCategoryInventorySchema = object({
 /* -------------------------------------------------------------------------- */
 /*                           STEP 3 : MEDIA & GALLERY                         */
 /* -------------------------------------------------------------------------- */
+
 const sizeFormat = (size: number) => {
   const value = size / MB;
 
   return `${Number.isInteger(value) ? value : value.toFixed(2)}MB`;
 };
-const createFileSchema = ({
-  maxFileSize,
-  mimeTypes,
-  extensions,
-}: {
-  maxFileSize: number;
-  mimeTypes: readonly string[];
-  extensions: readonly string[];
-}) =>
-  z_instanceof(File).superRefine((file, ctx) => {
-    if (file.size > maxFileSize) {
-      ctx.addIssue({
-        code: 'custom',
-        message: `Selected file size is ${sizeFormat(file.size)}. Max allowed size is ${sizeFormat(maxFileSize)}.`,
-      });
-    }
-
-    if (!mimeTypes.includes(file.type)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: `File type must be one of: ${extensions.join(', ')}.`,
-      });
-    }
-  });
-
-export const imageFileSchema = createFileSchema({
-  maxFileSize: MAX_IMAGE_FILE_SIZE,
-  mimeTypes: FILE_MIME.image,
-  extensions: FILE_EXTENSIONS.image,
-});
-
-export const videoFileSchema = createFileSchema({
-  maxFileSize: MAX_VIDEO_FILE_SIZE,
-  mimeTypes: FILE_MIME.video,
-  extensions: FILE_EXTENSIONS.video,
-});
 
 export const thumbnailSchema = union([
-  imageFileSchema,
-  url({ message: 'Invalid thumbnail URL.', normalize: true, pattern: REGEX.URL }),
+  z_instanceof(File).superRefine((file, ctx) => {
+    if (file.size > MAX_IMAGE_FILE_SIZE) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Thumbnail size is ${sizeFormat(file.size)}. Max allowed size is ${sizeFormat(MAX_IMAGE_FILE_SIZE)}.`,
+      });
+    }
+    const fileTypes: readonly string[] = FILE_MIME.image;
+    if (!fileTypes.includes(file.type)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Thumbnail type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+      });
+    }
+  }),
+  url({
+    message: 'Invalid thumbnail URL.',
+    normalize: true,
+    pattern: REGEX.URL,
+  }),
 ])
   .optional()
   .superRefine((value, ctx) => {
     if (!value) {
-      ctx.addIssue({ code: 'custom', message: 'Thumbnail is required.' });
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Thumbnail is required.',
+      });
     }
   });
 
 export const videoSchema = union([
-  videoFileSchema,
-  url({ message: 'Invalid video URL.', normalize: true, pattern: REGEX.URL }),
+  z_instanceof(File).superRefine((file, ctx) => {
+    if (file.size > MAX_VIDEO_FILE_SIZE) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Video size is ${sizeFormat(file.size)}. Max allowed size is ${sizeFormat(MAX_VIDEO_FILE_SIZE)}.`,
+      });
+    }
+    const fileTypes: readonly string[] = FILE_MIME.video;
+    if (!fileTypes.includes(file.type)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Video type must be one of: ${FILE_EXTENSIONS.video.join(', ')}.`,
+      });
+    }
+  }),
+  url({
+    message: 'Invalid video URL.',
+    normalize: true,
+    pattern: REGEX.URL,
+  }),
 ]);
 
 export const imageItemSchema = union([
-  imageFileSchema,
-  url({ message: 'Invalid image URL.', normalize: true, pattern: REGEX.URL }),
+  z_instanceof(File),
+  url({
+    message: 'Invalid image URL.',
+    normalize: true,
+    pattern: REGEX.URL,
+  }),
 ]);
 
-export const imagesSchema = array(imageItemSchema)
+export const imagesSchema = array(
+  union([
+    z_instanceof(File),
+    url({ message: 'Invalid image URL.', normalize: true, pattern: REGEX.URL }),
+  ]),
+)
   .min(1, { message: 'At least one image is required.' })
   .superRefine((items, ctx) => {
     items.forEach((item, index) => {
-      if (typeof item === 'string' && item.trim() === '') {
-        ctx.addIssue({ code: 'custom', path: [index], message: 'Image URL cannot be empty.' });
+      const imageLabel = `Image ${index + 1}`;
+
+      if (typeof item === 'string') {
+        if (!item.trim()) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [index],
+            message: `${imageLabel} URL cannot be empty.`,
+          });
+        }
+
+        return;
+      }
+
+      if (item instanceof File) {
+        if (item.size > MAX_IMAGE_FILE_SIZE) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [index],
+            message: `${imageLabel} size is ${sizeFormat(item.size)}. Max allowed size is ${sizeFormat(MAX_IMAGE_FILE_SIZE)}.`,
+          });
+        }
+
+        const fileTypes: readonly string[] = FILE_MIME.image;
+
+        if (!fileTypes.includes(item.type)) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [index],
+            message: `${imageLabel} type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+          });
+        }
       }
     });
   });
