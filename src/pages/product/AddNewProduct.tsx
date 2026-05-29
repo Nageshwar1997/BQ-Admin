@@ -46,7 +46,7 @@ const FORM_IDS = [
 ] as const;
 
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(1);
 
   const basicInfoForm = useForm<TProductBasicInfo>({
     resolver: zodResolver(productBasicInfoSchema),

@@ -167,8 +167,8 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
   // },
 
   {
-    title: 'Media and gallery',
-    description: 'Upload thumbnail, product images and video',
+    title: 'Media, gallery and Variants',
+    description: 'Upload thumbnail, product images, video and variants',
     icon: 'solar:gallery-linear',
   },
 
@@ -239,4 +239,9 @@ export const FILE_EXTENSIONS = {
 
 export const DEFAULT_POSTER = '/images/logo/BQ_gradient_logo.webp';
 
-export const PRODUCT_TYPE = ['Simple', 'Variable'] as const;
+export const PRODUCT_TYPE_MAP = {
+  SIMPLE: 'Simple',
+  VARIABLE: 'Variable',
+} as const;
+
+export const PRODUCT_TYPE = Object.values(PRODUCT_TYPE_MAP);

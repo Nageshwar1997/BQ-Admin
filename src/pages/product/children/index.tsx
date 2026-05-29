@@ -300,6 +300,7 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
   const {
     control,
     formState: { errors },
+    register,
     resetField,
     setValue,
   } = form;
@@ -307,6 +308,8 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
   const images = useWatch({ control, name: 'images' });
   const thumbnail = useWatch({ control, name: 'thumbnail' });
   const video = useWatch({ control, name: 'video' });
+
+  const baseVariant = useWatch({ control, name: 'baseVariant' });
 
   return (
     <div className="grid gap-4">
@@ -375,6 +378,86 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
           />
         )}
       />
+
+      <Controller
+        name="productType"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Select
+            label="Product type"
+            error={errors.productType?.message}
+            options={PRODUCT_TYPE.map((type) => ({ label: type, value: type }))}
+            selectProps={{ value, placeholder: 'Select product type', onChange }}
+          />
+        )}
+      />
+
+      <div className="border-smoke-eerie-invert/20 bg-smoke-eerie/50 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
+        <Controller
+          name={`baseVariant.type`}
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <Select
+              label="Variant type"
+              error={errors.baseVariant?.type?.message}
+              options={[
+                { label: 'Color', value: 'color' },
+                { label: 'Text', value: 'text' },
+              ]}
+              selectProps={{
+                value,
+                onChange,
+                placeholder: 'Select variant type',
+              }}
+            />
+          )}
+        />
+
+        <Input
+          label="Variant name"
+          register={register(`baseVariant.label`)}
+          error={errors.baseVariant?.label?.message}
+          inputProps={{ placeholder: 'Black' }}
+        />
+
+        <Input
+          label={baseVariant?.type === 'color' ? 'Hex code' : 'Variant value'}
+          register={register(`baseVariant.value`)}
+          error={errors.baseVariant?.value?.message}
+          inputProps={{ placeholder: baseVariant?.type === 'color' ? '#000000' : '50ml' }}
+        />
+
+        <Input
+          label="Original Price"
+          register={register(`baseVariant.originalPrice`, { valueAsNumber: true })}
+          error={errors.baseVariant?.originalPrice?.message}
+          inputProps={{ type: 'number', placeholder: '999' }}
+        />
+
+        <Input
+          label="Discounted price"
+          register={register(`baseVariant.sellingPrice`, { valueAsNumber: true })}
+          error={errors.baseVariant?.sellingPrice?.message}
+          inputProps={{ type: 'number', placeholder: '799' }}
+        />
+
+        <Input
+          label="Stock"
+          register={register(`baseVariant.stock`, { valueAsNumber: true })}
+          error={errors.baseVariant?.stock?.message}
+          inputProps={{ type: 'number', placeholder: '100' }}
+        />
+        <Input
+          label="Stock threshold"
+          register={register(`baseVariant.stockThreshold`, {
+            valueAsNumber: true,
+          })}
+          error={errors.baseVariant?.stockThreshold?.message}
+          inputProps={{ type: 'number', placeholder: '100' }}
+        />
+
+        <Button pattern="tertiary" content="Add variant" buttonProps={{ type: 'button' }} />
+      </div>
     </div>
   );
 };

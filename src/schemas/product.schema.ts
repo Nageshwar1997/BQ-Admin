@@ -5,6 +5,7 @@ import {
   MAX_VIDEO_FILE_SIZE,
   MB,
   PRODUCT_TYPE,
+  PRODUCT_TYPE_MAP,
 } from '@/constants/common.constants';
 import { REGEX } from '@/constants/regex.constants';
 import {
@@ -189,10 +190,138 @@ export const imagesSchema = array(
     });
   });
 
+const baseVariantSchema = object({
+  type: z_enum(['color', 'text']),
+
+  label: string({ error: 'Variant label is required.' }).min(1, 'Variant label is required.'),
+
+  value: string({ error: 'Variant value is required.' }).min(1, 'Variant value is required.'),
+
+  originalPrice: number({
+    error: 'Original price is required.',
+  }).min(1, 'Original price must be greater than 0.'),
+
+  sellingPrice: number({
+    error: 'Selling price is required.',
+  }).min(1, 'Selling price must be greater than 0.'),
+
+  stock: number({
+    error: 'Stock is required.',
+  })
+    .min(1, 'Stock must be greater than 0.')
+    .max(100, 'Stock cannot exceed 100.'),
+  stockThreshold: number({
+    error: 'Stock threshold is required.',
+  })
+    .min(1, 'Stock threshold must be greater than 0.')
+    .max(10, 'Stock threshold cannot exceed 10.'),
+
+  thumbnail: union([
+    z_instanceof(File).superRefine((file, ctx) => {
+      if (file.size > MAX_IMAGE_FILE_SIZE) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Thumbnail size is ${sizeFormat(file.size)}. Max allowed size is ${sizeFormat(MAX_IMAGE_FILE_SIZE)}.`,
+        });
+      }
+
+      const fileTypes: readonly string[] = FILE_MIME.image;
+
+      if (!fileTypes.includes(file.type)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Thumbnail type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+        });
+      }
+    }),
+
+    url({
+      message: 'Invalid thumbnail URL.',
+      normalize: true,
+      pattern: REGEX.URL,
+    }),
+  ])
+    .optional()
+    .superRefine((value, ctx) => {
+      if (!value) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Thumbnail is required.',
+        });
+      }
+    }),
+
+  images: array(
+    union([
+      z_instanceof(File),
+      url({
+        message: 'Invalid image URL.',
+        normalize: true,
+        pattern: REGEX.URL,
+      }),
+    ]),
+  )
+    .min(1, 'At least one image is required.')
+    .max(10, 'Maximum of 10 images are allowed.')
+    .superRefine((items, ctx) => {
+      items.forEach((item, index) => {
+        const imageLabel = `Image ${index + 1}`;
+
+        if (item instanceof File) {
+          if (item.size > MAX_IMAGE_FILE_SIZE) {
+            ctx.addIssue({
+              code: 'custom',
+              path: [index],
+              message: `${imageLabel} size is ${sizeFormat(item.size)}. Max allowed size is ${sizeFormat(MAX_IMAGE_FILE_SIZE)}.`,
+            });
+          }
+
+          const fileTypes: readonly string[] = FILE_MIME.image;
+
+          if (!fileTypes.includes(item.type)) {
+            ctx.addIssue({
+              code: 'custom',
+              path: [index],
+              message: `${imageLabel} type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+            });
+          }
+        }
+      });
+    }),
+});
+
 export const productMediaSchema = object({
   thumbnail: thumbnailSchema,
   images: imagesSchema,
   video: videoSchema.optional(),
+
+  productType: z_enum(PRODUCT_TYPE, {
+    error: 'Product type is required.',
+  }),
+
+  baseVariant: baseVariantSchema.optional(),
+
+  variants: array(baseVariantSchema).optional(),
+}).superRefine((data, ctx) => {
+  if (data.productType === PRODUCT_TYPE_MAP.SIMPLE) {
+    return;
+  }
+
+  if (!data.baseVariant) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['baseVariant'],
+      message: 'Base variant is required.',
+    });
+  }
+
+  if (!data.variants?.length) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['variants'],
+      message: 'At least one variant is required.',
+    });
+  }
 });
 
 /* -------------------------------------------------------------------------- */
