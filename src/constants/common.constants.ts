@@ -237,3 +237,5 @@ export const FILE_EXTENSIONS = {
 } as const;
 
 export const DEFAULT_POSTER = '/images/logo/BQ_gradient_logo.webp';
+
+export const PRODUCT_TYPE = ['Simple', 'Variable'] as const;

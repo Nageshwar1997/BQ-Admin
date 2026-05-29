@@ -4,6 +4,7 @@ import {
   MAX_IMAGE_FILE_SIZE,
   MAX_VIDEO_FILE_SIZE,
   MB,
+  PRODUCT_TYPE,
 } from '@/constants/common.constants';
 import { REGEX } from '@/constants/regex.constants';
 import {
@@ -39,6 +40,19 @@ export const productBasicInfoSchema = object({
   sellingPrice: number({ error: 'Selling price is required.' })
     .min(0, 'Selling price cannot be negative.')
     .optional(),
+  l1Category: string({ error: '(L1) Main category is required.' }).regex(
+    REGEX.MONGODB_ID,
+    '(L1) Main category must be a valid ID.',
+  ),
+  l2Category: string({ error: '(L2) Sub-category is required.' }).regex(
+    REGEX.MONGODB_ID,
+    '(L2) Sub-category must be a valid ID.',
+  ),
+  l3Category: string({ error: '(L3) Product category is required.' }).regex(
+    REGEX.MONGODB_ID,
+    '(L3) Product category must be a valid ID.',
+  ),
+  productType: z_enum(PRODUCT_TYPE, { error: 'Product type is required.' }),
 }).refine((data) => !data.sellingPrice || data.sellingPrice <= data.originalPrice, {
   path: ['sellingPrice'],
   message: 'Selling price cannot be greater than original price.',

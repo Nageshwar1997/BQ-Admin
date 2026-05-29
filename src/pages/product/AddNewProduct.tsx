@@ -49,7 +49,7 @@ const FORM_IDS = [
 ] as const;
 
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState(1);
+  const [activeStep, setActiveStep] = useState(0);
 
   const basicInfoForm = useForm<TProductBasicInfo>({
     resolver: zodResolver(productBasicInfoSchema),
@@ -83,8 +83,8 @@ const AddNewProduct = () => {
     resolver: zodResolver(confirmDetailsSchema),
   });
 
-  const l1Cat = useWatch({ control: categoryInventoryForm.control, name: 'l1Category' });
-  const l2Cat = useWatch({ control: categoryInventoryForm.control, name: 'l2Category' });
+  const l1Cat = useWatch({ control: basicInfoForm.control, name: 'l1Category' });
+  const l2Cat = useWatch({ control: basicInfoForm.control, name: 'l2Category' });
 
   const { data: l1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L1,
@@ -130,7 +130,7 @@ const AddNewProduct = () => {
       description: 'Product title, brand and pricing',
       content: (
         <form onSubmit={basicInfoForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
-          <BasicInfoFields form={basicInfoForm} />
+          <BasicInfoFields form={basicInfoForm} l1Cats={l1Cats} l2Cats={l2Cats} l3Cats={l3Cats} />
         </form>
       ),
     },

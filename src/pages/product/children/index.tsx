@@ -3,7 +3,7 @@ import Checkbox from '@/components/ui/inputs/Checkbox';
 import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
-import { EMPTY_ARRAY, FILE_MIME } from '@/constants/common.constants';
+import { EMPTY_ARRAY, FILE_MIME, PRODUCT_TYPE } from '@/constants/common.constants';
 import { PRODUCT_BASIC_INFO_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type { ICategory } from '@/types/api.type';
 import type {
@@ -59,20 +59,118 @@ const getErrorMessages = (fieldErrors?: FieldErrors<TProductMedia>): string[] | 
 /*                          STEP 1 : BASIC INFO                               */
 /* -------------------------------------------------------------------------- */
 
-export const BasicInfoFields = ({ form }: { form: UseFormReturn<TProductBasicInfo> }) => {
+export const BasicInfoFields = ({
+  form,
+  l1Cats,
+  l2Cats,
+  l3Cats,
+}: {
+  form: UseFormReturn<TProductBasicInfo>;
+  l1Cats: ICategory[];
+  l2Cats: ICategory[];
+  l3Cats: ICategory[];
+}) => {
+  const {
+    register,
+    control,
+    formState: { errors },
+  } = form;
+
+  const l1Category = useWatch({ control, name: 'l1Category' });
+  const l2Category = useWatch({ control, name: 'l2Category' });
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {PRODUCT_BASIC_INFO_INPUT_MAP_DATA.map((input) => (
         <Input
           key={input.name}
           label={input.label}
-          register={form.register(input.name, {
+          register={register(input.name, {
             ...(input.type === 'number' && { valueAsNumber: true }),
           })}
-          error={form.formState.errors[input.name]?.message}
+          error={errors[input.name]?.message}
           inputProps={{ type: input.type, placeholder: input.placeholder }}
         />
       ))}
+      <Controller
+        name="l1Category"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Select
+            label="Main category"
+            error={errors.l1Category?.message}
+            options={l1Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
+            optionsPosition="top"
+            selectProps={{
+              value,
+              placeholder: 'Select (L1) main category',
+              onChange: (value) => {
+                onChange(value);
+
+                form.setValue('l2Category', '');
+                form.setValue('l3Category', '');
+              },
+            }}
+          />
+        )}
+      />
+
+      <Controller
+        name="l2Category"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Select
+            label="Sub-category"
+            error={errors.l2Category?.message}
+            options={l2Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
+            optionsPosition="top"
+            selectProps={{
+              value,
+              disabled: !l1Category,
+              placeholder: 'Select (L2) sub-category',
+              onChange: (value) => {
+                onChange(value);
+
+                form.setValue('l3Category', '');
+              },
+            }}
+          />
+        )}
+      />
+
+      <Controller
+        name="l3Category"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Select
+            label="Product category"
+            error={errors.l3Category?.message}
+            options={l3Cats.map((cat) => ({
+              label: cat.name,
+              value: cat._id,
+            }))}
+            optionsPosition="top"
+            selectProps={{
+              value,
+              disabled: !l2Category,
+              placeholder: 'Select (L3) product category',
+              onChange,
+            }}
+          />
+        )}
+      />
+      <Controller
+        name="productType"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <Select
+            label="Product type"
+            error={errors.productType?.message}
+            optionsPosition="top"
+            options={PRODUCT_TYPE.map((value) => ({ label: value, value }))}
+            selectProps={{ value, placeholder: 'Select product type', onChange }}
+          />
+        )}
+      />
     </div>
   );
 };
