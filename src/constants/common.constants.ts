@@ -156,7 +156,7 @@ export const CATEGORY_MODAL_STEPS: StepperStep[] = [
 export const ADD_PRODUCT_STEPS: StepperStep[] = [
   {
     title: 'Basic information',
-    description: 'Set product type, pricing and brand details',
+    description: 'Set product title, pricing and brand details',
     icon: 'solar:tag-price-linear',
   },
 
