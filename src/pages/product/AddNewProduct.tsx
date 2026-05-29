@@ -4,7 +4,6 @@ import Stepper from '@/components/ui/Stepper';
 import { ADD_PRODUCT_STEPS, CATEGORY_LEVELS_MAP, EMPTY_ARRAY } from '@/constants/common.constants';
 import {
   productBasicInfoSchema,
-  productCategoryInventorySchema,
   productDescriptionSchema,
   productMediaSchema,
   productSeoSchema,
@@ -16,7 +15,6 @@ import { useGetCategoriesByParentLevel } from '@/services/product-service/catego
 import type {
   TConfirmDetails,
   TProductBasicInfo,
-  TProductCategoryInventory,
   TProductDescription,
   TProductMedia,
   TProductSeo,
@@ -28,7 +26,6 @@ import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import {
   BasicInfoFields,
-  CategoryInventoryFields,
   ConfirmFields,
   DescriptionFields,
   MediaFields,
@@ -39,7 +36,7 @@ import {
 
 const FORM_IDS = [
   'product-basic-info-form',
-  'product-category-inventory-form',
+  // 'product-category-inventory-form',
   'product-media-form',
   'product-description-form',
   'product-variants-form',
@@ -55,9 +52,9 @@ const AddNewProduct = () => {
     resolver: zodResolver(productBasicInfoSchema),
   });
 
-  const categoryInventoryForm = useForm<TProductCategoryInventory>({
-    resolver: zodResolver(productCategoryInventorySchema),
-  });
+  // const categoryInventoryForm = useForm<TProductCategoryInventory>({
+  //   resolver: zodResolver(productCategoryInventorySchema),
+  // });
 
   const mediaForm = useForm<TProductMedia>({
     resolver: zodResolver(productMediaSchema),
@@ -113,7 +110,7 @@ const AddNewProduct = () => {
   const handleSaveDraft = async () => {
     const payload = {
       basicInfo: basicInfoForm.getValues(),
-      categoryInventory: categoryInventoryForm.getValues(),
+      // categoryInventory: categoryInventoryForm.getValues(),
       media: mediaForm.getValues(),
       description: descriptionForm.getValues(),
       variants: variantsForm.getValues(),
@@ -135,20 +132,20 @@ const AddNewProduct = () => {
       ),
     },
 
-    {
-      title: 'Category and inventory',
-      description: 'Category and stock details',
-      content: (
-        <form onSubmit={categoryInventoryForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
-          <CategoryInventoryFields
-            form={categoryInventoryForm}
-            l1Cats={l1Cats}
-            l2Cats={l2Cats}
-            l3Cats={l3Cats}
-          />
-        </form>
-      ),
-    },
+    // {
+    //   title: 'Category and inventory',
+    //   description: 'Category and stock details',
+    //   content: (
+    //     <form onSubmit={categoryInventoryForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+    //       <CategoryInventoryFields
+    //         form={categoryInventoryForm}
+    //         l1Cats={l1Cats}
+    //         l2Cats={l2Cats}
+    //         l3Cats={l3Cats}
+    //       />
+    //     </form>
+    //   ),
+    // },
 
     {
       title: 'Media and gallery',
@@ -208,7 +205,7 @@ const AddNewProduct = () => {
             form={confirmForm}
             values={{
               basicInfo: basicInfoForm.getValues(),
-              categoryInventory: categoryInventoryForm.getValues(),
+              // categoryInventory: categoryInventoryForm.getValues(),
               media: mediaForm.getValues(),
               description: descriptionForm.getValues(),
               variants: variantsForm.getValues(),

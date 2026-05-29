@@ -62,12 +62,12 @@ export const productBasicInfoSchema = object({
 /*                       STEP 2 : CATEGORY & INVENTORY                        */
 /* -------------------------------------------------------------------------- */
 
-export const productCategoryInventorySchema = object({
-  l1Category: string().min(1, '(L1) Main category is required.'),
-  l2Category: string().min(1, '(L2) Sub-category is required.'),
-  l3Category: string().min(1, '(L3) Product category is required.'),
-  stock: number().min(0, 'Stock cannot be negative.'),
-});
+// export const productCategoryInventorySchema = object({
+//   l1Category: string().min(1, '(L1) Main category is required.'),
+//   l2Category: string().min(1, '(L2) Sub-category is required.'),
+//   l3Category: string().min(1, '(L3) Product category is required.'),
+//   stock: number().min(0, 'Stock cannot be negative.'),
+// });
 
 /* -------------------------------------------------------------------------- */
 /*                           STEP 3 : MEDIA & GALLERY                         */

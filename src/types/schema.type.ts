@@ -7,7 +7,6 @@ import type {
 } from '@/schemas/category.schema';
 import type {
   productBasicInfoSchema,
-  productCategoryInventorySchema,
   productDescriptionSchema,
   productMediaSchema,
   productSeoSchema,
@@ -51,7 +50,7 @@ export type TCategory = zodInfer<typeof categorySchema>;
 /* ================ PRODUCT SCHEMA TYPES ================ */
 export type TProductBasicInfo = zodInfer<typeof productBasicInfoSchema>;
 
-export type TProductCategoryInventory = zodInfer<typeof productCategoryInventorySchema>;
+// export type TProductCategoryInventory = zodInfer<typeof productCategoryInventorySchema>;
 
 export type TProductMedia = zodInfer<typeof productMediaSchema>;
 

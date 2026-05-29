@@ -159,11 +159,12 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
     description: 'Set product title, pricing, brand and category details',
     icon: 'solar:tag-price-linear',
   },
-  {
-    title: 'Category and inventory',
-    description: 'Manage categories',
-    icon: 'solar:box-linear',
-  },
+
+  // {
+  //   title: 'Category and inventory',
+  //   description: 'Manage categories',
+  //   icon: 'solar:box-linear',
+  // },
 
   {
     title: 'Media and gallery',

@@ -9,7 +9,6 @@ import type { ICategory } from '@/types/api.type';
 import type {
   TConfirmDetails,
   TProductBasicInfo,
-  TProductCategoryInventory,
   TProductDescription,
   TProductMedia,
   TProductSeo,
@@ -179,119 +178,119 @@ export const BasicInfoFields = ({
 /*                    STEP 2 : CATEGORY & INVENTORY                           */
 /* -------------------------------------------------------------------------- */
 
-export const CategoryInventoryFields = ({
-  form,
-  l1Cats,
-  l2Cats,
-  l3Cats,
-}: {
-  form: UseFormReturn<TProductCategoryInventory>;
-  l1Cats: ICategory[];
-  l2Cats: ICategory[];
-  l3Cats: ICategory[];
-}) => {
-  const {
-    register,
-    control,
-    formState: { errors },
-  } = form;
+// export const CategoryInventoryFields = ({
+//   form,
+//   l1Cats,
+//   l2Cats,
+//   l3Cats,
+// }: {
+//   form: UseFormReturn<TProductCategoryInventory>;
+//   l1Cats: ICategory[];
+//   l2Cats: ICategory[];
+//   l3Cats: ICategory[];
+// }) => {
+//   const {
+//     register,
+//     control,
+//     formState: { errors },
+//   } = form;
 
-  const l1Category = useWatch({ control, name: 'l1Category' });
-  const l2Category = useWatch({ control, name: 'l2Category' });
+//   const l1Category = useWatch({ control, name: 'l1Category' });
+//   const l2Category = useWatch({ control, name: 'l2Category' });
 
-  return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      <Controller
-        name="l1Category"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            label="Main category"
-            error={errors.l1Category?.message}
-            options={l1Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
-            selectProps={{
-              value,
-              placeholder: 'Select (L1) main category',
-              onChange: (value) => {
-                onChange(value);
+//   return (
+//     <div className="grid gap-4 sm:grid-cols-2">
+//       <Controller
+//         name="l1Category"
+//         control={control}
+//         render={({ field: { onChange, value } }) => (
+//           <Select
+//             label="Main category"
+//             error={errors.l1Category?.message}
+//             options={l1Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
+//             selectProps={{
+//               value,
+//               placeholder: 'Select (L1) main category',
+//               onChange: (value) => {
+//                 onChange(value);
 
-                form.setValue('l2Category', '');
-                form.setValue('l3Category', '');
-              },
-            }}
-          />
-        )}
-      />
+//                 form.setValue('l2Category', '');
+//                 form.setValue('l3Category', '');
+//               },
+//             }}
+//           />
+//         )}
+//       />
 
-      <Controller
-        name="l2Category"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            label="Sub-category"
-            error={errors.l2Category?.message}
-            options={l2Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
-            selectProps={{
-              value,
-              disabled: !l1Category,
-              placeholder: 'Select (L2) sub-category',
-              onChange: (value) => {
-                onChange(value);
+//       <Controller
+//         name="l2Category"
+//         control={control}
+//         render={({ field: { onChange, value } }) => (
+//           <Select
+//             label="Sub-category"
+//             error={errors.l2Category?.message}
+//             options={l2Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
+//             selectProps={{
+//               value,
+//               disabled: !l1Category,
+//               placeholder: 'Select (L2) sub-category',
+//               onChange: (value) => {
+//                 onChange(value);
 
-                form.setValue('l3Category', '');
-              },
-            }}
-          />
-        )}
-      />
+//                 form.setValue('l3Category', '');
+//               },
+//             }}
+//           />
+//         )}
+//       />
 
-      <Controller
-        name="l3Category"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            label="Product category"
-            error={errors.l3Category?.message}
-            options={l3Cats.map((cat) => ({
-              label: cat.name,
-              value: cat._id,
-            }))}
-            selectProps={{
-              value,
-              disabled: !l2Category,
-              placeholder: 'Select (L3) product category',
-              onChange,
-            }}
-          />
-        )}
-      />
+//       <Controller
+//         name="l3Category"
+//         control={control}
+//         render={({ field: { onChange, value } }) => (
+//           <Select
+//             label="Product category"
+//             error={errors.l3Category?.message}
+//             options={l3Cats.map((cat) => ({
+//               label: cat.name,
+//               value: cat._id,
+//             }))}
+//             selectProps={{
+//               value,
+//               disabled: !l2Category,
+//               placeholder: 'Select (L3) product category',
+//               onChange,
+//             }}
+//           />
+//         )}
+//       />
 
-      {/* <Input
-        label="Stock"
-        register={register('stock', {
-          valueAsNumber: true,
-        })}
-        error={errors.stock?.message}
-        inputProps={{
-          type: 'number',
-          placeholder: '100',
-        }}
-      /> */}
+//       {/* <Input
+//         label="Stock"
+//         register={register('stock', {
+//           valueAsNumber: true,
+//         })}
+//         error={errors.stock?.message}
+//         inputProps={{
+//           type: 'number',
+//           placeholder: '100',
+//         }}
+//       /> */}
 
-      {/* <Input
-        label="Low stock threshold"
-        register={register('lowStockThreshold', {
-          valueAsNumber: true,
-        })}
-        error={errors.lowStockThreshold?.message}
-        inputProps={{
-          type: 'number',
-          placeholder: '10',
-        }}
-      /> */}
-    </div>
-  );
-};
+//       {/* <Input
+//         label="Low stock threshold"
+//         register={register('lowStockThreshold', {
+//           valueAsNumber: true,
+//         })}
+//         error={errors.lowStockThreshold?.message}
+//         inputProps={{
+//           type: 'number',
+//           placeholder: '10',
+//         }}
+//       /> */}
+//     </div>
+//   );
+// };
 
 /* -------------------------------------------------------------------------- */
 /*                       STEP 3 : MEDIA & GALLERY                             */
@@ -681,7 +680,7 @@ export const ConfirmFields = ({
   form: UseFormReturn<TConfirmDetails>;
   values: {
     basicInfo: TProductBasicInfo;
-    categoryInventory: TProductCategoryInventory;
+    // categoryInventory: TProductCategoryInventory;
     media: TProductMedia;
     description: TProductDescription;
     variants: TProductVariants;
