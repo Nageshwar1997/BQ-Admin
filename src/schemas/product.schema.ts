@@ -347,24 +347,72 @@ export const productDescriptionSchema = object({
 /* -------------------------------------------------------------------------- */
 
 export const productVariantsSchema = object({
+  productType: z_enum(PRODUCT_TYPE, { error: 'Product type is required.' }),
   variants: array(
     object({
       type: z_enum(['color', 'text']),
 
-      label: string(),
+      label: string({ error: 'Variant label is required.' })
+        .min(2, 'Variant label must be at least 2 characters.')
+        .max(100, 'Variant label cannot exceed 100 characters.'),
 
-      value: string(),
+      value: string({ error: 'Variant value is required.' }),
 
-      originalPrice: number({ error: 'Original price is required.' }).min(
-        1,
-        'Original price must be greater than 0.',
-      ),
-      sellingPrice: number({ error: 'Selling price is required.' })
-        .min(0, 'Selling price cannot be negative.')
-        .optional(),
-      stock: number().min(0, 'Stock cannot be negative.'),
+      originalPrice: number({
+        error: 'Original price is required.',
+      }).min(1, 'Original price must be greater than 0.'),
 
-      images: array(string()).optional(),
+      sellingPrice: number({
+        error: 'Selling price is required.',
+      }).min(1, 'Selling price must be greater than 0.'),
+
+      stock: number({
+        error: 'Stock is required.',
+      })
+        .min(1, 'Stock must be greater than 0.')
+        .max(100, 'Stock cannot exceed 100.'),
+      stockThreshold: number({
+        error: 'Stock threshold is required.',
+      })
+        .min(1, 'Stock threshold must be greater than 0.')
+        .max(10, 'Stock threshold cannot exceed 10.'),
+      images: array(
+        union([
+          z_instanceof(File),
+          url({
+            message: 'Invalid image URL.',
+            normalize: true,
+            pattern: REGEX.URL,
+          }),
+        ]),
+      )
+        .min(1, 'At least one image is required.')
+        .max(10, 'Maximum of 10 images are allowed.')
+        .superRefine((items, ctx) => {
+          items.forEach((item, index) => {
+            const imageLabel = `Image ${index + 1}`;
+
+            if (item instanceof File) {
+              if (item.size > MAX_IMAGE_FILE_SIZE) {
+                ctx.addIssue({
+                  code: 'custom',
+                  path: [index],
+                  message: `${imageLabel} size is ${sizeFormat(item.size)}. Max allowed size is ${sizeFormat(MAX_IMAGE_FILE_SIZE)}.`,
+                });
+              }
+
+              const fileTypes: readonly string[] = FILE_MIME.image;
+
+              if (!fileTypes.includes(item.type)) {
+                ctx.addIssue({
+                  code: 'custom',
+                  path: [index],
+                  message: `${imageLabel} type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+                });
+              }
+            }
+          });
+        }),
     }).superRefine((data, ctx) => {
       /* -------------------------------------------------------------------------- */
       /*                               COMMON CHECKS                                 */
@@ -382,33 +430,8 @@ export const productVariantsSchema = object({
       /*                               COLOR VARIANT                                */
       /* -------------------------------------------------------------------------- */
 
-      if (data.type === 'color') {
-        if (!data.label) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['label'],
-            message: 'Color label is required.',
-          });
-        } else {
-          if (data.label.length < 2) {
-            ctx.addIssue({
-              code: 'custom',
-              path: ['label'],
-              message: 'Color label must be at least 2 characters.',
-            });
-          }
-
-          if (data.label.length > 50) {
-            ctx.addIssue({
-              code: 'custom',
-              path: ['label'],
-              message: 'Color label cannot exceed 50 characters.',
-            });
-          }
-        }
-
-        const isValidHex = /^#([0-9A-F]{3}){1,2}$/i.test(data.value);
-
+      if (data.type === 'color' && data.value) {
+        const isValidHex = REGEX.HEX_CODE.test(data.value);
         if (!isValidHex) {
           ctx.addIssue({
             code: 'custom',
@@ -422,28 +445,19 @@ export const productVariantsSchema = object({
       /*                                TEXT VARIANT                                */
       /* -------------------------------------------------------------------------- */
 
-      if (data.type === 'text') {
-        if (!data.value.trim()) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['value'],
-            message: 'Variant value is required.',
-          });
-        }
-
-        if (data.value.length < 1) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['value'],
-            message: 'Variant value must be at least 1 character.',
-          });
-        }
-
-        if (data.value.length > 50) {
+      if (data.type === 'text' && data.value) {
+        if (data.value.trim().length > 50) {
           ctx.addIssue({
             code: 'custom',
             path: ['value'],
             message: 'Variant value cannot exceed 50 characters.',
+          });
+        }
+        if (data.value.trim().length < 2) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['value'],
+            message: 'Variant value must be at least 2 character.',
           });
         }
       }
