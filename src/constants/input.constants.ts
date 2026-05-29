@@ -90,3 +90,34 @@ export const REGISTER_INPUT_MAP_DATA = [
   PHONE_NUMBER_INPUT_DATA,
   ...PASSWORDS_INPUT_MAP_DATA,
 ] as const;
+
+export const PRODUCT_BASIC_INFO_INPUT_MAP_DATA = [
+  {
+    name: 'title',
+    label: 'Title',
+    type: 'text',
+    autoComplete: 'given-name',
+    placeholder: 'Enter product title',
+  },
+  {
+    name: 'brand',
+    label: 'Brand',
+    type: 'text',
+    autoComplete: 'given-name',
+    placeholder: 'Enter product brand',
+  },
+  {
+    name: 'originalPrice',
+    label: 'Original Price',
+    type: 'number',
+    autoComplete: 'tel',
+    placeholder: 'Enter product original price',
+  },
+  {
+    name: 'sellingPrice',
+    label: 'Selling Price',
+    type: 'number',
+    autoComplete: 'tel',
+    placeholder: 'Enter product selling price',
+  },
+] as const;

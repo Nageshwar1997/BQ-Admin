@@ -32,14 +32,16 @@ export const productBasicInfoSchema = object({
     .min(2, 'Brand must be at least 2 characters.')
     .max(80, 'Brand cannot exceed 80 characters.'),
 
-  price: number({ error: 'Price is required.' }).min(1, 'Price must be greater than 0.'),
-  discountedPrice: number({ error: 'Discounted price is required.' }).min(
-    0,
-    'Discounted price cannot be negative.',
+  originalPrice: number({ error: 'Original price is required.' }).min(
+    1,
+    'Original price must be greater than 0.',
   ),
-}).refine((data) => data.discountedPrice <= data.price, {
-  path: ['discountedPrice'],
-  message: 'Discounted price cannot be greater than actual price.',
+  sellingPrice: number({ error: 'Selling price is required.' })
+    .min(0, 'Selling price cannot be negative.')
+    .optional(),
+}).refine((data) => !data.sellingPrice || data.sellingPrice <= data.originalPrice, {
+  path: ['sellingPrice'],
+  message: 'Selling price cannot be greater than original price.',
 });
 
 /* -------------------------------------------------------------------------- */
@@ -210,10 +212,13 @@ export const productVariantsSchema = object({
 
       value: string(),
 
-      price: number().min(1, 'Price must be greater than 0.'),
-
-      discountedPrice: number().min(0, 'Discounted price cannot be negative.').optional(),
-
+      originalPrice: number({ error: 'Original price is required.' }).min(
+        1,
+        'Original price must be greater than 0.',
+      ),
+      sellingPrice: number({ error: 'Selling price is required.' })
+        .min(0, 'Selling price cannot be negative.')
+        .optional(),
       stock: number().min(0, 'Stock cannot be negative.'),
 
       images: array(string()).optional(),
@@ -222,11 +227,11 @@ export const productVariantsSchema = object({
       /*                               COMMON CHECKS                                 */
       /* -------------------------------------------------------------------------- */
 
-      if (data.discountedPrice !== undefined && data.discountedPrice > data.price) {
+      if (data.sellingPrice !== undefined && data.sellingPrice > data.originalPrice) {
         ctx.addIssue({
           code: 'custom',
-          path: ['discountedPrice'],
-          message: 'Discounted price cannot be greater than actual price.',
+          path: ['sellingPrice'],
+          message: 'Selling price cannot be greater than original price.',
         });
       }
 

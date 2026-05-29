@@ -4,6 +4,7 @@ import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import { FILE_MIME } from '@/constants/common.constants';
+import { PRODUCT_BASIC_INFO_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type {
   TConfirmDetails,
   TProductBasicInfo,
@@ -58,58 +59,19 @@ const getErrorMessages = (fieldErrors?: FieldErrors<TProductMedia>): string[] | 
 /* -------------------------------------------------------------------------- */
 
 export const BasicInfoFields = ({ form }: { form: UseFormReturn<TProductBasicInfo> }) => {
-  const {
-    control,
-    register,
-    formState: { errors },
-  } = form;
-
-  const values = useWatch({ control });
-  console.log("🚀 ~ BasicInfoFields ~ values:", values)
-
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <Input
-        label="Title"
-        register={register('title')}
-        error={errors.title?.message}
-        inputProps={{
-          placeholder: 'Product title',
-        }}
-      />
-
-      <Input
-        label="Brand"
-        register={register('brand')}
-        error={errors.brand?.message}
-        inputProps={{
-          placeholder: 'Brand name',
-        }}
-      />
-
-      <Input
-        label="Price"
-        register={register('price', {
-          valueAsNumber: true,
-        })}
-        error={errors.price?.message}
-        inputProps={{
-          type: 'number',
-          placeholder: '999',
-        }}
-      />
-
-      <Input
-        label="Discounted price"
-        register={register('discountedPrice', {
-          valueAsNumber: true,
-        })}
-        error={errors.discountedPrice?.message}
-        inputProps={{
-          type: 'number',
-          placeholder: '799',
-        }}
-      />
+      {PRODUCT_BASIC_INFO_INPUT_MAP_DATA.map((input) => (
+        <Input
+          key={input.name}
+          label={input.label}
+          register={form.register(input.name, {
+            ...(input.type === 'number' && { valueAsNumber: true }),
+          })}
+          error={form.formState.errors[input.name]?.message}
+          inputProps={{ type: input.type, placeholder: input.placeholder }}
+        />
+      ))}
     </div>
   );
 };
@@ -425,11 +387,11 @@ export const VariantsFields = ({ form }: { form: UseFormReturn<TProductVariants>
             />
 
             <Input
-              label="Price"
-              register={register(`variants.${index}.price`, {
+              label="Original Price"
+              register={register(`variants.${index}.originalPrice`, {
                 valueAsNumber: true,
               })}
-              error={errors.variants?.[index]?.price?.message}
+              error={errors.variants?.[index]?.originalPrice?.message}
               inputProps={{
                 type: 'number',
                 placeholder: '999',
@@ -438,10 +400,10 @@ export const VariantsFields = ({ form }: { form: UseFormReturn<TProductVariants>
 
             <Input
               label="Discounted price"
-              register={register(`variants.${index}.discountedPrice`, {
+              register={register(`variants.${index}.sellingPrice`, {
                 valueAsNumber: true,
               })}
-              error={errors.variants?.[index]?.discountedPrice?.message}
+              error={errors.variants?.[index]?.sellingPrice?.message}
               inputProps={{
                 type: 'number',
                 placeholder: '799',
@@ -485,8 +447,8 @@ export const VariantsFields = ({ form }: { form: UseFormReturn<TProductVariants>
               type: 'text',
               label: '',
               value: '',
-              price: 0,
-              discountedPrice: 0,
+              originalPrice: 0,
+              sellingPrice: 0,
               stock: 0,
               images: [],
             }),
