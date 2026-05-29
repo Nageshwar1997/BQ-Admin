@@ -53,6 +53,7 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
     control,
     name: 'variants',
   });
+  console.log('🚀 ~ VariantsFieldsTest ~ fields:', fields);
 
   return (
     <div className="flex flex-col gap-6">
@@ -70,7 +71,10 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
       />
       {fields.map((field, index) => {
         return (
-          <div className="border-smoke-eerie-invert/20 bg-smoke-eerie/50 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
+          <div
+            key={field.id}
+            className="border-smoke-eerie-invert/20 bg-smoke-eerie/50 grid gap-4 rounded-xl border p-4 sm:grid-cols-2"
+          >
             <Controller
               name={`variants.${index}.type`}
               control={control}
@@ -176,22 +180,40 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                 />
               )}
             />
-              <Button
-                pattern="outline"
-                content="Reset"
-                className="bg-primary-red border-none text-white"
-                buttonProps={{
-                  type: 'button',
-                }}
-              />
-              <Button
-                pattern="outline"
-                content="Save"
-                className="bg-primary-yellow border-none text-white"
-                buttonProps={{
-                  type: 'button',
-                }}
-              />
+            <Button
+              pattern="outline"
+              content="Reset"
+              className="bg-primary-red border-none text-white"
+              buttonProps={{
+                type: 'button',
+                onClick: () => {
+                  form.setValue(`variants.${index}`, {
+                    type: VARIANT_TYPE_MAP.COLOR,
+                    label: '',
+                    value: '',
+                    originalPrice: NaN,
+                    sellingPrice: NaN,
+                    stock: NaN,
+                    stockThreshold: NaN,
+                    thumbnail: undefined,
+                    images: [],
+                  });
+
+                  form.clearErrors(`variants.${index}`);
+                },
+              }}
+            />
+            <Button
+              pattern="outline"
+              content="Save"
+              className="bg-primary-yellow border-none text-white"
+              buttonProps={{
+                type: 'button',
+                onClick: () => {
+                  console.log(form.getValues(`variants.${index}`));
+                },
+              }}
+            />
           </div>
         );
       })}

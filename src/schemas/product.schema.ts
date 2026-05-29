@@ -355,10 +355,11 @@ export const productVariantsSchema = object({
       type: z_enum(VARIANT_TYPE, { error: 'Variant type is required.' }),
 
       label: string({ error: 'Variant label is required.' })
+        .min(1, 'Variant label is required.')
         .min(2, 'Variant label must be at least 2 characters.')
         .max(100, 'Variant label cannot exceed 100 characters.'),
 
-      value: string({ error: 'Variant value is required.' }),
+      value: string({ error: 'Variant value is required.' }).min(1, 'Variant value is required.'),
 
       originalPrice: number({
         error: 'Original price is required.',
@@ -418,6 +419,9 @@ export const productVariantsSchema = object({
             pattern: REGEX.URL,
           }),
         ]),
+        {
+          error: 'At least one image is required.',
+        },
       )
         .min(1, 'At least one image is required.')
         .max(10, 'Maximum of 10 images are allowed.')
