@@ -6,6 +6,8 @@ import {
   MB,
   PRODUCT_TYPE,
   PRODUCT_TYPE_MAP,
+  VARIANT_TYPE,
+  VARIANT_TYPE_MAP,
 } from '@/constants/common.constants';
 import { REGEX } from '@/constants/regex.constants';
 import {
@@ -350,7 +352,7 @@ export const productVariantsSchema = object({
   productType: z_enum(PRODUCT_TYPE, { error: 'Product type is required.' }),
   variants: array(
     object({
-      type: z_enum(['color', 'text']),
+      type: z_enum(VARIANT_TYPE, { error: 'Variant type is required.' }),
 
       label: string({ error: 'Variant label is required.' })
         .min(2, 'Variant label must be at least 2 characters.')
@@ -376,6 +378,37 @@ export const productVariantsSchema = object({
       })
         .min(1, 'Stock threshold must be greater than 0.')
         .max(10, 'Stock threshold cannot exceed 10.'),
+      thumbnail: union([
+        z_instanceof(File).superRefine((file, ctx) => {
+          if (file.size > MAX_IMAGE_FILE_SIZE) {
+            ctx.addIssue({
+              code: 'custom',
+              message: `Thumbnail size is ${sizeFormat(file.size)}. Max allowed size is ${sizeFormat(MAX_IMAGE_FILE_SIZE)}.`,
+            });
+          }
+          const fileTypes: readonly string[] = FILE_MIME.image;
+          if (!fileTypes.includes(file.type)) {
+            ctx.addIssue({
+              code: 'custom',
+              message: `Thumbnail type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+            });
+          }
+        }),
+        url({
+          message: 'Invalid thumbnail URL.',
+          normalize: true,
+          pattern: REGEX.URL,
+        }),
+      ])
+        .optional()
+        .superRefine((value, ctx) => {
+          if (!value) {
+            ctx.addIssue({
+              code: 'custom',
+              message: 'Thumbnail is required.',
+            });
+          }
+        }),
       images: array(
         union([
           z_instanceof(File),
@@ -430,7 +463,7 @@ export const productVariantsSchema = object({
       /*                               COLOR VARIANT                                */
       /* -------------------------------------------------------------------------- */
 
-      if (data.type === 'color' && data.value) {
+      if (data.type === VARIANT_TYPE_MAP.COLOR && data.value) {
         const isValidHex = REGEX.HEX_CODE.test(data.value);
         if (!isValidHex) {
           ctx.addIssue({
@@ -445,7 +478,7 @@ export const productVariantsSchema = object({
       /*                                TEXT VARIANT                                */
       /* -------------------------------------------------------------------------- */
 
-      if (data.type === 'text' && data.value) {
+      if (data.type === VARIANT_TYPE_MAP.TEXT && data.value) {
         if (data.value.trim().length > 50) {
           ctx.addIssue({
             code: 'custom',

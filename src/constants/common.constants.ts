@@ -245,3 +245,7 @@ export const PRODUCT_TYPE_MAP = {
 } as const;
 
 export const PRODUCT_TYPE = Object.values(PRODUCT_TYPE_MAP);
+
+export const VARIANT_TYPE_MAP = { COLOR: 'Color', TEXT: 'Text' } as const;
+
+export const VARIANT_TYPE = Object.values(VARIANT_TYPE_MAP);

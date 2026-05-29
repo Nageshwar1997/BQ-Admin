@@ -30,7 +30,7 @@ export interface ICheckbox extends Omit<IBaseInput, 'needRef' | 'icons' | 'label
 
 type TOption = { label: string | ReactNode; value: string };
 
-export interface IRadio extends TClassName, Pick<IBaseInput, 'error'> {
+export interface IRadio extends TClassName, TContainerClassName, Pick<IBaseInput, 'error'> {
   value: string;
   onChange: (value: string) => void;
   options: TOption[];

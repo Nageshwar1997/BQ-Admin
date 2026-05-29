@@ -1,12 +1,19 @@
 import type { IRadio } from '@/types/input.type';
 import { InputError } from './children';
 
-const Radio = ({ value, onChange, options, className = '', error }: IRadio) => {
+const Radio = ({
+  value,
+  onChange,
+  options,
+  className = '',
+  containerClassName = '',
+  error,
+}: IRadio) => {
   const index = options.findIndex((opt) => opt.value === value);
   const translatePercent = `${index * 100}%`;
 
   return (
-    <div className="flex max-w-full min-w-0 flex-col gap-1.5">
+    <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
       <div
         className={`border-battleship-davys-gray mx-auto flex w-full items-center justify-center gap-4 rounded-full border ${className}`}
       >

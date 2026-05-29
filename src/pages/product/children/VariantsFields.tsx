@@ -1,8 +1,14 @@
 import Button from '@/components/ui/Button';
 import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
+import Radio from '@/components/ui/inputs/Radio';
 import Select from '@/components/ui/inputs/Select';
-import { EMPTY_ARRAY, PRODUCT_TYPE } from '@/constants/common.constants';
+import {
+  EMPTY_ARRAY,
+  PRODUCT_TYPE,
+  VARIANT_TYPE,
+  VARIANT_TYPE_MAP,
+} from '@/constants/common.constants';
 import type { TProductVariants } from '@/types/schema.type';
 import { Controller, useFieldArray, type FieldErrors, type UseFormReturn } from 'react-hook-form';
 
@@ -65,13 +71,12 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
       {fields.map((field, index) => {
         return (
           <div className="border-smoke-eerie-invert/20 bg-smoke-eerie/50 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
-            <Controller
+            {/* <Controller
               name={`variants.${index}.type`}
               control={control}
               render={({ field: { onChange, value } }) => (
                 <Select
                   label="Variant type"
-                  error={errors.variants?.[index]?.type?.message}
                   options={[
                     { label: 'Color', value: 'color' },
                     { label: 'Text', value: 'text' },
@@ -81,6 +86,22 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                     onChange,
                     placeholder: 'Select variant type',
                   }}
+                />
+              )}
+            /> */}
+
+            <Controller
+              name={`variants.${index}.type`}
+              control={control}
+              defaultValue={VARIANT_TYPE_MAP.COLOR}
+              render={({ field: { onChange, value } }) => (
+                <Radio
+                  value={value}
+                  onChange={onChange}
+                  options={VARIANT_TYPE.map((type) => ({ label: type, value: type }))}
+                  className="w-50! border"
+                  containerClassName="sm:col-span-2 max-w-xs mx-auto"
+                  error={errors.variants?.[index]?.type?.message}
                 />
               )}
             />
@@ -93,10 +114,12 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
             />
 
             <Input
-              label={field?.type === 'color' ? 'Hex color code' : 'Variant value'}
+              label={field?.type === VARIANT_TYPE_MAP.COLOR ? 'Hex color code' : 'Variant value'}
               register={register(`variants.${index}.value`)}
               error={errors.variants?.[index]?.value?.message}
-              inputProps={{ placeholder: field?.type === 'color' ? '#000000' : '50ml' }}
+              inputProps={{
+                placeholder: field?.type === VARIANT_TYPE_MAP.COLOR ? '#000000' : '50ml',
+              }}
             />
 
             <Input
@@ -120,6 +143,33 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
               inputProps={{ type: 'number', placeholder: '100' }}
             />
 
+            <Input
+              label="Stock threshold"
+              register={register(`variants.${index}.stockThreshold`, {
+                valueAsNumber: true,
+              })}
+              error={errors.variants?.[index]?.stockThreshold?.message}
+              inputProps={{ type: 'number', placeholder: '100' }}
+            />
+
+            <Controller
+              control={control}
+              name={`variants.${index}.thumbnail`}
+              render={({ field: { name, onChange, value } }) => (
+                <FileInput
+                  fileInputProps={{
+                    name,
+                    placeholder: !!field?.thumbnail ? 'Change thumbnail' : 'Select thumbnail',
+                    onChange: ({ target: { files } }) => onChange(files?.[0]),
+                    value,
+                  }}
+                  errors={getErrorMessages(errors.variants?.[index]?.thumbnail)}
+                  handleRemove={() =>
+                    form.resetField(`variants.${index}.thumbnail`, { defaultValue: undefined })
+                  }
+                />
+              )}
+            />
             <Controller
               control={control}
               name={`variants.${index}.images`}
@@ -154,27 +204,18 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
               )}
             />
             <>
-              <Input
-                label="Stock threshold"
-                register={register(`variants.${index}.stockThreshold`, {
-                  valueAsNumber: true,
-                })}
-                error={errors.variants?.[index]?.stockThreshold?.message}
-                inputProps={{ type: 'number', placeholder: '100' }}
-              />
-              <div className="flex h-min gap-4">
+              <div className="col-span-2 flex h-min gap-4">
                 <Button
                   pattern="outline"
-                  content="Clear"
+                  content="Reset"
                   className="bg-primary-red border-none text-white"
                   buttonProps={{
                     type: 'button',
-                    // onClick: () => resetField('baseVariant'),
                   }}
                 />
                 <Button
                   pattern="outline"
-                  content="Add"
+                  content="Save"
                   className="bg-primary-yellow border-none text-white"
                   buttonProps={{
                     type: 'button',
@@ -191,7 +232,7 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
         content="Add variant"
         buttonProps={{
           type: 'button',
-          // onClick: () => append({}),
+          onClick: () => append({} as TProductVariants['variants'][number]),
         }}
       />
     </div>
