@@ -324,6 +324,7 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
         name="thumbnail"
         render={({ field: { name, onChange, value } }) => (
           <FileInput
+            label="Thumbnail"
             fileInputProps={{
               name,
               placeholder: !!thumbnail ? 'Change thumbnail' : 'Select thumbnail',
@@ -341,6 +342,7 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
         name="images"
         render={({ field: { name, onChange, value } }) => (
           <FileInput
+            label="Images"
             fileInputProps={{
               name,
               placeholder: images?.length ? 'Change images' : 'Select images',
@@ -372,6 +374,7 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
         name="video"
         render={({ field: { name, value, onChange } }) => (
           <FileInput
+            label="Video"
             fileInputProps={{
               name,
               placeholder: !!video ? 'Change video' : 'Select video',
@@ -504,42 +507,52 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
             />
           )}
         />
+        <>
+          <Input
+            label="Stock threshold"
+            register={register(`baseVariant.stockThreshold`, {
+              valueAsNumber: true,
+            })}
+            error={errors.baseVariant?.stockThreshold?.message}
+            inputProps={{ type: 'number', placeholder: '100' }}
+          />
+          <div className="flex h-min gap-4">
+            <Button
+              pattern="outline"
+              content="Clear"
+              className="bg-primary-red border-none text-white"
+              buttonProps={{
+                type: 'button',
+                onClick: async () => {
+                  const isValid = await form.trigger('baseVariant');
+                  console.log('🚀 ~ MediaFields ~ isValid:', isValid);
 
-        <Button
-          pattern="tertiary"
-          content="Add variant"
-          className="h-min"
-          buttonProps={{
-            type: 'button',
-            onClick: async () => {
-              const isValid = await form.trigger('baseVariant');
-              console.log('🚀 ~ MediaFields ~ isValid:', isValid);
+                  console.log('🚀 ~ MediaFields ~ baseVariant:', baseVariant);
+                  if (!isValid || !baseVariant) return;
 
-              console.log('🚀 ~ MediaFields ~ baseVariant:', baseVariant);
-              if (!isValid || !baseVariant) return;
+                  append(structuredClone(baseVariant));
+                },
+              }}
+            />
+            <Button
+              pattern="outline"
+              content="Add"
+              className="bg-primary-yellow border-none text-white"
+              buttonProps={{
+                type: 'button',
+                onClick: async () => {
+                  const isValid = await form.trigger('baseVariant');
+                  console.log('🚀 ~ MediaFields ~ isValid:', isValid);
 
-              append(structuredClone(baseVariant));
-            },
-          }}
-        />
+                  console.log('🚀 ~ MediaFields ~ baseVariant:', baseVariant);
+                  if (!isValid || !baseVariant) return;
 
-        <Button
-          pattern="tertiary"
-          content="Add variant"
-          className="h-min"
-          buttonProps={{
-            type: 'button',
-            onClick: async () => {
-              const isValid = await form.trigger('baseVariant');
-              console.log('🚀 ~ MediaFields ~ isValid:', isValid);
-
-              console.log('🚀 ~ MediaFields ~ baseVariant:', baseVariant);
-              if (!isValid || !baseVariant) return;
-
-              append(structuredClone(baseVariant));
-            },
-          }}
-        />
+                  append(structuredClone(baseVariant));
+                },
+              }}
+            />
+          </div>
+        </>
       </div>
 
       {fields.map((field, index) => (
