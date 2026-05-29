@@ -210,11 +210,6 @@ const baseVariantSchema = object({
   })
     .min(1, 'Stock must be greater than 0.')
     .max(100, 'Stock cannot exceed 100.'),
-  stockThreshold: number({
-    error: 'Stock threshold is required.',
-  })
-    .min(1, 'Stock threshold must be greater than 0.')
-    .max(10, 'Stock threshold cannot exceed 10.'),
 
   thumbnail: union([
     z_instanceof(File).superRefine((file, ctx) => {

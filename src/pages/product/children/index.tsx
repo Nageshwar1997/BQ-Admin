@@ -304,12 +304,18 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
     resetField,
     setValue,
   } = form;
+  console.log('🚀 ~ MediaFields ~ errors:', errors);
 
   const images = useWatch({ control, name: 'images' });
   const thumbnail = useWatch({ control, name: 'thumbnail' });
   const video = useWatch({ control, name: 'video' });
 
   const baseVariant = useWatch({ control, name: 'baseVariant' });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'variants',
+  });
+  console.log('🚀 ~ MediaFields ~ fields:', fields);
 
   return (
     <div className="grid gap-4">
@@ -447,17 +453,119 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
           error={errors.baseVariant?.stock?.message}
           inputProps={{ type: 'number', placeholder: '100' }}
         />
-        <Input
-          label="Stock threshold"
-          register={register(`baseVariant.stockThreshold`, {
-            valueAsNumber: true,
-          })}
-          error={errors.baseVariant?.stockThreshold?.message}
-          inputProps={{ type: 'number', placeholder: '100' }}
+
+        <Controller
+          control={control}
+          name="baseVariant.thumbnail"
+          render={({ field: { name, onChange, value } }) => (
+            <FileInput
+              fileInputProps={{
+                name,
+                placeholder: !!baseVariant?.thumbnail ? 'Change thumbnail' : 'Select thumbnail',
+                onChange: ({ target: { files } }) => onChange(files?.[0]),
+                value,
+              }}
+              errors={getErrorMessages(errors.baseVariant?.thumbnail)}
+              handleRemove={() => resetField('baseVariant.thumbnail', { defaultValue: undefined })}
+            />
+          )}
         />
 
-        <Button pattern="tertiary" content="Add variant" buttonProps={{ type: 'button' }} />
+        <Controller
+          control={control}
+          name="baseVariant.images"
+          render={({ field: { name, onChange, value } }) => (
+            <FileInput
+              fileInputProps={{
+                name,
+                placeholder: baseVariant?.images?.length ? 'Change images' : 'Select images',
+                multiple: true,
+                disabled: images?.length >= 10,
+                onChange: (event) => {
+                  const newFiles = Array.from(event.target.files || EMPTY_ARRAY);
+                  const oldImages = baseVariant?.images || EMPTY_ARRAY;
+                  const files = [...oldImages, ...newFiles];
+                  onChange(files);
+                },
+                value,
+              }}
+              errors={getErrorMessages(errors.baseVariant?.images)}
+              handleRemove={(index) => {
+                const oldImages = baseVariant?.images || EMPTY_ARRAY;
+
+                const nextValue = oldImages.filter((_, currentIndex) => currentIndex !== index);
+
+                setValue('baseVariant.images', nextValue, {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                  shouldValidate: true,
+                });
+              }}
+            />
+          )}
+        />
+
+        <Button
+          pattern="tertiary"
+          content="Add variant"
+          className="h-min"
+          buttonProps={{
+            type: 'button',
+            onClick: async () => {
+              const isValid = await form.trigger('baseVariant');
+              console.log('🚀 ~ MediaFields ~ isValid:', isValid);
+
+              console.log('🚀 ~ MediaFields ~ baseVariant:', baseVariant);
+              if (!isValid || !baseVariant) return;
+
+              append(structuredClone(baseVariant));
+            },
+          }}
+        />
+
+        <Button
+          pattern="tertiary"
+          content="Add variant"
+          className="h-min"
+          buttonProps={{
+            type: 'button',
+            onClick: async () => {
+              const isValid = await form.trigger('baseVariant');
+              console.log('🚀 ~ MediaFields ~ isValid:', isValid);
+
+              console.log('🚀 ~ MediaFields ~ baseVariant:', baseVariant);
+              if (!isValid || !baseVariant) return;
+
+              append(structuredClone(baseVariant));
+            },
+          }}
+        />
       </div>
+
+      {fields.map((field, index) => (
+        <div
+          key={field.id}
+          className="border-smoke-eerie-invert/20 bg-smoke-eerie/30 rounded-xl border p-4"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p>{field.label}</p>
+              <p className="text-secondary text-xs">
+                {field.type} • {field.value}
+              </p>
+            </div>
+
+            <Button
+              pattern="secondary"
+              content="Remove"
+              buttonProps={{
+                type: 'button',
+                onClick: () => remove(index),
+              }}
+            />
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
