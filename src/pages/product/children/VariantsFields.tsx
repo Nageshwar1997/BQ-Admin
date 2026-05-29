@@ -71,25 +71,6 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
       {fields.map((field, index) => {
         return (
           <div className="border-smoke-eerie-invert/20 bg-smoke-eerie/50 grid gap-4 rounded-xl border p-4 sm:grid-cols-2">
-            {/* <Controller
-              name={`variants.${index}.type`}
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Select
-                  label="Variant type"
-                  options={[
-                    { label: 'Color', value: 'color' },
-                    { label: 'Text', value: 'text' },
-                  ]}
-                  selectProps={{
-                    value,
-                    onChange,
-                    placeholder: 'Select variant type',
-                  }}
-                />
-              )}
-            /> */}
-
             <Controller
               name={`variants.${index}.type`}
               control={control}
@@ -99,20 +80,17 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                   value={value}
                   onChange={onChange}
                   options={VARIANT_TYPE.map((type) => ({ label: type, value: type }))}
-                  className="w-50! border"
-                  containerClassName="sm:col-span-2 max-w-xs mx-auto"
+                  containerClassName="sm:col-span-2 max-w-xs w-full mx-auto mb-2"
                   error={errors.variants?.[index]?.type?.message}
                 />
               )}
             />
-
             <Input
               label="Variant name"
               register={register(`variants.${index}.label`)}
               error={errors.variants?.[index]?.label?.message}
               inputProps={{ placeholder: 'Black' }}
             />
-
             <Input
               label={field?.type === VARIANT_TYPE_MAP.COLOR ? 'Hex color code' : 'Variant value'}
               register={register(`variants.${index}.value`)}
@@ -121,28 +99,24 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                 placeholder: field?.type === VARIANT_TYPE_MAP.COLOR ? '#000000' : '50ml',
               }}
             />
-
             <Input
               label="Original Price"
               register={register(`variants.${index}.originalPrice`, { valueAsNumber: true })}
               error={errors.variants?.[index]?.originalPrice?.message}
               inputProps={{ type: 'number', placeholder: '999' }}
             />
-
             <Input
               label="Discounted price"
               register={register(`variants.${index}.sellingPrice`, { valueAsNumber: true })}
               error={errors.variants?.[index]?.sellingPrice?.message}
               inputProps={{ type: 'number', placeholder: '799' }}
             />
-
             <Input
               label="Stock"
               register={register(`variants.${index}.stock`, { valueAsNumber: true })}
               error={errors.variants?.[index]?.stock?.message}
               inputProps={{ type: 'number', placeholder: '100' }}
             />
-
             <Input
               label="Stock threshold"
               register={register(`variants.${index}.stockThreshold`, {
@@ -151,7 +125,6 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
               error={errors.variants?.[index]?.stockThreshold?.message}
               inputProps={{ type: 'number', placeholder: '100' }}
             />
-
             <Controller
               control={control}
               name={`variants.${index}.thumbnail`}
@@ -203,26 +176,22 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                 />
               )}
             />
-            <>
-              <div className="col-span-2 flex h-min gap-4">
-                <Button
-                  pattern="outline"
-                  content="Reset"
-                  className="bg-primary-red border-none text-white"
-                  buttonProps={{
-                    type: 'button',
-                  }}
-                />
-                <Button
-                  pattern="outline"
-                  content="Save"
-                  className="bg-primary-yellow border-none text-white"
-                  buttonProps={{
-                    type: 'button',
-                  }}
-                />
-              </div>
-            </>
+              <Button
+                pattern="outline"
+                content="Reset"
+                className="bg-primary-red border-none text-white"
+                buttonProps={{
+                  type: 'button',
+                }}
+              />
+              <Button
+                pattern="outline"
+                content="Save"
+                className="bg-primary-yellow border-none text-white"
+                buttonProps={{
+                  type: 'button',
+                }}
+              />
           </div>
         );
       })}
