@@ -209,7 +209,11 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
               className="bg-primary-yellow border-none text-white"
               buttonProps={{
                 type: 'button',
-                onClick: () => {
+                onClick: async () => {
+                  const isValid = await form.trigger(`variants.${index}`);
+
+                  if (!isValid) return;
+
                   console.log(form.getValues(`variants.${index}`));
                 },
               }}
