@@ -335,9 +335,9 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
           <FileInput
             fileInputProps={{
               name,
-              placeholder: images.length ? 'Change images' : 'Select images',
+              placeholder: images?.length ? 'Change images' : 'Select images',
               multiple: true,
-              disabled: images.length >= 10,
+              disabled: images?.length >= 10,
               onChange: (event) => {
                 const newFiles = Array.from(event.target.files || EMPTY_ARRAY);
                 const files = [...images, ...newFiles];
