@@ -156,13 +156,12 @@ export const CATEGORY_MODAL_STEPS: StepperStep[] = [
 export const ADD_PRODUCT_STEPS: StepperStep[] = [
   {
     title: 'Basic information',
-    description: 'Set product title, pricing and brand details',
+    description: 'Set product title, pricing, brand and category details',
     icon: 'solar:tag-price-linear',
   },
-
   {
     title: 'Category and inventory',
-    description: 'Manage categories, stock and publish settings',
+    description: 'Manage categories',
     icon: 'solar:box-linear',
   },
 

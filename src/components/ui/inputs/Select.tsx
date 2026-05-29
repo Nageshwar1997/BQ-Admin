@@ -74,7 +74,7 @@ const Select = ({
                 isOpen ? 'rotate-180' : ''
               } ${selected?.value ? 'text-primary' : 'text-primary/50'}`}
             />
-            {isOpen && (
+            {isOpen && options.length > 0 && (
               <div
                 className={`border-primary/10 bg-smoke-eerie absolute left-0 z-3 w-full overflow-hidden rounded-lg border shadow-md ${
                   optionsPosition === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'

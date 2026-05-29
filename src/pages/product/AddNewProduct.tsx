@@ -1,7 +1,7 @@
 import Navbar from '@/components/layout/navbar';
 import Button from '@/components/ui/Button';
 import Stepper from '@/components/ui/Stepper';
-import { ADD_PRODUCT_STEPS } from '@/constants/common.constants';
+import { ADD_PRODUCT_STEPS, CATEGORY_LEVELS_MAP, EMPTY_ARRAY } from '@/constants/common.constants';
 import {
   productBasicInfoSchema,
   productCategoryInventorySchema,
@@ -12,6 +12,7 @@ import {
   productVariantsSchema,
 } from '@/schemas/product.schema';
 import { confirmDetailsSchema } from '@/schemas/shared.schema';
+import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type {
   TConfirmDetails,
   TProductBasicInfo,
@@ -24,7 +25,7 @@ import type {
 } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import {
   BasicInfoFields,
   CategoryInventoryFields,
@@ -48,7 +49,7 @@ const FORM_IDS = [
 ] as const;
 
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(1);
 
   const basicInfoForm = useForm<TProductBasicInfo>({
     resolver: zodResolver(productBasicInfoSchema),
@@ -80,6 +81,25 @@ const AddNewProduct = () => {
 
   const confirmForm = useForm<TConfirmDetails>({
     resolver: zodResolver(confirmDetailsSchema),
+  });
+
+  const l1Cat = useWatch({ control: categoryInventoryForm.control, name: 'l1Category' });
+  const l2Cat = useWatch({ control: categoryInventoryForm.control, name: 'l2Category' });
+
+  const { data: l1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
+    level: CATEGORY_LEVELS_MAP.L1,
+  });
+
+  const { data: l2Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
+    level: CATEGORY_LEVELS_MAP.L2,
+    parent: l1Cat,
+    enabled: !!l1Cat,
+  });
+
+  const { data: l3Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
+    level: CATEGORY_LEVELS_MAP.L3,
+    parent: l2Cat,
+    enabled: !!l2Cat,
   });
 
   const handleNext = () => {
@@ -120,7 +140,12 @@ const AddNewProduct = () => {
       description: 'Category and stock details',
       content: (
         <form onSubmit={categoryInventoryForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
-          <CategoryInventoryFields form={categoryInventoryForm} />
+          <CategoryInventoryFields
+            form={categoryInventoryForm}
+            l1Cats={l1Cats}
+            l2Cats={l2Cats}
+            l3Cats={l3Cats}
+          />
         </form>
       ),
     },

@@ -3,8 +3,9 @@ import Checkbox from '@/components/ui/inputs/Checkbox';
 import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
-import { FILE_MIME } from '@/constants/common.constants';
+import { EMPTY_ARRAY, FILE_MIME } from '@/constants/common.constants';
 import { PRODUCT_BASIC_INFO_INPUT_MAP_DATA } from '@/constants/input.constants';
+import type { ICategory } from '@/types/api.type';
 import type {
   TConfirmDetails,
   TProductBasicInfo,
@@ -82,14 +83,23 @@ export const BasicInfoFields = ({ form }: { form: UseFormReturn<TProductBasicInf
 
 export const CategoryInventoryFields = ({
   form,
+  l1Cats,
+  l2Cats,
+  l3Cats,
 }: {
   form: UseFormReturn<TProductCategoryInventory>;
+  l1Cats: ICategory[];
+  l2Cats: ICategory[];
+  l3Cats: ICategory[];
 }) => {
   const {
     register,
     control,
     formState: { errors },
   } = form;
+
+  const l1Category = useWatch({ control, name: 'l1Category' });
+  const l2Category = useWatch({ control, name: 'l2Category' });
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -100,11 +110,16 @@ export const CategoryInventoryFields = ({
           <Select
             label="Main category"
             error={errors.l1Category?.message}
-            options={[]}
+            options={l1Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
             selectProps={{
               value,
-              onChange,
               placeholder: 'Select (L1) main category',
+              onChange: (value) => {
+                onChange(value);
+
+                form.setValue('l2Category', '');
+                form.setValue('l3Category', '');
+              },
             }}
           />
         )}
@@ -117,11 +132,16 @@ export const CategoryInventoryFields = ({
           <Select
             label="Sub-category"
             error={errors.l2Category?.message}
-            options={[]}
+            options={l2Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
             selectProps={{
               value,
-              onChange,
+              disabled: !l1Category,
               placeholder: 'Select (L2) sub-category',
+              onChange: (value) => {
+                onChange(value);
+
+                form.setValue('l3Category', '');
+              },
             }}
           />
         )}
@@ -134,17 +154,21 @@ export const CategoryInventoryFields = ({
           <Select
             label="Product category"
             error={errors.l3Category?.message}
-            options={[]}
+            options={l3Cats.map((cat) => ({
+              label: cat.name,
+              value: cat._id,
+            }))}
             selectProps={{
               value,
-              onChange,
+              disabled: !l2Category,
               placeholder: 'Select (L3) product category',
+              onChange,
             }}
           />
         )}
       />
 
-      <Input
+      {/* <Input
         label="Stock"
         register={register('stock', {
           valueAsNumber: true,
@@ -154,7 +178,7 @@ export const CategoryInventoryFields = ({
           type: 'number',
           placeholder: '100',
         }}
-      />
+      /> */}
 
       {/* <Input
         label="Low stock threshold"
@@ -217,7 +241,7 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
               multiple: true,
               disabled: images.length >= 10,
               onChange: (event) => {
-                const newFiles = Array.from(event.target.files || []);
+                const newFiles = Array.from(event.target.files || EMPTY_ARRAY);
                 const files = [...images, ...newFiles];
                 onChange(files);
               },
