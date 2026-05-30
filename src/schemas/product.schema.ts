@@ -55,7 +55,6 @@ export const productBasicInfoSchema = object({
     REGEX.MONGODB_ID,
     '(L3) Product category must be a valid ID.',
   ),
-  productType: z_enum(PRODUCT_TYPE, { error: 'Product type is required.' }),
 }).refine((data) => !data.sellingPrice || data.sellingPrice <= data.originalPrice, {
   path: ['sellingPrice'],
   message: 'Selling price cannot be greater than original price.',

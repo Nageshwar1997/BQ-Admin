@@ -1,7 +1,6 @@
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
-import { PRODUCT_TYPE } from '@/constants/common.constants';
 import { PRODUCT_BASIC_INFO_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type { ICategory } from '@/types/api.type';
 import type {
@@ -53,86 +52,75 @@ export const BasicInfoFields = ({
           inputProps={{ type: input.type, placeholder: input.placeholder }}
         />
       ))}
-      <Controller
-        name="l1Category"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            label="Main category"
-            error={errors.l1Category?.message}
-            options={l1Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
-            optionsPosition="top"
-            selectProps={{
-              value,
-              placeholder: 'Select (L1) main category',
-              onChange: (value) => {
-                onChange(value);
+      <div className="grid gap-4 sm:col-span-2 sm:grid-cols-3">
+        <Controller
+          name="l1Category"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <Select
+              label="Main category"
+              error={errors.l1Category?.message}
+              options={l1Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
+              optionsPosition="top"
+              selectProps={{
+                value,
+                placeholder: 'Select (L1) main category',
+                onChange: (value) => {
+                  onChange(value);
 
-                form.setValue('l2Category', '');
-                form.setValue('l3Category', '');
-              },
-            }}
-          />
-        )}
-      />
+                  form.setValue('l2Category', '');
+                  form.setValue('l3Category', '');
+                },
+              }}
+            />
+          )}
+        />
 
-      <Controller
-        name="l2Category"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            label="Sub-category"
-            error={errors.l2Category?.message}
-            options={l2Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
-            optionsPosition="top"
-            selectProps={{
-              value,
-              disabled: !l1Category,
-              placeholder: 'Select (L2) sub-category',
-              onChange: (value) => {
-                onChange(value);
+        <Controller
+          name="l2Category"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <Select
+              label="Sub-category"
+              error={errors.l2Category?.message}
+              options={l2Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
+              optionsPosition="top"
+              selectProps={{
+                value,
+                disabled: !l1Category,
+                placeholder: 'Select (L2) sub-category',
+                onChange: (value) => {
+                  onChange(value);
 
-                form.setValue('l3Category', '');
-              },
-            }}
-          />
-        )}
-      />
+                  form.setValue('l3Category', '');
+                },
+              }}
+            />
+          )}
+        />
 
-      <Controller
-        name="l3Category"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            label="Product category"
-            error={errors.l3Category?.message}
-            options={l3Cats.map((cat) => ({
-              label: cat.name,
-              value: cat._id,
-            }))}
-            optionsPosition="top"
-            selectProps={{
-              value,
-              disabled: !l2Category,
-              placeholder: 'Select (L3) product category',
-              onChange,
-            }}
-          />
-        )}
-      />
-      <Controller
-        name="productType"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            label="Product type"
-            error={errors.productType?.message}
-            optionsPosition="top"
-            options={PRODUCT_TYPE.map((value) => ({ label: value, value }))}
-            selectProps={{ value, placeholder: 'Select product type', onChange }}
-          />
-        )}
-      />
+        <Controller
+          name="l3Category"
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <Select
+              label="Product category"
+              error={errors.l3Category?.message}
+              options={l3Cats.map((cat) => ({
+                label: cat.name,
+                value: cat._id,
+              }))}
+              optionsPosition="top"
+              selectProps={{
+                value,
+                disabled: !l2Category,
+                placeholder: 'Select (L3) product category',
+                onChange,
+              }}
+            />
+          )}
+        />
+      </div>
     </div>
   );
 };
