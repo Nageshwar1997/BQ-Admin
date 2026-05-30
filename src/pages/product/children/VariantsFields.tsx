@@ -111,7 +111,7 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                 if (fields.length <= 1) {
                   onChange(value);
                   if (value === PRODUCT_TYPE_MAP.SIMPLE) {
-                    remove();
+                    form.resetField('variants');
                   }
                 }
               },
@@ -233,56 +233,47 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                   />
                 )}
               />
-              <Button
-                pattern="outline"
-                content="Reset"
-                className="bg-primary-red border-none text-white"
-                buttonProps={{
-                  type: 'button',
-                  onClick: () => {
-                    form.setValue(`variants.${index}`, {
-                      type: VARIANT_TYPE_MAP.COLOR,
-                      label: '',
-                      value: '',
-                      originalPrice: NaN,
-                      sellingPrice: NaN,
-                      stock: NaN,
-                      stockThreshold: NaN,
-                      thumbnail: undefined,
-                      images: [],
-                    });
+              <div className="flex items-center justify-center gap-2 sm:col-span-2">
+                <Button
+                  pattern="outline"
+                  content="Remove"
+                  className="bg-electric-purple-c border-none"
+                  buttonProps={{
+                    type: 'button',
+                    onClick: () => {
+                      if (fields?.length === 1) {
+                        form.setValue('productType', PRODUCT_TYPE_MAP.SIMPLE);
+                      }
+                      remove(index);
+                    },
+                  }}
+                />
+                <Button
+                  pattern="outline"
+                  content="Clear"
+                  className="bg-primary-red border-none"
+                  buttonProps={{
+                    type: 'button',
+                    onClick: () => {
+                      form.setValue(`variants.${index}`, EMPTY_VARIANT);
 
-                    form.clearErrors(`variants.${index}`);
-                  },
-                }}
-              />
-              <Button
-                pattern="outline"
-                content="Save"
-                className="bg-primary-yellow border-none text-white"
-                buttonProps={{
-                  type: 'button',
-                  onClick: async () => {
-                    const isValid = await form.trigger(`variants.${index}`);
-
-                    if (!isValid) return;
-
-                    console.log(form.getValues(`variants.${index}`));
-                  },
-                }}
-              />
+                      form.clearErrors(`variants.${index}`);
+                    },
+                  }}
+                />
+                <Button
+                  pattern="outline"
+                  content="Add"
+                  className="bg-primary-yellow border-none"
+                  buttonProps={{
+                    type: 'button',
+                    onClick: () => append(EMPTY_VARIANT),
+                  }}
+                />
+              </div>
             </div>
           );
         })}
-
-      <Button
-        pattern="primary"
-        content="Add variant"
-        buttonProps={{
-          type: 'button',
-          onClick: () => append({} as NonNullable<TProductVariants['variants']>[number]),
-        }}
-      />
     </div>
   );
 };
