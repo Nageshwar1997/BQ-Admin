@@ -111,28 +111,31 @@ export const thumbnailSchema = custom<File | string>((value) => !!value, {
   }
 });
 
-export const videoSchema = union([
-  z_instanceof(File).superRefine((file, ctx) => {
-    if (file.size > MAX_VIDEO_FILE_SIZE) {
+export const videoSchema = custom<File | string>((value) => !!value, {
+  error: 'Video is required.',
+}).superRefine((value, ctx) => {
+  if (value instanceof File) {
+    if (value.size > MAX_VIDEO_FILE_SIZE) {
       ctx.addIssue({
         code: 'custom',
-        message: `Video size is ${sizeFormat(file.size)}. Max allowed size is ${sizeFormat(MAX_VIDEO_FILE_SIZE)}.`,
+        message: `Video size is ${sizeFormat(value.size)}. Max allowed size is ${sizeFormat(MAX_VIDEO_FILE_SIZE)}.`,
       });
     }
+
     const fileTypes: readonly string[] = FILE_MIME.video;
-    if (!fileTypes.includes(file.type)) {
+
+    if (!fileTypes.includes(value.type)) {
       ctx.addIssue({
         code: 'custom',
         message: `Video type must be one of: ${FILE_EXTENSIONS.video.join(', ')}.`,
       });
     }
-  }),
-  url({
-    message: 'Invalid video URL.',
-    normalize: true,
-    pattern: REGEX.URL,
-  }),
-]);
+  }
+
+  if (typeof value === 'string' && !REGEX.URL.test(value)) {
+    ctx.addIssue({ code: 'custom', message: 'Invalid video URL.' });
+  }
+});
 
 export const imagesSchema = array(
   union([
