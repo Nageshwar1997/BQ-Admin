@@ -10,6 +10,7 @@ import {
   VARIANT_TYPE_MAP,
 } from '@/constants/common.constants';
 import type { TProductVariants } from '@/types/schema.type';
+import { toaster } from '@/utils/common.util';
 import { useEffect } from 'react';
 import {
   Controller,
@@ -81,6 +82,8 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
     defaultValue: PRODUCT_TYPE_MAP.SIMPLE,
   });
 
+  const variants = useWatch({ control, name: 'variants' });
+
   useEffect(() => {
     if (productType === PRODUCT_TYPE_MAP.VARIABLE && !fields.length) {
       append(EMPTY_VARIANT);
@@ -121,6 +124,7 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
       />
       {productType === PRODUCT_TYPE_MAP.VARIABLE &&
         fields.map((field, index) => {
+          const currentVariant = variants?.[index];
           return (
             <div
               key={field.id}
@@ -147,11 +151,15 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                 inputProps={{ placeholder: 'Black' }}
               />
               <Input
-                label={field?.type === VARIANT_TYPE_MAP.COLOR ? 'Hex color code' : 'Variant value'}
+                label={
+                  currentVariant?.type === VARIANT_TYPE_MAP.COLOR
+                    ? 'Hex color code'
+                    : 'Variant value'
+                }
                 register={register(`variants.${index}.value`)}
                 error={errors.variants?.[index]?.value?.message}
                 inputProps={{
-                  placeholder: field?.type === VARIANT_TYPE_MAP.COLOR ? '#000000' : '50ml',
+                  placeholder: currentVariant?.type === VARIANT_TYPE_MAP.COLOR ? '#000000' : '50ml',
                 }}
               />
               <Input
@@ -185,9 +193,12 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                 name={`variants.${index}.thumbnail`}
                 render={({ field: { name, onChange, value } }) => (
                   <FileInput
+                    label="Thumbnail"
                     fileInputProps={{
                       name,
-                      placeholder: !!field?.thumbnail ? 'Change thumbnail' : 'Select thumbnail',
+                      placeholder: !!currentVariant?.thumbnail
+                        ? 'Change thumbnail'
+                        : 'Select thumbnail',
                       onChange: ({ target: { files } }) => onChange(files?.[0]),
                       value,
                     }}
@@ -203,9 +214,12 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                 name={`variants.${index}.images`}
                 render={({ field: { name, onChange, value } }) => (
                   <FileInput
+                    label="Images"
                     fileInputProps={{
                       name,
-                      placeholder: field?.images?.length ? 'Change images' : 'Select images',
+                      placeholder: currentVariant?.images?.length
+                        ? 'Change images'
+                        : 'Select images',
                       multiple: true,
                       disabled: field?.images?.length >= 10,
                       onChange: (event) => {
@@ -267,7 +281,87 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                   className="bg-primary-yellow border-none"
                   buttonProps={{
                     type: 'button',
-                    onClick: () => append(EMPTY_VARIANT),
+                    onClick: () => {
+                      const currentVariant = form.getValues(`variants.${index}`);
+                      const {
+                        images,
+                        label,
+                        originalPrice,
+                        sellingPrice,
+                        stock,
+                        stockThreshold,
+                        value,
+                        type,
+                      } = currentVariant || {};
+
+                      if (!type) {
+                        return toaster.error({
+                          title: 'Required',
+                          description: 'Please select a type to the variant',
+                        });
+                      }
+
+                      if (!label) {
+                        return toaster.error({
+                          title: 'Required',
+                          description: 'Please add a label to the variant',
+                        });
+                      }
+
+                      if (!value) {
+                        return toaster.error({
+                          title: 'Required',
+                          description: 'Please add a value to the variant',
+                        });
+                      }
+
+                      if (Number.isNaN(originalPrice)) {
+                        return toaster.error({
+                          title: 'Required',
+                          description: 'Please add an original price to the variant',
+                        });
+                      }
+                      if (Number.isNaN(sellingPrice)) {
+                        return toaster.error({
+                          title: 'Required',
+                          description: 'Please add an selling price to the variant',
+                        });
+                      }
+
+                      if (
+                        !Number.isNaN(originalPrice) &&
+                        !Number.isNaN(originalPrice) &&
+                        Number(originalPrice) < Number(sellingPrice)
+                      ) {
+                        return toaster.error({
+                          title: 'Invalid',
+                          description: 'Selling price must be greater than original price',
+                        });
+                      }
+
+                      if (Number.isNaN(stock)) {
+                        return toaster.error({
+                          title: 'Required',
+                          description: 'Please add a stock to the variant',
+                        });
+                      }
+
+                      if (Number.isNaN(stockThreshold)) {
+                        return toaster.error({
+                          title: 'Required',
+                          description: 'Please add a stock threshold to the variant',
+                        });
+                      }
+
+                      if (!images?.length) {
+                        return toaster.error({
+                          title: 'Required',
+                          description: 'Please add images to the variant',
+                        });
+                      }
+
+                      append(EMPTY_VARIANT);
+                    },
                   }}
                 />
               </div>
