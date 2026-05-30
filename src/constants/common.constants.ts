@@ -226,6 +226,7 @@ export const FILE_MIME = {
     'video/webm',
     'video/quicktime', // mov
     'video/x-matroska', // mkv
+    'video/matroska', // mkv
     'video/ogg', // ogg
     'application/vnd.apple.mpegurl', // m3u8
     'application/x-mpegURL', // m3u8 fallback

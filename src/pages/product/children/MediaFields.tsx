@@ -48,23 +48,43 @@ export const TestMediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }
 
   return (
     <div className="grid gap-4">
-      <Controller
-        control={control}
-        name="thumbnail"
-        render={({ field: { name, onChange, value } }) => (
-          <FileInput
-            label="Thumbnail"
-            fileInputProps={{
-              name,
-              placeholder: !!thumbnail ? 'Change thumbnail' : 'Select thumbnail',
-              onChange: ({ target: { files } }) => onChange(files?.[0]),
-              value,
-            }}
-            errors={getErrorMessages(errors.thumbnail)}
-            handleRemove={() => resetField('thumbnail', { defaultValue: undefined })}
-          />
-        )}
-      />
+      <div className="grid grid-cols-2 gap-4">
+        <Controller
+          control={control}
+          name="thumbnail"
+          render={({ field: { name, onChange, value } }) => (
+            <FileInput
+              label="Thumbnail"
+              fileInputProps={{
+                name,
+                placeholder: !!thumbnail ? 'Change thumbnail' : 'Select thumbnail',
+                onChange: ({ target: { files } }) => onChange(files?.[0]),
+                value,
+              }}
+              errors={getErrorMessages(errors.thumbnail)}
+              handleRemove={() => resetField('thumbnail', { defaultValue: undefined })}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="video"
+          render={({ field: { name, value, onChange } }) => (
+            <FileInput
+              label="Video"
+              fileInputProps={{
+                name,
+                placeholder: !!video ? 'Change video' : 'Select video',
+                accept: FILE_MIME.video.join(','),
+                onChange: ({ target: { files } }) => onChange(files?.[0]),
+                value,
+              }}
+              errors={getErrorMessages(errors.video)}
+              handleRemove={() => resetField('video', { defaultValue: undefined })}
+            />
+          )}
+        />
+      </div>
 
       <Controller
         control={control}
@@ -94,25 +114,6 @@ export const TestMediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }
                 shouldValidate: true,
               });
             }}
-          />
-        )}
-      />
-
-      <Controller
-        control={control}
-        name="video"
-        render={({ field: { name, value, onChange } }) => (
-          <FileInput
-            label="Video"
-            fileInputProps={{
-              name,
-              placeholder: !!video ? 'Change video' : 'Select video',
-              accept: FILE_MIME.video.join(','),
-              onChange: ({ target: { files } }) => onChange(files?.[0]),
-              value,
-            }}
-            errors={getErrorMessages(errors.video)}
-            handleRemove={() => resetField('video', { defaultValue: undefined })}
           />
         )}
       />
