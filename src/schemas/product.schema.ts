@@ -499,7 +499,17 @@ export const productVariantsSchema = object({
         }
       }
     }),
-  ).min(1, 'At least one variant is required.'),
+  ).optional(),
+}).superRefine((data, ctx) => {
+  if (
+    data.productType === PRODUCT_TYPE_MAP.VARIABLE &&
+    (!data.variants || data.variants.length === 0)
+  ) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'At least 1 variant is required.',
+    });
+  }
 });
 
 /* -------------------------------------------------------------------------- */
