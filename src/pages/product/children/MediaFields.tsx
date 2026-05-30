@@ -41,7 +41,6 @@ export const TestMediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }
     resetField,
     setValue,
   } = form;
-  console.log('🚀 ~ TestMediaFields ~ errors:', errors);
 
   const images = useWatch({ control, name: 'images' });
   const thumbnail = useWatch({ control, name: 'thumbnail' });
