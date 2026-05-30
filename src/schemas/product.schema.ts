@@ -82,18 +82,9 @@ const sizeFormat = (size: number) => {
   return `${Number.isInteger(value) ? value : value.toFixed(2)}MB`;
 };
 
-export const thumbnailSchema = custom<File | string>(
-  (value) => {
-    if (value instanceof File) return true;
-
-    if (typeof value === 'string') {
-      return !!value;
-    }
-
-    return false;
-  },
-  { error: 'Thumbnail is required.' },
-).superRefine((value, ctx) => {
+export const thumbnailSchema = custom<File | string>((value) => !!value, {
+  error: 'Thumbnail is required.',
+}).superRefine((value, ctx) => {
   if (value instanceof File) {
     if (value.size > MAX_IMAGE_FILE_SIZE) {
       ctx.addIssue({

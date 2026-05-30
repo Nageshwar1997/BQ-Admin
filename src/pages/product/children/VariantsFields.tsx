@@ -204,7 +204,7 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                     }}
                     errors={getErrorMessages(errors.variants?.[index]?.thumbnail)}
                     handleRemove={() =>
-                      form.resetField(`variants.${index}.thumbnail`, { defaultValue: undefined })
+                      form.resetField(`variants.${index}.thumbnail`)
                     }
                   />
                 )}
