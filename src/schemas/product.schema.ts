@@ -101,13 +101,14 @@ export const thumbnailSchema = custom<File | string>((value) => !!value, {
         message: `Thumbnail type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
       });
     }
-  }
-
-  if (typeof value === 'string' && !REGEX.URL.test(value)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Invalid thumbnail URL.',
-    });
+  } else if (typeof value === 'string') {
+    if (!value.trim()) {
+      ctx.addIssue({ code: 'custom', message: 'Thumbnail URL cannot be empty.' });
+    } else if (!REGEX.URL.test(value)) {
+      ctx.addIssue({ code: 'custom', message: 'Invalid thumbnail URL.' });
+    }
+  } else {
+    ctx.addIssue({ code: 'custom', message: 'Invalid thumbnail.' });
   }
 });
 
@@ -130,18 +131,20 @@ export const videoSchema = custom<File | string>((value) => !!value, {
         message: `Video type must be one of: ${FILE_EXTENSIONS.video.join(', ')}.`,
       });
     }
-  }
-
-  if (typeof value === 'string' && !REGEX.URL.test(value)) {
-    ctx.addIssue({ code: 'custom', message: 'Invalid video URL.' });
+  } else if (typeof value === 'string') {
+    if (!value.trim()) {
+      ctx.addIssue({ code: 'custom', message: 'Video URL cannot be empty.' });
+    } else if (!REGEX.URL.test(value)) {
+      ctx.addIssue({ code: 'custom', message: 'Invalid thumbnail URL.' });
+    }
+  } else {
+    ctx.addIssue({ code: 'custom', message: 'Invalid video.' });
   }
 });
 
 export const imagesSchema = array(
-  union([
-    z_instanceof(File),
-    url({ message: 'Invalid image URL.', normalize: true, pattern: REGEX.URL }),
-  ]),
+  custom<File | string>((value) => !!value, { error: 'Image is required.' }),
+  { error: 'At least one image is required.' },
 )
   .min(1, { message: 'At least one image is required.' })
   .max(10, { message: 'Maximum of 10 images are allowed.' })
