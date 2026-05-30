@@ -159,12 +159,10 @@ export const imagesSchema = array(
             path: [index],
             message: `${imageLabel} URL cannot be empty.`,
           });
+        } else if (!REGEX.URL.test(item)) {
+          ctx.addIssue({ code: 'custom', path: [index], message: `${imageLabel} URL is invalid.` });
         }
-
-        return;
-      }
-
-      if (item instanceof File) {
+      } else if (item instanceof File) {
         if (item.size > MAX_IMAGE_FILE_SIZE) {
           ctx.addIssue({
             code: 'custom',
@@ -182,6 +180,8 @@ export const imagesSchema = array(
             message: `${imageLabel} type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
           });
         }
+      } else {
+        ctx.addIssue({ code: 'custom', path: [index], message: `${imageLabel} is invalid.` });
       }
     });
   });

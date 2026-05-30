@@ -90,6 +90,7 @@ export const TestMediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }
       <Controller
         control={control}
         name="images"
+        defaultValue={[]}
         render={({ field: { name, onChange, value } }) => (
           <FileInput
             label="Images"
