@@ -13,6 +13,7 @@ import { REGEX } from '@/constants/regex.constants';
 import {
   array,
   boolean,
+  custom,
   literal,
   number,
   object,
@@ -81,37 +82,43 @@ const sizeFormat = (size: number) => {
   return `${Number.isInteger(value) ? value : value.toFixed(2)}MB`;
 };
 
-export const thumbnailSchema = union([
-  z_instanceof(File).superRefine((file, ctx) => {
-    if (file.size > MAX_IMAGE_FILE_SIZE) {
+export const thumbnailSchema = custom<File | string>(
+  (value) => {
+    if (value instanceof File) return true;
+
+    if (typeof value === 'string') {
+      return !!value;
+    }
+
+    return false;
+  },
+  { error: 'Thumbnail is required.' },
+).superRefine((value, ctx) => {
+  if (value instanceof File) {
+    if (value.size > MAX_IMAGE_FILE_SIZE) {
       ctx.addIssue({
         code: 'custom',
-        message: `Thumbnail size is ${sizeFormat(file.size)}. Max allowed size is ${sizeFormat(MAX_IMAGE_FILE_SIZE)}.`,
+        message: `Thumbnail size is ${sizeFormat(value.size)}. Max allowed size is ${sizeFormat(MAX_IMAGE_FILE_SIZE)}.`,
       });
     }
+
     const fileTypes: readonly string[] = FILE_MIME.image;
-    if (!fileTypes.includes(file.type)) {
+
+    if (!fileTypes.includes(value.type)) {
       ctx.addIssue({
         code: 'custom',
         message: `Thumbnail type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
       });
     }
-  }),
-  url({
-    message: 'Invalid thumbnail URL.',
-    normalize: true,
-    pattern: REGEX.URL,
-  }),
-])
-  .optional()
-  .superRefine((value, ctx) => {
-    if (!value) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Thumbnail is required.',
-      });
-    }
-  });
+  }
+
+  if (typeof value === 'string' && !REGEX.URL.test(value)) {
+    ctx.addIssue({
+      code: 'custom',
+      message: 'Invalid thumbnail URL.',
+    });
+  }
+});
 
 export const videoSchema = union([
   z_instanceof(File).superRefine((file, ctx) => {

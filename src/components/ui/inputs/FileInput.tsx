@@ -19,7 +19,7 @@ const getMediaType = (value: File | string): TMediaResource => {
       return 'video';
     }
 
-    throw new Error('Invalid file type.');
+    return 'image';
   }
 
   const cleanUrl = value.split('?')[0].split('#')[0];
@@ -27,7 +27,7 @@ const getMediaType = (value: File | string): TMediaResource => {
   const extension = cleanUrl.split('.').pop()?.toLowerCase();
 
   if (!extension) {
-    throw new Error('Invalid file type.');
+    return 'image';
   }
 
   const imgExtensions: readonly string[] = FILE_EXTENSIONS.image;
