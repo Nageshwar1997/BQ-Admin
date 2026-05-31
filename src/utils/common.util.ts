@@ -1,4 +1,4 @@
-import { DEFAULT_POSTER, TOOLTIP_GAP } from '@/constants/common.constants';
+import { DEFAULT_POSTER, GB, KB, MB, TOOLTIP_GAP } from '@/constants/common.constants';
 import useToastStore from '@/stores/toast.store';
 import type { IButton, ITooltip } from '@/types/component.type';
 import type { ICustomToast, IDefaultToast, ILoadingToast } from '@/types/store.type';
@@ -83,15 +83,30 @@ export const getTooltipArrowCss = (placement: NonNullable<ITooltip['placement']>
 const { addToast, removeToast } = useToastStore.getState();
 export const toaster = {
   success: (data: Omit<IDefaultToast, 'type'>) => addToast({ ...data, type: 'success' }),
-
   error: (data: Omit<IDefaultToast, 'type'>) => addToast({ ...data, type: 'error' }),
-
   warning: (data: Omit<IDefaultToast, 'type'>) => addToast({ ...data, type: 'warning' }),
   loading: (data: Omit<ILoadingToast, 'type'>) => addToast({ ...data, type: 'loading' }),
-
   custom: (data: ICustomToast) => addToast(data),
-
   remove: (toastId: string) => removeToast(toastId),
+};
+
+export const formatFileSize = (size: number) => {
+  if (size < KB) {
+    return `${size} Bytes`;
+  }
+
+  if (size < MB) {
+    const value = size / KB;
+    return `${Number.isInteger(value) ? value : value.toFixed(2)} KB`;
+  }
+
+  if (size < GB) {
+    const value = size / MB;
+    return `${Number.isInteger(value) ? value : value.toFixed(2)} MB`;
+  }
+
+  const value = size / GB;
+  return `${Number.isInteger(value) ? value : value.toFixed(2)} GB`;
 };
 
 export const deepEqual = <T>(obj1: T, obj2: T): boolean => {

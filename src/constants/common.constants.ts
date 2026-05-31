@@ -206,7 +206,10 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
 export const CATEGORY_LEVELS_MAP = { L1: 1, L2: 2, L3: 3 } as const;
 export const CATEGORY_LEVELS = Object.values(CATEGORY_LEVELS_MAP);
 
-export const MB = 1024 ** 2;
+export const KB = 1024;
+export const MB = KB * 1024;
+export const GB = MB * 1024;
+
 export const MAX_IMAGE_FILE_SIZE = 2 * MB; // 2MB
 export const MAX_VIDEO_FILE_SIZE = 50 * MB; // 50MB
 export const FILE_MIME = {

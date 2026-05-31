@@ -1,3 +1,5 @@
+import type { TQuillToolbar } from '@/types/input.type';
+
 export const PASSWORD_KEYS = ['password', 'confirmPassword'];
 
 const NAME_DATA = { type: 'text', autoComplete: 'given-name' } as const;
@@ -120,4 +122,19 @@ export const PRODUCT_BASIC_INFO_INPUT_MAP_DATA = [
     autoComplete: 'tel',
     placeholder: 'Enter product selling price',
   },
+] as const;
+
+export const DEFAULT_QUILL_LINK_ID = 'custom-link-btn' as const;
+
+export const defaultQuillToolbar: TQuillToolbar = [
+  [{ header: [false, 6, 5, 4, 3, 2, 1] }],
+  ['bold', 'italic', 'underline', 'strike'],
+  [{ color: [] }, { background: [] }],
+  [{ list: 'ordered' }, { list: 'bullet' }],
+  [{ script: 'sub' }, { script: 'super' }],
+  [{ indent: '-1' }, { indent: '+1' }],
+  [{ align: [] }],
+  [{ direction: 'rtl' }],
+  ['link', 'image', 'video'],
+  ['code', 'clean'],
 ] as const;

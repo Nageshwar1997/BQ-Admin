@@ -3,13 +3,13 @@ import {
   FILE_MIME,
   MAX_IMAGE_FILE_SIZE,
   MAX_VIDEO_FILE_SIZE,
-  MB,
   PRODUCT_TYPE,
   PRODUCT_TYPE_MAP,
   VARIANT_TYPE,
   VARIANT_TYPE_MAP,
 } from '@/constants/common.constants';
 import { REGEX } from '@/constants/regex.constants';
+import { formatFileSize } from '@/utils/common.util';
 import {
   array,
   boolean,
@@ -76,12 +76,6 @@ export const productBasicInfoSchema = object({
 /*                           STEP 3 : MEDIA & GALLERY                         */
 /* -------------------------------------------------------------------------- */
 
-const sizeFormat = (size: number) => {
-  const value = size / MB;
-
-  return `${Number.isInteger(value) ? value : value.toFixed(2)}MB`;
-};
-
 export const thumbnailSchema = custom<File | string>((value) => !!value, {
   error: 'Thumbnail is required.',
 }).superRefine((value, ctx) => {
@@ -89,7 +83,7 @@ export const thumbnailSchema = custom<File | string>((value) => !!value, {
     if (value.size > MAX_IMAGE_FILE_SIZE) {
       ctx.addIssue({
         code: 'custom',
-        message: `Thumbnail size is ${sizeFormat(value.size)}. Max allowed size is ${sizeFormat(MAX_IMAGE_FILE_SIZE)}.`,
+        message: `Thumbnail size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
       });
     }
 
@@ -119,7 +113,7 @@ export const videoSchema = custom<File | string>((value) => !!value, {
     if (value.size > MAX_VIDEO_FILE_SIZE) {
       ctx.addIssue({
         code: 'custom',
-        message: `Video size is ${sizeFormat(value.size)}. Max allowed size is ${sizeFormat(MAX_VIDEO_FILE_SIZE)}.`,
+        message: `Video size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_VIDEO_FILE_SIZE)}.`,
       });
     }
 
@@ -167,7 +161,7 @@ export const imagesSchema = array(
           ctx.addIssue({
             code: 'custom',
             path: [index],
-            message: `${imageLabel} size is ${sizeFormat(item.size)}. Max allowed size is ${sizeFormat(MAX_IMAGE_FILE_SIZE)}.`,
+            message: `${imageLabel} size is ${formatFileSize(item.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
           });
         }
 
@@ -250,7 +244,7 @@ export const productVariantsSchema = object({
           if (file.size > MAX_IMAGE_FILE_SIZE) {
             ctx.addIssue({
               code: 'custom',
-              message: `Thumbnail size is ${sizeFormat(file.size)}. Max allowed size is ${sizeFormat(MAX_IMAGE_FILE_SIZE)}.`,
+              message: `Thumbnail size is ${formatFileSize(file.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
             });
           }
           const fileTypes: readonly string[] = FILE_MIME.image;
@@ -300,7 +294,7 @@ export const productVariantsSchema = object({
                 ctx.addIssue({
                   code: 'custom',
                   path: [index],
-                  message: `${imageLabel} size is ${sizeFormat(item.size)}. Max allowed size is ${sizeFormat(MAX_IMAGE_FILE_SIZE)}.`,
+                  message: `${imageLabel} size is ${formatFileSize(item.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
                 });
               }
 

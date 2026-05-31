@@ -1,5 +1,6 @@
 import type { IconProps } from '@iconify/react';
-import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from 'react';
+import type { ToolbarProps } from 'quill/modules/toolbar';
+import type { InputHTMLAttributes, ReactNode, RefObject, SelectHTMLAttributes } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 import type { TClassName, TContainerClassName } from './component.type';
 
@@ -61,3 +62,60 @@ export interface IFileInput extends Omit<IBaseInput, 'error' | 'register'> {
   mediaModalClassName?: string;
   mediaCarouselClassName?: string;
 }
+
+export type TToolbarOption =
+  | { header: (1 | 2 | 3 | 4 | 5 | 6 | false)[] }
+  | 'bold'
+  | 'italic'
+  | 'underline'
+  | 'strike'
+  | { list: 'ordered' | 'bullet' }
+  | { script: 'sub' | 'super' }
+  | { indent: '-1' | '+1' }
+  | { color: string[] } // can be empty for Quill to auto-generate colors
+  | { background: string[] }
+  | { align: string[] }
+  | { direction: 'rtl' }
+  | 'link'
+  | 'image'
+  | 'video'
+  | 'code'
+  | 'clean';
+
+export type TQuillToolbar = (TToolbarOption | TToolbarOption[])[];
+
+export interface IToolBarOptions {
+  header?: (1 | 2 | 3 | 4 | 5 | 6 | false)[];
+  script?: ('sub' | 'super')[];
+  indent?: ('-1' | '+1')[];
+  color?: boolean;
+  background?: boolean;
+  align?: boolean;
+  direction?: 'rtl';
+  text?: ('bold' | 'italic' | 'underline' | 'strike' | 'link')[];
+  list?: ('ordered' | 'bullet')[];
+  media?: ('image' | 'video' | 'link')[];
+  misc?: ('code' | 'clean')[];
+}
+
+export interface IQuillInput
+  extends
+    TClassName,
+    Pick<IBaseInput, 'error' | 'label'>,
+    Pick<IInput['inputProps'], 'placeholder' | 'disabled'> {
+  value?: string;
+  needLinkButton?: boolean;
+  onChange?: (value: string) => void;
+  blobUrlsRef?: RefObject<string[]>;
+  toolbarOptions?: IToolBarOptions;
+}
+
+export interface IQuillToolbar extends ToolbarProps {
+  handlers: Record<string, (...args: unknown[]) => void>;
+}
+
+export type TQuillImageBlot = {
+  new (): HTMLElement;
+  create(value: unknown): HTMLElement;
+  value(node: HTMLElement): unknown;
+};
