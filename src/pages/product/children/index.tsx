@@ -1,6 +1,5 @@
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Input from '@/components/ui/inputs/Input';
-import QuillInput from '@/components/ui/inputs/quillInput';
 import Select from '@/components/ui/inputs/Select';
 import { PRODUCT_BASIC_INFO_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type { ICategory } from '@/types/api.type';
@@ -14,6 +13,7 @@ import type {
   TProductVariants,
 } from '@/types/schema.type';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
+import ContentFields from './ContentFields';
 import { TestMediaFields } from './MediaFields';
 import VariantsFieldsTest from './VariantsFields';
 
@@ -257,33 +257,20 @@ export const MediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) =>
 /* -------------------------------------------------------------------------- */
 
 export const DescriptionFields = ({ form }: { form: UseFormReturn<TProductDescription> }) => {
-  const {
-    register,
-    formState: { errors },
-  } = form;
-
   return (
     <div className="grid gap-4">
-      <QuillInput />
-      <Input
-        label="Short description"
-        register={register('shortDescription')}
-        error={errors.shortDescription?.message}
-        inputProps={{
-          placeholder: 'Short description',
-        }}
-      />
+      <ContentFields form={form} />
 
-      <Input
+      {/* <Input
         label="Description"
         register={register('description')}
         error={errors.description?.message}
         inputProps={{
           placeholder: 'Full description',
         }}
-      />
+      /> */}
 
-      <Input
+      {/* <Input
         label="Usage instructions"
         register={register('usageInstructions')}
         error={errors.usageInstructions?.message}
@@ -299,7 +286,7 @@ export const DescriptionFields = ({ form }: { form: UseFormReturn<TProductDescri
         inputProps={{
           placeholder: 'Ingredients',
         }}
-      />
+      /> */}
     </div>
   );
 };

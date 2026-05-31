@@ -82,10 +82,8 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
       quill.on('text-change', (delta, _oldDelta, source) => {
         // *NOTE - Don't change order
         const html = quill.root.innerHTML.trim();
-        const isEmpty = html === '<p><br></p>';
-
-        onChange?.(isEmpty ? '' : html);
-        if (!isEmpty && blobUrlsRef) {
+        onChange?.(html);
+        if (blobUrlsRef) {
           removeImageFromQuill(quill, blobUrlsRef);
         }
 

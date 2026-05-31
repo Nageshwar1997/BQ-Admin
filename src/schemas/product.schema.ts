@@ -191,15 +191,13 @@ export const productMediaSchema = object({
 /* -------------------------------------------------------------------------- */
 
 export const productDescriptionSchema = object({
-  shortDescription: string()
+  shortDescription: string('Short description is required.')
     .min(10, 'Short description must be at least 10 characters.')
     .max(300, 'Short description cannot exceed 300 characters.'),
-
-  description: string()
-    .min(20, 'Description must be at least 20 characters.')
-    .max(5000, 'Description cannot exceed 5000 characters.'),
-
-  usageInstructions: string().optional(),
+  description: string('Description is required.')
+    .refine((value) => value !== '<p><br></p>', 'Description is required.')
+    .min(107, 'Description must be at least 100 characters.'),
+  usage: string().min(20, 'Usage must be at least 10 characters.').optional(),
 
   ingredients: string().optional(),
 });
