@@ -1,8 +1,12 @@
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
+import { CATEGORY_LEVELS_MAP, EMPTY_ARRAY } from '@/constants/common.constants';
+import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import { PRODUCT_BASIC_INFO_INPUT_MAP_DATA } from '@/constants/input.constants';
-import type { ICategory } from '@/types/api.type';
+import { productBasicInfoSchema } from '@/schemas/product.schema';
+import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
+import type { TAddProductStepNumber } from '@/types/common.type';
 import type {
   TConfirmDetails,
   TProductBasicInfo,
@@ -12,7 +16,8 @@ import type {
   TProductTryOn,
   TProductVariants,
 } from '@/types/schema.type';
-import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm, useWatch, type UseFormReturn } from 'react-hook-form';
 import ContentFields from './ContentFields';
 import { TestMediaFields } from './MediaFields';
 import VariantsFieldsTest from './VariantsFields';
@@ -22,26 +27,55 @@ import VariantsFieldsTest from './VariantsFields';
 /* -------------------------------------------------------------------------- */
 
 export const BasicInfoFields = ({
-  form,
-  l1Cats,
-  l2Cats,
-  l3Cats,
+  onNext,
+  step,
 }: {
-  form: UseFormReturn<TProductBasicInfo>;
-  l1Cats: ICategory[];
-  l2Cats: ICategory[];
-  l3Cats: ICategory[];
+  onNext: () => void;
+  step: TAddProductStepNumber;
 }) => {
   const {
-    register,
     control,
     formState: { errors },
-  } = form;
+    handleSubmit,
+    register,
+    setValue,
+  } = useForm<TProductBasicInfo>({
+    resolver: zodResolver(productBasicInfoSchema),
+  });
 
   const l1Category = useWatch({ control, name: 'l1Category' });
   const l2Category = useWatch({ control, name: 'l2Category' });
+
+  const l1Cat = useWatch({ control: control, name: 'l1Category' });
+  const l2Cat = useWatch({ control: control, name: 'l2Category' });
+
+  const { data: l1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
+    level: CATEGORY_LEVELS_MAP.L1,
+  });
+
+  const { data: l2Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
+    level: CATEGORY_LEVELS_MAP.L2,
+    parent: l1Cat,
+    enabled: !!l1Cat,
+  });
+
+  const { data: l3Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
+    level: CATEGORY_LEVELS_MAP.L3,
+    parent: l2Cat,
+    enabled: !!l2Cat,
+  });
+
+  const onSubmit = (data: TProductBasicInfo) => {
+    console.log('🚀 ~ onSubmit ~ data:', data);
+    onNext();
+  };
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[step]}
+      onSubmit={handleSubmit(onSubmit)}
+      className="grid gap-4 sm:grid-cols-2"
+    >
       {PRODUCT_BASIC_INFO_INPUT_MAP_DATA.map((input) => (
         <Input
           key={input.name}
@@ -69,8 +103,8 @@ export const BasicInfoFields = ({
                 onChange: (value) => {
                   onChange(value);
 
-                  form.setValue('l2Category', '');
-                  form.setValue('l3Category', '');
+                  setValue('l2Category', '');
+                  setValue('l3Category', '');
                 },
               }}
             />
@@ -93,7 +127,7 @@ export const BasicInfoFields = ({
                 onChange: (value) => {
                   onChange(value);
 
-                  form.setValue('l3Category', '');
+                  setValue('l3Category', '');
                 },
               }}
             />
@@ -107,10 +141,7 @@ export const BasicInfoFields = ({
             <Select
               label="Product category"
               error={errors.l3Category?.message}
-              options={l3Cats.map((cat) => ({
-                label: cat.name,
-                value: cat._id,
-              }))}
+              options={l3Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
               optionsPosition="top"
               selectProps={{
                 value,
@@ -122,7 +153,7 @@ export const BasicInfoFields = ({
           )}
         />
       </div>
-    </div>
+    </form>
   );
 };
 
@@ -394,20 +425,7 @@ export const SeoFields = ({ form }: { form: UseFormReturn<TProductSeo> }) => {
 /*                   STEP 8 : CONFIRM BEFORE SAVE                             */
 /* -------------------------------------------------------------------------- */
 
-export const ConfirmFields = ({
-  form,
-}: {
-  form: UseFormReturn<TConfirmDetails>;
-  values: {
-    basicInfo: TProductBasicInfo;
-    // categoryInventory: TProductCategoryInventory;
-    media: TProductMedia;
-    description: TProductDescription;
-    variants: TProductVariants;
-    tryOn: TProductTryOn;
-    seo: TProductSeo;
-  };
-}) => {
+export const ConfirmFields = ({ form }: { form: UseFormReturn<TConfirmDetails> }) => {
   const {
     register,
     formState: { errors },

@@ -1,9 +1,9 @@
 import Navbar from '@/components/layout/navbar';
 import Button from '@/components/ui/Button';
 import Stepper from '@/components/ui/Stepper';
-import { ADD_PRODUCT_STEPS, CATEGORY_LEVELS_MAP, EMPTY_ARRAY } from '@/constants/common.constants';
+import { ADD_PRODUCT_STEPS } from '@/constants/common.constants';
+import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import {
-  productBasicInfoSchema,
   productDescriptionSchema,
   productMediaSchema,
   productSeoSchema,
@@ -11,10 +11,9 @@ import {
   productVariantsSchema,
 } from '@/schemas/product.schema';
 import { confirmDetailsSchema } from '@/schemas/shared.schema';
-import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
+import type { TAddProductStepNumber } from '@/types/common.type';
 import type {
   TConfirmDetails,
-  TProductBasicInfo,
   TProductDescription,
   TProductMedia,
   TProductSeo,
@@ -23,7 +22,7 @@ import type {
 } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import {
   BasicInfoFields,
   ConfirmFields,
@@ -34,27 +33,8 @@ import {
   VariantsFields,
 } from './children';
 
-const FORM_IDS = [
-  'product-basic-info-form',
-  // 'product-category-inventory-form',
-  'product-media-form',
-  'product-description-form',
-  'product-variants-form',
-  'product-tryon-form',
-  'product-seo-form',
-  'product-confirm-form',
-] as const;
-
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState(2);
-
-  const basicInfoForm = useForm<TProductBasicInfo>({
-    resolver: zodResolver(productBasicInfoSchema),
-  });
-
-  // const categoryInventoryForm = useForm<TProductCategoryInventory>({
-  //   resolver: zodResolver(productCategoryInventorySchema),
-  // });
+  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(2);
 
   const mediaForm = useForm<TProductMedia>({
     resolver: zodResolver(productMediaSchema),
@@ -80,78 +60,35 @@ const AddNewProduct = () => {
     resolver: zodResolver(confirmDetailsSchema),
   });
 
-  const l1Cat = useWatch({ control: basicInfoForm.control, name: 'l1Category' });
-  const l2Cat = useWatch({ control: basicInfoForm.control, name: 'l2Category' });
-
-  const { data: l1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
-    level: CATEGORY_LEVELS_MAP.L1,
-  });
-
-  const { data: l2Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
-    level: CATEGORY_LEVELS_MAP.L2,
-    parent: l1Cat,
-    enabled: !!l1Cat,
-  });
-
-  const { data: l3Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
-    level: CATEGORY_LEVELS_MAP.L3,
-    parent: l2Cat,
-    enabled: !!l2Cat,
-  });
-
   const handleNext = () => {
-    setActiveStep((prev) => Math.min(prev + 1, ADD_PRODUCT_STEPS.length - 1));
+    setActiveStep(
+      (prev) => (prev < ADD_PRODUCT_STEPS.length - 1 ? prev + 1 : prev) as TAddProductStepNumber,
+    );
   };
 
   const handleBack = () => {
-    setActiveStep((prev) => Math.max(prev - 1, 0));
+    setActiveStep((prev) => (prev > 0 ? prev - 1 : prev) as TAddProductStepNumber);
   };
 
   const handleSaveDraft = async () => {
-    const payload = {
-      basicInfo: basicInfoForm.getValues(),
-      // categoryInventory: categoryInventoryForm.getValues(),
-      media: mediaForm.getValues(),
-      description: descriptionForm.getValues(),
-      variants: variantsForm.getValues(),
-      tryOn: tryOnForm.getValues(),
-      seo: seoFOrm.getValues(),
-    };
-
-    console.log(payload);
+    console.log('Save Draft');
   };
 
   const stepFields = [
     {
       title: 'Basic information',
       description: 'Product title, brand and pricing',
-      content: (
-        <form onSubmit={basicInfoForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
-          <BasicInfoFields form={basicInfoForm} l1Cats={l1Cats} l2Cats={l2Cats} l3Cats={l3Cats} />
-        </form>
-      ),
+      content: <BasicInfoFields step={activeStep} onNext={handleNext} />,
     },
-
-    // {
-    //   title: 'Category and inventory',
-    //   description: 'Category and stock details',
-    //   content: (
-    //     <form onSubmit={categoryInventoryForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
-    //       <CategoryInventoryFields
-    //         form={categoryInventoryForm}
-    //         l1Cats={l1Cats}
-    //         l2Cats={l2Cats}
-    //         l3Cats={l3Cats}
-    //       />
-    //     </form>
-    //   ),
-    // },
 
     {
       title: 'Media and gallery',
       description: 'Upload product media',
       content: (
-        <form onSubmit={mediaForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+        <form
+          onSubmit={mediaForm.handleSubmit(handleNext)}
+          id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+        >
           <MediaFields form={mediaForm} />
         </form>
       ),
@@ -161,7 +98,10 @@ const AddNewProduct = () => {
       title: 'Description and details',
       description: 'Product descriptions and usage',
       content: (
-        <form onSubmit={descriptionForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+        <form
+          onSubmit={descriptionForm.handleSubmit(handleNext)}
+          id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+        >
           <DescriptionFields form={descriptionForm} />
         </form>
       ),
@@ -170,7 +110,10 @@ const AddNewProduct = () => {
       title: 'Variants and specifications',
       description: 'Product variants and specs',
       content: (
-        <form onSubmit={variantsForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+        <form
+          onSubmit={variantsForm.handleSubmit(handleNext)}
+          id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+        >
           <VariantsFields form={variantsForm} />
         </form>
       ),
@@ -180,7 +123,10 @@ const AddNewProduct = () => {
       title: 'TryOn configuration',
       description: 'Configure TryOn assets',
       content: (
-        <form onSubmit={tryOnForm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+        <form
+          onSubmit={tryOnForm.handleSubmit(handleNext)}
+          id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+        >
           <TryOnFields form={tryOnForm} />
         </form>
       ),
@@ -190,7 +136,7 @@ const AddNewProduct = () => {
       title: 'SEO and visibility',
       description: 'SEO related settings',
       content: (
-        <form onSubmit={seoFOrm.handleSubmit(handleNext)} id={FORM_IDS[activeStep]}>
+        <form onSubmit={seoFOrm.handleSubmit(handleNext)} id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
           <SeoFields form={seoFOrm} />
         </form>
       ),
@@ -200,19 +146,11 @@ const AddNewProduct = () => {
       title: 'Confirm before save',
       description: 'Review all details',
       content: (
-        <form onSubmit={confirmForm.handleSubmit(handleSaveDraft)} id={FORM_IDS[activeStep]}>
-          <ConfirmFields
-            form={confirmForm}
-            values={{
-              basicInfo: basicInfoForm.getValues(),
-              // categoryInventory: categoryInventoryForm.getValues(),
-              media: mediaForm.getValues(),
-              description: descriptionForm.getValues(),
-              variants: variantsForm.getValues(),
-              tryOn: tryOnForm.getValues(),
-              seo: seoFOrm.getValues(),
-            }}
-          />
+        <form
+          onSubmit={confirmForm.handleSubmit(handleSaveDraft)}
+          id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+        >
+          <ConfirmFields form={confirmForm} />
         </form>
       ),
     },
@@ -224,7 +162,7 @@ const AddNewProduct = () => {
       <Stepper
         steps={ADD_PRODUCT_STEPS}
         activeStep={activeStep}
-        onStepClick={(step) => setActiveStep(step)}
+        onStepClick={(step) => setActiveStep(step as TAddProductStepNumber)}
         className="mt-4 p-4!"
       >
         <div className="flex flex-col gap-5">
@@ -246,7 +184,7 @@ const AddNewProduct = () => {
             <Button
               pattern="primary"
               content={activeStep === ADD_PRODUCT_STEPS.length - 1 ? 'Save' : 'Next'}
-              buttonProps={{ type: 'submit', form: FORM_IDS[activeStep] }}
+              buttonProps={{ type: 'submit', form: ADD_PRODUCT_FORM_ID_MAP[activeStep] }}
             />
           </div>
         </div>
