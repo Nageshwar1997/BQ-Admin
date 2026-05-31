@@ -1,5 +1,6 @@
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Input from '@/components/ui/inputs/Input';
+import QuillInput from '@/components/ui/inputs/quillInput';
 import Select from '@/components/ui/inputs/Select';
 import { PRODUCT_BASIC_INFO_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type { ICategory } from '@/types/api.type';
@@ -263,6 +264,7 @@ export const DescriptionFields = ({ form }: { form: UseFormReturn<TProductDescri
 
   return (
     <div className="grid gap-4">
+      <QuillInput />
       <Input
         label="Short description"
         register={register('shortDescription')}
