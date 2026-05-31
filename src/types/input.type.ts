@@ -1,8 +1,14 @@
 import type { IconProps } from '@iconify/react';
 import type { ToolbarProps } from 'quill/modules/toolbar';
-import type { InputHTMLAttributes, ReactNode, RefObject, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
+import type {
+  InputHTMLAttributes,
+  ReactNode,
+  RefObject,
+  SelectHTMLAttributes,
+  TextareaHTMLAttributes,
+} from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
-import type { TClassName, TContainerClassName } from './component.type';
+import type { TClassName, TContainerClassName, TQuillImageRef } from './component.type';
 
 type LeftIcon = { left: IconProps | string; right?: never };
 
@@ -109,7 +115,7 @@ export interface IQuillInput
   value?: string;
   needLinkButton?: boolean;
   onChange?: (value: string) => void;
-  blobUrlsRef?: RefObject<string[]>;
+  quillImagesRef?: RefObject<TQuillImageRef[]>;
   toolbarOptions?: IToolBarOptions;
 }
 

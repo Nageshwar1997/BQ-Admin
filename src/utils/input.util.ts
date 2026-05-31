@@ -1,5 +1,6 @@
 import { FILE_EXTENSIONS, FILE_MIME, MAX_IMAGE_FILE_SIZE } from '@/constants/common.constants';
 import { DEFAULT_QUILL_LINK_ID } from '@/constants/input.constants';
+import type { TQuillImageRef } from '@/types/component.type';
 import type { IQuillToolbar, IToolBarOptions, TQuillToolbar } from '@/types/input.type';
 import { nanoid } from 'nanoid';
 import type Quill from 'quill';
@@ -9,65 +10,77 @@ import type { RefObject } from 'react';
 import { formatFileSize, toaster } from './common.util';
 
 // Add Blob URL to Image
-export const insertImageIntoQuill = (quill: Quill, blobUrlsRef: RefObject<string[]>) => {
+export const insertImageIntoQuill = (quill: Quill, imagesRef: RefObject<TQuillImageRef[]>) => {
   const input = document.createElement('input');
-  input.setAttribute('type', 'file');
-  input.setAttribute('accept', FILE_MIME.image.join(', '));
+
+  input.type = 'file';
+  input.accept = FILE_MIME.image.join(', ');
   input.click();
 
-  input.onchange = async () => {
+  input.onchange = () => {
     if (!input.files?.length) return;
 
     const file = input.files[0];
 
     // Validate file size
-    if (file?.size > MAX_IMAGE_FILE_SIZE) {
+    if (file.size > MAX_IMAGE_FILE_SIZE) {
       return toaster.error({
         title: 'File size limit exceeded',
         description: `Image size is ${formatFileSize(file.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
       });
     }
 
+    // Validate extension and file type
+    const fileTypes: readonly string[] = FILE_MIME.image;
     const ext = file.name.split('.').pop()?.toLowerCase();
     const extensions: readonly string[] = FILE_EXTENSIONS.image;
 
-    if (!ext || !extensions.includes(ext)) {
+    if (!fileTypes.includes(file.type) || !ext || !extensions.includes(ext)) {
       return toaster.error({
         title: 'Invalid file type',
         description: `File extension is .${ext ?? 'unknown'}. Allowed extensions are ${extensions.join(', ')}.`,
       });
     }
 
-    const blobUrl = URL.createObjectURL(file);
-
     const range = quill.getSelection();
 
     if (!range) return;
 
-    blobUrlsRef.current?.push(blobUrl);
-    const alt = file?.name || 'Image';
+    const image: TQuillImageRef = { id: nanoid(), file, blobUrl: URL.createObjectURL(file) };
 
-    quill.insertEmbed(range.index, 'image', { src: blobUrl, alt }, 'user');
+    imagesRef.current.push(image);
 
-    quill.setSelection({ index: range.index + 1, length: 0 });
+    quill.insertEmbed(
+      range.index,
+      'image',
+      { src: image.blobUrl, alt: file.name || 'Image', id: image.id },
+      'user',
+    );
+
+    // NOTE: Without 'silent', cursor may jump to the end in some cases
+    quill.setSelection(range.index + 1, 0, 'silent'); // if it's not silent, the cursor will be at the end (If not working use below code)
+    // quill.setSelection({ index: range.index + 1, length: 0, silent: true });
   };
 };
 
-// Clean unused blob URLs
-export const removeImageFromQuill = (quill: Quill, blobUrlsRef: RefObject<string[]>) => {
+// Clean unused images
+export const removeImageFromQuill = (quill: Quill, imagesRef: RefObject<TQuillImageRef[]>) => {
   const imgs = quill.root.querySelectorAll('img');
 
-  const editorImages = Array.from(imgs).map((img) => img.getAttribute('src'));
+  const editorImageIds = Array.from(imgs)
+    .map((img) => img.getAttribute('data-image-id'))
+    .filter((id): id is string => Boolean(id));
 
-  const removedBlobUrls = blobUrlsRef.current?.filter((url) => !editorImages.includes(url));
+  const removedImages = imagesRef.current.filter((image) => !editorImageIds.includes(image.id));
 
-  removedBlobUrls?.forEach((url) => URL.revokeObjectURL(url));
+  removedImages.forEach((image) => {
+    URL.revokeObjectURL(image.blobUrl);
+  });
 
-  if (blobUrlsRef.current) {
-    const filteredUrls = blobUrlsRef.current.filter((url) => editorImages.includes(url));
-    blobUrlsRef.current.length = 0; // clear old
-    blobUrlsRef.current.push(...filteredUrls); // add new
-  }
+  const filteredImages = imagesRef.current.filter((image) => editorImageIds.includes(image.id));
+
+  imagesRef.current.length = 0; // clear old
+  imagesRef.current.push(...filteredImages); // add new
 };
 
 // Add IDs to headings
@@ -131,17 +144,20 @@ export const toggleLinkId = (quill: Quill) => {
 // Block dragged or copied image
 export const blockDraggedOrCopiedImage = (delta: Delta): boolean => {
   let block = false;
+
   delta.ops.forEach((op) => {
     if (op.insert && typeof op.insert === 'object' && 'image' in op.insert) {
-      const image = op.insert.image as { src: string };
+      const image = op.insert.image as { src: string; alt?: string; id?: string };
 
-      const isAllowedURL = ['blob:'].some((prefix) => image.src.includes(prefix));
-      if (image && !isAllowedURL) {
+      const isAllowedURL = image.src.startsWith('blob:');
+
+      if (!isAllowedURL) {
         block = true;
         return;
       }
     }
   });
+
   if (block) {
     toaster.error({
       title: 'You cannot copy, drag & drop images here.',
@@ -180,20 +196,25 @@ export const buildToolbar = (options?: IToolBarOptions): TQuillToolbar => {
 
 // Toolbar link button
 export const addLinkIdButtonToToolbar = (quill: Quill) => {
-  const toolbarContainer = document.querySelector('.ql-toolbar');
-  if (toolbarContainer) {
-    const toolbarModule = quill.getModule('toolbar') as IQuillToolbar;
-    const button = document.createElement('button');
-    const section = document.createElement('span');
-    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 24 24" class="ql-fill">
+  const toolbarModule = quill.getModule('toolbar') as IQuillToolbar;
+
+  const toolbarContainer = toolbarModule.container as HTMLElement;
+  const button = document.createElement('button');
+  const section = document.createElement('span');
+
+  button.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 24 24" class="ql-fill">
       <path fill="none" d="M0 0h24v24H0V0z"></path>
       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"></path>
       <circle cx="12" cy="12" r="5"></circle>
-    </svg>`;
-    button.type = 'button';
-    button.onclick = () => toolbarModule?.handlers.addIdToLink();
-    section.classList.add('ql-formats');
-    section.appendChild(button);
-    toolbarContainer.appendChild(section);
-  }
+    </svg>
+  `;
+
+  button.type = 'button';
+  button.onclick = () => toolbarModule.handlers.addIdToLink();
+
+  section.classList.add('ql-formats');
+  section.appendChild(button);
+
+  toolbarContainer.appendChild(section);
 };

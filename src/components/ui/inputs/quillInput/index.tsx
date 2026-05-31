@@ -29,9 +29,9 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
       value,
       onChange,
       placeholder = 'Write your content here...',
-      blobUrlsRef,
+      quillImagesRef,
       toolbarOptions,
-      needLinkButton = false,
+      needLinkButton = true,
     },
     ref,
   ) => {
@@ -43,6 +43,7 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
 
       const container = containerRef.current;
       const editorContainer = document.createElement('div');
+
       container.innerHTML = '';
       container.appendChild(editorContainer);
 
@@ -53,10 +54,8 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
           toolbar: {
             container: toolbarOptions ? buildToolbar(toolbarOptions) : defaultQuillToolbar,
             handlers: {
-              ...(blobUrlsRef && {
-                image: function () {
-                  insertImageIntoQuill(quill, blobUrlsRef);
-                },
+              ...(quillImagesRef && {
+                image: () => insertImageIntoQuill(quill, quillImagesRef),
               }),
               ...(needLinkButton && { toggleLinkId: () => toggleLinkId(quill) }),
             },
@@ -82,16 +81,21 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
       quill.on('text-change', (delta, _oldDelta, source) => {
         // *NOTE - Don't change order
         const html = quill.root.innerHTML.trim();
+
         onChange?.(html);
-        if (blobUrlsRef) {
-          removeImageFromQuill(quill, blobUrlsRef);
+
+        if (quillImagesRef) {
+          removeImageFromQuill(quill, quillImagesRef);
         }
 
         if (source !== 'user') return; // only block user actions
 
         // *NOTE - For prevent drag & drop Or Copy images
         const isDraggedOrCopied = blockDraggedOrCopiedImage(delta);
-        if (isDraggedOrCopied) quill.history.undo();
+
+        if (isDraggedOrCopied) {
+          quill.history.undo();
+        }
       });
 
       editorRef.current = quill;
@@ -104,21 +108,20 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
         }
       }
 
-      // **Important**: Cache blobUrlsRef.current here
-      const blobUrls = blobUrlsRef?.current;
+      // Cache current blob URLs for cleanup on unmount
+      const blobUrls = quillImagesRef?.current.map((image) => image.blobUrl);
 
       return () => {
         if (ref && 'current' in ref) {
           ref.current = null;
         }
+
         container.innerHTML = '';
-        // Safe cleanup using cached blobUrls
+
         if (blobUrls) {
           blobUrls.forEach((url) => URL.revokeObjectURL(url));
-          blobUrls.length = 0;
         }
       };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Set value when it changes from outside
@@ -129,21 +132,20 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
     }, [value]);
 
     useEffect(() => {
-      if (editorRef.current) {
-        editorRef.current.enable(!disabled);
-      }
+      editorRef.current?.enable(!disabled);
     }, [disabled]);
 
     return (
       <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${className}`}>
         <div className="relative">
           <InputLabel children={label} />
+
           <div
             ref={containerRef}
-            id="custom-editor"
-            className="bg-smoke-eerie border-primary/10 text-primary w-full rounded-lg border"
+            className="custom-editor bg-smoke-eerie border-primary/10 text-primary w-full rounded-lg border"
           />
         </div>
+
         <InputError error={error} />
       </div>
     );

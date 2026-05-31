@@ -149,3 +149,5 @@ export interface IMediaCarouselWithParent
   extends TClassName, IVideo, Pick<IMediaCarousel, 'media' | 'selected' | 'handleRemove'> {
   needButtonControls?: boolean;
 }
+
+export type TQuillImageRef = { id: string; file: File; blobUrl: string };

@@ -1,5 +1,6 @@
 import QuillInput from '@/components/ui/inputs/quillInput';
 import Textarea from '@/components/ui/inputs/Textarea';
+import type { TQuillImageRef } from '@/types/component.type';
 import type { TProductDescription } from '@/types/schema.type';
 import type Quill from 'quill';
 import { useRef, type RefObject } from 'react';
@@ -16,14 +17,14 @@ const ContentFields = ({ form }: { form: UseFormReturn<TProductDescription> }) =
     additional: useRef<Quill | null>(null),
   };
 
-  const blobUrlRefs: Record<
+  const imageRefs: Record<
     keyof Omit<TProductDescription, 'shortDescription'>,
-    RefObject<string[]>
+    RefObject<TQuillImageRef[]>
   > = {
-    description: useRef<string[]>([]),
-    ingredients: useRef<string[]>([]),
-    instructions: useRef<string[]>([]),
-    additional: useRef<string[]>([]),
+    description: useRef<TQuillImageRef[]>([]),
+    ingredients: useRef<TQuillImageRef[]>([]),
+    instructions: useRef<TQuillImageRef[]>([]),
+    additional: useRef<TQuillImageRef[]>([]),
   };
 
   const {
@@ -47,7 +48,7 @@ const ContentFields = ({ form }: { form: UseFormReturn<TProductDescription> }) =
           <QuillInput
             label="Description"
             ref={quillRefs.description}
-            blobUrlsRef={blobUrlRefs.description}
+            quillImagesRef={imageRefs.description}
             placeholder="Write product description here..."
             value={value}
             onChange={onChange}
@@ -62,7 +63,7 @@ const ContentFields = ({ form }: { form: UseFormReturn<TProductDescription> }) =
           <QuillInput
             label="Ingredients"
             ref={quillRefs.ingredients}
-            blobUrlsRef={blobUrlRefs.ingredients}
+            quillImagesRef={imageRefs.ingredients}
             placeholder="Write product ingredients here..."
             value={value}
             onChange={onChange}
@@ -77,7 +78,7 @@ const ContentFields = ({ form }: { form: UseFormReturn<TProductDescription> }) =
           <QuillInput
             label="Usage instructions"
             ref={quillRefs.instructions}
-            blobUrlsRef={blobUrlRefs.instructions}
+            quillImagesRef={imageRefs.instructions}
             placeholder="Write product usage instructions here..."
             value={value}
             onChange={onChange}
@@ -92,7 +93,7 @@ const ContentFields = ({ form }: { form: UseFormReturn<TProductDescription> }) =
           <QuillInput
             label="Additional details"
             ref={quillRefs.additional}
-            blobUrlsRef={blobUrlRefs.additional}
+            quillImagesRef={imageRefs.additional}
             placeholder="Write product additional details here..."
             value={value}
             onChange={onChange}
