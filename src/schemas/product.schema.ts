@@ -50,18 +50,7 @@ export const productBasicInfoSchema = object({
 });
 
 /* -------------------------------------------------------------------------- */
-/*                       STEP 2 : CATEGORY & INVENTORY                        */
-/* -------------------------------------------------------------------------- */
-
-// export const productCategoryInventorySchema = object({
-//   l1Category: string().min(1, '(L1) Main category is required.'),
-//   l2Category: string().min(1, '(L2) Sub-category is required.'),
-//   l3Category: string().min(1, '(L3) Product category is required.'),
-//   stock: number().min(0, 'Stock cannot be negative.'),
-// });
-
-/* -------------------------------------------------------------------------- */
-/*                           STEP 3 : MEDIA & GALLERY                         */
+/*                           STEP 2 : MEDIA & GALLERY                         */
 /* -------------------------------------------------------------------------- */
 
 const thumbnailSchema = custom<File | string>((value) => !!value, {
@@ -175,7 +164,7 @@ export const productMediaSchema = object({
 });
 
 /* -------------------------------------------------------------------------- */
-/*                     STEP 4 : DESCRIPTION & DETAILS                         */
+/*                     STEP 3 : DESCRIPTION & DETAILS                         */
 /* -------------------------------------------------------------------------- */
 
 export const productDescriptionSchema = object({
@@ -191,7 +180,7 @@ export const productDescriptionSchema = object({
 });
 
 /* -------------------------------------------------------------------------- */
-/*                  STEP 5 : VARIANTS & SPECIFICATIONS                        */
+/*                  STEP 4 : VARIANTS & SPECIFICATIONS                        */
 /* -------------------------------------------------------------------------- */
 
 export const productVariantsSchema = object({
@@ -366,7 +355,7 @@ export const productVariantsSchema = object({
 });
 
 /* -------------------------------------------------------------------------- */
-/*                       STEP 6 : TRYON CONFIGURATION                         */
+/*                       STEP 5 : TRYON CONFIGURATION                         */
 /* -------------------------------------------------------------------------- */
 
 export const productTryOnSchema = object({
@@ -378,7 +367,7 @@ export const productTryOnSchema = object({
 });
 
 /* -------------------------------------------------------------------------- */
-/*                       STEP 7 : SEO & VISIBILITY                            */
+/*                       STEP 6 : SEO & VISIBILITY                            */
 /* -------------------------------------------------------------------------- */
 
 export const productSeoSchema = object({
@@ -390,11 +379,15 @@ export const productSeoSchema = object({
 });
 
 /* -------------------------------------------------------------------------- */
-/*                      STEP 8 : CONFIRM BEFORE SAVE                          */
+/*                      STEP 7 : CONFIRM BEFORE SAVE                          */
 /* -------------------------------------------------------------------------- */
 
 export const productConfirmSchema = object({
-  confirm: literal(true, {
-    message: 'Please confirm details before saving.',
-  }),
+  confirm: literal(true, { message: 'Please confirm details before saving.' }),
+  basicInfo: productBasicInfoSchema,
+  media: productMediaSchema,
+  description: productDescriptionSchema,
+  variants: productVariantsSchema,
+  tryOn: productTryOnSchema,
+  seo: productSeoSchema,
 });
