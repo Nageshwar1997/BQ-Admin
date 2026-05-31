@@ -144,7 +144,7 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
           <div
             ref={containerRef}
             id="custom-editor"
-            className="bg-smoke-eerie border-primary-10 text-primary flex w-full flex-col gap-2 rounded-lg border"
+            className="bg-smoke-eerie border-primary/10 text-primary flex w-full flex-col gap-2 rounded-lg border"
           />
         </div>
         <InputError error={error} />
