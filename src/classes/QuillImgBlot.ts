@@ -4,7 +4,7 @@ import Quill from 'quill';
 // Extended Image Blot
 const BaseImage = Quill.import('formats/image') as TQuillImageBlot;
 
-export class QuillImage extends BaseImage {
+class QuillImgBlot extends BaseImage {
   static create(value: { alt: string; src: string } | string) {
     const node = super.create(value) as HTMLImageElement;
     if (typeof value === 'string') {
@@ -24,3 +24,5 @@ export class QuillImage extends BaseImage {
     return Link?.sanitize ? Link.sanitize(url) : url;
   }
 }
+
+export default QuillImgBlot;

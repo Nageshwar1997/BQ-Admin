@@ -25,7 +25,6 @@ const ContentFields = ({ form }: { form: UseFormReturn<TProductDescription> }) =
     instructions: useRef<string[]>([]),
     additional: useRef<string[]>([]),
   };
-  console.log('🚀 ~ ContentFields ~ blobUrlRefs:', blobUrlRefs);
 
   const {
     control,

@@ -1,4 +1,4 @@
-import { QuillImage } from '@/classes/QuillImage';
+import QuillImgBlot from '@/classes/QuillImgBlot';
 import { defaultQuillToolbar } from '@/constants/input.constants';
 import type { IQuillInput } from '@/types/input.type';
 import {
@@ -16,7 +16,7 @@ import { forwardRef, useEffect, useRef } from 'react';
 import { InputError, InputLabel } from '../children';
 import './quillInput.css';
 
-Quill.register('formats/image', QuillImage, true);
+Quill.register('formats/image', QuillImgBlot, true);
 Quill.register('modules/headingIds', enableQuillHeadingIds);
 
 const QuillInput = forwardRef<Quill | null, IQuillInput>(
