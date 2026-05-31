@@ -4,7 +4,7 @@
     font-family: 'metropolis', sans-serif !important;
     border: transparent;
     border-bottom: 2px solid rgba(var(--primary-rgb), 0.1);
-    padding: 20px 12px 12px 12px;
+    padding: 12px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -27,8 +27,9 @@
   & .ql-editor {
     height: 300px;
     max-height: 300px;
-    margin-bottom: 12px;
-    padding-bottom: 0 !important;
+    margin-block: 12px;
+    padding-inline: 12px !important;
+    padding-block: 0 !important;
     & a {
       color: rgb(var(--blue-crayola-c-rgb)) !important;
       text-decoration: none !important;
