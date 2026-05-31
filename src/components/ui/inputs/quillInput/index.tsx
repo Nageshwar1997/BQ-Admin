@@ -78,6 +78,15 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
         addLinkIdButtonToToolbar(quill);
       }
 
+      // Hide link tooltip on editor scroll
+      const handleScroll = () => {
+        const tooltip = (quill.theme as { tooltip?: { hide: () => void } }).tooltip;
+
+        tooltip?.hide();
+      };
+
+      quill.root.addEventListener('scroll', handleScroll);
+
       quill.on('text-change', (delta, _oldDelta, source) => {
         // *NOTE - Don't change order
         const html = quill.root.innerHTML.trim();
@@ -112,6 +121,8 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
       const blobUrls = quillImagesRef?.current.map((image) => image.blobUrl);
 
       return () => {
+        quill.root.removeEventListener('scroll', handleScroll);
+
         if (ref && 'current' in ref) {
           ref.current = null;
         }
@@ -142,7 +153,7 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
 
           <div
             ref={containerRef}
-            className="custom-editor bg-smoke-eerie border-primary/10 text-primary w-full rounded-lg border"
+            className="custom-editor bg-smoke-eerie border-primary/10 text-primary w-full overflow-hidden rounded-lg border"
           />
         </div>
 
