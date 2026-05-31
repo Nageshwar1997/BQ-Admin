@@ -1,6 +1,6 @@
 import type { IconProps } from '@iconify/react';
 import type { ToolbarProps } from 'quill/modules/toolbar';
-import type { InputHTMLAttributes, ReactNode, RefObject, SelectHTMLAttributes } from 'react';
+import type { InputHTMLAttributes, ReactNode, RefObject, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import type { UseFormRegisterReturn } from 'react-hook-form';
 import type { TClassName, TContainerClassName } from './component.type';
 
@@ -63,6 +63,9 @@ export interface IFileInput extends Omit<IBaseInput, 'error' | 'register'> {
   mediaCarouselClassName?: string;
 }
 
+export interface ITextArea extends Omit<IBaseInput, 'icons'> {
+  textAreaProps: TextareaHTMLAttributes<HTMLTextAreaElement>;
+}
 export type TToolbarOption =
   | { header: (1 | 2 | 3 | 4 | 5 | 6 | false)[] }
   | 'bold'

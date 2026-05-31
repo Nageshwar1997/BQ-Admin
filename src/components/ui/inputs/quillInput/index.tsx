@@ -135,10 +135,9 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
     }, [disabled]);
 
     return (
-      <div className={`w-full space-y-1.5 ${className}`}>
+      <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${className}`}>
         <div className="relative">
           <InputLabel children={label} />
-
           <div
             ref={containerRef}
             id="custom-editor"

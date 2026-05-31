@@ -1,5 +1,5 @@
-import Input from '@/components/ui/inputs/Input';
 import QuillInput from '@/components/ui/inputs/quillInput';
+import Textarea from '@/components/ui/inputs/Textarea';
 import type { TProductDescription } from '@/types/schema.type';
 import type Quill from 'quill';
 import { useRef, type RefObject } from 'react';
@@ -35,11 +35,11 @@ const ContentFields = ({ form }: { form: UseFormReturn<TProductDescription> }) =
 
   return (
     <div className="grid gap-4">
-      <Input
+      <Textarea
         label="Short description"
         register={register('shortDescription')}
         error={errors.shortDescription?.message}
-        inputProps={{ placeholder: 'Short description', name: 'shortDescription' }}
+        textAreaProps={{ placeholder: 'Short description', name: 'shortDescription' }}
       />
       <Controller
         control={control}
