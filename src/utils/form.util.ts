@@ -72,5 +72,5 @@ export const processQuillContent = async ({
 };
 
 export const getQuillValue = (value: string | undefined) => {
-  return value ? (value !== '<p><br></p>' ? value : '') : '';
+  return value !== '<p><br></p>' ? value : '';
 };
