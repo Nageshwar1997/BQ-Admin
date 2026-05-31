@@ -10,19 +10,7 @@ import {
 } from '@/constants/common.constants';
 import { REGEX } from '@/constants/regex.constants';
 import { formatFileSize } from '@/utils/common.util';
-import {
-  array,
-  boolean,
-  custom,
-  literal,
-  number,
-  object,
-  string,
-  union,
-  url,
-  enum as z_enum,
-  instanceof as z_instanceof,
-} from 'zod';
+import { array, boolean, custom, literal, number, object, string, enum as z_enum } from 'zod';
 
 /* -------------------------------------------------------------------------- */
 /*                             STEP 1 : BASIC INFO                            */
@@ -76,7 +64,7 @@ export const productBasicInfoSchema = object({
 /*                           STEP 3 : MEDIA & GALLERY                         */
 /* -------------------------------------------------------------------------- */
 
-export const thumbnailSchema = custom<File | string>((value) => !!value, {
+const thumbnailSchema = custom<File | string>((value) => !!value, {
   error: 'Thumbnail is required.',
 }).superRefine((value, ctx) => {
   if (value instanceof File) {
@@ -106,7 +94,7 @@ export const thumbnailSchema = custom<File | string>((value) => !!value, {
   }
 });
 
-export const videoSchema = custom<File | string>((value) => !!value, {
+const videoSchema = custom<File | string>((value) => !!value, {
   error: 'Video is required.',
 }).superRefine((value, ctx) => {
   if (value instanceof File) {
@@ -136,7 +124,7 @@ export const videoSchema = custom<File | string>((value) => !!value, {
   }
 });
 
-export const imagesSchema = array(
+const imagesSchema = array(
   custom<File | string>((value) => !!value, { error: 'Image is required.' }),
   { error: 'At least one image is required.' },
 )
@@ -237,57 +225,62 @@ export const productVariantsSchema = object({
       })
         .min(1, 'Stock threshold must be greater than 0.')
         .max(10, 'Stock threshold cannot exceed 10.'),
-      thumbnail: union([
-        z_instanceof(File).superRefine((file, ctx) => {
-          if (file.size > MAX_IMAGE_FILE_SIZE) {
-            ctx.addIssue({
-              code: 'custom',
-              message: `Thumbnail size is ${formatFileSize(file.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
-            });
-          }
-          const fileTypes: readonly string[] = FILE_MIME.image;
-          if (!fileTypes.includes(file.type)) {
-            ctx.addIssue({
-              code: 'custom',
-              message: `Thumbnail type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
-            });
-          }
-        }),
-        url({
-          message: 'Invalid thumbnail URL.',
-          normalize: true,
-          pattern: REGEX.URL,
-        }),
-      ])
-        .optional()
+      thumbnail: custom<File | string>((value) => !!value, {
+        error: 'Variant thumbnail is required.',
+      })
         .superRefine((value, ctx) => {
-          if (!value) {
-            ctx.addIssue({
-              code: 'custom',
-              message: 'Thumbnail is required.',
-            });
+          if (value instanceof File) {
+            if (value.size > MAX_IMAGE_FILE_SIZE) {
+              ctx.addIssue({
+                code: 'custom',
+                message: `Variant thumbnail size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
+              });
+            }
+
+            const fileTypes: readonly string[] = FILE_MIME.image;
+
+            if (!fileTypes.includes(value.type)) {
+              ctx.addIssue({
+                code: 'custom',
+                message: `Variant thumbnail type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+              });
+            }
+          } else if (typeof value === 'string') {
+            if (!value.trim()) {
+              ctx.addIssue({ code: 'custom', message: 'Variant thumbnail URL cannot be empty.' });
+            } else if (!REGEX.URL.test(value)) {
+              ctx.addIssue({ code: 'custom', message: 'Invalid variant thumbnail URL.' });
+            }
+          } else {
+            ctx.addIssue({ code: 'custom', message: 'Invalid variant thumbnail.' });
           }
-        }),
+        })
+        .optional(),
       images: array(
-        union([
-          z_instanceof(File),
-          url({
-            message: 'Invalid image URL.',
-            normalize: true,
-            pattern: REGEX.URL,
-          }),
-        ]),
-        {
-          error: 'At least one image is required.',
-        },
+        custom<File | string>((value) => !!value, { error: 'Variant image is required.' }),
+        { error: 'At least one variant image is required.' },
       )
-        .min(1, 'At least one image is required.')
-        .max(10, 'Maximum of 10 images are allowed.')
+        .min(1, { message: 'At least one variant image is required.' })
+        .max(10, { message: 'Maximum of 10 variant images are allowed.' })
         .superRefine((items, ctx) => {
           items.forEach((item, index) => {
-            const imageLabel = `Image ${index + 1}`;
+            const imageLabel = `Variant-image ${index + 1}`;
 
-            if (item instanceof File) {
+            if (typeof item === 'string') {
+              if (!item.trim()) {
+                ctx.addIssue({
+                  code: 'custom',
+                  path: [index],
+                  message: `${imageLabel} URL cannot be empty.`,
+                });
+              } else if (!REGEX.URL.test(item)) {
+                ctx.addIssue({
+                  code: 'custom',
+                  path: [index],
+                  message: `${imageLabel} URL is invalid.`,
+                });
+              }
+            } else if (item instanceof File) {
               if (item.size > MAX_IMAGE_FILE_SIZE) {
                 ctx.addIssue({
                   code: 'custom',
@@ -305,6 +298,8 @@ export const productVariantsSchema = object({
                   message: `${imageLabel} type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
                 });
               }
+            } else {
+              ctx.addIssue({ code: 'custom', path: [index], message: `${imageLabel} is invalid.` });
             }
           });
         }),
