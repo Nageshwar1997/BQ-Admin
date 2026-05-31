@@ -197,9 +197,9 @@ export const productDescriptionSchema = object({
   description: string('Description is required.')
     .refine((value) => value !== '<p><br></p>', 'Description is required.')
     .min(107, 'Description must be at least 100 characters.'),
-  usage: string().min(20, 'Usage must be at least 10 characters.').optional(),
-
-  ingredients: string().optional(),
+  instructions: string().min(20, 'Usage instructions must be at least 10 characters.').optional(),
+  ingredients: string().min(20, 'Ingredients must be at least 10 characters.').optional(),
+  additional: string().min(20, 'Additional details must be at least 10 characters.').optional(),
 });
 
 /* -------------------------------------------------------------------------- */
