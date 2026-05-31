@@ -211,7 +211,7 @@ export const addLinkIdButtonToToolbar = (quill: Quill) => {
   `;
 
   button.type = 'button';
-  button.onclick = () => toolbarModule.handlers.addIdToLink();
+  button.onclick = () => toolbarModule.handlers.toggleLinkId();
 
   section.classList.add('ql-formats');
   section.appendChild(button);
