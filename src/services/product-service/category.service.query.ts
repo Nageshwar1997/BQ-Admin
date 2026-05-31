@@ -95,6 +95,6 @@ export const useGetCategoriesByParentLevel = ({
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     refetchOnReconnect: true,
-    select: (data) => data?.categories || [],
+    select: (data) => (data?.categories || []) as ICategory[],
   });
 };

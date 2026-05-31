@@ -44,3 +44,13 @@ export const FORM_DEFAULT_VALUES = {
     description: '',
   },
 } as const;
+
+export const ADD_PRODUCT_FORM_ID_MAP = {
+  0: 'product-basic-info-form',
+  1: 'product-media-form',
+  2: 'product-description-form',
+  3: 'product-variants-form',
+  4: 'product-tryon-form',
+  5: 'product-seo-form',
+  6: 'product-confirm-form',
+} as const;

@@ -10,7 +10,7 @@ import {
 } from '@/constants/common.constants';
 import { REGEX } from '@/constants/regex.constants';
 import { formatFileSize } from '@/utils/common.util';
-import { array, boolean, custom, literal, number, object, string, enum as z_enum } from 'zod';
+import { array, boolean, custom, number, object, string, enum as z_enum } from 'zod';
 
 /* -------------------------------------------------------------------------- */
 /*                             STEP 1 : BASIC INFO                            */
@@ -378,16 +378,13 @@ export const productSeoSchema = object({
   seoKeywords: array(string()).optional(),
 });
 
-/* -------------------------------------------------------------------------- */
-/*                      STEP 7 : CONFIRM BEFORE SAVE                          */
-/* -------------------------------------------------------------------------- */
-
-export const productConfirmSchema = object({
-  confirm: literal(true, { message: 'Please confirm details before saving.' }),
-  basicInfo: productBasicInfoSchema,
-  media: productMediaSchema,
-  description: productDescriptionSchema,
-  variants: productVariantsSchema,
-  tryOn: productTryOnSchema,
-  seo: productSeoSchema,
+export const productBaseSchema = object({
+  basicInfo: productBasicInfoSchema
+    .extend({ l1CategoryName: string(), l2CategoryName: string(), l3CategoryName: string() })
+    .optional(),
+  media: productMediaSchema.optional(),
+  description: productDescriptionSchema.optional(),
+  variants: productVariantsSchema.optional(),
+  tryOn: productTryOnSchema.optional(),
+  seo: productSeoSchema.optional(),
 });

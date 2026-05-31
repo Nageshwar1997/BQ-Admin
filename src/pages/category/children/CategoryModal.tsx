@@ -5,6 +5,7 @@ import Checkbox from '@/components/ui/inputs/Checkbox';
 import {
   CATEGORY_LEVELS_MAP,
   CATEGORY_MODAL_STEPS,
+  EMPTY_ARRAY,
   QUERY_PARAMS_KEY_MAP,
 } from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
@@ -115,18 +116,18 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
 
   const { mutateAsync: updateCategoryAsync } = useUpdateCategory({ categoryId: category?._id });
 
-  const { data: level1Cats } = useGetCategoriesByParentLevel({
+  const { data: level1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L1,
     enabled: !isL1(level),
   });
 
-  const { data: level2Cats } = useGetCategoriesByParentLevel({
+  const { data: level2Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L2,
     parent: mainCategory,
     enabled: level === CATEGORY_LEVELS_MAP.L3 && !!mainCategory,
   });
 
-  const { data: level3Cats } = useGetCategoriesByParentLevel({
+  const { data: level3Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L3,
     parent: subCategory,
     enabled: level === CATEGORY_LEVELS_MAP.L3 && !!subCategory,
@@ -161,7 +162,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
 
     if (!trimmedName) return false;
 
-    let categories: ICategory[] | undefined = [];
+    let categories: ICategory[] = [];
 
     if (isL1(level)) {
       categories = level1Cats;

@@ -1,7 +1,7 @@
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import Tooltip from '@/components/ui/Tooltip';
-import { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
+import { CATEGORY_LEVELS_MAP, EMPTY_ARRAY } from '@/constants/common.constants';
 import type { ICategory } from '@/types/api.type';
 import type { TCategory, TL2Category, TL3Category } from '@/types/schema.type';
 import {
@@ -23,11 +23,11 @@ type TCommonFields = {
 
 type TLevel1Fields = TCommonFields;
 type TLevel2Fields = TCommonFields & {
-  level1Cats: ICategory[];
+  level1Cats: ICategory[] | undefined;
   mainCategory: TL2Category['mainCategory'];
 };
 type TLevel3Fields = Omit<TLevel2Fields, 'mainCategory'> & {
-  level2Cats: ICategory[];
+  level2Cats: ICategory[] | undefined;
   mainCategory: TL3Category['mainCategory'];
   subCategory: TL3Category['subCategory'];
 };
@@ -119,7 +119,7 @@ export const Level2Fields = ({
   control,
   level,
   setValue,
-  level1Cats,
+  level1Cats = EMPTY_ARRAY,
   mainCategory,
   isLevelDisabled,
 }: TLevel2Fields) => {
@@ -163,8 +163,8 @@ export const Level3Fields = ({
   control,
   level,
   setValue,
-  level1Cats,
-  level2Cats,
+  level1Cats = EMPTY_ARRAY,
+  level2Cats = EMPTY_ARRAY,
   mainCategory,
   subCategory,
   isLevelDisabled,
@@ -207,10 +207,7 @@ export const Level3Fields = ({
         render={({ field: { onChange } }) => (
           <Select
             label="Sub-category"
-            options={level2Cats?.map((cat: ICategory) => ({
-              label: cat.name,
-              value: cat._id,
-            }))}
+            options={level2Cats?.map((cat) => ({ label: cat.name, value: cat._id }))}
             error={errors.subCategory?.message}
             selectProps={{
               value: subCategory,

@@ -15,6 +15,7 @@ import {
 import Badge from '@/components/ui/Badge';
 import {
   CATEGORY_LEVELS_MAP,
+  EMPTY_ARRAY,
   QUERY_PARAMS_KEY_MAP,
   SORT_ORDER_MAP,
 } from '@/constants/common.constants';
@@ -160,14 +161,13 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
   const sort = useDeferredValue(queryParams[q_cat_keys.level.l3.sort]) as TSort;
 
   const {
-    data = [],
+    data: categories = EMPTY_ARRAY,
     isLoading,
     isError,
   } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L3,
     parent: parentCat._id,
   });
-  const categories = data as ICategory[];
   const filteredCats = useMemo(
     () => getFilteredAndSortedCats(categories, search, sort),
     [categories, search, sort],
@@ -214,14 +214,13 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
   const sort = useDeferredValue(queryParams[q_cat_keys.level.l2.sort]) as TSort;
   const [selectedId, setSelectedId] = useState('');
   const {
-    data = [],
+    data: categories = EMPTY_ARRAY,
     isLoading,
     isError,
   } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L2,
     parent: parentCat._id,
   });
-  const categories = data as ICategory[];
   const filteredCats = useMemo(
     () => getFilteredAndSortedCats(categories, search, sort),
     [categories, search, sort],
@@ -295,13 +294,12 @@ const L1Table = () => {
   const [editData, setEditData] = useState<TCatModal | null>(null);
   const [deleteId, setDeleteId] = useState('');
   const {
-    data = [],
+    data: categories = EMPTY_ARRAY,
     isLoading,
     isError,
   } = useGetCategoriesByParentLevel({ level: CATEGORY_LEVELS_MAP.L1 });
 
   const { mutateAsync: deleteCategoryAsync } = useDeleteCategory({ categoryId: deleteId });
-  const categories = data as ICategory[];
 
   const handleEdit = (data: TCatModal) => {
     setEditData(data);
