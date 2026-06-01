@@ -1,53 +1,47 @@
 import FileInput from '@/components/ui/inputs/FileInput';
 import { EMPTY_ARRAY, FILE_MIME } from '@/constants/common.constants';
+import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
+import { productMediaSchema } from '@/schemas/product.schema';
+import type { TAddProductStepNumber } from '@/types/common.type';
 import type { TProductMedia } from '@/types/schema.type';
-import { Controller, useWatch, type FieldErrors, type UseFormReturn } from 'react-hook-form';
+import { toErrorMessageArray } from '@/utils/form.util';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 
-const getErrorMessages = (fieldErrors?: FieldErrors<TProductMedia>): string[] | undefined => {
-  if (!fieldErrors) return undefined;
-
-  // Direct message object
-  if (
-    typeof fieldErrors === 'object' &&
-    'message' in fieldErrors &&
-    typeof fieldErrors.message === 'string'
-  ) {
-    return [fieldErrors.message];
-  }
-
-  // Array/object indexed errors
-  return (Object.keys(fieldErrors) as Array<keyof TProductMedia>)
-    .map((key) => {
-      const error = fieldErrors[key];
-
-      if (
-        error &&
-        typeof error === 'object' &&
-        'message' in error &&
-        typeof error.message === 'string'
-      ) {
-        return error.message;
-      }
-
-      return null;
-    })
-    .filter(Boolean) as string[];
-};
-
-export const TestMediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }) => {
+const AddProductMediaForm = ({
+  onNext,
+  step,
+}: {
+  onNext: () => void;
+  step: TAddProductStepNumber;
+}) => {
   const {
     control,
     formState: { errors },
+    handleSubmit,
     resetField,
     setValue,
-  } = form;
+  } = useForm<TProductMedia>({ resolver: zodResolver(productMediaSchema) });
 
   const images = useWatch({ control, name: 'images' });
   const thumbnail = useWatch({ control, name: 'thumbnail' });
   const video = useWatch({ control, name: 'video' });
 
+  const getInputErrors = (field: keyof TProductMedia) => {
+    return toErrorMessageArray<TProductMedia>(errors[field]);
+  };
+
+  const onSubmit = (data: TProductMedia) => {
+    console.log('🚀 ~ onSubmit ~ data:', data);
+    onNext();
+  };
+
   return (
-    <div className="grid gap-4">
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[step]}
+      onSubmit={handleSubmit(onSubmit)}
+      className="grid gap-4"
+    >
       <div className="grid grid-cols-2 gap-4">
         <Controller
           control={control}
@@ -61,7 +55,7 @@ export const TestMediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }
                 onChange: ({ target: { files } }) => onChange(files?.[0]),
                 value,
               }}
-              errors={getErrorMessages(errors.thumbnail)}
+              errors={getInputErrors('thumbnail')}
               handleRemove={() => resetField('thumbnail')}
             />
           )}
@@ -79,7 +73,7 @@ export const TestMediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }
                 onChange: ({ target: { files } }) => onChange(files?.[0]),
                 value,
               }}
-              errors={getErrorMessages(errors.video)}
+              errors={getInputErrors('video')}
               handleRemove={() => resetField('video')}
             />
           )}
@@ -105,7 +99,7 @@ export const TestMediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }
               },
               value,
             }}
-            errors={getErrorMessages(errors.images)}
+            errors={getInputErrors('images')}
             handleRemove={(index) => {
               const nextValue = images.filter((_, currentIndex) => currentIndex !== index);
 
@@ -118,6 +112,7 @@ export const TestMediaFields = ({ form }: { form: UseFormReturn<TProductMedia> }
           />
         )}
       />
-    </div>
+    </form>
   );
 };
+export default AddProductMediaForm;

@@ -1,12 +1,22 @@
 import QuillInput from '@/components/ui/inputs/quillInput';
 import Textarea from '@/components/ui/inputs/Textarea';
+import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
+import { productDescriptionSchema } from '@/schemas/product.schema';
+import type { TAddProductStepNumber } from '@/types/common.type';
 import type { TQuillImageRef } from '@/types/component.type';
 import type { TProductDescription } from '@/types/schema.type';
+import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
 import { useRef, type RefObject } from 'react';
-import { Controller, type UseFormReturn } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
-const ContentFields = ({ form }: { form: UseFormReturn<TProductDescription> }) => {
+const AddProductDescriptionsForm = ({
+  onNext,
+  step,
+}: {
+  onNext: () => void;
+  step: TAddProductStepNumber;
+}) => {
   const quillRefs: Record<
     keyof Omit<TProductDescription, 'shortDescription'>,
     RefObject<Quill | null>
@@ -29,12 +39,22 @@ const ContentFields = ({ form }: { form: UseFormReturn<TProductDescription> }) =
 
   const {
     control,
-    register,
     formState: { errors },
-  } = form;
+    handleSubmit,
+    register,
+  } = useForm<TProductDescription>({ resolver: zodResolver(productDescriptionSchema) });
+
+  const onSubmit = (data: TProductDescription) => {
+    console.log('🚀 ~ onSubmit ~ data:', data);
+    onNext();
+  };
 
   return (
-    <div className="grid gap-4">
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[step]}
+      onSubmit={handleSubmit(onSubmit)}
+      className="grid gap-4"
+    >
       <Textarea
         label="Short description"
         register={register('shortDescription')}
@@ -101,8 +121,8 @@ const ContentFields = ({ form }: { form: UseFormReturn<TProductDescription> }) =
           />
         )}
       />
-    </div>
+    </form>
   );
 };
 
-export default ContentFields;
+export default AddProductDescriptionsForm;

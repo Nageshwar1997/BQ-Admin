@@ -9,16 +9,15 @@ import {
   VARIANT_TYPE,
   VARIANT_TYPE_MAP,
 } from '@/constants/common.constants';
+import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
+import { productVariantsSchema } from '@/schemas/product.schema';
+import type { TAddProductStepNumber } from '@/types/common.type';
 import type { TProductVariants } from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
+import { toErrorMessageArray } from '@/utils/form.util';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
-import {
-  Controller,
-  useFieldArray,
-  useWatch,
-  type FieldErrors,
-  type UseFormReturn,
-} from 'react-hook-form';
+import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 const EMPTY_VARIANT = {
   type: VARIANT_TYPE_MAP.COLOR,
@@ -32,49 +31,25 @@ const EMPTY_VARIANT = {
   images: [],
 };
 
-const getErrorMessages = (fieldErrors?: FieldErrors<TProductVariants>): string[] | undefined => {
-  if (!fieldErrors) return undefined;
-
-  // Direct message object
-  if (
-    typeof fieldErrors === 'object' &&
-    'message' in fieldErrors &&
-    typeof fieldErrors.message === 'string'
-  ) {
-    return [fieldErrors.message];
-  }
-
-  // Array/object indexed errors
-  return (Object.keys(fieldErrors) as Array<keyof TProductVariants>)
-    .map((key) => {
-      const error = fieldErrors[key];
-
-      if (
-        error &&
-        typeof error === 'object' &&
-        'message' in error &&
-        typeof error.message === 'string'
-      ) {
-        return error.message;
-      }
-
-      return null;
-    })
-    .filter(Boolean) as string[];
-};
-const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> }) => {
+const AddProductVariantsForm = ({
+  onNext,
+  step,
+}: {
+  onNext: () => void;
+  step: TAddProductStepNumber;
+}) => {
   const {
+    clearErrors,
     control,
-    register,
     formState: { errors },
-  } = form;
-  console.log('🚀 ~ VariantsFieldsTest ~ errors:', errors);
+    getValues,
+    handleSubmit,
+    register,
+    resetField,
+    setValue,
+  } = useForm<TProductVariants>({ resolver: zodResolver(productVariantsSchema) });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'variants',
-  });
-  console.log('🚀 ~ VariantsFieldsTest ~ fields:', fields);
+  const { fields, append, remove } = useFieldArray({ control, name: 'variants' });
 
   const productType = useWatch({
     control,
@@ -84,13 +59,22 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
 
   const variants = useWatch({ control, name: 'variants' });
 
+  const onSubmit = (data: TProductVariants) => {
+    console.log('🚀 ~ onSubmit ~ data:', data);
+    onNext();
+  };
+
   useEffect(() => {
     if (productType === PRODUCT_TYPE_MAP.VARIABLE && !fields.length) {
       append(EMPTY_VARIANT);
     }
   }, [productType, fields.length, append]);
   return (
-    <div className="flex flex-col gap-6">
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[step]}
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-6"
+    >
       <Controller
         name="productType"
         control={control}
@@ -114,7 +98,7 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                 if (fields.length <= 1) {
                   onChange(value);
                   if (value === PRODUCT_TYPE_MAP.SIMPLE) {
-                    form.resetField('variants');
+                    resetField('variants');
                   }
                 }
               },
@@ -202,10 +186,10 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                       onChange: ({ target: { files } }) => onChange(files?.[0]),
                       value,
                     }}
-                    errors={getErrorMessages(errors.variants?.[index]?.thumbnail)}
-                    handleRemove={() =>
-                      form.resetField(`variants.${index}.thumbnail`)
-                    }
+                    errors={toErrorMessageArray<TProductVariants>(
+                      errors.variants?.[index]?.thumbnail,
+                    )}
+                    handleRemove={() => resetField(`variants.${index}.thumbnail`)}
                   />
                 )}
               />
@@ -230,7 +214,7 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                       },
                       value,
                     }}
-                    errors={getErrorMessages(errors.variants?.[index]?.images)}
+                    errors={toErrorMessageArray<TProductVariants>(errors.variants?.[index]?.images)}
                     handleRemove={(index) => {
                       const oldImages = field?.images || EMPTY_ARRAY;
 
@@ -238,7 +222,7 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                         (_, currentIndex) => currentIndex !== index,
                       );
 
-                      form.setValue(`variants.${index}.images`, nextValue, {
+                      setValue(`variants.${index}.images`, nextValue, {
                         shouldDirty: true,
                         shouldTouch: true,
                         shouldValidate: true,
@@ -256,7 +240,7 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                     type: 'button',
                     onClick: () => {
                       if (fields?.length === 1) {
-                        form.setValue('productType', PRODUCT_TYPE_MAP.SIMPLE);
+                        setValue('productType', PRODUCT_TYPE_MAP.SIMPLE);
                       }
                       remove(index);
                     },
@@ -269,9 +253,9 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                   buttonProps={{
                     type: 'button',
                     onClick: () => {
-                      form.setValue(`variants.${index}`, EMPTY_VARIANT);
+                      setValue(`variants.${index}`, EMPTY_VARIANT);
 
-                      form.clearErrors(`variants.${index}`);
+                      clearErrors(`variants.${index}`);
                     },
                   }}
                 />
@@ -282,7 +266,7 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
                   buttonProps={{
                     type: 'button',
                     onClick: () => {
-                      const currentVariant = form.getValues(`variants.${index}`);
+                      const currentVariant = getValues(`variants.${index}`);
                       const {
                         images,
                         label,
@@ -368,8 +352,8 @@ const VariantsFieldsTest = ({ form }: { form: UseFormReturn<TProductVariants> })
             </div>
           );
         })}
-    </div>
+    </form>
   );
 };
 
-export default VariantsFieldsTest;
+export default AddProductVariantsForm;

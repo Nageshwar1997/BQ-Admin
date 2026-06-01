@@ -75,10 +75,11 @@ export const getQuillValue = (value: string | undefined) => {
   return value !== '<p><br></p>' ? value : '';
 };
 
-const getErrorMessages = (fieldErrors?: FieldErrors<TProductMedia>): string[] | undefined => {
+export const toErrorMessageArray = <T extends FieldValues>(
+  fieldErrors?: FieldErrors<T>,
+): string[] | undefined => {
   if (!fieldErrors) return undefined;
 
-  // Direct message object
   if (
     typeof fieldErrors === 'object' &&
     'message' in fieldErrors &&
@@ -87,11 +88,8 @@ const getErrorMessages = (fieldErrors?: FieldErrors<TProductMedia>): string[] | 
     return [fieldErrors.message];
   }
 
-  // Array/object indexed errors
-  return (Object.keys(fieldErrors) as Array<keyof TProductMedia>)
-    .map((key) => {
-      const error = fieldErrors[key];
-
+  return Object.values(fieldErrors)
+    .map((error) => {
       if (
         error &&
         typeof error === 'object' &&
@@ -103,5 +101,5 @@ const getErrorMessages = (fieldErrors?: FieldErrors<TProductMedia>): string[] | 
 
       return null;
     })
-    .filter(Boolean) as string[];
+    .filter((message): message is string => !!message);
 };
