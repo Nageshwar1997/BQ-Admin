@@ -1,4 +1,5 @@
 import type { ICheckbox } from '@/types/input.type';
+import type { ChangeEvent } from 'react';
 import { InputError } from './children';
 
 const Checkbox = ({
@@ -9,6 +10,11 @@ const Checkbox = ({
   containerClassName = '',
   error,
 }: ICheckbox) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (checkboxProps.disabled) return;
+    register?.onChange?.(e);
+    checkboxProps?.onChange?.(e);
+  };
   return (
     <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
       <div className="flex items-center gap-2 sm:gap-3">
@@ -18,6 +24,7 @@ const Checkbox = ({
             className="peer sr-only outline-hidden"
             {...register}
             {...checkboxProps}
+            onChange={handleChange}
             id={checkboxProps?.id || checkboxProps?.name}
           />
           <span
