@@ -1,7 +1,7 @@
 import type { TFieldErrors } from '@/types/api.type';
 import type { IProcessQuillContent } from '@/types/input.type';
 import axios from 'axios';
-import type { FieldValues, Path, UseFormSetError } from 'react-hook-form';
+import type { FieldErrors, FieldValues, Path, UseFormSetError } from 'react-hook-form';
 import { toaster } from './common.util';
 
 export const setErrorToForm = <T extends FieldValues>(
@@ -73,4 +73,35 @@ export const processQuillContent = async ({
 
 export const getQuillValue = (value: string | undefined) => {
   return value !== '<p><br></p>' ? value : '';
+};
+
+const getErrorMessages = (fieldErrors?: FieldErrors<TProductMedia>): string[] | undefined => {
+  if (!fieldErrors) return undefined;
+
+  // Direct message object
+  if (
+    typeof fieldErrors === 'object' &&
+    'message' in fieldErrors &&
+    typeof fieldErrors.message === 'string'
+  ) {
+    return [fieldErrors.message];
+  }
+
+  // Array/object indexed errors
+  return (Object.keys(fieldErrors) as Array<keyof TProductMedia>)
+    .map((key) => {
+      const error = fieldErrors[key];
+
+      if (
+        error &&
+        typeof error === 'object' &&
+        'message' in error &&
+        typeof error.message === 'string'
+      ) {
+        return error.message;
+      }
+
+      return null;
+    })
+    .filter(Boolean) as string[];
 };
