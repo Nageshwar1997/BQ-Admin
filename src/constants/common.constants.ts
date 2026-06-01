@@ -159,43 +159,32 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
     description: 'Set product title, pricing, brand and category details',
     icon: 'solar:tag-price-linear',
   },
-
-  // {
-  //   title: 'Category and inventory',
-  //   description: 'Manage categories',
-  //   icon: 'solar:box-linear',
-  // },
-
   {
-    title: 'Media, gallery and Variants',
-    description: 'Upload thumbnail, product images, video and variants',
+    title: 'Media and gallery',
+    description: 'Upload thumbnail, product images and video',
     icon: 'solar:gallery-linear',
   },
-
   {
     title: 'Description and details',
-    description: 'Add descriptions, usage instructions and ingredients',
+    description:
+      'Add short description, full description, usage instructions, ingredients and additional details',
     icon: 'solar:document-text-linear',
   },
-
   {
-    title: 'Variants and pricing',
-    description: 'Configure variants, pricing and stock',
+    title: 'Product type and variants',
+    description: 'Set product type and Configure variants, pricing and stock',
     icon: 'solar:list-check-linear',
   },
-
   {
     title: 'TryOn configuration',
-    description: 'Setup TryOn model and related assets',
+    description: 'Setup TryOn type and configure TryOn details',
     icon: 'solar:face-scan-square-linear',
   },
-
   {
     title: 'SEO and visibility',
     description: 'Optimize search visibility and metadata',
     icon: 'solar:global-linear',
   },
-
   {
     title: 'Review and confirm',
     description: 'Verify all details before saving product',
