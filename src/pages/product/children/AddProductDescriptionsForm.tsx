@@ -4,7 +4,7 @@ import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import { productDescriptionSchema } from '@/schemas/product.schema';
 import type { TAddProductStepNumber } from '@/types/common.type';
 import type { TQuillImageRef } from '@/types/component.type';
-import type { TProductDescription } from '@/types/schema.type';
+import type { TBaseProduct, TProductDescription } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
 import { useRef, type RefObject } from 'react';
@@ -14,7 +14,7 @@ const AddProductDescriptionsForm = ({
   onNext,
   step,
 }: {
-  onNext: () => void;
+  onNext: (key: keyof TBaseProduct, value: TBaseProduct[keyof TBaseProduct]) => void;
   step: TAddProductStepNumber;
 }) => {
   const quillRefs: Record<
@@ -46,7 +46,7 @@ const AddProductDescriptionsForm = ({
 
   const onSubmit = (data: TProductDescription) => {
     console.log('🚀 ~ onSubmit ~ data:', data);
-    onNext();
+    onNext('description', data);
   };
 
   return (

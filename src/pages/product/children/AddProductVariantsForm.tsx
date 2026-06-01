@@ -12,7 +12,7 @@ import {
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import { productVariantsSchema } from '@/schemas/product.schema';
 import type { TAddProductStepNumber } from '@/types/common.type';
-import type { TProductVariants } from '@/types/schema.type';
+import type { TBaseProduct, TProductVariants } from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
 import { toErrorMessageArray } from '@/utils/form.util';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,7 +35,7 @@ const AddProductVariantsForm = ({
   onNext,
   step,
 }: {
-  onNext: () => void;
+  onNext: (key: keyof TBaseProduct, value: TBaseProduct[keyof TBaseProduct]) => void;
   step: TAddProductStepNumber;
 }) => {
   const {
@@ -61,7 +61,7 @@ const AddProductVariantsForm = ({
 
   const onSubmit = (data: TProductVariants) => {
     console.log('🚀 ~ onSubmit ~ data:', data);
-    onNext();
+    onNext("variants", data);
   };
 
   useEffect(() => {

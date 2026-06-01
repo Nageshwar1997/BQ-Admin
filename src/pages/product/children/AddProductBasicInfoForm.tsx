@@ -6,7 +6,7 @@ import { PRODUCT_BASIC_INFO_INPUT_MAP_DATA } from '@/constants/input.constants';
 import { productBasicInfoSchema } from '@/schemas/product.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { TAddProductStepNumber } from '@/types/common.type';
-import type { TProductBasicInfo } from '@/types/schema.type';
+import type { TBaseProduct, TProductBasicInfo } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
@@ -14,7 +14,7 @@ const AddProductBasicInfoForm = ({
   onNext,
   step,
 }: {
-  onNext: () => void;
+  onNext: (key: keyof TBaseProduct, value: TBaseProduct[keyof TBaseProduct]) => void;
   step: TAddProductStepNumber;
 }) => {
   const {
@@ -27,6 +27,7 @@ const AddProductBasicInfoForm = ({
 
   const l1Category = useWatch({ control, name: 'l1Category' });
   const l2Category = useWatch({ control, name: 'l2Category' });
+  const l3Category = useWatch({ control, name: 'l3Category' });
 
   const { data: l1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L1,
@@ -46,7 +47,12 @@ const AddProductBasicInfoForm = ({
 
   const onSubmit = (data: TProductBasicInfo) => {
     console.log('🚀 ~ onSubmit ~ data:', data);
-    onNext();
+    onNext('basicInfo', {
+      ...data,
+      l1CategoryName: l1Cats.find((cat) => cat._id === l1Category)?.name || '',
+      l2CategoryName: l2Cats.find((cat) => cat._id === l2Category)?.name || '',
+      l3CategoryName: l3Cats.find((cat) => cat._id === l3Category)?.name || '',
+    });
   };
 
   return (

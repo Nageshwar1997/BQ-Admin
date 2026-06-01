@@ -2,15 +2,15 @@ import Checkbox from '@/components/ui/inputs/Checkbox';
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import { confirmDetailsSchema } from '@/schemas/shared.schema';
 import type { TAddProductStepNumber } from '@/types/common.type';
-import type { TConfirmDetails } from '@/types/schema.type';
+import type { TBaseProduct, TConfirmDetails } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 const AddProductConfirmForm = ({
-  onNext,
+  values,
   step,
 }: {
-  onNext: () => void;
+  values: TBaseProduct;
   step: TAddProductStepNumber;
 }) => {
   const {
@@ -22,8 +22,8 @@ const AddProductConfirmForm = ({
   });
 
   const onSubmit = (data: TConfirmDetails) => {
+    console.log('🚀 ~ onSubmit ~ values:', values);
     console.log('🚀 ~ onSubmit ~ data:', data);
-    onNext();
   };
 
   return (

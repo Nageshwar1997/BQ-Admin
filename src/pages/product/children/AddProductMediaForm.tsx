@@ -3,7 +3,7 @@ import { EMPTY_ARRAY, FILE_MIME } from '@/constants/common.constants';
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import { productMediaSchema } from '@/schemas/product.schema';
 import type { TAddProductStepNumber } from '@/types/common.type';
-import type { TProductMedia } from '@/types/schema.type';
+import type { TBaseProduct, TProductMedia } from '@/types/schema.type';
 import { toErrorMessageArray } from '@/utils/form.util';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm, useWatch } from 'react-hook-form';
@@ -12,7 +12,7 @@ const AddProductMediaForm = ({
   onNext,
   step,
 }: {
-  onNext: () => void;
+  onNext: (key: keyof TBaseProduct, value: TBaseProduct[keyof TBaseProduct]) => void;
   step: TAddProductStepNumber;
 }) => {
   const {
@@ -33,7 +33,7 @@ const AddProductMediaForm = ({
 
   const onSubmit = (data: TProductMedia) => {
     console.log('🚀 ~ onSubmit ~ data:', data);
-    onNext();
+    onNext('media', data);
   };
 
   return (

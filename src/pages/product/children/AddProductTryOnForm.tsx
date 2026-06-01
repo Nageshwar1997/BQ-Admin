@@ -3,7 +3,7 @@ import Input from '@/components/ui/inputs/Input';
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import { productTryOnSchema } from '@/schemas/product.schema';
 import type { TAddProductStepNumber } from '@/types/common.type';
-import type { TProductTryOn } from '@/types/schema.type';
+import type { TBaseProduct, TProductTryOn } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
 
@@ -11,7 +11,7 @@ const AddProductTryOnForm = ({
   onNext,
   step,
 }: {
-  onNext: () => void;
+  onNext: (key: keyof TBaseProduct, value: TBaseProduct[keyof TBaseProduct]) => void;
   step: TAddProductStepNumber;
 }) => {
   const {
@@ -27,7 +27,7 @@ const AddProductTryOnForm = ({
 
   const onSubmit = (data: TProductTryOn) => {
     console.log('🚀 ~ onSubmit ~ data:', data);
-    onNext();
+    onNext('tryOn', data);
   };
 
   return (

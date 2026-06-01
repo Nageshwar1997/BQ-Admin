@@ -2,7 +2,7 @@ import Input from '@/components/ui/inputs/Input';
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import { productSeoSchema } from '@/schemas/product.schema';
 import type { TAddProductStepNumber } from '@/types/common.type';
-import type { TProductSeo } from '@/types/schema.type';
+import type { TBaseProduct, TProductSeo } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -10,7 +10,7 @@ const AddProductSeoForm = ({
   onNext,
   step,
 }: {
-  onNext: () => void;
+  onNext: (key: keyof TBaseProduct, value: TBaseProduct[keyof TBaseProduct]) => void;
   step: TAddProductStepNumber;
 }) => {
   const {
@@ -23,7 +23,7 @@ const AddProductSeoForm = ({
 
   const onSubmit = (data: TProductSeo) => {
     console.log('🚀 ~ onSubmit ~ data:', data);
-    onNext();
+    onNext('seo', data);
   };
 
   return (
