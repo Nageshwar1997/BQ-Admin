@@ -3,8 +3,6 @@ import {
   FILE_MIME,
   MAX_IMAGE_FILE_SIZE,
   MAX_VIDEO_FILE_SIZE,
-  PRODUCT_TYPE,
-  PRODUCT_TYPE_MAP,
   VARIANT_TYPE,
   VARIANT_TYPE_MAP,
 } from '@/constants/common.constants';
@@ -184,7 +182,9 @@ export const productDescriptionSchema = object({
 /* -------------------------------------------------------------------------- */
 
 export const productVariantsSchema = object({
-  productType: z_enum(PRODUCT_TYPE, { error: 'Product type is required.' }),
+  hasVariants: boolean({
+    error: 'Please specify whether this product has variants.',
+  }).optional(),
   variants: array(
     object({
       type: z_enum(VARIANT_TYPE, { error: 'Variant type is required.' }),
@@ -343,14 +343,8 @@ export const productVariantsSchema = object({
     }),
   ).optional(),
 }).superRefine((data, ctx) => {
-  if (
-    data.productType === PRODUCT_TYPE_MAP.VARIABLE &&
-    (!data.variants || data.variants.length === 0)
-  ) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'At least 1 variant is required.',
-    });
+  if (data.hasVariants && (!data.variants || data.variants.length === 0)) {
+    ctx.addIssue({ code: 'custom', message: 'At least 1 variant is required.' });
   }
 });
 

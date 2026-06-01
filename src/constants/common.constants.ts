@@ -232,13 +232,6 @@ export const FILE_EXTENSIONS = {
 
 export const DEFAULT_POSTER = '/images/logo/BQ_gradient_logo.webp';
 
-export const PRODUCT_TYPE_MAP = {
-  SIMPLE: 'Simple',
-  VARIABLE: 'Variable',
-} as const;
-
-export const PRODUCT_TYPE = Object.values(PRODUCT_TYPE_MAP);
-
 export const VARIANT_TYPE_MAP = { COLOR: 'Color', TEXT: 'Text' } as const;
 
 export const VARIANT_TYPE = Object.values(VARIANT_TYPE_MAP);

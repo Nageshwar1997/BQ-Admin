@@ -1,14 +1,9 @@
 import Button from '@/components/ui/Button';
+import Checkbox from '@/components/ui/inputs/Checkbox';
 import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
-import Select from '@/components/ui/inputs/Select';
-import {
-  EMPTY_ARRAY,
-  PRODUCT_TYPE_MAP,
-  VARIANT_TYPE,
-  VARIANT_TYPE_MAP,
-} from '@/constants/common.constants';
+import { EMPTY_ARRAY, VARIANT_TYPE, VARIANT_TYPE_MAP } from '@/constants/common.constants';
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import { productVariantsSchema } from '@/schemas/product.schema';
 import type { TAddProductStepNumber } from '@/types/common.type';
@@ -16,7 +11,6 @@ import type { TBaseProduct, TProductVariants } from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
 import { toErrorMessageArray } from '@/utils/form.util';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 const EMPTY_VARIANT = {
@@ -42,7 +36,6 @@ const AddProductVariantsForm = ({
     clearErrors,
     control,
     formState: { errors },
-    getValues,
     handleSubmit,
     register,
     resetField,
@@ -51,62 +44,51 @@ const AddProductVariantsForm = ({
 
   const { fields, append, remove } = useFieldArray({ control, name: 'variants' });
 
-  const productType = useWatch({
-    control,
-    name: 'productType',
-    defaultValue: PRODUCT_TYPE_MAP.SIMPLE,
-  });
+  const hasVariants = useWatch({ control, name: 'hasVariants', defaultValue: true });
 
   const variants = useWatch({ control, name: 'variants' });
 
   const onSubmit = (data: TProductVariants) => {
     console.log('🚀 ~ onSubmit ~ data:', data);
-    onNext("variants", data);
+    onNext('variants', data);
   };
 
-  useEffect(() => {
-    if (productType === PRODUCT_TYPE_MAP.VARIABLE && !fields.length) {
-      append(EMPTY_VARIANT);
-    }
-  }, [productType, fields.length, append]);
   return (
     <form
       id={ADD_PRODUCT_FORM_ID_MAP[step]}
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-6"
     >
-      <Controller
-        name="productType"
-        control={control}
-        defaultValue={PRODUCT_TYPE_MAP.SIMPLE}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            label="Product type"
-            error={errors.productType?.message}
-            options={[
-              { label: 'Simple without variants', value: PRODUCT_TYPE_MAP.SIMPLE },
-              {
-                label: 'Variable with variants',
-                value: PRODUCT_TYPE_MAP.VARIABLE,
-              },
-            ]}
-            selectProps={{
-              value,
-              placeholder: 'Select product type',
-              disabled: fields.length > 1,
-              onChange: (value) => {
-                if (fields.length <= 1) {
-                  onChange(value);
-                  if (value === PRODUCT_TYPE_MAP.SIMPLE) {
-                    resetField('variants');
-                  }
-                }
-              },
-            }}
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+        <Checkbox
+          error={errors.hasVariants?.message}
+          content="This product is available in multiple variants"
+          checkboxProps={{
+            name: 'confirm',
+            checked: hasVariants,
+            onChange: () => {
+              if (fields.length) {
+                return toaster.warning({
+                  title: 'Please remove the variants first',
+                  description: 'You cannot toggle this.',
+                });
+              }
+
+              setValue('hasVariants', !hasVariants);
+            },
+          }}
+        />
+        {hasVariants && !fields?.length && (
+          <Button
+            pattern="tertiary"
+            content="Add Variant"
+            className="h-10 w-auto!"
+            leftIcon={{ icon: 'solar:add-circle-linear' }}
+            buttonProps={{ onClick: () => append(EMPTY_VARIANT) }}
           />
         )}
-      />
-      {productType === PRODUCT_TYPE_MAP.VARIABLE &&
+      </div>
+      {hasVariants &&
         fields.map((field, index) => {
           const currentVariant = variants?.[index];
           return (
@@ -240,7 +222,7 @@ const AddProductVariantsForm = ({
                     type: 'button',
                     onClick: () => {
                       if (fields?.length === 1) {
-                        setValue('productType', PRODUCT_TYPE_MAP.SIMPLE);
+                        setValue('hasVariants', false);
                       }
                       remove(index);
                     },
@@ -254,7 +236,6 @@ const AddProductVariantsForm = ({
                     type: 'button',
                     onClick: () => {
                       setValue(`variants.${index}`, EMPTY_VARIANT);
-
                       clearErrors(`variants.${index}`);
                     },
                   }}
@@ -266,7 +247,7 @@ const AddProductVariantsForm = ({
                   buttonProps={{
                     type: 'button',
                     onClick: () => {
-                      const currentVariant = getValues(`variants.${index}`);
+                      const currentVariant = variants?.[index];
                       const {
                         images,
                         label,
