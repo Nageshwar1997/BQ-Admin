@@ -171,7 +171,7 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
     icon: 'solar:document-text-linear',
   },
   {
-    title: 'Product type and variants',
+    title: 'Product variants and stock',
     description: 'Set product type and Configure variants, pricing and stock',
     icon: 'solar:list-check-linear',
   },

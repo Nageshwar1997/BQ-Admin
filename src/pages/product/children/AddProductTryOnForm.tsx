@@ -1,5 +1,4 @@
 import Checkbox from '@/components/ui/inputs/Checkbox';
-import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import { ADD_PRODUCT_FORM_ID_MAP, TRY_ON_MAP, TRY_ON_TYPES } from '@/constants/form.constants';
 import { productTryOnSchema } from '@/schemas/product.schema';
@@ -25,14 +24,13 @@ const AddProductTryOnForm = ({
   } = useForm<TProductTryOn>({
     resolver: zodResolver(productTryOnSchema),
   });
-    console.log("🚀 ~ AddProductTryOnForm ~ errors:", errors)
 
-  const enableTryOn = useWatch({ control, name: 'enableTryOn' });
-  const tryOnType = useWatch({ control, name: 'type' });
+  const enabled = useWatch({ control, name: 'enabled' });
+  const tryOn = useWatch({ control, name: 'tryon' });
 
   const subTypes = useMemo(() => {
-    return tryOnType ? TRY_ON_MAP[tryOnType] : [];
-  }, [tryOnType]);
+    return tryOn?.type ? TRY_ON_MAP[tryOn.type] : [];
+  }, [tryOn?.type]);
 
   const onSubmit = (data: TProductTryOn) => {
     console.log('🚀 ~ onSubmit ~ data:', data);
@@ -46,30 +44,27 @@ const AddProductTryOnForm = ({
       className="grid gap-4"
     >
       <Checkbox
-        register={register('enableTryOn')}
-        error={errors.enableTryOn?.message}
+        register={register('enabled')}
+        error={errors.enabled?.message}
         content="Enable TryOn"
-        checkboxProps={{
-          name: 'enableTryOn',
-        }}
+        checkboxProps={{ name: 'enabled', onChange: () => resetField('tryon') }}
       />
-
-      {enableTryOn && (
+      {enabled && (
         <>
           <Controller
-            name="type"
+            name="tryon.type"
             control={control}
             render={({ field: { onChange, value } }) => (
               <Select
                 label="TryOn type"
-                error={'type' in errors ? errors.type?.message : undefined}
+                error={'tryon' in errors ? errors.tryon?.type?.message : undefined}
                 options={TRY_ON_TYPES.map((type) => ({ label: type, value: type }))}
                 selectProps={{
                   value,
                   placeholder: 'Select TryOn type',
                   onChange: (value) => {
                     onChange(value);
-                    resetField('subType');
+                    resetField('tryon.subType');
                   },
                 }}
                 optionsClassName="[&>ul>li>span]:lowercase [&>ul>li>span]:first-letter:capitalize"
@@ -78,39 +73,23 @@ const AddProductTryOnForm = ({
             )}
           />
           <Controller
-            name="subType"
+            name="tryon.subType"
             control={control}
             render={({ field: { onChange, value } }) => (
               <Select
                 label="TryOn sub-type"
-                error={'subType' in errors ? errors.subType?.message : undefined}
+                error={'tryon' in errors ? errors.tryon?.subType?.message : undefined}
                 options={subTypes.map((type) => ({ label: type, value: type }))}
                 selectProps={{
                   value,
                   placeholder: 'Select TryOn sub-type',
                   onChange,
+                  disabled: !tryOn?.type,
                 }}
                 optionsClassName="[&>ul>li>span]:lowercase [&>ul>li>span]:first-letter:capitalize"
                 className="[&>div>span]:lowercase [&>div>span]:first-letter:capitalize"
               />
             )}
-          />
-          <Input
-            label="TryOn model"
-            register={register('model')}
-            error={'model' in errors ? errors.model?.message : undefined}
-            inputProps={{
-              placeholder: 'Model URL',
-            }}
-          />
-
-          <Input
-            label="TryOn assets"
-            register={register('assets.0')}
-            error={'assets' in errors ? errors.assets?.message : undefined}
-            inputProps={{
-              placeholder: 'Asset URL',
-            }}
           />
         </>
       )}

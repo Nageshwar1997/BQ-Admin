@@ -18,7 +18,6 @@ import {
   number,
   object,
   string,
-  union,
   enum as z_enum,
 } from 'zod';
 
@@ -364,48 +363,50 @@ export const productVariantsSchema = object({
 /*                       STEP 5 : TRYON CONFIGURATION                         */
 /* -------------------------------------------------------------------------- */
 
-const enabledTryOnBaseSchema = object({
-  enableTryOn: literal(true),
-  model: string(),
-  assets: array(string()).min(1),
-});
+const enabledTryOnSchema = discriminatedUnion(
+  'type',
+  [
+    object({
+      type: literal(TRYON_TYPE.LIP),
+      subType: z_enum(TRY_ON_MAP[TRYON_TYPE.LIP], { error: `TryOn sub-type is required.` }),
+    }),
 
-const enabledTryOnSchema = discriminatedUnion('type', [
-  enabledTryOnBaseSchema.extend({
-    type: literal(TRYON_TYPE.LIP),
-    subType: z_enum(TRY_ON_MAP[TRYON_TYPE.LIP]),
-  }),
+    object({
+      type: literal(TRYON_TYPE.EYE),
+      subType: z_enum(TRY_ON_MAP[TRYON_TYPE.EYE], { error: `TryOn sub-type is required.` }),
+    }),
 
-  enabledTryOnBaseSchema.extend({
-    type: literal(TRYON_TYPE.EYE),
-    subType: z_enum(TRY_ON_MAP[TRYON_TYPE.EYE]),
-  }),
+    object({
+      type: literal(TRYON_TYPE.HAIR),
+      subType: z_enum(TRY_ON_MAP[TRYON_TYPE.HAIR], { error: `TryOn sub-type is required.` }),
+    }),
 
-  enabledTryOnBaseSchema.extend({
-    type: literal(TRYON_TYPE.HAIR),
-    subType: z_enum(TRY_ON_MAP[TRYON_TYPE.HAIR]),
-  }),
+    object({
+      type: literal(TRYON_TYPE.FACE),
+      subType: z_enum(TRY_ON_MAP[TRYON_TYPE.FACE], { error: `TryOn sub-type is required.` }),
+    }),
 
-  enabledTryOnBaseSchema.extend({
-    type: literal(TRYON_TYPE.FACE),
-    subType: z_enum(TRY_ON_MAP[TRYON_TYPE.FACE]),
-  }),
+    object({
+      type: literal(TRYON_TYPE.NAIL),
+      subType: z_enum(TRY_ON_MAP[TRYON_TYPE.NAIL], { error: `TryOn sub-type is required.` }),
+    }),
 
-  enabledTryOnBaseSchema.extend({
-    type: literal(TRYON_TYPE.NAIL),
-    subType: z_enum(TRY_ON_MAP[TRYON_TYPE.NAIL]),
-  }),
+    object({
+      type: literal(TRYON_TYPE.SKIN),
+      subType: z_enum(TRY_ON_MAP[TRYON_TYPE.SKIN], { error: `TryOn sub-type is required.` }),
+    }),
+  ],
+  { error: 'TryOn type is required.' },
+);
 
-  enabledTryOnBaseSchema.extend({
-    type: literal(TRYON_TYPE.SKIN),
-    subType: z_enum(TRY_ON_MAP[TRYON_TYPE.SKIN]),
-  }),
-]);
-
-export const productTryOnSchema = union([
-  enabledTryOnSchema,
-  object({ enableTryOn: literal(false) }),
-]);
+export const productTryOnSchema = discriminatedUnion(
+  'enabled',
+  [
+    object({ enabled: literal(false) }),
+    object({ enabled: literal(true), tryon: enabledTryOnSchema }),
+  ],
+  { error: 'TryOn is required.' },
+);
 
 /* -------------------------------------------------------------------------- */
 /*                       STEP 6 : SEO & VISIBILITY                            */
