@@ -23,10 +23,15 @@ const Select = ({
 
   const selected = options.find((opt) => opt.value === selectProps.value);
 
+  const handleToggle = () => {
+    if (selectProps?.disabled && !!options.length) return;
+    setIsOpen((prev) => !prev);
+  };
+
   useEffect(() => {
     if (isOpen && selectedOptionRef.current) {
       selectedOptionRef.current.scrollIntoView({
-        block: 'center',
+        block: 'end',
         inline: 'nearest',
         behavior: 'smooth',
       });
@@ -39,7 +44,7 @@ const Select = ({
       className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}
     >
       <div className="relative h-10 lg:h-12">
-        <InputLabel children={label} onClick={() => setIsOpen((prev) => !prev)} className="z-2" />
+        <InputLabel children={label} onClick={handleToggle} className="z-2" />
         <div
           className={`border-primary/10 bg-smoke-eerie flex h-full w-full items-center gap-1 overflow-hidden rounded-lg border ${className}`}
         >
@@ -63,7 +68,7 @@ const Select = ({
           </select> */}
           <div
             className={`text-primary line-clamp-1 flex h-full w-full flex-1 items-center justify-between border-none bg-transparent p-3 text-sm font-normal ${selectProps.disabled ? 'cursor-no-drop' : 'cursor-pointer'}`}
-            onClick={() => !selectProps?.disabled && setIsOpen((prev) => !prev)}
+            onClick={handleToggle}
           >
             <span className={`line-clamp-1 ${!selected?.value ? 'text-primary/50 text-xs' : ''}`}>
               {selected?.label || selectProps?.placeholder}
@@ -72,7 +77,7 @@ const Select = ({
               icon="solar:alt-arrow-down-linear"
               className={`size-4 transition-transform md:size-5 ${
                 isOpen ? 'rotate-180' : ''
-              } ${selected?.value ? 'text-primary' : 'text-primary/50'}`}
+              } ${selected?.value ? 'text-primary' : 'text-primary/30'}`}
             />
             {isOpen && options.length > 0 && (
               <div
@@ -87,7 +92,7 @@ const Select = ({
                       <li
                         key={option.value}
                         ref={active ? selectedOptionRef : null}
-                        className={`hover:bg-primary/10 text-tertiary flex cursor-pointer items-center justify-between gap-2 rounded-sm p-2 text-sm ${
+                        className={`hover:bg-primary/5 text-tertiary flex cursor-pointer items-center justify-between gap-2 rounded-sm p-2 text-sm ${
                           active ? 'bg-primary/8' : ''
                         }`}
                         onClick={(e) => {

@@ -54,3 +54,22 @@ export const ADD_PRODUCT_FORM_ID_MAP = {
   5: 'product-seo-form',
   6: 'product-confirm-form',
 } as const;
+
+export const TRY_ON_MAP = {
+  LIP: ['MATTE', 'GLOSS', 'SHIMMER', 'CRAYON'],
+  EYE: ['EYEBROW', 'EYELINER', 'KAJAL', 'EYESHADOW'],
+  HAIR: ['COLOR'],
+  FACE: ['CONCEALER', 'FOUNDATION', 'HIGHLIGHTER', 'BLUSH'],
+  NAIL: ['GEL', 'LIQUID'],
+  SKIN: ['MOISTURIZER', 'SERUM', 'TONER', 'CLEANSER'],
+} as const;
+
+export const TRY_ON_TYPES = Object.keys(TRY_ON_MAP) as (keyof typeof TRY_ON_MAP)[];
+
+export const TRYON_ALL_SUB_TYPES = Object.values(TRY_ON_MAP).flat();
+
+export const TRYON_TYPE = Object.fromEntries(
+  TRY_ON_TYPES.map((category) => [category, category]),
+) as {
+  [K in keyof typeof TRY_ON_MAP]: K;
+};

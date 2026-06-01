@@ -18,7 +18,7 @@ import AddProductTryOnForm from './children/AddProductTryOnForm';
 import AddProductVariantsForm from './children/AddProductVariantsForm';
 
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(3);
+  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(4);
 
   const { getValues, setValue, control } = useForm<TBaseProduct>({
     resolver: zodResolver(productBaseSchema),

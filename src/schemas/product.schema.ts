@@ -6,9 +6,21 @@ import {
   VARIANT_TYPE,
   VARIANT_TYPE_MAP,
 } from '@/constants/common.constants';
+import { TRY_ON_MAP, TRYON_TYPE } from '@/constants/form.constants';
 import { REGEX } from '@/constants/regex.constants';
 import { formatFileSize } from '@/utils/common.util';
-import { array, boolean, custom, number, object, string, enum as z_enum } from 'zod';
+import {
+  array,
+  boolean,
+  custom,
+  discriminatedUnion,
+  literal,
+  number,
+  object,
+  string,
+  union,
+  enum as z_enum,
+} from 'zod';
 
 /* -------------------------------------------------------------------------- */
 /*                             STEP 1 : BASIC INFO                            */
@@ -352,13 +364,48 @@ export const productVariantsSchema = object({
 /*                       STEP 5 : TRYON CONFIGURATION                         */
 /* -------------------------------------------------------------------------- */
 
-export const productTryOnSchema = object({
-  enableTryOn: boolean(),
-
-  model: string().optional(),
-
-  assets: array(string()).optional(),
+const enabledTryOnBaseSchema = object({
+  enableTryOn: literal(true),
+  model: string(),
+  assets: array(string()).min(1),
 });
+
+const enabledTryOnSchema = discriminatedUnion('type', [
+  enabledTryOnBaseSchema.extend({
+    type: literal(TRYON_TYPE.LIP),
+    subType: z_enum(TRY_ON_MAP[TRYON_TYPE.LIP]),
+  }),
+
+  enabledTryOnBaseSchema.extend({
+    type: literal(TRYON_TYPE.EYE),
+    subType: z_enum(TRY_ON_MAP[TRYON_TYPE.EYE]),
+  }),
+
+  enabledTryOnBaseSchema.extend({
+    type: literal(TRYON_TYPE.HAIR),
+    subType: z_enum(TRY_ON_MAP[TRYON_TYPE.HAIR]),
+  }),
+
+  enabledTryOnBaseSchema.extend({
+    type: literal(TRYON_TYPE.FACE),
+    subType: z_enum(TRY_ON_MAP[TRYON_TYPE.FACE]),
+  }),
+
+  enabledTryOnBaseSchema.extend({
+    type: literal(TRYON_TYPE.NAIL),
+    subType: z_enum(TRY_ON_MAP[TRYON_TYPE.NAIL]),
+  }),
+
+  enabledTryOnBaseSchema.extend({
+    type: literal(TRYON_TYPE.SKIN),
+    subType: z_enum(TRY_ON_MAP[TRYON_TYPE.SKIN]),
+  }),
+]);
+
+export const productTryOnSchema = union([
+  enabledTryOnSchema,
+  object({ enableTryOn: literal(false) }),
+]);
 
 /* -------------------------------------------------------------------------- */
 /*                       STEP 6 : SEO & VISIBILITY                            */
