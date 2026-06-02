@@ -58,7 +58,7 @@ const AddProductVariantsForm = ({
     <form
       id={ADD_PRODUCT_FORM_ID_MAP[step]}
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-6"
+      className="grid gap-6"
     >
       <Checkbox
         register={register('hasVariants')}
@@ -74,7 +74,8 @@ const AddProductVariantsForm = ({
           },
         }}
       />
-      {hasVariants &&
+
+      {hasVariants ? (
         fields.map((field, index) => {
           const currentVariant = variants?.[index];
           return (
@@ -318,7 +319,23 @@ const AddProductVariantsForm = ({
               </div>
             </div>
           );
-        })}
+        })
+      ) : (
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Stock"
+            register={register('stock', { valueAsNumber: true })}
+            error={errors.stock?.message}
+            inputProps={{ type: 'number', placeholder: '100' }}
+          />
+          <Input
+            label="Stock threshold"
+            register={register('stockThreshold', { valueAsNumber: true })}
+            error={errors.stockThreshold?.message}
+            inputProps={{ type: 'number', placeholder: '100' }}
+          />
+        </div>
+      )}
     </form>
   );
 };

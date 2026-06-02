@@ -15,6 +15,7 @@ import {
   custom,
   discriminatedUnion,
   literal,
+  nan,
   number,
   object,
   string,
@@ -196,6 +197,16 @@ export const productVariantsSchema = object({
   hasVariants: boolean({
     error: 'Please specify whether this product has variants.',
   }).optional(),
+  stock: number()
+    .min(1, 'Stock must be greater than 0.')
+    .max(100, 'Stock cannot exceed 100.')
+    .or(nan())
+    .optional(),
+  stockThreshold: number()
+    .min(1, 'Stock threshold must be greater than 0.')
+    .max(10, 'Stock threshold cannot exceed 10.')
+    .or(nan())
+    .optional(),
   variants: array(
     object({
       type: z_enum(VARIANT_TYPE, { error: 'Variant type is required.' }),
@@ -353,8 +364,23 @@ export const productVariantsSchema = object({
       }
     }),
   ).optional(),
-}).superRefine((data, ctx) => {
-  if (data.hasVariants && (!data.variants || data.variants.length === 0)) {
+}).superRefine(({ hasVariants, stock, stockThreshold, variants }, ctx) => {
+  console.log('🚀 ~ stockThreshold:', stockThreshold);
+  console.log('🚀 ~ stock:', stock);
+  if (!hasVariants) {
+    if (!stock) {
+      ctx.addIssue({ code: 'custom', path: ['stock'], message: 'Stock is required.' });
+    }
+
+    if (!stockThreshold) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['stockThreshold'],
+        message: 'Stock threshold is required.',
+      });
+    }
+  }
+  if (hasVariants && (!variants || variants.length === 0)) {
     ctx.addIssue({
       code: 'custom',
       message: "Don't have variants, Please uncheck it.",
