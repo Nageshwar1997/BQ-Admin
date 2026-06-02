@@ -11,7 +11,7 @@ import type {
   TextareaHTMLAttributes,
 } from 'react';
 import type { UseFormRegisterReturn, UseFormSetValue } from 'react-hook-form';
-import type { TClassName, TContainerClassName, TQuillImageRef } from './component.type';
+import type { ITooltip, TClassName, TContainerClassName, TQuillImageRef } from './component.type';
 
 type LeftIcon = { left: IconProps | string; right?: never };
 
@@ -36,6 +36,8 @@ export interface IInput extends IBaseInput {
 export interface ICheckbox extends Omit<IBaseInput, 'needRef' | 'icons' | 'label'> {
   content?: string | ReactNode;
   checkboxProps: Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
+  tooltipRequired?: boolean;
+  tooltip?: Pick<ITooltip, 'required' | 'description' | 'title' | 'placement'>;
 }
 
 type TOption = { label: string | ReactNode; value: string };

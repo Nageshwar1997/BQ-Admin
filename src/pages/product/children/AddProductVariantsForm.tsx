@@ -63,7 +63,16 @@ const AddProductVariantsForm = ({
       <Checkbox
         register={register('hasVariants')}
         error={errors.hasVariants?.message}
-        content="This product is available in multiple variants"
+        content={
+          <div className="grid">
+            <p>Product has variants</p>
+            {!fields.length && (
+              <p className="text-rose-c text-[10px]">
+                If variants are added, stock and threshold will be managed per variant.
+              </p>
+            )}
+          </div>
+        }
         checkboxProps={{
           name: 'hasVariants',
           disabled: !!fields.length,
@@ -72,6 +81,12 @@ const AddProductVariantsForm = ({
               append(EMPTY_VARIANT);
             }
           },
+        }}
+        tooltip={{
+          title: 'Variants exist',
+          description: 'Remove all variants to disable.',
+          required: !!fields.length,
+          placement: 'right',
         }}
       />
 
