@@ -365,8 +365,6 @@ export const productVariantsSchema = object({
     }),
   ).optional(),
 }).superRefine(({ hasVariants, stock, stockThreshold, variants }, ctx) => {
-  console.log('🚀 ~ stockThreshold:', stockThreshold);
-  console.log('🚀 ~ stock:', stock);
   if (!hasVariants) {
     if (!stock) {
       ctx.addIssue({ code: 'custom', path: ['stock'], message: 'Stock is required.' });
