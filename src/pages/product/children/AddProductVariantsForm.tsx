@@ -62,7 +62,7 @@ const AddProductVariantsForm = ({
     >
       <Checkbox
         register={register('hasVariants')}
-        error={errors.variants?.message || errors.hasVariants?.message}
+        error={errors.hasVariants?.message}
         content="This product is available in multiple variants"
         checkboxProps={{
           name: 'hasVariants',
@@ -78,6 +78,7 @@ const AddProductVariantsForm = ({
       {hasVariants ? (
         fields.map((field, index) => {
           const currentVariant = variants?.[index];
+          const error = 'variants' in errors ? errors.variants?.[index] : undefined;
           return (
             <div
               key={field.id}
@@ -93,14 +94,14 @@ const AddProductVariantsForm = ({
                     onChange={onChange}
                     options={VARIANT_TYPE.map((type) => ({ label: type, value: type }))}
                     containerClassName="sm:col-span-2 max-w-xs w-full mx-auto mb-2"
-                    error={errors.variants?.[index]?.type?.message}
+                    error={error?.type?.message}
                   />
                 )}
               />
               <Input
                 label="Variant name"
                 register={register(`variants.${index}.label`)}
-                error={errors.variants?.[index]?.label?.message}
+                error={error?.label?.message}
                 inputProps={{ placeholder: 'Black' }}
               />
               <Input
@@ -110,7 +111,7 @@ const AddProductVariantsForm = ({
                     : 'Variant value'
                 }
                 register={register(`variants.${index}.value`)}
-                error={errors.variants?.[index]?.value?.message}
+                error={error?.value?.message}
                 inputProps={{
                   placeholder: currentVariant?.type === VARIANT_TYPE_MAP.COLOR ? '#000000' : '50ml',
                 }}
@@ -118,19 +119,19 @@ const AddProductVariantsForm = ({
               <Input
                 label="Original Price"
                 register={register(`variants.${index}.originalPrice`, { valueAsNumber: true })}
-                error={errors.variants?.[index]?.originalPrice?.message}
+                error={error?.originalPrice?.message}
                 inputProps={{ type: 'number', placeholder: '999' }}
               />
               <Input
                 label="Discounted price"
                 register={register(`variants.${index}.sellingPrice`, { valueAsNumber: true })}
-                error={errors.variants?.[index]?.sellingPrice?.message}
+                error={error?.sellingPrice?.message}
                 inputProps={{ type: 'number', placeholder: '799' }}
               />
               <Input
                 label="Stock"
                 register={register(`variants.${index}.stock`, { valueAsNumber: true })}
-                error={errors.variants?.[index]?.stock?.message}
+                error={error?.stock?.message}
                 inputProps={{ type: 'number', placeholder: '100' }}
               />
               <Input
@@ -138,7 +139,7 @@ const AddProductVariantsForm = ({
                 register={register(`variants.${index}.stockThreshold`, {
                   valueAsNumber: true,
                 })}
-                error={errors.variants?.[index]?.stockThreshold?.message}
+                error={error?.stockThreshold?.message}
                 inputProps={{ type: 'number', placeholder: '100' }}
               />
               <Controller
@@ -155,9 +156,7 @@ const AddProductVariantsForm = ({
                       onChange: ({ target: { files } }) => onChange(files?.[0]),
                       value,
                     }}
-                    errors={toErrorMessageArray<TProductVariants>(
-                      errors.variants?.[index]?.thumbnail,
-                    )}
+                    errors={toErrorMessageArray<TProductVariants>(error?.thumbnail)}
                     handleRemove={() => resetField(`variants.${index}.thumbnail`)}
                   />
                 )}
@@ -183,7 +182,7 @@ const AddProductVariantsForm = ({
                       },
                       value,
                     }}
-                    errors={toErrorMessageArray<TProductVariants>(errors.variants?.[index]?.images)}
+                    errors={toErrorMessageArray<TProductVariants>(error?.images)}
                     handleRemove={(index) => {
                       const oldImages = field?.images || EMPTY_ARRAY;
 
@@ -325,13 +324,13 @@ const AddProductVariantsForm = ({
           <Input
             label="Stock"
             register={register('stock', { valueAsNumber: true })}
-            error={errors.stock?.message}
+            error={'stock' in errors ? errors.stock?.message : undefined}
             inputProps={{ type: 'number', placeholder: '100' }}
           />
           <Input
             label="Stock threshold"
             register={register('stockThreshold', { valueAsNumber: true })}
-            error={errors.stockThreshold?.message}
+            error={'stockThreshold' in errors ? errors.stockThreshold?.message : undefined}
             inputProps={{ type: 'number', placeholder: '100' }}
           />
         </div>

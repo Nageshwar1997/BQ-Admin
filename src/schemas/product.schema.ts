@@ -11,11 +11,9 @@ import { REGEX } from '@/constants/regex.constants';
 import { formatFileSize } from '@/utils/common.util';
 import {
   array,
-  boolean,
   custom,
   discriminatedUnion,
   literal,
-  nan,
   number,
   object,
   string,
@@ -193,199 +191,201 @@ export const productDescriptionSchema = object({
 /*                  STEP 4 : VARIANTS & SPECIFICATIONS                        */
 /* -------------------------------------------------------------------------- */
 
-export const productVariantsSchema = object({
-  hasVariants: boolean({
-    error: 'Please specify whether this product has variants.',
-  }).optional(),
-  stock: number()
+const variantSchema = object({
+  type: z_enum(VARIANT_TYPE, { error: 'Variant type is required.' }),
+
+  label: string({ error: 'Variant label is required.' })
+    .min(1, 'Variant label is required.')
+    .min(2, 'Variant label must be at least 2 characters.')
+    .max(100, 'Variant label cannot exceed 100 characters.'),
+
+  value: string({ error: 'Variant value is required.' }).min(1, 'Variant value is required.'),
+
+  originalPrice: number({ error: 'Original price is required.' }).min(
+    1,
+    'Original price must be greater than 0.',
+  ),
+
+  sellingPrice: number({ error: 'Selling price is required.' }).min(
+    1,
+    'Selling price must be greater than 0.',
+  ),
+
+  stock: number({ error: 'Stock is required' })
+    .int('Stock must be a whole number.')
     .min(1, 'Stock must be greater than 0.')
-    .max(100, 'Stock cannot exceed 100.')
-    .or(nan())
-    .optional(),
-  stockThreshold: number()
+    .max(100, 'Stock cannot exceed 100.'),
+  stockThreshold: number({ error: 'Stock threshold is required' })
+    .int('Stock threshold must be a whole number.')
     .min(1, 'Stock threshold must be greater than 0.')
-    .max(10, 'Stock threshold cannot exceed 10.')
-    .or(nan())
+    .max(10, 'Stock threshold cannot exceed 10.'),
+  thumbnail: custom<File | string>((value) => !!value, { error: 'Variant thumbnail is required.' })
+    .superRefine((value, ctx) => {
+      if (value instanceof File) {
+        if (value.size > MAX_IMAGE_FILE_SIZE) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Variant thumbnail size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
+          });
+        }
+
+        const fileTypes: readonly string[] = FILE_MIME.image;
+
+        if (!fileTypes.includes(value.type)) {
+          ctx.addIssue({
+            code: 'custom',
+            message: `Variant thumbnail type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+          });
+        }
+      } else if (typeof value === 'string') {
+        if (!value.trim()) {
+          ctx.addIssue({ code: 'custom', message: 'Variant thumbnail URL cannot be empty.' });
+        } else if (!REGEX.URL.test(value)) {
+          ctx.addIssue({ code: 'custom', message: 'Invalid variant thumbnail URL.' });
+        }
+      } else {
+        ctx.addIssue({ code: 'custom', message: 'Invalid variant thumbnail.' });
+      }
+    })
     .optional(),
-  variants: array(
-    object({
-      type: z_enum(VARIANT_TYPE, { error: 'Variant type is required.' }),
+  images: array(
+    custom<File | string>((value) => !!value, { error: 'Variant image is required.' }),
+    { error: 'At least one variant image is required.' },
+  )
+    .min(1, { message: 'At least one variant image is required.' })
+    .max(10, { message: 'Maximum of 10 variant images are allowed.' })
+    .superRefine((items, ctx) => {
+      items.forEach((item, index) => {
+        const imageLabel = `Variant-image ${index + 1}`;
 
-      label: string({ error: 'Variant label is required.' })
-        .min(1, 'Variant label is required.')
-        .min(2, 'Variant label must be at least 2 characters.')
-        .max(100, 'Variant label cannot exceed 100 characters.'),
-
-      value: string({ error: 'Variant value is required.' }).min(1, 'Variant value is required.'),
-
-      originalPrice: number({
-        error: 'Original price is required.',
-      }).min(1, 'Original price must be greater than 0.'),
-
-      sellingPrice: number({
-        error: 'Selling price is required.',
-      }).min(1, 'Selling price must be greater than 0.'),
-
-      stock: number({
-        error: 'Stock is required.',
-      })
-        .min(1, 'Stock must be greater than 0.')
-        .max(100, 'Stock cannot exceed 100.'),
-      stockThreshold: number({
-        error: 'Stock threshold is required.',
-      })
-        .min(1, 'Stock threshold must be greater than 0.')
-        .max(10, 'Stock threshold cannot exceed 10.'),
-      thumbnail: custom<File | string>((value) => !!value, {
-        error: 'Variant thumbnail is required.',
-      })
-        .superRefine((value, ctx) => {
-          if (value instanceof File) {
-            if (value.size > MAX_IMAGE_FILE_SIZE) {
-              ctx.addIssue({
-                code: 'custom',
-                message: `Variant thumbnail size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
-              });
-            }
-
-            const fileTypes: readonly string[] = FILE_MIME.image;
-
-            if (!fileTypes.includes(value.type)) {
-              ctx.addIssue({
-                code: 'custom',
-                message: `Variant thumbnail type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
-              });
-            }
-          } else if (typeof value === 'string') {
-            if (!value.trim()) {
-              ctx.addIssue({ code: 'custom', message: 'Variant thumbnail URL cannot be empty.' });
-            } else if (!REGEX.URL.test(value)) {
-              ctx.addIssue({ code: 'custom', message: 'Invalid variant thumbnail URL.' });
-            }
-          } else {
-            ctx.addIssue({ code: 'custom', message: 'Invalid variant thumbnail.' });
+        if (typeof item === 'string') {
+          if (!item.trim()) {
+            ctx.addIssue({
+              code: 'custom',
+              path: [index],
+              message: `${imageLabel} URL cannot be empty.`,
+            });
+          } else if (!REGEX.URL.test(item)) {
+            ctx.addIssue({
+              code: 'custom',
+              path: [index],
+              message: `${imageLabel} URL is invalid.`,
+            });
           }
-        })
-        .optional(),
-      images: array(
-        custom<File | string>((value) => !!value, { error: 'Variant image is required.' }),
-        { error: 'At least one variant image is required.' },
-      )
-        .min(1, { message: 'At least one variant image is required.' })
-        .max(10, { message: 'Maximum of 10 variant images are allowed.' })
-        .superRefine((items, ctx) => {
-          items.forEach((item, index) => {
-            const imageLabel = `Variant-image ${index + 1}`;
+        } else if (item instanceof File) {
+          if (item.size > MAX_IMAGE_FILE_SIZE) {
+            ctx.addIssue({
+              code: 'custom',
+              path: [index],
+              message: `${imageLabel} size is ${formatFileSize(item.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
+            });
+          }
 
-            if (typeof item === 'string') {
-              if (!item.trim()) {
-                ctx.addIssue({
-                  code: 'custom',
-                  path: [index],
-                  message: `${imageLabel} URL cannot be empty.`,
-                });
-              } else if (!REGEX.URL.test(item)) {
-                ctx.addIssue({
-                  code: 'custom',
-                  path: [index],
-                  message: `${imageLabel} URL is invalid.`,
-                });
-              }
-            } else if (item instanceof File) {
-              if (item.size > MAX_IMAGE_FILE_SIZE) {
-                ctx.addIssue({
-                  code: 'custom',
-                  path: [index],
-                  message: `${imageLabel} size is ${formatFileSize(item.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
-                });
-              }
+          const fileTypes: readonly string[] = FILE_MIME.image;
 
-              const fileTypes: readonly string[] = FILE_MIME.image;
-
-              if (!fileTypes.includes(item.type)) {
-                ctx.addIssue({
-                  code: 'custom',
-                  path: [index],
-                  message: `${imageLabel} type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
-                });
-              }
-            } else {
-              ctx.addIssue({ code: 'custom', path: [index], message: `${imageLabel} is invalid.` });
-            }
-          });
-        }),
-    }).superRefine((data, ctx) => {
-      /* -------------------------------------------------------------------------- */
-      /*                               COMMON CHECKS                                 */
-      /* -------------------------------------------------------------------------- */
-
-      if (data.sellingPrice !== undefined && data.sellingPrice > data.originalPrice) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['sellingPrice'],
-          message: 'Selling price cannot be greater than original price.',
-        });
-      }
-
-      /* -------------------------------------------------------------------------- */
-      /*                               COLOR VARIANT                                */
-      /* -------------------------------------------------------------------------- */
-
-      if (data.type === VARIANT_TYPE_MAP.COLOR && data.value) {
-        const isValidHex = REGEX.HEX_CODE.test(data.value);
-        if (!isValidHex) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['value'],
-            message: 'Invalid hex color code.',
-          });
+          if (!fileTypes.includes(item.type)) {
+            ctx.addIssue({
+              code: 'custom',
+              path: [index],
+              message: `${imageLabel} type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+            });
+          }
+        } else {
+          ctx.addIssue({ code: 'custom', path: [index], message: `${imageLabel} is invalid.` });
         }
-      }
-
-      /* -------------------------------------------------------------------------- */
-      /*                                TEXT VARIANT                                */
-      /* -------------------------------------------------------------------------- */
-
-      if (data.type === VARIANT_TYPE_MAP.TEXT && data.value) {
-        if (data.value.trim().length > 50) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['value'],
-            message: 'Variant value cannot exceed 50 characters.',
-          });
-        }
-        if (data.value.trim().length < 2) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['value'],
-            message: 'Variant value must be at least 2 character.',
-          });
-        }
-      }
+      });
     }),
-  ).optional(),
-}).superRefine(({ hasVariants, stock, stockThreshold, variants }, ctx) => {
-  if (!hasVariants) {
-    if (!stock) {
-      ctx.addIssue({ code: 'custom', path: ['stock'], message: 'Stock is required.' });
-    }
+}).superRefine((data, ctx) => {
+  /* -------------------------------------------------------------------------- */
+  /*                               COMMON CHECKS                                 */
+  /* -------------------------------------------------------------------------- */
 
-    if (!stockThreshold) {
+  if (data.sellingPrice !== undefined && data.sellingPrice > data.originalPrice) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['sellingPrice'],
+      message: 'Selling price cannot be greater than original price.',
+    });
+  }
+
+  if (data.stockThreshold >= data.stock) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['stockThreshold'],
+      message: 'Stock threshold must be less than stock.',
+    });
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /*                               COLOR VARIANT                                */
+  /* -------------------------------------------------------------------------- */
+
+  if (data.type === VARIANT_TYPE_MAP.COLOR && data.value) {
+    const isValidHex = REGEX.HEX_CODE.test(data.value);
+    if (!isValidHex) {
       ctx.addIssue({
         code: 'custom',
-        path: ['stockThreshold'],
-        message: 'Stock threshold is required.',
+        path: ['value'],
+        message: 'Invalid hex color code.',
       });
     }
   }
-  if (hasVariants && (!variants || variants.length === 0)) {
+
+  /* -------------------------------------------------------------------------- */
+  /*                                TEXT VARIANT                                */
+  /* -------------------------------------------------------------------------- */
+
+  if (data.type === VARIANT_TYPE_MAP.TEXT && data.value) {
+    if (data.value.trim().length > 50) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['value'],
+        message: 'Variant value cannot exceed 50 characters.',
+      });
+    }
+    if (data.value.trim().length < 2) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['value'],
+        message: 'Variant value must be at least 2 character.',
+      });
+    }
+  }
+});
+
+const withoutVariantsSchema = object({
+  hasVariants: literal(false),
+  stock: number({ error: 'Stock is required' })
+    .int('Stock must be a whole number.')
+    .min(1, 'Stock must be greater than 0.')
+    .max(100, 'Stock cannot exceed 100.'),
+  stockThreshold: number({ error: 'Stock threshold is required' })
+    .int('Stock threshold must be a whole number.')
+    .min(1, 'Stock threshold must be greater than 0.')
+    .max(10, 'Stock threshold cannot exceed 10.'),
+}).superRefine((data, ctx) => {
+  if (data.stockThreshold >= data.stock) {
     ctx.addIssue({
       code: 'custom',
-      message: "Don't have variants, Please uncheck it.",
-      path: ['variants'],
+      path: ['stockThreshold'],
+      message: 'Stock threshold must be less than stock.',
     });
   }
 });
+
+const withVariantsSchema = object({
+  hasVariants: literal(true),
+  variants: array(variantSchema, { error: 'At least one variant is required.' }).min(
+    1,
+    'Minimum one variant is required.',
+  ),
+});
+
+export const productVariantsSchema = discriminatedUnion(
+  'hasVariants',
+  [withoutVariantsSchema, withVariantsSchema],
+  { error: 'Please specify whether product has variants.' },
+);
 
 /* -------------------------------------------------------------------------- */
 /*                       STEP 5 : TRYON CONFIGURATION                         */
