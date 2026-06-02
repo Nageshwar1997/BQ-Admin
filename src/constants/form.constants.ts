@@ -51,8 +51,7 @@ export const ADD_PRODUCT_FORM_ID_MAP = {
   2: 'product-description-form',
   3: 'product-variants-form',
   4: 'product-tryon-form',
-  5: 'product-seo-form',
-  6: 'product-confirm-form',
+  5: 'product-confirm-form',
 } as const;
 
 export const TRY_ON_MAP = {

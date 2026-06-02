@@ -13,7 +13,6 @@ import AddProductBasicInfoForm from './children/AddProductBasicInfoForm';
 import AddProductConfirmForm from './children/AddProductConfirmForm';
 import AddProductDescriptionsForm from './children/AddProductDescriptionsForm';
 import AddProductMediaForm from './children/AddProductMediaForm';
-import AddProductSeoForm from './children/AddProductSeoForm';
 import AddProductTryOnForm from './children/AddProductTryOnForm';
 import AddProductVariantsForm from './children/AddProductVariantsForm';
 
@@ -49,7 +48,6 @@ const AddNewProduct = () => {
     <AddProductDescriptionsForm step={activeStep} onNext={handleNext} />,
     <AddProductVariantsForm step={activeStep} onNext={handleNext} />,
     <AddProductTryOnForm step={activeStep} onNext={handleNext} />,
-    <AddProductSeoForm step={activeStep} onNext={handleNext} />,
     <AddProductConfirmForm step={activeStep} values={getValues()} />,
   ];
 

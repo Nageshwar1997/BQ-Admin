@@ -355,7 +355,11 @@ export const productVariantsSchema = object({
   ).optional(),
 }).superRefine((data, ctx) => {
   if (data.hasVariants && (!data.variants || data.variants.length === 0)) {
-    ctx.addIssue({ code: 'custom', message: 'At least 1 variant is required.' });
+    ctx.addIssue({
+      code: 'custom',
+      message: "Don't have variants, Please uncheck it.",
+      path: ['variants'],
+    });
   }
 });
 
@@ -409,16 +413,8 @@ export const productTryOnSchema = discriminatedUnion(
 );
 
 /* -------------------------------------------------------------------------- */
-/*                       STEP 6 : SEO & VISIBILITY                            */
+/*                       STEP 6 : CONFIRM DETAILS (View)                            */
 /* -------------------------------------------------------------------------- */
-
-export const productSeoSchema = object({
-  seoTitle: string().max(70, 'SEO title cannot exceed 70 characters.').optional(),
-
-  seoDescription: string().max(160, 'SEO description cannot exceed 160 characters.').optional(),
-
-  seoKeywords: array(string()).optional(),
-});
 
 export const productBaseSchema = object({
   basicInfo: productBasicInfoSchema
@@ -428,5 +424,4 @@ export const productBaseSchema = object({
   description: productDescriptionSchema.optional(),
   variants: productVariantsSchema.optional(),
   tryOn: productTryOnSchema.optional(),
-  seo: productSeoSchema.optional(),
 });

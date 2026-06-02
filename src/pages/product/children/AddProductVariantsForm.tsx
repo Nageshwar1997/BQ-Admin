@@ -41,10 +41,11 @@ const AddProductVariantsForm = ({
     resetField,
     setValue,
   } = useForm<TProductVariants>({ resolver: zodResolver(productVariantsSchema) });
+  console.log('🚀 ~ AddProductVariantsForm ~ errors:', errors);
 
   const { fields, append, remove } = useFieldArray({ control, name: 'variants' });
 
-  const hasVariants = useWatch({ control, name: 'hasVariants', defaultValue: true });
+  const hasVariants = useWatch({ control, name: 'hasVariants' });
 
   const variants = useWatch({ control, name: 'variants' });
 
@@ -59,35 +60,20 @@ const AddProductVariantsForm = ({
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-6"
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
-        <Checkbox
-          error={errors.hasVariants?.message}
-          content="This product is available in multiple variants"
-          checkboxProps={{
-            name: 'confirm',
-            checked: hasVariants,
-            onChange: () => {
-              if (fields.length) {
-                return toaster.warning({
-                  title: 'Please remove the variants first',
-                  description: 'You cannot toggle this.',
-                });
-              }
-
-              setValue('hasVariants', !hasVariants);
-            },
-          }}
-        />
-        {hasVariants && !fields?.length && (
-          <Button
-            pattern="tertiary"
-            content="Add Variant"
-            className="h-10 w-auto!"
-            leftIcon={{ icon: 'solar:add-circle-linear' }}
-            buttonProps={{ onClick: () => append(EMPTY_VARIANT) }}
-          />
-        )}
-      </div>
+      <Checkbox
+        register={register('hasVariants')}
+        error={errors.variants?.message || errors.hasVariants?.message}
+        content="This product is available in multiple variants"
+        checkboxProps={{
+          name: 'hasVariants',
+          disabled: !!fields.length,
+          onChange: () => {
+            if (!fields.length) {
+              append(EMPTY_VARIANT);
+            }
+          },
+        }}
+      />
       {hasVariants &&
         fields.map((field, index) => {
           const currentVariant = variants?.[index];

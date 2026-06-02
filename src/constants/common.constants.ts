@@ -181,11 +181,6 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
     icon: 'solar:face-scan-square-linear',
   },
   {
-    title: 'SEO and visibility',
-    description: 'Optimize search visibility and metadata',
-    icon: 'solar:global-linear',
-  },
-  {
     title: 'Review and confirm',
     description: 'Verify all details before saving product',
     icon: 'solar:check-circle-linear',
