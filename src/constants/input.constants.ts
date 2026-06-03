@@ -124,6 +124,24 @@ export const PRODUCT_BASIC_INFO_INPUT_MAP_DATA = [
   },
 ] as const;
 
+export const PRODUCT_CATEGORIES_SELECT_MAP_DATA = [
+  {
+    name: 'l1Category',
+    label: 'Main category',
+    placeholder: 'Select (L1) main category',
+  },
+  {
+    name: 'l2Category',
+    label: 'Sub-category',
+    placeholder: 'Select (L2) sub-category',
+  },
+  {
+    name: 'l3Category',
+    label: 'Product category',
+    placeholder: 'Select (L3) product category',
+  },
+] as const;
+
 export const DEFAULT_QUILL_LINK_ID = 'custom-link-btn' as const;
 
 export const defaultQuillToolbar: TQuillToolbar = [

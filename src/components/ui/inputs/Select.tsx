@@ -24,7 +24,7 @@ const Select = ({
   const selected = options.find((opt) => opt.value === selectProps.value);
 
   const handleToggle = () => {
-    if (selectProps?.disabled && !!options.length) return;
+    if (selectProps?.disabled || !!options.length) return;
     setIsOpen((prev) => !prev);
   };
 
