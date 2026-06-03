@@ -8,6 +8,7 @@ import {
   productBasicInfoSchema,
   productDescriptionAndContentSchema,
   productMediaAndGallerySchema,
+  productStockAndVariantsSchema,
 } from '@/schemas/product.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type {
@@ -21,6 +22,7 @@ import type {
   TProductBasicInfo,
   TProductDescriptionAndContent,
   TProductMediaAndGallery,
+  TProductStockAndVariants,
 } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
@@ -64,6 +66,10 @@ const AddNewProduct = () => {
 
   const descriptionAndContentForm = useForm<TProductDescriptionAndContent>({
     resolver: zodResolver(productDescriptionAndContentSchema),
+  });
+
+  const stockAndVariantsForm = useForm<TProductStockAndVariants>({
+    resolver: zodResolver(productStockAndVariantsSchema),
   });
 
   const l1Category = useWatch({ control: basicInfoForm.control, name: 'l1Category' });
@@ -112,6 +118,11 @@ const AddNewProduct = () => {
     handleNext();
   };
 
+  const onStockAndVariantsSubmit = (data: TProductStockAndVariants) => {
+    console.log('onStockAndVariantsSubmit data', data);
+    handleNext();
+  };
+
   const handleBack = () => {
     setActiveStep((prev) => (prev > 0 ? prev - 1 : prev) as TAddProductStepNumber);
   };
@@ -146,8 +157,11 @@ const AddNewProduct = () => {
         quillRefs={quillRefs}
       />
     </form>,
-    <form id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
-      <AddProductVariantsForm step={activeStep} onNext={handleNext} />
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+      onSubmit={stockAndVariantsForm.handleSubmit(onStockAndVariantsSubmit)}
+    >
+      <AddProductVariantsForm form={stockAndVariantsForm} />
     </form>,
     <form id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
       <AddProductTryOnForm step={activeStep} onNext={handleNext} />

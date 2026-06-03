@@ -381,7 +381,7 @@ const withVariantsSchema = object({
   ),
 });
 
-export const productVariantsSchema = discriminatedUnion(
+export const productStockAndVariantsSchema = discriminatedUnion(
   'hasVariants',
   [withoutVariantsSchema, withVariantsSchema],
   { error: 'Please specify whether product has variants.' },
@@ -446,6 +446,6 @@ export const productBaseSchema = object({
     .optional(),
   media: productMediaAndGallerySchema.optional(),
   description: productDescriptionAndContentSchema.optional(),
-  variants: productVariantsSchema.optional(),
+  variants: productStockAndVariantsSchema.optional(),
   tryOn: productTryOnSchema.optional(),
 });

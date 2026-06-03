@@ -4,14 +4,12 @@ import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
 import { EMPTY_ARRAY, VARIANT_TYPE, VARIANT_TYPE_MAP } from '@/constants/common.constants';
-import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
-import { productVariantsSchema } from '@/schemas/product.schema';
-import type { TAddProductStepNumber } from '@/types/common.type';
-import type { TBaseProduct, TProductVariants } from '@/types/schema.type';
+import type { TProductStockAndVariants } from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
 import { toErrorMessageArray } from '@/utils/form.util';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { Controller, useFieldArray, useWatch, type UseFormReturn } from 'react-hook-form';
+
+type Props = { form: UseFormReturn<TProductStockAndVariants> };
 
 const EMPTY_VARIANT = {
   type: VARIANT_TYPE_MAP.COLOR,
@@ -25,23 +23,15 @@ const EMPTY_VARIANT = {
   images: [],
 };
 
-const AddProductVariantsForm = ({
-  onNext,
-  step,
-}: {
-  onNext: (key: keyof TBaseProduct, value: TBaseProduct[keyof TBaseProduct]) => void;
-  step: TAddProductStepNumber;
-}) => {
+const AddProductVariantsForm = ({ form }: Props) => {
   const {
     clearErrors,
     control,
     formState: { errors },
-    handleSubmit,
     register,
     resetField,
     setValue,
-  } = useForm<TProductVariants>({ resolver: zodResolver(productVariantsSchema) });
-  console.log('🚀 ~ AddProductVariantsForm ~ errors:', errors);
+  } = form;
 
   const { fields, append, remove } = useFieldArray({ control, name: 'variants' });
 
@@ -49,17 +39,8 @@ const AddProductVariantsForm = ({
 
   const variants = useWatch({ control, name: 'variants' });
 
-  const onSubmit = (data: TProductVariants) => {
-    console.log('🚀 ~ onSubmit ~ data:', data);
-    onNext('variants', data);
-  };
-
   return (
-    <form
-      id={ADD_PRODUCT_FORM_ID_MAP[step]}
-      onSubmit={handleSubmit(onSubmit)}
-      className="grid gap-6"
-    >
+    <div className="grid gap-6">
       <Checkbox
         register={register('hasVariants')}
         error={errors.hasVariants?.message}
@@ -171,7 +152,7 @@ const AddProductVariantsForm = ({
                       onChange: ({ target: { files } }) => onChange(files?.[0]),
                       value,
                     }}
-                    errors={toErrorMessageArray<TProductVariants>(error?.thumbnail)}
+                    errors={toErrorMessageArray<TProductStockAndVariants>(error?.thumbnail)}
                     handleRemove={() => resetField(`variants.${index}.thumbnail`)}
                   />
                 )}
@@ -197,7 +178,7 @@ const AddProductVariantsForm = ({
                       },
                       value,
                     }}
-                    errors={toErrorMessageArray<TProductVariants>(error?.images)}
+                    errors={toErrorMessageArray<TProductStockAndVariants>(error?.images)}
                     handleRemove={(index) => {
                       const oldImages = field?.images || EMPTY_ARRAY;
 
@@ -350,7 +331,7 @@ const AddProductVariantsForm = ({
           />
         </div>
       )}
-    </form>
+    </div>
   );
 };
 
