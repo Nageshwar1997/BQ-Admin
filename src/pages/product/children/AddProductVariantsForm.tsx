@@ -1,5 +1,6 @@
 import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/inputs/Checkbox';
+import ColorInput from '@/components/ui/inputs/colorInput';
 import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
@@ -110,6 +111,12 @@ const AddProductVariantsForm = ({ form }: Props) => {
                 error={error?.value?.message}
                 inputProps={{
                   placeholder: currentVariant?.type === VARIANT_TYPE_MAP.COLOR ? '#000000' : '50ml',
+                }}
+              />
+              <ColorInput
+                value="#fff"
+                onChange={(val) => {
+                  console.log('COLOR VAL', val);
                 }}
               />
               <Input

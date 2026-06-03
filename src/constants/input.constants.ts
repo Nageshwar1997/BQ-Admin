@@ -1,4 +1,5 @@
 import type { TQuillToolbar } from '@/types/input.type';
+import { VARIANT_TYPE, VARIANT_TYPE_MAP } from './common.constants';
 
 export const PASSWORD_KEYS = ['password', 'confirmPassword'];
 
@@ -188,6 +189,20 @@ export const PRODUCT_DESCRIPTION_AND_CONTENT_INPUT_MAP_DATA = [
     name: 'additional',
     label: 'Additional details',
     placeholder: 'Write product additional details here...',
+  },
+] as const;
+
+export const PRODUCT_VARIANT_INPUT_MAP_DATA = [
+  {
+    name: 'type',
+    defaultValue: VARIANT_TYPE_MAP.COLOR,
+    options: VARIANT_TYPE.map((type) => ({ label: type, value: type })),
+  },
+  {
+    name: 'label',
+    label: 'Variant label',
+    placeholder: 'Enter variant label',
+    autoComplete: 'given-name',
   },
 ] as const;
 
