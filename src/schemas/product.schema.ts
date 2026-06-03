@@ -165,7 +165,7 @@ const imagesSchema = array(
     });
   });
 
-export const productMediaSchema = object({
+export const productMediaAndGallerySchema = object({
   thumbnail: thumbnailSchema,
   images: imagesSchema,
   video: videoSchema.optional(),
@@ -444,7 +444,7 @@ export const productBaseSchema = object({
   basicInfo: productBasicInfoSchema
     .extend({ l1CategoryName: string(), l2CategoryName: string(), l3CategoryName: string() })
     .optional(),
-  media: productMediaSchema.optional(),
+  media: productMediaAndGallerySchema.optional(),
   description: productDescriptionSchema.optional(),
   variants: productVariantsSchema.optional(),
   tryOn: productTryOnSchema.optional(),

@@ -1,0 +1,74 @@
+import FileInput from '@/components/ui/inputs/FileInput';
+import { EMPTY_ARRAY, FILE_MIME } from '@/constants/common.constants';
+import { PRODUCT_MEDIA_AND_GALLERY_INPUT_MAP_DATA } from '@/constants/input.constants';
+import type { TProductMediaAndGallery } from '@/types/schema.type';
+import { toErrorMessageArray } from '@/utils/form.util';
+import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
+
+type Props = { form: UseFormReturn<TProductMediaAndGallery> };
+
+const AddProductMediaAndGalleryFields = ({ form }: Props) => {
+  const images = useWatch({ control: form.control, name: 'images' });
+  const values = useWatch({ control: form.control });
+
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {PRODUCT_MEDIA_AND_GALLERY_INPUT_MAP_DATA.map((input) => {
+        const { name, label, placeholder1, placeholder2 } = input;
+
+        const isVideo = name === 'video';
+        const isImages = name === 'images';
+
+        const value = values[name];
+        const hasValue = Array.isArray(value) ? value.length > 0 : !!value;
+        const placeholder = hasValue ? placeholder2 : placeholder1;
+
+        return (
+          <Controller
+            key={name}
+            control={form.control}
+            name={name}
+            render={({ field: { value, onChange } }) => (
+              <FileInput
+                label={label}
+                fileInputProps={{
+                  name,
+                  placeholder,
+                  multiple: isImages,
+                  accept: isVideo ? FILE_MIME.video.join(',') : undefined,
+                  disabled: isImages && images?.length >= 10,
+                  value,
+                  onChange: ({ target: { files } }) => {
+                    if (!files?.length) return;
+                    if (isImages) {
+                      const oldFiles = images || EMPTY_ARRAY;
+                      onChange([...oldFiles, ...Array.from(files)]);
+                    } else {
+                      onChange(files[0]);
+                    }
+                  },
+                }}
+                errors={toErrorMessageArray<TProductMediaAndGallery>(form.formState.errors[name])}
+                handleRemove={(index) => {
+                  if (isImages) {
+                    const nextValue = images.filter((_, currentIndex) => currentIndex !== index);
+
+                    form.setValue(name, nextValue, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    });
+                  } else {
+                    form.resetField(name);
+                  }
+                }}
+                containerClassName={isImages ? 'col-span-2' : ''}
+              />
+            )}
+          />
+        );
+      })}
+    </div>
+  );
+};
+export default AddProductMediaAndGalleryFields;

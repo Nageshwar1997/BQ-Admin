@@ -3,22 +3,26 @@ import Button from '@/components/ui/Button';
 import Stepper from '@/components/ui/Stepper';
 import { ADD_PRODUCT_STEPS, CATEGORY_LEVELS_MAP, EMPTY_ARRAY } from '@/constants/common.constants';
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
-import { productBaseSchema, productBasicInfoSchema } from '@/schemas/product.schema';
+import {
+  productBaseSchema,
+  productBasicInfoSchema,
+  productMediaAndGallerySchema,
+} from '@/schemas/product.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { TAddProductStepNumber } from '@/types/common.type';
-import type { TBaseProduct, TProductBasicInfo } from '@/types/schema.type';
+import type { TBaseProduct, TProductBasicInfo, TProductMediaAndGallery } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm, useWatch, type Path, type PathValue } from 'react-hook-form';
 import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
 import AddProductConfirmForm from './children/AddProductConfirmForm';
 import AddProductDescriptionsForm from './children/AddProductDescriptionsForm';
-import AddProductMediaForm from './children/AddProductMediaForm';
+import AddProductMediaAndGalleryFields from './children/AddProductMediaAndGalleryFields';
 import AddProductTryOnForm from './children/AddProductTryOnForm';
 import AddProductVariantsForm from './children/AddProductVariantsForm';
 
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(3);
+  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(1);
 
   const { getValues, control } = useForm<TBaseProduct>({
     resolver: zodResolver(productBaseSchema),
@@ -26,6 +30,10 @@ const AddNewProduct = () => {
 
   const basicInfoForm = useForm<TProductBasicInfo>({
     resolver: zodResolver(productBasicInfoSchema),
+  });
+
+  const mediaAndGalleryForm = useForm<TProductMediaAndGallery>({
+    resolver: zodResolver(productMediaAndGallerySchema),
   });
 
   const l1Category = useWatch({ control: basicInfoForm.control, name: 'l1Category' });
@@ -64,6 +72,11 @@ const AddNewProduct = () => {
     handleNext();
   };
 
+  const onMediaAndGallerySubmit = (data: TProductMediaAndGallery) => {
+    console.log('onBasicInfoSubmit data', data);
+    handleNext();
+  };
+
   const handleBack = () => {
     setActiveStep((prev) => (prev > 0 ? prev - 1 : prev) as TAddProductStepNumber);
   };
@@ -82,8 +95,11 @@ const AddNewProduct = () => {
         categories={{ L1: l1Cats, L2: l2Cats, L3: l3Cats }}
       />
     </form>,
-    <form id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
-      <AddProductMediaForm step={activeStep} onNext={handleNext} />
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+      onSubmit={mediaAndGalleryForm.handleSubmit(onMediaAndGallerySubmit)}
+    >
+      <AddProductMediaAndGalleryFields form={mediaAndGalleryForm} />
     </form>,
     <form id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
       <AddProductDescriptionsForm step={activeStep} onNext={handleNext} />

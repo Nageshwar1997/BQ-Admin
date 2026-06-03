@@ -142,6 +142,27 @@ export const PRODUCT_CATEGORIES_SELECT_MAP_DATA = [
   },
 ] as const;
 
+export const PRODUCT_MEDIA_AND_GALLERY_INPUT_MAP_DATA = [
+  {
+    name: 'thumbnail',
+    label: 'Thumbnail',
+    placeholder1: 'Select thumbnail',
+    placeholder2: 'Change thumbnail',
+  },
+  {
+    name: 'video',
+    label: 'Video',
+    placeholder1: 'Select video',
+    placeholder2: 'Change video',
+  },
+  {
+    name: 'images',
+    label: 'Images',
+    placeholder1: 'Select images',
+    placeholder2: 'Add images',
+  },
+] as const;
+
 export const DEFAULT_QUILL_LINK_ID = 'custom-link-btn' as const;
 
 export const defaultQuillToolbar: TQuillToolbar = [
