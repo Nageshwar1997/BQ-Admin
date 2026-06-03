@@ -1,24 +1,15 @@
 .rcp {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  border: 1px solid rgba(var(--primary-rgb), 0.1);
-  background-color: var(--platinum-black);
-  border-radius: 10px;
-  padding: 15px;
+  background-color: var(--smoke-eerie);
+  padding: 12px;
   width: 100%;
 }
 
-.rcp-body {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
+.rcp,
+.rcp-body,
 .rcp-section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .rcp-interactive {
@@ -39,7 +30,7 @@
   position: relative;
   background-image:
     linear-gradient(to bottom, transparent, black), linear-gradient(to right, white, transparent);
-  border-radius: 10px;
+  border-radius: 4px;
 }
 
 .rcp-saturation-cursor {

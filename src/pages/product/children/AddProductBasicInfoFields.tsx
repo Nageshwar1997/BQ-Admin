@@ -60,7 +60,7 @@ const AddProductBasicInfoFields = ({
                   label={label}
                   error={errors[name]?.message}
                   options={options}
-                  optionsPosition="top"
+                  position="top"
                   selectProps={{
                     value,
                     placeholder,

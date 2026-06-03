@@ -61,7 +61,7 @@ export interface ISelect extends Omit<IBaseInput, 'needRef' | 'register'> {
     };
   options: IDropdownOption[];
   optionsClassName?: string;
-  optionsPosition?: 'top' | 'bottom';
+  position?: 'top' | 'bottom';
 }
 
 export interface IFileInput extends Omit<IBaseInput, 'error' | 'register'> {

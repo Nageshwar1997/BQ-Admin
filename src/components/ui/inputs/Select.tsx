@@ -14,7 +14,7 @@ const Select = ({
   icons,
   selectProps,
   options = EMPTY_ARRAY,
-  optionsPosition = 'bottom',
+  position = 'bottom',
 }: ISelect) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -82,7 +82,7 @@ const Select = ({
             {isOpen && options.length > 0 && (
               <div
                 className={`border-primary/10 bg-smoke-eerie absolute left-0 z-3 w-full overflow-hidden rounded-lg border shadow-md ${
-                  optionsPosition === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
+                  position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
                 } ${optionsClassName}`}
               >
                 <ul className="flex max-h-60 flex-col gap-0.5 overflow-auto px-1 py-2">
