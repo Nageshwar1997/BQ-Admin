@@ -175,7 +175,7 @@ export const productMediaAndGallerySchema = object({
 /*                     STEP 3 : DESCRIPTION & DETAILS                         */
 /* -------------------------------------------------------------------------- */
 
-export const productDescriptionSchema = object({
+export const productDescriptionAndContentSchema = object({
   shortDescription: string('Short description is required.')
     .min(10, 'Short description must be at least 10 characters.')
     .max(300, 'Short description cannot exceed 300 characters.'),
@@ -445,7 +445,7 @@ export const productBaseSchema = object({
     .extend({ l1CategoryName: string(), l2CategoryName: string(), l3CategoryName: string() })
     .optional(),
   media: productMediaAndGallerySchema.optional(),
-  description: productDescriptionSchema.optional(),
+  description: productDescriptionAndContentSchema.optional(),
   variants: productVariantsSchema.optional(),
   tryOn: productTryOnSchema.optional(),
 });

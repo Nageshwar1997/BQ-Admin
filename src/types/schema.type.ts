@@ -8,7 +8,7 @@ import type {
 import type {
   productBaseSchema,
   productBasicInfoSchema,
-  productDescriptionSchema,
+  productDescriptionAndContentSchema,
   productMediaAndGallerySchema,
   productTryOnSchema,
   productVariantsSchema,
@@ -54,7 +54,7 @@ export type TProductBasicInfo = zodInfer<typeof productBasicInfoSchema>;
 
 export type TProductMediaAndGallery = zodInfer<typeof productMediaAndGallerySchema>;
 
-export type TProductDescription = zodInfer<typeof productDescriptionSchema>;
+export type TProductDescriptionAndContent = zodInfer<typeof productDescriptionAndContentSchema>;
 
 export type TProductVariants = zodInfer<typeof productVariantsSchema>;
 

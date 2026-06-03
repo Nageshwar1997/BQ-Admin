@@ -1,24 +1,16 @@
 import QuillInput from '@/components/ui/inputs/quillInput';
 import Textarea from '@/components/ui/inputs/Textarea';
-import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
-import { productDescriptionSchema } from '@/schemas/product.schema';
-import type { TAddProductStepNumber } from '@/types/common.type';
 import type { TQuillImageRef } from '@/types/component.type';
-import type { TBaseProduct, TProductDescription } from '@/types/schema.type';
-import { zodResolver } from '@hookform/resolvers/zod';
+import type { TProductDescriptionAndContent } from '@/types/schema.type';
 import type Quill from 'quill';
 import { useRef, type RefObject } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, type UseFormReturn } from 'react-hook-form';
 
-const AddProductDescriptionsForm = ({
-  onNext,
-  step,
-}: {
-  onNext: (key: keyof TBaseProduct, value: TBaseProduct[keyof TBaseProduct]) => void;
-  step: TAddProductStepNumber;
-}) => {
+type Props = { form: UseFormReturn<TProductDescriptionAndContent> };
+
+const AddProductDescriptionAndContentFields = ({ form }: Props) => {
   const quillRefs: Record<
-    keyof Omit<TProductDescription, 'shortDescription'>,
+    keyof Omit<TProductDescriptionAndContent, 'shortDescription'>,
     RefObject<Quill | null>
   > = {
     description: useRef<Quill | null>(null),
@@ -28,7 +20,7 @@ const AddProductDescriptionsForm = ({
   };
 
   const imageRefs: Record<
-    keyof Omit<TProductDescription, 'shortDescription'>,
+    keyof Omit<TProductDescriptionAndContent, 'shortDescription'>,
     RefObject<TQuillImageRef[]>
   > = {
     description: useRef<TQuillImageRef[]>([]),
@@ -40,21 +32,11 @@ const AddProductDescriptionsForm = ({
   const {
     control,
     formState: { errors },
-    handleSubmit,
     register,
-  } = useForm<TProductDescription>({ resolver: zodResolver(productDescriptionSchema) });
-
-  const onSubmit = (data: TProductDescription) => {
-    console.log('🚀 ~ onSubmit ~ data:', data);
-    onNext('description', data);
-  };
+  } = form;
 
   return (
-    <form
-      id={ADD_PRODUCT_FORM_ID_MAP[step]}
-      onSubmit={handleSubmit(onSubmit)}
-      className="grid gap-4"
-    >
+    <div className="grid gap-4">
       <Textarea
         label="Short description"
         register={register('shortDescription')}
@@ -121,8 +103,8 @@ const AddProductDescriptionsForm = ({
           />
         )}
       />
-    </form>
+    </div>
   );
 };
 
-export default AddProductDescriptionsForm;
+export default AddProductDescriptionAndContentFields;

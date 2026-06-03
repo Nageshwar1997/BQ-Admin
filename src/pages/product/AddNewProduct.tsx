@@ -6,23 +6,29 @@ import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import {
   productBaseSchema,
   productBasicInfoSchema,
+  productDescriptionAndContentSchema,
   productMediaAndGallerySchema,
 } from '@/schemas/product.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type { TAddProductStepNumber } from '@/types/common.type';
-import type { TBaseProduct, TProductBasicInfo, TProductMediaAndGallery } from '@/types/schema.type';
+import type {
+  TBaseProduct,
+  TProductBasicInfo,
+  TProductDescriptionAndContent,
+  TProductMediaAndGallery,
+} from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm, useWatch, type Path, type PathValue } from 'react-hook-form';
 import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
 import AddProductConfirmForm from './children/AddProductConfirmForm';
-import AddProductDescriptionsForm from './children/AddProductDescriptionsForm';
+import AddProductDescriptionAndContentFields from './children/AddProductDescriptionAndContentFields';
 import AddProductMediaAndGalleryFields from './children/AddProductMediaAndGalleryFields';
 import AddProductTryOnForm from './children/AddProductTryOnForm';
 import AddProductVariantsForm from './children/AddProductVariantsForm';
 
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(1);
+  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(2);
 
   const { getValues, control } = useForm<TBaseProduct>({
     resolver: zodResolver(productBaseSchema),
@@ -34,6 +40,10 @@ const AddNewProduct = () => {
 
   const mediaAndGalleryForm = useForm<TProductMediaAndGallery>({
     resolver: zodResolver(productMediaAndGallerySchema),
+  });
+
+  const descriptionAndContentForm = useForm<TProductDescriptionAndContent>({
+    resolver: zodResolver(productDescriptionAndContentSchema),
   });
 
   const l1Category = useWatch({ control: basicInfoForm.control, name: 'l1Category' });
@@ -73,7 +83,12 @@ const AddNewProduct = () => {
   };
 
   const onMediaAndGallerySubmit = (data: TProductMediaAndGallery) => {
-    console.log('onBasicInfoSubmit data', data);
+    console.log('onMediaAndGallerySubmit data', data);
+    handleNext();
+  };
+
+  const onDescriptionAndContentSubmit = (data: TProductDescriptionAndContent) => {
+    console.log('onDescriptionAndContentSubmit data', data);
     handleNext();
   };
 
@@ -101,8 +116,11 @@ const AddNewProduct = () => {
     >
       <AddProductMediaAndGalleryFields form={mediaAndGalleryForm} />
     </form>,
-    <form id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
-      <AddProductDescriptionsForm step={activeStep} onNext={handleNext} />
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+      onSubmit={descriptionAndContentForm.handleSubmit(onDescriptionAndContentSubmit)}
+    >
+      <AddProductDescriptionAndContentFields form={descriptionAndContentForm} />
     </form>,
     <form id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
       <AddProductVariantsForm step={activeStep} onNext={handleNext} />
