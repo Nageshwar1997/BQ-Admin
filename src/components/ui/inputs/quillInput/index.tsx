@@ -29,7 +29,7 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
       value,
       onChange,
       placeholder = 'Write your content here...',
-      quillImagesRef,
+      imagesRef,
       toolbarOptions,
       needLinkButton = true,
     },
@@ -54,8 +54,8 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
           toolbar: {
             container: toolbarOptions ? buildToolbar(toolbarOptions) : defaultQuillToolbar,
             handlers: {
-              ...(quillImagesRef && {
-                image: () => insertImageIntoQuill(quill, quillImagesRef),
+              ...(imagesRef && {
+                image: () => insertImageIntoQuill(quill, imagesRef),
               }),
               ...(needLinkButton && { toggleLinkId: () => toggleLinkId(quill) }),
             },
@@ -93,8 +93,8 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
 
         onChange?.(html);
 
-        if (quillImagesRef) {
-          removeImageFromQuill(quill, quillImagesRef);
+        if (imagesRef) {
+          removeImageFromQuill(quill, imagesRef);
         }
 
         if (source !== 'user') return; // only block user actions
@@ -118,7 +118,7 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
       }
 
       // Cache current blob URLs for cleanup on unmount
-      const blobUrls = quillImagesRef?.current.map((image) => image.blobUrl);
+      const blobUrls = imagesRef?.current.map((image) => image.blobUrl);
 
       return () => {
         quill.root.removeEventListener('scroll', handleScroll);

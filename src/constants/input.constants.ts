@@ -163,6 +163,34 @@ export const PRODUCT_MEDIA_AND_GALLERY_INPUT_MAP_DATA = [
   },
 ] as const;
 
+export const PRODUCT_DESCRIPTION_AND_CONTENT_INPUT_MAP_DATA = [
+  {
+    name: 'shortDescription',
+    label: 'Short description',
+    placeholder: 'Enter short description',
+  },
+  {
+    name: 'description',
+    label: 'Description',
+    placeholder: 'Write product description here...',
+  },
+  {
+    name: 'ingredients',
+    label: 'Ingredients',
+    placeholder: 'Write product ingredients here...',
+  },
+  {
+    name: 'instructions',
+    label: 'Usage instructions',
+    placeholder: 'Write product usage instructions here...',
+  },
+  {
+    name: 'additional',
+    label: 'Additional details',
+    placeholder: 'Write product additional details here...',
+  },
+] as const;
+
 export const DEFAULT_QUILL_LINK_ID = 'custom-link-btn' as const;
 
 export const defaultQuillToolbar: TQuillToolbar = [

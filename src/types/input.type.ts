@@ -120,7 +120,7 @@ export interface IQuillInput
   value?: string;
   needLinkButton?: boolean;
   onChange?: (value: string) => void;
-  quillImagesRef?: RefObject<TQuillImageRef[]>;
+  imagesRef?: RefObject<TQuillImageRef[]>;
   toolbarOptions?: IToolBarOptions;
 }
 
@@ -136,7 +136,7 @@ export type TQuillImageBlot = {
 
 export interface IProcessQuillContent {
   quillRef: RefObject<Quill | null>;
-  quillImagesRef: RefObject<TQuillImageRef[]>;
+  imagesRef: RefObject<TQuillImageRef[]>;
   setValue: UseFormSetValue<any>;
   fieldName: any;
   folderName: string;

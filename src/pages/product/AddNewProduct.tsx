@@ -10,7 +10,12 @@ import {
   productMediaAndGallerySchema,
 } from '@/schemas/product.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
-import type { TAddProductStepNumber } from '@/types/common.type';
+import type {
+  TAddProductStepNumber,
+  TProductQuillImageRefs,
+  TProductQuillRefs,
+} from '@/types/common.type';
+import type { TQuillImageRef } from '@/types/component.type';
 import type {
   TBaseProduct,
   TProductBasicInfo,
@@ -18,7 +23,8 @@ import type {
   TProductMediaAndGallery,
 } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import type Quill from 'quill';
+import { useRef, useState } from 'react';
 import { useForm, useWatch, type Path, type PathValue } from 'react-hook-form';
 import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
 import AddProductConfirmForm from './children/AddProductConfirmForm';
@@ -29,6 +35,20 @@ import AddProductVariantsForm from './children/AddProductVariantsForm';
 
 const AddNewProduct = () => {
   const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(2);
+
+  const quillRefs: TProductQuillRefs = {
+    description: useRef<Quill | null>(null),
+    ingredients: useRef<Quill | null>(null),
+    instructions: useRef<Quill | null>(null),
+    additional: useRef<Quill | null>(null),
+  };
+
+  const imageRefs: TProductQuillImageRefs = {
+    description: useRef<TQuillImageRef[]>([]),
+    ingredients: useRef<TQuillImageRef[]>([]),
+    instructions: useRef<TQuillImageRef[]>([]),
+    additional: useRef<TQuillImageRef[]>([]),
+  };
 
   const { getValues, control } = useForm<TBaseProduct>({
     resolver: zodResolver(productBaseSchema),
@@ -120,7 +140,11 @@ const AddNewProduct = () => {
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
       onSubmit={descriptionAndContentForm.handleSubmit(onDescriptionAndContentSubmit)}
     >
-      <AddProductDescriptionAndContentFields form={descriptionAndContentForm} />
+      <AddProductDescriptionAndContentFields
+        form={descriptionAndContentForm}
+        imageRefs={imageRefs}
+        quillRefs={quillRefs}
+      />
     </form>,
     <form id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
       <AddProductVariantsForm step={activeStep} onNext={handleNext} />

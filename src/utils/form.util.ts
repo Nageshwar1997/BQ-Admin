@@ -21,7 +21,7 @@ export const setErrorToForm = <T extends FieldValues>(
 
 export const processQuillContent = async ({
   quillRef,
-  quillImagesRef,
+  imagesRef,
   setValue,
   fieldName,
   folderName,
@@ -31,7 +31,7 @@ export const processQuillContent = async ({
   const quill = quillRef.current;
   let content = quill.root.innerHTML;
 
-  const images = quillImagesRef.current;
+  const images = imagesRef.current;
 
   const files = images.map(({ file }) => file).filter(Boolean);
 
