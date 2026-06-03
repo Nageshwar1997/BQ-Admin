@@ -9,7 +9,7 @@ import type { ICategory } from '@/types/api.type';
 import type { TProductBasicInfo } from '@/types/schema.type';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
-const AddProductBasicInfoForm = ({
+const AddProductBasicInfoFields = ({
   form,
   categories,
 }: {
@@ -86,4 +86,4 @@ const AddProductBasicInfoForm = ({
   );
 };
 
-export default AddProductBasicInfoForm;
+export default AddProductBasicInfoFields;

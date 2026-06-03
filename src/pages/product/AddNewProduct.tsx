@@ -10,7 +10,7 @@ import type { TBaseProduct, TProductBasicInfo } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm, useWatch, type Path, type PathValue } from 'react-hook-form';
-import AddProductBasicInfoForm from './children/AddProductBasicInfoForm';
+import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
 import AddProductConfirmForm from './children/AddProductConfirmForm';
 import AddProductDescriptionsForm from './children/AddProductDescriptionsForm';
 import AddProductMediaForm from './children/AddProductMediaForm';
@@ -20,7 +20,7 @@ import AddProductVariantsForm from './children/AddProductVariantsForm';
 const AddNewProduct = () => {
   const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(3);
 
-  const { getValues, setValue, control } = useForm<TBaseProduct>({
+  const { getValues, control } = useForm<TBaseProduct>({
     resolver: zodResolver(productBaseSchema),
   });
 
@@ -77,7 +77,7 @@ const AddNewProduct = () => {
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
       onSubmit={basicInfoForm.handleSubmit(onBasicInfoSubmit)}
     >
-      <AddProductBasicInfoForm
+      <AddProductBasicInfoFields
         form={basicInfoForm}
         categories={{ L1: l1Cats, L2: l2Cats, L3: l3Cats }}
       />
