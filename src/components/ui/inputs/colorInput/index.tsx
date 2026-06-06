@@ -1,19 +1,9 @@
 import { useOutsideClick } from '@/hooks/useOutsideClick';
-import type { IBaseInput, IInput, ISelect } from '@/types/input.type';
-import { Icon } from '@iconify/react';
+import type { IColorInput } from '@/types/input.type';
 import { useState } from 'react';
 import { ColorPicker, useColor, type IColor } from 'react-color-palette';
-import { InputError, InputLabel } from '../children';
+import { InputError, InputIcon, InputLabel } from '../children';
 import './colorInput.css';
-
-export interface IColorInput
-  extends
-    Pick<IBaseInput, 'className' | 'containerClassName' | 'error' | 'label'>,
-    Pick<IInput['inputProps'], 'disabled' | 'placeholder'>,
-    Pick<ISelect, 'position'> {
-  value: string;
-  onChange: (value: string) => void;
-}
 
 const ColorInput = ({
   label,
@@ -27,7 +17,7 @@ const ColorInput = ({
   position = 'bottom',
 }: IColorInput) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [color, setColor] = useColor(value);
+  const [color, setColor] = useColor(value ?? '');
 
   const containerRef = useOutsideClick<HTMLDivElement>(() => setIsOpen(false), { enabled: isOpen });
 
@@ -52,24 +42,39 @@ const ColorInput = ({
         <div
           className={`border-primary/10 bg-smoke-eerie flex h-full w-full items-center gap-1 overflow-hidden rounded-lg border ${className}`}
         >
-          <div
-            className={`text-primary line-clamp-1 flex h-full w-full flex-1 items-center justify-between border-none bg-transparent p-3 text-sm font-normal ${disabled ? 'cursor-no-drop' : 'cursor-pointer'}`}
-            onClick={handleToggle}
-          >
-            <span className={`line-clamp-1 ${!value ? 'text-primary/50 text-xs' : ''}`}>
+          <div className="text-primary line-clamp-1 flex h-full w-full flex-1 items-center justify-between border-none bg-transparent text-sm font-normal">
+            <div className="h-full p-2 [&_span]:p-0">
+              <div
+                className={`border-primary/10 ${disabled ? 'cursor-no-drop' : 'cursor-pointer'} rounded border p-1`}
+                style={{ backgroundColor: `${color.hex}` }}
+                onClick={handleToggle}
+              >
+                <InputIcon
+                  position="left"
+                  left={{
+                    icon: 'mage:color-picker-fill',
+                    className: '[&>path]:last:stroke-primary [&>path]:last:fill-primary-invert',
+                  }}
+                />
+              </div>
+            </div>
+            <span className={`line-clamp-1 flex-1 ${!value ? 'text-primary/50 text-xs' : ''}`}>
               {value || placeholder}
             </span>
-            <Icon
-              icon="solar:alt-arrow-down-linear"
-              className={`size-4 transition-transform md:size-5 ${
-                isOpen ? 'rotate-180' : ''
-              } ${value ? 'text-primary' : 'text-primary/30'}`}
+            <InputIcon
+              position="right"
+              right={{
+                icon: isOpen ? 'pepicons-pop:color-picker-off' : 'pepicons-pop:color-picker',
+                className: `${disabled ? 'cursor-no-drop' : 'cursor-pointer'}`,
+                onClick: handleToggle,
+              }}
             />
             {isOpen && (
               <div
                 className={`border-primary/10 bg-smoke-eerie absolute left-0 z-3 w-full overflow-hidden rounded-lg border shadow-md ${
                   position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
                 }`}
+                onClick={(e) => e.stopPropagation()}
               >
                 <ColorPicker
                   hideInput={['hsv']}

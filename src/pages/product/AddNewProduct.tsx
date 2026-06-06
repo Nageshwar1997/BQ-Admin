@@ -36,7 +36,7 @@ import AddProductTryOnForm from './children/AddProductTryOnForm';
 import AddProductVariantsForm from './children/AddProductVariantsForm';
 
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(2);
+  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(3);
 
   const quillRefs: TProductQuillRefs = {
     description: useRef<Quill | null>(null),

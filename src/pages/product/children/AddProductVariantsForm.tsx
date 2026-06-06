@@ -88,7 +88,10 @@ const AddProductVariantsForm = ({ form }: Props) => {
                 render={({ field: { onChange, value } }) => (
                   <Radio
                     value={value ?? VARIANT_TYPE_MAP.COLOR}
-                    onChange={onChange}
+                    onChange={(val) => {
+                      onChange(val);
+                      form.resetField(`variants.${index}.value`);
+                    }}
                     options={VARIANT_TYPE.map((type) => ({ label: type, value: type }))}
                     containerClassName="sm:col-span-2 max-w-xs w-full mx-auto mb-2"
                     error={error?.type?.message}
@@ -101,24 +104,30 @@ const AddProductVariantsForm = ({ form }: Props) => {
                 error={error?.label?.message}
                 inputProps={{ placeholder: 'Black' }}
               />
-              <Input
-                label={
-                  currentVariant?.type === VARIANT_TYPE_MAP.COLOR
-                    ? 'Hex color code'
-                    : 'Variant value'
-                }
-                register={register(`variants.${index}.value`)}
-                error={error?.value?.message}
-                inputProps={{
-                  placeholder: currentVariant?.type === VARIANT_TYPE_MAP.COLOR ? '#000000' : '50ml',
-                }}
-              />
-              <ColorInput
-                value="#fff"
-                onChange={(val) => {
-                  console.log('COLOR VAL', val);
-                }}
-              />
+
+              {currentVariant?.type === VARIANT_TYPE_MAP.COLOR ? (
+                <Controller
+                  name={`variants.${index}.value`}
+                  control={form.control}
+                  render={({ field: { onChange, value } }) => (
+                    <ColorInput
+                      label="Variant color"
+                      value={value}
+                      onChange={onChange}
+                      placeholder="#000000"
+                      error={error?.value?.message}
+                    />
+                  )}
+                />
+              ) : (
+                <Input
+                  label="Variant size"
+                  register={register(`variants.${index}.value`)}
+                  error={error?.value?.message}
+                  inputProps={{ placeholder: '50ml/small' }}
+                />
+              )}
+
               <Input
                 label="Original Price"
                 register={register(`variants.${index}.originalPrice`, { valueAsNumber: true })}
