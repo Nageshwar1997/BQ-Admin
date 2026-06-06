@@ -84,19 +84,29 @@ const AddProductVariantsForm = ({ form }: Props) => {
             >
               {PRODUCT_VARIANT_INPUT_MAP_DATA.map((input) => {
                 const { name, type } = input;
+
+                const isColorVariant = currentVariant?.type === VARIANT_TYPE_MAP.COLOR;
+
+                if (name === 'value') {
+                  if (type === 'color' && !isColorVariant) return null;
+                  if (type === 'text' && isColorVariant) return null;
+                }
+
                 return type === 'radio' ? (
                   <Controller
+                    key={`${name}-${type}`}
                     name={`variants.${index}.${name}`}
                     control={form.control}
                     defaultValue={input.defaultValue}
                     render={({ field: { onChange, value } }) => {
                       const { defaultValue, options } = input;
+
                       return (
                         <Radio
                           value={value ?? defaultValue}
                           onChange={(val) => {
                             onChange(val);
-                            form.resetField(`variants.${index}.${name}`);
+                            form.resetField(`variants.${index}.value`);
                           }}
                           options={options}
                           containerClassName="sm:col-span-2 max-w-xs w-full mx-auto mb-2"
@@ -107,11 +117,12 @@ const AddProductVariantsForm = ({ form }: Props) => {
                   />
                 ) : type === 'color' ? (
                   <Controller
+                    key={`${name}-${type}`}
                     name={`variants.${index}.${name}`}
                     control={form.control}
                     render={({ field: { onChange, value } }) => (
                       <ColorInput
-                        label="Variant color"
+                        label={input.label}
                         value={value}
                         onChange={onChange}
                         placeholder={input.placeholder}
@@ -121,14 +132,17 @@ const AddProductVariantsForm = ({ form }: Props) => {
                   />
                 ) : type === 'file' ? (
                   <Controller
+                    key={`${name}-${type}`}
                     control={form.control}
-                    name={`variants.${index}.${input.name}`}
+                    name={`variants.${index}.${name}`}
                     render={({ field: { onChange, value } }) => {
                       const { label, placeholder1, placeholder2 } = input;
 
                       const currVal = currentVariant?.[name];
                       const hasValue = Array.isArray(currVal) ? currVal.length > 0 : !!currVal;
+
                       const placeholder = hasValue ? placeholder2 : placeholder1;
+
                       return (
                         <FileInput
                           label={label}
@@ -136,31 +150,53 @@ const AddProductVariantsForm = ({ form }: Props) => {
                             name,
                             placeholder,
                             value,
+                            multiple: name === 'images',
                             onChange: ({ target: { files } }) => {
                               if (!files?.length) return;
 
-                              const newFiles = Array.from(files);
+                              const newFiles = Array.from(files) || EMPTY_ARRAY;
 
                               if (name === 'thumbnail') {
-                                onChange(newFiles?.[0]);
-                              } else if (name === 'images') {
-                                const oldFiles = field?.[name] || EMPTY_ARRAY;
+                                onChange(newFiles[0]);
+                              } else {
+                                const oldFiles = currentVariant?.images || EMPTY_ARRAY;
+
                                 onChange([...oldFiles, ...newFiles]);
                               }
                             },
                           }}
                           errors={toErrorMessageArray<TProductStockAndVariants>(error?.[name])}
-                          handleRemove={() => resetField(`variants.${index}.${name}`)}
+                          handleRemove={(imgIdx) => {
+                            if (name === 'images') {
+                              const oldImages = currentVariant?.images || EMPTY_ARRAY;
+
+                              const nextValue = oldImages.filter(
+                                (_, currentIndex) => currentIndex !== imgIdx,
+                              );
+
+                              setValue(`variants.${index}.${name}`, nextValue, {
+                                shouldDirty: true,
+                                shouldTouch: true,
+                                shouldValidate: true,
+                              });
+                            } else {
+                              resetField(`variants.${index}.${name}`);
+                            }
+                          }}
                         />
                       );
                     }}
                   />
                 ) : (
                   <Input
+                    key={`${name}-${type}`}
                     label={input.label}
-                    register={register(`variants.${index}.${input.name}`)}
-                    error={error?.[input.name]?.message}
-                    inputProps={{ placeholder: input.placeholder, type: input.type }}
+                    register={register(`variants.${index}.${name}`)}
+                    error={error?.[name]?.message}
+                    inputProps={{
+                      placeholder: input.placeholder,
+                      type: input.type,
+                    }}
                   />
                 );
               })}

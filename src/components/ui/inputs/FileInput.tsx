@@ -179,6 +179,19 @@ const FileInput = ({
     { url: string; type: TMediaResource; isBlob?: boolean }[]
   >([]);
 
+  const previewUrlsRef = useRef<Map<File, string>>(new Map());
+
+  const getPreviewUrl = (file: File) => {
+    let url = previewUrlsRef.current.get(file);
+
+    if (!url) {
+      url = URL.createObjectURL(file);
+      previewUrlsRef.current.set(file, url);
+    }
+
+    return url;
+  };
+
   useEffect(() => {
     const value = fileInputProps.value;
 
@@ -194,25 +207,29 @@ const FileInput = ({
         const type = getMediaType(item);
 
         if (item instanceof File) {
-          return { url: URL.createObjectURL(item), type, isBlob: true };
+          return { url: getPreviewUrl(item), type, isBlob: true };
         }
-        if (typeof item === 'string') return { url: item, type, isBlob: false };
+
+        if (typeof item === 'string') {
+          return { url: item, type, isBlob: false };
+        }
 
         return null;
       })
       .filter(Boolean) as typeof previews;
 
     setPreviews(nextPreviews);
-
-    return () => {
-      nextPreviews.forEach((preview) => {
-        if (preview.isBlob) {
-          URL.revokeObjectURL(preview.url);
-        }
-      });
-    };
   }, [fileInputProps.value]);
 
+  useEffect(() => {
+    return () => {
+      previewUrlsRef.current.forEach((url) => {
+        URL.revokeObjectURL(url);
+      });
+
+      previewUrlsRef.current.clear();
+    };
+  }, []);
   return (
     <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
       <div className="relative h-10 lg:h-12">

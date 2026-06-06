@@ -142,6 +142,7 @@ export const PRODUCT_CATEGORIES_SELECT_MAP_DATA = [
     placeholder: 'Select (L3) product category',
   },
 ] as const;
+
 const THUMBNAIL_INPUT_DATA = {
   name: 'thumbnail',
   label: 'Thumbnail',
