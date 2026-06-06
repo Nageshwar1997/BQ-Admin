@@ -4,7 +4,8 @@ import ColorInput from '@/components/ui/inputs/colorInput';
 import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
-import { EMPTY_ARRAY, VARIANT_TYPE, VARIANT_TYPE_MAP } from '@/constants/common.constants';
+import { EMPTY_ARRAY, VARIANT_TYPE_MAP } from '@/constants/common.constants';
+import { PRODUCT_VARIANT_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type { TProductStockAndVariants } from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
 import { toErrorMessageArray } from '@/utils/form.util';
@@ -81,136 +82,89 @@ const AddProductVariantsForm = ({ form }: Props) => {
               key={field.id}
               className="border-smoke-eerie-invert/20 bg-smoke-eerie/50 grid gap-4 rounded-xl border p-4 sm:grid-cols-2"
             >
-              <Controller
-                name={`variants.${index}.type`}
-                control={control}
-                defaultValue={VARIANT_TYPE_MAP.COLOR}
-                render={({ field: { onChange, value } }) => (
-                  <Radio
-                    value={value ?? VARIANT_TYPE_MAP.COLOR}
-                    onChange={(val) => {
-                      onChange(val);
-                      form.resetField(`variants.${index}.value`);
-                    }}
-                    options={VARIANT_TYPE.map((type) => ({ label: type, value: type }))}
-                    containerClassName="sm:col-span-2 max-w-xs w-full mx-auto mb-2"
-                    error={error?.type?.message}
-                  />
-                )}
-              />
-              <Input
-                label="Variant name"
-                register={register(`variants.${index}.label`)}
-                error={error?.label?.message}
-                inputProps={{ placeholder: 'Black' }}
-              />
-
-              {currentVariant?.type === VARIANT_TYPE_MAP.COLOR ? (
-                <Controller
-                  name={`variants.${index}.value`}
-                  control={form.control}
-                  render={({ field: { onChange, value } }) => (
-                    <ColorInput
-                      label="Variant color"
-                      value={value}
-                      onChange={onChange}
-                      placeholder="#000000"
-                      error={error?.value?.message}
-                    />
-                  )}
-                />
-              ) : (
-                <Input
-                  label="Variant size"
-                  register={register(`variants.${index}.value`)}
-                  error={error?.value?.message}
-                  inputProps={{ placeholder: '50ml/small' }}
-                />
-              )}
-
-              <Input
-                label="Original Price"
-                register={register(`variants.${index}.originalPrice`, { valueAsNumber: true })}
-                error={error?.originalPrice?.message}
-                inputProps={{ type: 'number', placeholder: '999' }}
-              />
-              <Input
-                label="Discounted price"
-                register={register(`variants.${index}.sellingPrice`, { valueAsNumber: true })}
-                error={error?.sellingPrice?.message}
-                inputProps={{ type: 'number', placeholder: '799' }}
-              />
-              <Input
-                label="Stock"
-                register={register(`variants.${index}.stock`, { valueAsNumber: true })}
-                error={error?.stock?.message}
-                inputProps={{ type: 'number', placeholder: '100' }}
-              />
-              <Input
-                label="Stock threshold"
-                register={register(`variants.${index}.stockThreshold`, {
-                  valueAsNumber: true,
-                })}
-                error={error?.stockThreshold?.message}
-                inputProps={{ type: 'number', placeholder: '100' }}
-              />
-              <Controller
-                control={control}
-                name={`variants.${index}.thumbnail`}
-                render={({ field: { name, onChange, value } }) => (
-                  <FileInput
-                    label="Thumbnail"
-                    fileInputProps={{
-                      name,
-                      placeholder: !!currentVariant?.thumbnail
-                        ? 'Change thumbnail'
-                        : 'Select thumbnail',
-                      onChange: ({ target: { files } }) => onChange(files?.[0]),
-                      value,
-                    }}
-                    errors={toErrorMessageArray<TProductStockAndVariants>(error?.thumbnail)}
-                    handleRemove={() => resetField(`variants.${index}.thumbnail`)}
-                  />
-                )}
-              />
-              <Controller
-                control={control}
-                name={`variants.${index}.images`}
-                render={({ field: { name, onChange, value } }) => (
-                  <FileInput
-                    label="Images"
-                    fileInputProps={{
-                      name,
-                      placeholder: currentVariant?.images?.length
-                        ? 'Change images'
-                        : 'Select images',
-                      multiple: true,
-                      disabled: field?.images?.length >= 10,
-                      onChange: (event) => {
-                        const newFiles = Array.from(event.target.files || EMPTY_ARRAY);
-                        const oldImages = field?.images || EMPTY_ARRAY;
-                        const files = [...oldImages, ...newFiles];
-                        onChange(files);
-                      },
-                      value,
-                    }}
-                    errors={toErrorMessageArray<TProductStockAndVariants>(error?.images)}
-                    handleRemove={(index) => {
-                      const oldImages = field?.images || EMPTY_ARRAY;
-
-                      const nextValue = oldImages.filter(
-                        (_, currentIndex) => currentIndex !== index,
+              {PRODUCT_VARIANT_INPUT_MAP_DATA.map((input) => {
+                const { name, type } = input;
+                return type === 'radio' ? (
+                  <Controller
+                    name={`variants.${index}.${name}`}
+                    control={form.control}
+                    defaultValue={input.defaultValue}
+                    render={({ field: { onChange, value } }) => {
+                      const { defaultValue, options } = input;
+                      return (
+                        <Radio
+                          value={value ?? defaultValue}
+                          onChange={(val) => {
+                            onChange(val);
+                            form.resetField(`variants.${index}.${name}`);
+                          }}
+                          options={options}
+                          containerClassName="sm:col-span-2 max-w-xs w-full mx-auto mb-2"
+                          error={error?.[name]?.message}
+                        />
                       );
-
-                      setValue(`variants.${index}.images`, nextValue, {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                        shouldValidate: true,
-                      });
                     }}
                   />
-                )}
-              />
+                ) : type === 'color' ? (
+                  <Controller
+                    name={`variants.${index}.${name}`}
+                    control={form.control}
+                    render={({ field: { onChange, value } }) => (
+                      <ColorInput
+                        label="Variant color"
+                        value={value}
+                        onChange={onChange}
+                        placeholder={input.placeholder}
+                        error={error?.[name]?.message}
+                      />
+                    )}
+                  />
+                ) : type === 'file' ? (
+                  <Controller
+                    control={form.control}
+                    name={`variants.${index}.${input.name}`}
+                    render={({ field: { onChange, value } }) => {
+                      const { label, placeholder1, placeholder2 } = input;
+
+                      const currVal = currentVariant?.[name];
+                      const hasValue = Array.isArray(currVal) ? currVal.length > 0 : !!currVal;
+                      const placeholder = hasValue ? placeholder2 : placeholder1;
+                      return (
+                        <FileInput
+                          label={label}
+                          fileInputProps={{
+                            name,
+                            placeholder,
+                            value,
+                            onChange: ({ target: { files } }) => {
+                              if (!files?.length) return;
+
+                              const newFiles = Array.from(files);
+
+                              if (name === 'thumbnail') {
+                                onChange(newFiles?.[0]);
+                              } else if (name === 'images') {
+                                const oldFiles = field?.[name] || EMPTY_ARRAY;
+                                onChange([...oldFiles, ...newFiles]);
+                              }
+                            },
+                          }}
+                          errors={toErrorMessageArray<TProductStockAndVariants>(error?.[name])}
+                          handleRemove={() => resetField(`variants.${index}.${name}`)}
+                        />
+                      );
+                    }}
+                  />
+                ) : (
+                  <Input
+                    label={input.label}
+                    register={register(`variants.${index}.${input.name}`)}
+                    error={error?.[input.name]?.message}
+                    inputProps={{ placeholder: input.placeholder, type: input.type }}
+                  />
+                );
+              })}
+
               <div className="flex items-center justify-center gap-2 sm:col-span-2">
                 <Button
                   pattern="outline"

@@ -142,26 +142,32 @@ export const PRODUCT_CATEGORIES_SELECT_MAP_DATA = [
     placeholder: 'Select (L3) product category',
   },
 ] as const;
+const THUMBNAIL_INPUT_DATA = {
+  name: 'thumbnail',
+  label: 'Thumbnail',
+  type: 'file',
+  placeholder1: 'Select thumbnail',
+  placeholder2: 'Change thumbnail',
+} as const;
+
+const IMAGES_INPUT_DATA = {
+  name: 'images',
+  label: 'Images',
+  type: 'file',
+  placeholder1: 'Select images',
+  placeholder2: 'Add images',
+} as const;
 
 export const PRODUCT_MEDIA_AND_GALLERY_INPUT_MAP_DATA = [
-  {
-    name: 'thumbnail',
-    label: 'Thumbnail',
-    placeholder1: 'Select thumbnail',
-    placeholder2: 'Change thumbnail',
-  },
+  THUMBNAIL_INPUT_DATA,
   {
     name: 'video',
     label: 'Video',
+    type: 'file',
     placeholder1: 'Select video',
     placeholder2: 'Change video',
   },
-  {
-    name: 'images',
-    label: 'Images',
-    placeholder1: 'Select images',
-    placeholder2: 'Add images',
-  },
+  IMAGES_INPUT_DATA,
 ] as const;
 
 export const PRODUCT_DESCRIPTION_AND_CONTENT_INPUT_MAP_DATA = [
@@ -195,15 +201,61 @@ export const PRODUCT_DESCRIPTION_AND_CONTENT_INPUT_MAP_DATA = [
 export const PRODUCT_VARIANT_INPUT_MAP_DATA = [
   {
     name: 'type',
+    type: 'radio',
     defaultValue: VARIANT_TYPE_MAP.COLOR,
     options: VARIANT_TYPE.map((type) => ({ label: type, value: type })),
   },
   {
     name: 'label',
-    label: 'Variant label',
-    placeholder: 'Enter variant label',
+    label: 'Label',
+    type: 'text',
+    placeholder: 'Enter label',
     autoComplete: 'given-name',
   },
+  {
+    name: 'value',
+    label: 'Value',
+    type: 'color',
+    placeholder: 'Enter value',
+    autoComplete: 'given-name',
+  },
+  {
+    name: 'value',
+    label: 'Value',
+    type: 'text',
+    placeholder: 'Enter value',
+    autoComplete: 'given-name',
+  },
+  {
+    name: 'originalPrice',
+    label: 'Original price',
+    type: 'number',
+    placeholder: 'Enter original price',
+    autoComplete: 'tel',
+  },
+  {
+    name: 'sellingPrice',
+    label: 'Selling price',
+    type: 'number',
+    placeholder: 'Enter selling price',
+    autoComplete: 'tel',
+  },
+  {
+    name: 'stock',
+    label: 'Stock',
+    type: 'number',
+    placeholder: 'Enter stock',
+    autoComplete: 'tel',
+  },
+  {
+    name: 'stockThreshold',
+    label: 'Stock threshold',
+    type: 'number',
+    placeholder: 'Enter stock threshold',
+    autoComplete: 'tel',
+  },
+  THUMBNAIL_INPUT_DATA,
+  IMAGES_INPUT_DATA,
 ] as const;
 
 export const DEFAULT_QUILL_LINK_ID = 'custom-link-btn' as const;
