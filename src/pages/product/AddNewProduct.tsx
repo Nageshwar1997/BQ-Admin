@@ -9,6 +9,7 @@ import {
   productDescriptionAndContentSchema,
   productMediaAndGallerySchema,
   productStockAndVariantsSchema,
+  productTryOnConfigurationSchema,
 } from '@/schemas/product.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type {
@@ -23,6 +24,7 @@ import type {
   TProductDescriptionAndContent,
   TProductMediaAndGallery,
   TProductStockAndVariants,
+  TProductTryOnConfiguration,
 } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
@@ -33,7 +35,7 @@ import AddProductConfirmForm from './children/AddProductConfirmForm';
 import AddProductDescriptionAndContentFields from './children/AddProductDescriptionAndContentFields';
 import AddProductMediaAndGalleryFields from './children/AddProductMediaAndGalleryFields';
 import AddProductStockAndVariantsFields from './children/AddProductStockAndVariantsFields';
-import AddProductTryOnForm from './children/AddProductTryOnForm';
+import AddProductTryOnConfigurationFields from './children/AddProductTryOnConfigurationFields';
 
 const AddNewProduct = () => {
   const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(3);
@@ -70,6 +72,10 @@ const AddNewProduct = () => {
 
   const stockAndVariantsForm = useForm<TProductStockAndVariants>({
     resolver: zodResolver(productStockAndVariantsSchema),
+  });
+
+  const tryOnConfigurationForm = useForm<TProductTryOnConfiguration>({
+    resolver: zodResolver(productTryOnConfigurationSchema),
   });
 
   const l1Category = useWatch({ control: basicInfoForm.control, name: 'l1Category' });
@@ -123,6 +129,11 @@ const AddNewProduct = () => {
     handleNext();
   };
 
+  const onTryOnConfigurationSubmit = (data: TProductTryOnConfiguration) => {
+    console.log('onTryOnConfigurationSubmit data', data);
+    handleNext();
+  };
+
   const handleBack = () => {
     setActiveStep((prev) => (prev > 0 ? prev - 1 : prev) as TAddProductStepNumber);
   };
@@ -169,8 +180,11 @@ const AddNewProduct = () => {
         }}
       />
     </form>,
-    <form id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
-      <AddProductTryOnForm step={activeStep} onNext={handleNext} />
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+      onSubmit={tryOnConfigurationForm.handleSubmit(onTryOnConfigurationSubmit)}
+    >
+      <AddProductTryOnConfigurationFields form={tryOnConfigurationForm} />
     </form>,
     <form id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
       <AddProductConfirmForm step={activeStep} values={getValues()} />

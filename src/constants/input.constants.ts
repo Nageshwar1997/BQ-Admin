@@ -263,6 +263,26 @@ export const PRODUCT_VARIANT_INPUT_MAP_DATA = [
   IMAGES_INPUT_DATA,
 ] as const;
 
+export const PRODUCT_TRYON_INPUT_MAP_DATA = [
+  {
+    name: 'enabled',
+    content: 'Enable try-on',
+    type: 'checkbox',
+  },
+  {
+    name: 'type',
+    label: 'Try-on type',
+    type: 'select',
+    placeholder: 'Select try-on type',
+  },
+  {
+    name: 'subType',
+    label: 'Try-on sub-type',
+    type: 'select',
+    placeholder: 'Select try-on sub-type',
+  },
+] as const;
+
 export const DEFAULT_QUILL_LINK_ID = 'custom-link-btn' as const;
 
 export const defaultQuillToolbar: TQuillToolbar = [

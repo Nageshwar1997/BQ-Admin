@@ -11,7 +11,7 @@ import type {
   productDescriptionAndContentSchema,
   productMediaAndGallerySchema,
   productStockAndVariantsSchema,
-  productTryOnSchema,
+  productTryOnConfigurationSchema,
   withVariantsSchema,
   withoutVariantsSchema,
 } from '@/schemas/product.schema';
@@ -64,6 +64,6 @@ export type TProductWithoutVariant = zodInfer<typeof withoutVariantsSchema>;
 
 export type TProductStockAndVariants = zodInfer<typeof productStockAndVariantsSchema>;
 
-export type TProductTryOn = zodInfer<typeof productTryOnSchema>;
+export type TProductTryOnConfiguration = zodInfer<typeof productTryOnConfigurationSchema>;
 
 export type TBaseProduct = zodInfer<typeof productBaseSchema>;
