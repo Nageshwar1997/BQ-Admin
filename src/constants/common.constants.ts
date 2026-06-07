@@ -230,3 +230,9 @@ export const DEFAULT_POSTER = '/images/logo/BQ_gradient_logo.webp';
 export const VARIANT_TYPE_MAP = { COLOR: 'Color', TEXT: 'Text' } as const;
 
 export const VARIANT_TYPE = Object.values(VARIANT_TYPE_MAP);
+
+export const PRODUCT_VARIANT_ACTIONS = [
+  { content: 'Remove', className: 'bg-electric-purple-c' },
+  { content: 'Clear', className: 'bg-primary-red' },
+  { content: 'Add', className: 'bg-primary-yellow' },
+] as const;

@@ -4,7 +4,11 @@ import ColorInput from '@/components/ui/inputs/colorInput';
 import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
-import { EMPTY_ARRAY, VARIANT_TYPE_MAP } from '@/constants/common.constants';
+import {
+  EMPTY_ARRAY,
+  PRODUCT_VARIANT_ACTIONS,
+  VARIANT_TYPE_MAP,
+} from '@/constants/common.constants';
 import { PRODUCT_VARIANT_INPUT_MAP_DATA, STOCKS_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type { TProductStockAndVariants, TProductWithoutVariant } from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
@@ -206,123 +210,45 @@ const AddProductVariantsForm = ({ form }: Props) => {
                   />
                 );
               })}
-
               <div className="flex items-center justify-center gap-2 sm:col-span-2">
-                <Button
-                  pattern="outline"
-                  content="Remove"
-                  className="bg-electric-purple-c border-none"
-                  buttonProps={{
-                    type: 'button',
-                    onClick: () => {
-                      if (fields?.length === 1) {
-                        setValue('hasVariants', false);
-                      }
-                      remove(index);
-                    },
-                  }}
-                />
-                <Button
-                  pattern="outline"
-                  content="Clear"
-                  className="bg-primary-red border-none"
-                  buttonProps={{
-                    type: 'button',
-                    onClick: () => {
-                      setValue(`variants.${index}`, EMPTY_VARIANT);
-                      clearErrors(`variants.${index}`);
-                    },
-                  }}
-                />
-                <Button
-                  pattern="outline"
-                  content="Add"
-                  className="bg-primary-yellow border-none"
-                  buttonProps={{
-                    type: 'button',
-                    onClick: () => {
-                      const currentVariant = variants?.[index];
-                      const {
-                        images,
-                        label,
-                        originalPrice,
-                        sellingPrice,
-                        stock,
-                        stockThreshold,
-                        value,
-                        type,
-                      } = currentVariant || {};
+                {PRODUCT_VARIANT_ACTIONS.map((action) => (
+                  <Button
+                    pattern="outline"
+                    content={action.content}
+                    className={`border-none ${action.className}`}
+                    buttonProps={{
+                      type: 'button',
+                      onClick: () => {
+                        if (action.content === 'Remove') {
+                          if (fields?.length === 1) {
+                            setValue('hasVariants', false);
+                          }
+                          remove(index);
+                        } else if (action.content === 'Clear') {
+                          setValue(`variants.${index}`, EMPTY_VARIANT);
+                          clearErrors(`variants.${index}`);
+                        } else if (action.content === 'Add') {
+                          const isInvalid =
+                            !currentVariant.type ||
+                            !currentVariant.label ||
+                            !currentVariant.value ||
+                            Number.isNaN(currentVariant.originalPrice) ||
+                            Number.isNaN(currentVariant.sellingPrice) ||
+                            Number.isNaN(currentVariant.stock) ||
+                            Number.isNaN(currentVariant.stockThreshold) ||
+                            !currentVariant.images?.length;
 
-                      if (!type) {
-                        return toaster.error({
-                          title: 'Required',
-                          description: 'Please select a type to the variant',
-                        });
-                      }
-
-                      if (!label) {
-                        return toaster.error({
-                          title: 'Required',
-                          description: 'Please add a label to the variant',
-                        });
-                      }
-
-                      if (!value) {
-                        return toaster.error({
-                          title: 'Required',
-                          description: 'Please add a value to the variant',
-                        });
-                      }
-
-                      if (Number.isNaN(originalPrice)) {
-                        return toaster.error({
-                          title: 'Required',
-                          description: 'Please add an original price to the variant',
-                        });
-                      }
-                      if (Number.isNaN(sellingPrice)) {
-                        return toaster.error({
-                          title: 'Required',
-                          description: 'Please add an selling price to the variant',
-                        });
-                      }
-
-                      if (
-                        !Number.isNaN(originalPrice) &&
-                        !Number.isNaN(originalPrice) &&
-                        Number(originalPrice) < Number(sellingPrice)
-                      ) {
-                        return toaster.error({
-                          title: 'Invalid',
-                          description: 'Selling price must be greater than original price',
-                        });
-                      }
-
-                      if (Number.isNaN(stock)) {
-                        return toaster.error({
-                          title: 'Required',
-                          description: 'Please add a stock to the variant',
-                        });
-                      }
-
-                      if (Number.isNaN(stockThreshold)) {
-                        return toaster.error({
-                          title: 'Required',
-                          description: 'Please add a stock threshold to the variant',
-                        });
-                      }
-
-                      if (!images?.length) {
-                        return toaster.error({
-                          title: 'Required',
-                          description: 'Please add images to the variant',
-                        });
-                      }
-
-                      append(EMPTY_VARIANT);
-                    },
-                  }}
-                />
+                          if (isInvalid) {
+                            return toaster.warning({
+                              title: 'Required',
+                              description: 'Please fill all required fields.',
+                            });
+                          }
+                        }
+                      },
+                    }}
+                  />
+                ))}
               </div>
             </div>
           );
