@@ -35,7 +35,7 @@ const EMPTY_VARIANT = {
   images: [],
 };
 
-const AddProductVariantsForm = ({ form }: Props) => {
+const AddProductStockAndVariantsFields = ({ form }: Props) => {
   const {
     clearErrors,
     control,
@@ -270,4 +270,4 @@ const AddProductVariantsForm = ({ form }: Props) => {
   );
 };
 
-export default AddProductVariantsForm;
+export default AddProductStockAndVariantsFields;

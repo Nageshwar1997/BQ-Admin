@@ -32,8 +32,8 @@ import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
 import AddProductConfirmForm from './children/AddProductConfirmForm';
 import AddProductDescriptionAndContentFields from './children/AddProductDescriptionAndContentFields';
 import AddProductMediaAndGalleryFields from './children/AddProductMediaAndGalleryFields';
+import AddProductStockAndVariantsFields from './children/AddProductStockAndVariantsFields';
 import AddProductTryOnForm from './children/AddProductTryOnForm';
-import AddProductVariantsForm from './children/AddProductVariantsForm';
 
 const AddNewProduct = () => {
   const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(3);
@@ -161,7 +161,7 @@ const AddNewProduct = () => {
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
       onSubmit={stockAndVariantsForm.handleSubmit(onStockAndVariantsSubmit)}
     >
-      <AddProductVariantsForm form={stockAndVariantsForm} />
+      <AddProductStockAndVariantsFields form={stockAndVariantsForm} />
     </form>,
     <form id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
       <AddProductTryOnForm step={activeStep} onNext={handleNext} />
