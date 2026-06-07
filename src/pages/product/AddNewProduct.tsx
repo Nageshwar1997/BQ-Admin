@@ -4,13 +4,13 @@ import Stepper from '@/components/ui/Stepper';
 import { ADD_PRODUCT_STEPS, CATEGORY_LEVELS_MAP, EMPTY_ARRAY } from '@/constants/common.constants';
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import {
-  productBaseSchema,
   productBasicInfoSchema,
   productDescriptionAndContentSchema,
   productMediaAndGallerySchema,
   productStockAndVariantsSchema,
   productTryOnConfigurationSchema,
 } from '@/schemas/product.schema';
+import { confirmDetailsSchema } from '@/schemas/shared.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type {
   TAddProductStepNumber,
@@ -19,7 +19,7 @@ import type {
 } from '@/types/common.type';
 import type { TQuillImageRef } from '@/types/component.type';
 import type {
-  TBaseProduct,
+  TConfirmDetails,
   TProductBasicInfo,
   TProductDescriptionAndContent,
   TProductMediaAndGallery,
@@ -29,7 +29,7 @@ import type {
 import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
 import { useRef, useState } from 'react';
-import { useForm, useWatch, type Path, type PathValue } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
 import AddProductConfirmForm from './children/AddProductConfirmForm';
 import AddProductDescriptionAndContentFields from './children/AddProductDescriptionAndContentFields';
@@ -54,10 +54,6 @@ const AddNewProduct = () => {
     additional: useRef<TQuillImageRef[]>([]),
   };
 
-  const { getValues, control } = useForm<TBaseProduct>({
-    resolver: zodResolver(productBaseSchema),
-  });
-
   const basicInfoForm = useForm<TProductBasicInfo>({
     resolver: zodResolver(productBasicInfoSchema),
   });
@@ -76,6 +72,10 @@ const AddNewProduct = () => {
 
   const tryOnConfigurationForm = useForm<TProductTryOnConfiguration>({
     resolver: zodResolver(productTryOnConfigurationSchema),
+  });
+
+  const reviewAndConfirmForm = useForm<TConfirmDetails>({
+    resolver: zodResolver(confirmDetailsSchema),
   });
 
   const l1Category = useWatch({ control: basicInfoForm.control, name: 'l1Category' });
@@ -97,13 +97,7 @@ const AddNewProduct = () => {
     enabled: !!l2Category,
   });
 
-  const baseProductValues = useWatch({ control });
-  console.log('🚀 ~ AddNewProduct ~ baseProductValues:', baseProductValues);
-
-  const handleNext = <K extends Path<TBaseProduct>>(
-    _key?: K,
-    _value?: PathValue<TBaseProduct, K>,
-  ) => {
+  const handleNext = () => {
     setActiveStep(
       (prev) => (prev < ADD_PRODUCT_STEPS.length - 1 ? prev + 1 : prev) as TAddProductStepNumber,
     );
@@ -131,6 +125,11 @@ const AddNewProduct = () => {
 
   const onTryOnConfigurationSubmit = (data: TProductTryOnConfiguration) => {
     console.log('onTryOnConfigurationSubmit data', data);
+    handleNext();
+  };
+
+  const onReviewAndConfirmSubmit = (data: TConfirmDetails) => {
+    console.log('onReviewAndConfirmSubmit data', data);
     handleNext();
   };
 
@@ -186,8 +185,21 @@ const AddNewProduct = () => {
     >
       <AddProductTryOnConfigurationFields form={tryOnConfigurationForm} />
     </form>,
-    <form id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
-      <AddProductConfirmForm step={activeStep} values={getValues()} />
+    // reviewAndConfirmForm
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+      onSubmit={reviewAndConfirmForm.handleSubmit(onReviewAndConfirmSubmit)}
+    >
+      <AddProductConfirmForm
+        form={reviewAndConfirmForm}
+        values={{
+          basicInfo: basicInfoForm.getValues(),
+          mediaAndGallery: mediaAndGalleryForm.getValues(),
+          descriptionAndContent: descriptionAndContentForm.getValues(),
+          stockAndVariants: stockAndVariantsForm.getValues(),
+          tryOnConfiguration: tryOnConfigurationForm.getValues(),
+        }}
+      />
     </form>,
   ];
 

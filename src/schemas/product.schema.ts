@@ -435,17 +435,3 @@ export const productTryOnConfigurationSchema = discriminatedUnion(
   ],
   { error: 'TryOn is required.' },
 );
-
-/* -------------------------------------------------------------------------- */
-/*                       STEP 6 : CONFIRM DETAILS (View)                            */
-/* -------------------------------------------------------------------------- */
-
-export const productBaseSchema = object({
-  basicInfo: productBasicInfoSchema
-    .extend({ l1CategoryName: string(), l2CategoryName: string(), l3CategoryName: string() })
-    .optional(),
-  media: productMediaAndGallerySchema.optional(),
-  description: productDescriptionAndContentSchema.optional(),
-  variants: productStockAndVariantsSchema.optional(),
-  tryOn: productTryOnConfigurationSchema.optional(),
-});

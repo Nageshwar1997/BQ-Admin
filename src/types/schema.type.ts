@@ -6,7 +6,6 @@ import type {
   l3CategorySchema,
 } from '@/schemas/category.schema';
 import type {
-  productBaseSchema,
   productBasicInfoSchema,
   productDescriptionAndContentSchema,
   productMediaAndGallerySchema,
@@ -66,4 +65,3 @@ export type TProductStockAndVariants = zodInfer<typeof productStockAndVariantsSc
 
 export type TProductTryOnConfiguration = zodInfer<typeof productTryOnConfigurationSchema>;
 
-export type TBaseProduct = zodInfer<typeof productBaseSchema>;
