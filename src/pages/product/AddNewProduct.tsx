@@ -28,7 +28,7 @@ import type {
 } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
 import AddProductConfirmForm from './children/AddProductConfirmForm';
@@ -80,6 +80,7 @@ const AddNewProduct = () => {
 
   const l1Category = useWatch({ control: basicInfoForm.control, name: 'l1Category' });
   const l2Category = useWatch({ control: basicInfoForm.control, name: 'l2Category' });
+  const l3Category = useWatch({ control: basicInfoForm.control, name: 'l3Category' });
 
   const { data: l1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L1,
@@ -96,6 +97,13 @@ const AddNewProduct = () => {
     parent: l2Category,
     enabled: !!l2Category,
   });
+
+  const selectedCategoryNames = useMemo(() => {
+    const l1CategoryName = l1Cats.find((cat) => cat._id === l1Category)?.name || '';
+    const l2CategoryName = l2Cats.find((cat) => cat._id === l2Category)?.name || '';
+    const l3CategoryName = l3Cats.find((cat) => cat._id === l3Category)?.name || '';
+    return { l1CategoryName, l2CategoryName, l3CategoryName };
+  }, [l1Category, l2Category, l3Category, l1Cats, l2Cats, l3Cats]);
 
   const handleNext = () => {
     setActiveStep(
@@ -185,7 +193,6 @@ const AddNewProduct = () => {
     >
       <AddProductTryOnConfigurationFields form={tryOnConfigurationForm} />
     </form>,
-    // reviewAndConfirmForm
     <form
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
       onSubmit={reviewAndConfirmForm.handleSubmit(onReviewAndConfirmSubmit)}
@@ -193,7 +200,10 @@ const AddNewProduct = () => {
       <AddProductConfirmForm
         form={reviewAndConfirmForm}
         values={{
-          basicInfo: basicInfoForm.getValues(),
+          basicInfo: {
+            ...basicInfoForm.getValues(),
+            ...selectedCategoryNames,
+          },
           mediaAndGallery: mediaAndGalleryForm.getValues(),
           descriptionAndContent: descriptionAndContentForm.getValues(),
           stockAndVariants: stockAndVariantsForm.getValues(),

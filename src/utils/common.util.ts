@@ -215,3 +215,11 @@ export function convertVideoToPoster(videoUrl: string): Promise<string> {
     }
   });
 }
+
+export const formatINRCurrency = (amount: number): string =>
+  new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+    maximumFractionDigits: 2,
+  }).format(amount);

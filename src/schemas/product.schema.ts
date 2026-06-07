@@ -37,9 +37,10 @@ export const productBasicInfoSchema = object({
     1,
     'Original price must be greater than 0.',
   ),
-  sellingPrice: number({ error: 'Selling price is required.' })
-    .min(0, 'Selling price cannot be negative.')
-    .optional(),
+  sellingPrice: number({ error: 'Selling price is required.' }).min(
+    1,
+    'Selling price must be greater than 0.',
+  ),
   l1Category: string({ error: '(L1) Main category is required.' }).regex(
     REGEX.MONGODB_ID,
     '(L1) Main category must be a valid ID.',
