@@ -161,7 +161,13 @@ const AddNewProduct = () => {
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
       onSubmit={stockAndVariantsForm.handleSubmit(onStockAndVariantsSubmit)}
     >
-      <AddProductStockAndVariantsFields form={stockAndVariantsForm} />
+      <AddProductStockAndVariantsFields
+        form={stockAndVariantsForm}
+        defaultPrices={{
+          originalPrice: basicInfoForm.watch('originalPrice'),
+          sellingPrice: basicInfoForm.watch('sellingPrice'),
+        }}
+      />
     </form>,
     <form id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}>
       <AddProductTryOnForm step={activeStep} onNext={handleNext} />

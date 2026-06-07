@@ -10,7 +10,11 @@ import {
   VARIANT_TYPE_MAP,
 } from '@/constants/common.constants';
 import { PRODUCT_VARIANT_INPUT_MAP_DATA, STOCKS_INPUT_MAP_DATA } from '@/constants/input.constants';
-import type { TProductStockAndVariants, TProductWithoutVariant } from '@/types/schema.type';
+import type {
+  TProductBasicInfo,
+  TProductStockAndVariants,
+  TProductWithoutVariant,
+} from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
 import { toErrorMessageArray } from '@/utils/form.util';
 import {
@@ -21,21 +25,12 @@ import {
   type UseFormReturn,
 } from 'react-hook-form';
 
-type Props = { form: UseFormReturn<TProductStockAndVariants> };
-
-const EMPTY_VARIANT = {
-  type: VARIANT_TYPE_MAP.COLOR,
-  label: '',
-  value: '',
-  originalPrice: NaN,
-  sellingPrice: NaN,
-  stock: NaN,
-  stockThreshold: NaN,
-  thumbnail: undefined,
-  images: [],
+type Props = {
+  form: UseFormReturn<TProductStockAndVariants>;
+  defaultPrices: Pick<TProductBasicInfo, 'originalPrice' | 'sellingPrice'>;
 };
 
-const AddProductStockAndVariantsFields = ({ form }: Props) => {
+const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
   const {
     clearErrors,
     control,
@@ -44,6 +39,18 @@ const AddProductStockAndVariantsFields = ({ form }: Props) => {
     resetField,
     setValue,
   } = form;
+
+  const EMPTY_VARIANT = {
+    type: VARIANT_TYPE_MAP.COLOR,
+    label: '',
+    value: '',
+    originalPrice: defaultPrices.originalPrice ?? NaN,
+    sellingPrice: defaultPrices.sellingPrice ?? NaN,
+    stock: NaN,
+    stockThreshold: NaN,
+    thumbnail: undefined,
+    images: [],
+  };
 
   const { fields, append, remove } = useFieldArray({ control, name: 'variants' });
 
