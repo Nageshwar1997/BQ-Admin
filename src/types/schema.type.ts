@@ -10,8 +10,10 @@ import type {
   productBasicInfoSchema,
   productDescriptionAndContentSchema,
   productMediaAndGallerySchema,
-  productTryOnSchema,
   productStockAndVariantsSchema,
+  productTryOnSchema,
+  withVariantsSchema,
+  withoutVariantsSchema,
 } from '@/schemas/product.schema';
 import type { confirmDetailsSchema } from '@/schemas/shared.schema';
 import type {
@@ -55,6 +57,10 @@ export type TProductBasicInfo = zodInfer<typeof productBasicInfoSchema>;
 export type TProductMediaAndGallery = zodInfer<typeof productMediaAndGallerySchema>;
 
 export type TProductDescriptionAndContent = zodInfer<typeof productDescriptionAndContentSchema>;
+
+export type TProductWithVariant = zodInfer<typeof withVariantsSchema>;
+
+export type TProductWithoutVariant = zodInfer<typeof withoutVariantsSchema>;
 
 export type TProductStockAndVariants = zodInfer<typeof productStockAndVariantsSchema>;
 

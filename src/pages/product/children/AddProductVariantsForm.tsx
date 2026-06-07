@@ -5,11 +5,17 @@ import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
 import { EMPTY_ARRAY, VARIANT_TYPE_MAP } from '@/constants/common.constants';
-import { PRODUCT_VARIANT_INPUT_MAP_DATA } from '@/constants/input.constants';
-import type { TProductStockAndVariants } from '@/types/schema.type';
+import { PRODUCT_VARIANT_INPUT_MAP_DATA, STOCKS_INPUT_MAP_DATA } from '@/constants/input.constants';
+import type { TProductStockAndVariants, TProductWithoutVariant } from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
 import { toErrorMessageArray } from '@/utils/form.util';
-import { Controller, useFieldArray, useWatch, type UseFormReturn } from 'react-hook-form';
+import {
+  Controller,
+  useFieldArray,
+  useWatch,
+  type FieldErrors,
+  type UseFormReturn,
+} from 'react-hook-form';
 
 type Props = { form: UseFormReturn<TProductStockAndVariants> };
 
@@ -191,12 +197,12 @@ const AddProductVariantsForm = ({ form }: Props) => {
                   <Input
                     key={`${name}-${type}`}
                     label={input.label}
-                    register={register(`variants.${index}.${name}`)}
+                    register={register(
+                      `variants.${index}.${name}`,
+                      input.type === 'number' ? { valueAsNumber: true } : {},
+                    )}
                     error={error?.[name]?.message}
-                    inputProps={{
-                      placeholder: input.placeholder,
-                      type: input.type,
-                    }}
+                    inputProps={{ placeholder: input.placeholder, type: input.type }}
                   />
                 );
               })}
@@ -323,18 +329,15 @@ const AddProductVariantsForm = ({ form }: Props) => {
         })
       ) : (
         <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Stock"
-            register={register('stock', { valueAsNumber: true })}
-            error={'stock' in errors ? errors.stock?.message : undefined}
-            inputProps={{ type: 'number', placeholder: '100' }}
-          />
-          <Input
-            label="Stock threshold"
-            register={register('stockThreshold', { valueAsNumber: true })}
-            error={'stockThreshold' in errors ? errors.stockThreshold?.message : undefined}
-            inputProps={{ type: 'number', placeholder: '100' }}
-          />
+          {STOCKS_INPUT_MAP_DATA.map((input) => (
+            <Input
+              key={input.name}
+              label={input.label}
+              register={register(input.name, { valueAsNumber: true })}
+              error={(errors as FieldErrors<TProductWithoutVariant>)[input.name]?.message}
+              inputProps={{ type: input.type, placeholder: input.placeholder }}
+            />
+          ))}
         </div>
       )}
     </div>

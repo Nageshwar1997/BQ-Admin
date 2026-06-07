@@ -353,7 +353,7 @@ const variantSchema = object({
   }
 });
 
-const withoutVariantsSchema = object({
+export const withoutVariantsSchema = object({
   hasVariants: literal(false),
   stock: number({ error: 'Stock is required' })
     .int('Stock must be a whole number.')
@@ -373,7 +373,7 @@ const withoutVariantsSchema = object({
   }
 });
 
-const withVariantsSchema = object({
+export const withVariantsSchema = object({
   hasVariants: literal(true),
   variants: array(variantSchema, { error: 'At least one variant is required.' }).min(
     1,

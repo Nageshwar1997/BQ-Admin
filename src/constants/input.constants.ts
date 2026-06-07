@@ -199,6 +199,23 @@ export const PRODUCT_DESCRIPTION_AND_CONTENT_INPUT_MAP_DATA = [
   },
 ] as const;
 
+export const STOCKS_INPUT_MAP_DATA = [
+  {
+    name: 'stock',
+    label: 'Stock',
+    type: 'number',
+    placeholder: 'Enter stock',
+    autoComplete: 'tel',
+  },
+  {
+    name: 'stockThreshold',
+    label: 'Stock threshold',
+    type: 'number',
+    placeholder: 'Enter stock threshold',
+    autoComplete: 'tel',
+  },
+] as const;
+
 export const PRODUCT_VARIANT_INPUT_MAP_DATA = [
   {
     name: 'type',
@@ -241,20 +258,7 @@ export const PRODUCT_VARIANT_INPUT_MAP_DATA = [
     placeholder: 'Enter selling price',
     autoComplete: 'tel',
   },
-  {
-    name: 'stock',
-    label: 'Stock',
-    type: 'number',
-    placeholder: 'Enter stock',
-    autoComplete: 'tel',
-  },
-  {
-    name: 'stockThreshold',
-    label: 'Stock threshold',
-    type: 'number',
-    placeholder: 'Enter stock threshold',
-    autoComplete: 'tel',
-  },
+  ...STOCKS_INPUT_MAP_DATA,
   THUMBNAIL_INPUT_DATA,
   IMAGES_INPUT_DATA,
 ] as const;
