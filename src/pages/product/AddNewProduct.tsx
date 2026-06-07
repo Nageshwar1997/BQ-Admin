@@ -38,7 +38,7 @@ import AddProductStockAndVariantsFields from './children/AddProductStockAndVaria
 import AddProductTryOnConfigurationFields from './children/AddProductTryOnConfigurationFields';
 
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(3);
+  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(5);
 
   const quillRefs: TProductQuillRefs = {
     description: useRef<Quill | null>(null),

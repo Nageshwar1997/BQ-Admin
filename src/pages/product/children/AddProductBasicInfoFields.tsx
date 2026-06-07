@@ -64,7 +64,7 @@ const AddProductBasicInfoFields = ({
                   selectProps={{
                     value,
                     placeholder,
-                    disabled: isL1 ? !l1Category : isL2 ? !l2Category : !options.length,
+                    disabled: isL2 ? !l1Category : isL3 ? !l2Category : !options.length,
                     onChange: (value) => {
                       if (isL1) {
                         setValue('l2Category', '');
