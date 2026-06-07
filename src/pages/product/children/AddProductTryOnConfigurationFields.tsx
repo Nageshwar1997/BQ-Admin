@@ -30,10 +30,12 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
         if (input.type === 'select' && !enabled) return null;
         return input.type === 'select' ? (
           <Controller
+            key={input.name}
             name={`tryon.${input.name}`}
             control={control}
             render={({ field: { onChange, value } }) => {
               const options = input.name === 'subType' ? subTypes : TRY_ON_TYPES;
+              console.log('🚀 ~ AddProductTryOnConfigurationFields ~ options:', options);
               return (
                 <Select
                   label={input.label}
@@ -58,11 +60,12 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
           />
         ) : (
           <Checkbox
+            key={input.name}
             register={register('enabled')}
             error={errors.enabled?.message}
             content="Enable TryOn"
-              checkboxProps={{ name: 'enabled', onChange: () => resetField('tryon') }}
-              containerClassName='col-span-2'
+            checkboxProps={{ name: 'enabled', onChange: () => resetField('tryon') }}
+            containerClassName="col-span-2"
           />
         );
       })}
