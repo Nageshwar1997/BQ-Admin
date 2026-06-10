@@ -11,6 +11,10 @@ import {
   productTryOnConfigurationSchema,
 } from '@/schemas/product.schema';
 import { confirmDetailsSchema } from '@/schemas/shared.schema';
+import {
+  useUploadMultipleMedia,
+  useUploadSingleMedia,
+} from '@/services/media-service/media.service.query';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import type {
   TAddProductStepNumber,
@@ -38,7 +42,10 @@ import AddProductStockAndVariantsFields from './children/AddProductStockAndVaria
 import AddProductTryOnConfigurationFields from './children/AddProductTryOnConfigurationFields';
 
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(5);
+  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(0);
+
+  const uploadSingleMediaQuery = useUploadSingleMedia();
+  const uploadMultipleMediaQuery = useUploadMultipleMedia();
 
   const quillRefs: TProductQuillRefs = {
     description: useRef<Quill | null>(null),
@@ -116,9 +123,50 @@ const AddNewProduct = () => {
     handleNext();
   };
 
-  const onMediaAndGallerySubmit = (data: TProductMediaAndGallery) => {
+  const onMediaAndGallerySubmit = async (data: TProductMediaAndGallery) => {
     console.log('onMediaAndGallerySubmit data', data);
-    handleNext();
+    const thumbnailFormData = new FormData();
+    const imagesFormData = new FormData();
+    const basicInfo = basicInfoForm.getValues();
+
+    thumbnailFormData.append('file', data.thumbnail);
+    thumbnailFormData.append('folder', basicInfo.title);
+    thumbnailFormData.append('resourceType', 'image');
+
+    data.images.forEach((image) => {
+      imagesFormData.append('files', image);
+    });
+    imagesFormData.append('folder', basicInfo.title);
+    imagesFormData.append('resourceType', 'image');
+
+    await uploadSingleMediaQuery.mutateAsync(thumbnailFormData, {
+      onSuccess: async (data) => {
+        mediaAndGalleryForm.setValue('thumbnail', data.url);
+        // await uploadMultipleMediaQuery.mutateAsync(imagesFormData, {
+        //   onSuccess: async () => {
+            // if (data.video) {
+            //   const videoFormData = new FormData();
+
+            //   videoFormData.append('file', data.video);
+            //   videoFormData.append('folder', basicInfo.title);
+            //   videoFormData.append('resourceType', 'video');
+            //   await uploadSingleMediaQuery.mutateAsync(videoFormData, {
+            //     onSuccess: () => handleNext(),
+            //   });
+            // } else {
+            //   handleNext();
+            // }
+            handleNext();
+        //   },
+        // });
+      },
+    });
+
+    // await Promise.all([
+    //   uploadSingleMediaQuery.mutate(thumbnailFormData),
+    //   uploadMultipleMediaQuery.mutate(imagesFormData),
+    //   data.video && uploadSingleMediaQuery.mutate(videoFormData),
+    // ]).then(() => handleNext());
   };
 
   const onDescriptionAndContentSubmit = (data: TProductDescriptionAndContent) => {

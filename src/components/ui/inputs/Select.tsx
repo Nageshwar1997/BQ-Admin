@@ -16,7 +16,6 @@ const Select = ({
   options = EMPTY_ARRAY,
   position = 'bottom',
 }: ISelect) => {
-  console.log("🚀 ~ Select ~ options:", options)
   const [isOpen, setIsOpen] = useState(false);
 
   const containerRef = useOutsideClick<HTMLDivElement>(() => setIsOpen(false), { enabled: isOpen });

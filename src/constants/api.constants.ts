@@ -13,6 +13,7 @@ export const API_BASE_URLS = {
   gateway: envs.urls.gateway,
   'user-service': `${envs.urls.gateway}/api/v1/user-service`,
   'product-service': `${envs.urls.gateway}/api/v1/product-service`,
+  'media-service': `${envs.urls.gateway}/api/v1/media-service`,
 };
 
 export const METHODS_AND_PATHS = {
@@ -72,7 +73,14 @@ export const METHODS_AND_PATHS = {
       session: { method: METHOD_MAP.GET, path: '/session' },
     },
   },
-  media_service: { base: '/media-service' },
+  media_service: {
+    base: '/media-service',
+    upload: {
+      base: '/upload',
+      single: { method: METHOD_MAP.POST, path: '/single' },
+      multiple: { method: METHOD_MAP.POST, path: '/multiple' },
+    },
+  },
   product_service: {
     base: '/product-service',
     category: {

@@ -11,7 +11,7 @@ export class CategoryApi extends ApiRequest {
     return this.request({ ...this.routes.add, data });
   };
 
-  /* ===================== POST API ===================== */
+  /* ===================== PATCH API ===================== */
 
   public updateCategory = ({ _id, ...data }: Partial<Omit<ICategory, 'slug'>> & IId) => {
     const { method, url } = this.routes.update;
