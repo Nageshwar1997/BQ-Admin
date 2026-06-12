@@ -16,11 +16,7 @@ import { type UseFormReturn } from 'react-hook-form';
 type Props = {
   form: UseFormReturn<TConfirmDetails>;
   values: {
-    basicInfo: TProductBasicInfo & {
-      l1CategoryName: string;
-      l2CategoryName: string;
-      l3CategoryName: string;
-    };
+    basicInfo: TProductBasicInfo;
     mediaAndGallery: TProductMediaAndGallery;
     descriptionAndContent: TProductDescriptionAndContent;
     stockAndVariants: TProductStockAndVariants;
@@ -31,7 +27,7 @@ type Props = {
 const Heading = ({ title }: { title: string }) => (
   <div className="text-primary flex items-center gap-2">
     <h4 className="font-semibold">{title}</h4>
-    <Icon icon="solar:pen-2-linear" className='[&>g]:stroke-2' />
+    <Icon icon="solar:pen-2-linear" className="[&>g]:stroke-2" />
   </div>
 );
 
@@ -48,7 +44,7 @@ const KeyValue = ({
   );
 };
 
-const BasicInfo = ({ data }: { data: Props["values"]["basicInfo"] }) => {
+const BasicInfo = ({ data }: { data: Props['values']['basicInfo'] }) => {
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
       <Heading title="Basic Information" />
@@ -61,15 +57,15 @@ const BasicInfo = ({ data }: { data: Props["values"]["basicInfo"] }) => {
           className="[&>div]:text-primary-green"
         />
         <KeyValue label="Original Price" value={formatINRCurrency(data.originalPrice)} />
-        <KeyValue label="Main Category" value={data.l1CategoryName} />
-        <KeyValue label="Sub-Category" value={data.l2CategoryName} />
-        <KeyValue label="Product Category" value={data.l3CategoryName} />
+        <KeyValue label="Main Category" value={data.l1Category.name} />
+        <KeyValue label="Sub-Category" value={data.l2Category.name} />
+        <KeyValue label="Product Category" value={data.l3Category.name} />
       </div>
     </section>
   );
 };
 
-const MediaAndGallery = ({ data:_ }: { data: Props["values"]["mediaAndGallery"] }) => {
+const MediaAndGallery = ({ data: _ }: { data: Props['values']['mediaAndGallery'] }) => {
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
       <Heading title="Media and Gallery" />
@@ -91,8 +87,8 @@ const MediaAndGallery = ({ data:_ }: { data: Props["values"]["mediaAndGallery"] 
 };
 
 const AddProductConfirmForm = ({ values, form }: Props) => {
-  const { basicInfo,mediaAndGallery } = values;
-  console.log("🚀 ~ AddProductConfirmForm ~ mediaAndGallery:", mediaAndGallery)
+  const { basicInfo, mediaAndGallery } = values;
+  console.log('🚀 ~ AddProductConfirmForm ~ mediaAndGallery:', mediaAndGallery);
   return (
     <div className="grid gap-4">
       <BasicInfo data={basicInfo} />

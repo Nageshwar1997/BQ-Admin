@@ -16,15 +16,8 @@ const AddProductBasicInfoFields = ({
   form: UseFormReturn<TProductBasicInfo>;
   categories: Record<keyof typeof CATEGORY_LEVELS_MAP, ICategory[]>;
 }) => {
-  const {
-    control,
-    formState: { errors },
-    register,
-    setValue,
-  } = form;
-
-  const l1Category = useWatch({ control, name: 'l1Category' });
-  const l2Category = useWatch({ control, name: 'l2Category' });
+  const l1Category = useWatch({ control: form.control, name: 'l1Category' });
+  const l2Category = useWatch({ control: form.control, name: 'l2Category' });
 
   return (
     <div className="grid gap-4 sm:grid-cols-2">
@@ -32,10 +25,10 @@ const AddProductBasicInfoFields = ({
         <Input
           key={input.name}
           label={input.label}
-          register={register(input.name, {
+          register={form.register(input.name, {
             ...(input.type === 'number' && { valueAsNumber: true }),
           })}
-          error={errors[input.name]?.message}
+          error={form.formState.errors[input.name]?.message}
           inputProps={{ type: input.type, placeholder: input.placeholder }}
         />
       ))}
@@ -54,26 +47,34 @@ const AddProductBasicInfoFields = ({
             <Controller
               key={name}
               name={name}
-              control={control}
+              control={form.control}
               render={({ field: { onChange, value } }) => (
                 <Select
                   label={label}
-                  error={errors[name]?.message}
+                  error={
+                    form.formState.errors[name]?.message ||
+                    form.formState.errors[name]?.name?.message ||
+                    form.formState.errors[name]?.id?.message
+                  }
                   options={options}
                   position="top"
                   selectProps={{
-                    value,
+                    value: value?.id,
                     placeholder,
                     disabled: isL2 ? !l1Category : isL3 ? !l2Category : !options.length,
                     onChange: (value) => {
+                      const catName = options.find((cat) => cat.value === value)?.label;
+
+                      if (!catName) return;
+
                       if (isL1) {
-                        setValue('l2Category', '');
-                        setValue('l3Category', '');
+                        form.resetField('l2Category');
+                        form.resetField('l3Category');
                       }
                       if (isL2) {
-                        setValue('l3Category', '');
+                        form.resetField('l3Category');
                       }
-                      onChange(value);
+                      onChange({ id: value, name: catName });
                     },
                   }}
                 />

@@ -32,7 +32,7 @@ import type {
 } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
 import AddProductConfirmForm from './children/AddProductConfirmForm';
@@ -87,7 +87,6 @@ const AddNewProduct = () => {
 
   const l1Category = useWatch({ control: basicInfoForm.control, name: 'l1Category' });
   const l2Category = useWatch({ control: basicInfoForm.control, name: 'l2Category' });
-  const l3Category = useWatch({ control: basicInfoForm.control, name: 'l3Category' });
 
   const { data: l1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L1,
@@ -95,22 +94,15 @@ const AddNewProduct = () => {
 
   const { data: l2Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L2,
-    parent: l1Category,
-    enabled: !!l1Category,
+    parent: l1Category?.id,
+    enabled: !!l1Category?.id,
   });
 
   const { data: l3Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L3,
-    parent: l2Category,
-    enabled: !!l2Category,
+    parent: l2Category?.id,
+    enabled: !!l2Category?.id,
   });
-
-  const selectedCategoryNames = useMemo(() => {
-    const l1CategoryName = l1Cats.find((cat) => cat._id === l1Category)?.name || '';
-    const l2CategoryName = l2Cats.find((cat) => cat._id === l2Category)?.name || '';
-    const l3CategoryName = l3Cats.find((cat) => cat._id === l3Category)?.name || '';
-    return { l1CategoryName, l2CategoryName, l3CategoryName };
-  }, [l1Category, l2Category, l3Category, l1Cats, l2Cats, l3Cats]);
 
   const handleNext = () => {
     setActiveStep(
@@ -250,10 +242,7 @@ const AddNewProduct = () => {
       <AddProductConfirmForm
         form={reviewAndConfirmForm}
         values={{
-          basicInfo: {
-            ...basicInfoForm.getValues(),
-            ...selectedCategoryNames,
-          },
+          basicInfo: basicInfoForm.getValues(),
           mediaAndGallery: mediaAndGalleryForm.getValues(),
           descriptionAndContent: descriptionAndContentForm.getValues(),
           stockAndVariants: stockAndVariantsForm.getValues(),

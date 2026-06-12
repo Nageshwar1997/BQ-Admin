@@ -41,17 +41,35 @@ export const productBasicInfoSchema = object({
     1,
     'Selling price must be greater than 0.',
   ),
-  l1Category: string({ error: '(L1) Main category is required.' }).regex(
-    REGEX.MONGODB_ID,
-    '(L1) Main category must be a valid ID.',
+  l1Category: object(
+    {
+      id: string({ error: '(L1) Main category is required.' }).regex(
+        REGEX.MONGODB_ID,
+        '(L1) Main category must be a valid ID.',
+      ),
+      name: string({ error: '(L1) Main category is required.' }),
+    },
+    { error: '(L1) Main category is required.' },
   ),
-  l2Category: string({ error: '(L2) Sub-category is required.' }).regex(
-    REGEX.MONGODB_ID,
-    '(L2) Sub-category must be a valid ID.',
+  l2Category: object(
+    {
+      id: string({ error: '(L2) Sub-category is required.' }).regex(
+        REGEX.MONGODB_ID,
+        '(L2) Sub-category must be a valid ID.',
+      ),
+      name: string({ error: '(L2) Sub-category is required.' }),
+    },
+    { error: '(L2) Sub-category is required.' },
   ),
-  l3Category: string({ error: '(L3) Product category is required.' }).regex(
-    REGEX.MONGODB_ID,
-    '(L3) Product category must be a valid ID.',
+  l3Category: object(
+    {
+      id: string({ error: '(L3) Product category is required.' }).regex(
+        REGEX.MONGODB_ID,
+        '(L3) Product category must be a valid ID.',
+      ),
+      name: string({ error: '(L3) Product category is required.' }),
+    },
+    { error: '(L3) Product category is required.' },
   ),
 }).refine((data) => !data.sellingPrice || data.sellingPrice <= data.originalPrice, {
   path: ['sellingPrice'],

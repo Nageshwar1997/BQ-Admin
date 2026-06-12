@@ -51,8 +51,6 @@ export type TCategory = zodInfer<typeof categorySchema>;
 /* ================ PRODUCT SCHEMA TYPES ================ */
 export type TProductBasicInfo = zodInfer<typeof productBasicInfoSchema>;
 
-// export type TProductCategoryInventory = zodInfer<typeof productCategoryInventorySchema>;
-
 export type TProductMediaAndGallery = zodInfer<typeof productMediaAndGallerySchema>;
 
 export type TProductDescriptionAndContent = zodInfer<typeof productDescriptionAndContentSchema>;
@@ -64,4 +62,3 @@ export type TProductWithoutVariant = zodInfer<typeof withoutVariantsSchema>;
 export type TProductStockAndVariants = zodInfer<typeof productStockAndVariantsSchema>;
 
 export type TProductTryOnConfiguration = zodInfer<typeof productTryOnConfigurationSchema>;
-
