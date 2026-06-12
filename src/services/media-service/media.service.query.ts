@@ -7,10 +7,8 @@ import { useMutation } from '@tanstack/react-query';
 
 const { upload } = API_QUERY_KEYS.media_service;
 
-type TUploadPayload = {
-  data: FormData;
-  toasterInfo?: Partial<TTitleDescription>;
-};
+type TUploadPayload = { data: FormData; toasterInfo?: Partial<TTitleDescription> };
+
 export const useUploadSingleMedia = () => {
   return useMutation({
     mutationKey: upload.single,
