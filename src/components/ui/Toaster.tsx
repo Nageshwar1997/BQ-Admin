@@ -110,6 +110,18 @@ const Toaster = (props: TToastItem & TClassName) => {
               </p>
             )}
 
+            {'progress' in props && typeof props.progress === 'number' && (
+              <div className="mt-2 flex flex-col gap-1">
+                <div className="bg-primary/10 h-1.5 w-full overflow-hidden rounded-full">
+                  <div
+                    className="bg-primary h-full transition-all duration-200"
+                    style={{ width: `${props.progress}%` }}
+                  />
+                </div>
+                <p className="text-tertiary text-[10px]">{props.progress}%</p>
+              </div>
+            )}
+
             {isCustom && 'children' in props && props.children}
           </div>
 

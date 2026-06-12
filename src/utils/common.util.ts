@@ -1,7 +1,12 @@
 import { DEFAULT_POSTER, GB, KB, MB, TOOLTIP_GAP } from '@/constants/common.constants';
 import useToastStore from '@/stores/toast.store';
 import type { IButton, ITooltip } from '@/types/component.type';
-import type { ICustomToast, IDefaultToast, ILoadingToast } from '@/types/store.type';
+import type {
+  ICustomToast,
+  IDefaultToast,
+  ILoadingToast,
+  TProgressToastOptions,
+} from '@/types/store.type';
 import type { CSSProperties } from 'react';
 
 export const getButtonCss = (pattern: IButton['pattern']) => {
@@ -80,13 +85,14 @@ export const getTooltipArrowCss = (placement: NonNullable<ITooltip['placement']>
   }
 };
 
-const { addToast, removeToast } = useToastStore.getState();
+const { addToast, updateToast, removeToast } = useToastStore.getState();
 export const toaster = {
   success: (data: Omit<IDefaultToast, 'type'>) => addToast({ ...data, type: 'success' }),
   error: (data: Omit<IDefaultToast, 'type'>) => addToast({ ...data, type: 'error' }),
   warning: (data: Omit<IDefaultToast, 'type'>) => addToast({ ...data, type: 'warning' }),
   loading: (data: Omit<ILoadingToast, 'type'>) => addToast({ ...data, type: 'loading' }),
   custom: (data: ICustomToast) => addToast(data),
+  progress: (toastId: string, progress: number) => updateToast(toastId, progress),
   remove: (toastId: string) => removeToast(toastId),
 };
 
@@ -223,3 +229,27 @@ export const formatINRCurrency = (amount: number): string =>
     minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
     maximumFractionDigits: 2,
   }).format(amount);
+
+export const withProgressToast = async <T>({
+  title,
+  description,
+  request,
+}: TProgressToastOptions<T>): Promise<T> => {
+  const toastId = toaster.loading({ title, description, progress: 0 });
+
+  try {
+    const response = await request((event) => {
+      if (!event.total) return;
+
+      const progress = Math.round((event.loaded * 100) / event.total);
+
+      toaster.progress(toastId, progress);
+    });
+
+    toaster.progress(toastId, 100);
+
+    return response;
+  } finally {
+    toaster.remove(toastId);
+  }
+};

@@ -1,3 +1,4 @@
+import type { AxiosProgressEvent } from 'axios';
 import type { ReactNode } from 'react';
 import type { IUser } from './api.type';
 import type { IButton, TClassName } from './component.type';
@@ -31,6 +32,7 @@ export interface ICustomToast extends IBaseToast, TToastClosable {
 
 export interface ILoadingToast extends IBaseToast, TTitleDescription {
   type: 'loading';
+  progress?: number;
   isClosable?: never;
   autoClose?: never;
   closeTimer?: never;
@@ -43,15 +45,17 @@ export type TToastItem = TToast & { id: string };
 export interface IToastStore {
   toasts: TToastItem[];
   addToast: (toast: TToast) => string;
+  updateToast: (id: string, progress: number) => void;
   removeToast: (id: string) => void;
 }
 
+export type TProgressToastOptions<T> = TTitleDescription & {
+  request: (onProgress: (event: AxiosProgressEvent) => void) => Promise<T>;
+};
+
 export type TTheme = 'light' | 'dark';
 
-export type TThemeStore = {
-  theme: TTheme;
-  toggleTheme: () => void;
-};
+export type TThemeStore = { theme: TTheme; toggleTheme: () => void };
 
 export type TUserStore = {
   user: IUser | null;

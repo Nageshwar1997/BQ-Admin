@@ -1,4 +1,5 @@
 import type { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
+import type { AxiosProgressEvent } from 'axios';
 import type Quill from 'quill';
 import type { RefObject } from 'react';
 import type { TQuillImageRef } from './component.type';
@@ -13,3 +14,8 @@ export type TProductContentFields = keyof Omit<TProductDescriptionAndContent, 's
 export type TProductQuillRefs = Record<TProductContentFields, RefObject<Quill | null>>;
 
 export type TProductQuillImageRefs = Record<TProductContentFields, RefObject<TQuillImageRef[]>>;
+
+export type TFormDataProgress = {
+  data: FormData;
+  onUploadProgress?: (event: AxiosProgressEvent) => void;
+};
