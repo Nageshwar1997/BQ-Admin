@@ -124,49 +124,40 @@ const AddNewProduct = () => {
   };
 
   const onMediaAndGallerySubmit = async (data: TProductMediaAndGallery) => {
-    console.log('onMediaAndGallerySubmit data', data);
-    const thumbnailFormData = new FormData();
-    const imagesFormData = new FormData();
     const basicInfo = basicInfoForm.getValues();
 
+    const thumbnailFormData = new FormData();
     thumbnailFormData.append('file', data.thumbnail);
     thumbnailFormData.append('folder', basicInfo.title);
-    thumbnailFormData.append('resourceType', 'image');
 
+    const imagesFormData = new FormData();
     data.images.forEach((image) => {
       imagesFormData.append('files', image);
     });
     imagesFormData.append('folder', basicInfo.title);
-    imagesFormData.append('resourceType', 'image');
 
-    await uploadSingleMediaQuery.mutateAsync(thumbnailFormData, {
-      onSuccess: async (data) => {
-        mediaAndGalleryForm.setValue('thumbnail', data.url);
-        // await uploadMultipleMediaQuery.mutateAsync(imagesFormData, {
-        //   onSuccess: async () => {
-            // if (data.video) {
-            //   const videoFormData = new FormData();
+    const videoFormData = new FormData();
+    if (data.video) {
+      videoFormData.append('file', data.video);
+      videoFormData.append('folder', basicInfo.title);
+    }
 
-            //   videoFormData.append('file', data.video);
-            //   videoFormData.append('folder', basicInfo.title);
-            //   videoFormData.append('resourceType', 'video');
-            //   await uploadSingleMediaQuery.mutateAsync(videoFormData, {
-            //     onSuccess: () => handleNext(),
-            //   });
-            // } else {
-            //   handleNext();
-            // }
-            handleNext();
-        //   },
-        // });
-      },
-    });
+    const [thumbnailResponse, imagesResponse, videoResponse] = await Promise.all([
+      uploadSingleMediaQuery.mutateAsync(thumbnailFormData),
+      uploadMultipleMediaQuery.mutateAsync(imagesFormData),
+      data.video ? uploadSingleMediaQuery.mutateAsync(videoFormData) : Promise.resolve(null),
+    ]);
 
-    // await Promise.all([
-    //   uploadSingleMediaQuery.mutate(thumbnailFormData),
-    //   uploadMultipleMediaQuery.mutate(imagesFormData),
-    //   data.video && uploadSingleMediaQuery.mutate(videoFormData),
-    // ]).then(() => handleNext());
+    mediaAndGalleryForm.setValue('thumbnail', thumbnailResponse.url);
+    if (imagesResponse.urls) {
+      mediaAndGalleryForm.setValue('images', imagesResponse.urls);
+    }
+
+    if (videoResponse) {
+      mediaAndGalleryForm.setValue('video', videoResponse.url);
+    }
+
+    handleNext();
   };
 
   const onDescriptionAndContentSubmit = (data: TProductDescriptionAndContent) => {
