@@ -143,9 +143,20 @@ const AddNewProduct = () => {
     }
 
     const [thumbnailResponse, imagesResponse, videoResponse] = await Promise.all([
-      uploadSingleMediaQuery.mutateAsync(thumbnailFormData),
-      uploadMultipleMediaQuery.mutateAsync(imagesFormData),
-      data.video ? uploadSingleMediaQuery.mutateAsync(videoFormData) : Promise.resolve(null),
+      uploadSingleMediaQuery.mutateAsync({
+        data: thumbnailFormData,
+        toasterInfo: { title: 'Please wait...', description: 'Uploading thumbnail' },
+      }),
+      uploadMultipleMediaQuery.mutateAsync({
+        data: imagesFormData,
+        toasterInfo: { title: 'Please wait...', description: 'Uploading images' },
+      }),
+      data.video
+        ? uploadSingleMediaQuery.mutateAsync({
+            data: videoFormData,
+            toasterInfo: { title: 'Please wait...', description: 'Uploading video' },
+          })
+        : Promise.resolve(null),
     ]);
 
     mediaAndGalleryForm.setValue('thumbnail', thumbnailResponse.url);

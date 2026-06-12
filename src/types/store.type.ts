@@ -1,7 +1,8 @@
+import type { TOAST_TYPE } from '@/constants/common.constants';
 import type { AxiosProgressEvent } from 'axios';
 import type { ReactNode } from 'react';
 import type { IUser } from './api.type';
-import type { IButton, TClassName } from './component.type';
+import type { IButton, TClassName, TTitleDescription } from './component.type';
 
 interface IBaseToast extends TClassName {
   icon?: ReactNode;
@@ -14,39 +15,42 @@ type TToastClosable = {
   closeTimer?: number;
 };
 
-type TTitleDescription = {
-  title: string;
-  description: string;
-};
-
 export interface IDefaultToast extends IBaseToast, TToastClosable, TTitleDescription {
-  type: 'success' | 'error' | 'warning' | 'default';
+  type:
+    | typeof TOAST_TYPE.success
+    | typeof TOAST_TYPE.error
+    | typeof TOAST_TYPE.warning
+    | typeof TOAST_TYPE.default;
 }
 
 export interface ICustomToast extends IBaseToast, TToastClosable {
-  type: 'custom';
+  type: typeof TOAST_TYPE.custom;
   children: ReactNode;
   title?: never;
   description?: never;
 }
 
 export interface ILoadingToast extends IBaseToast, TTitleDescription {
-  type: 'loading';
-  progress?: number;
+  type: typeof TOAST_TYPE.loading;
   isClosable?: never;
   autoClose?: never;
   closeTimer?: never;
 }
 
-export type TToast = IDefaultToast | ICustomToast | ILoadingToast;
+export interface IProgressToast extends Omit<ILoadingToast, 'type'> {
+  type: typeof TOAST_TYPE.progress;
+  progress: number;
+}
+
+export type TToast = IDefaultToast | ICustomToast | ILoadingToast | IProgressToast;
 
 export type TToastItem = TToast & { id: string };
 
 export interface IToastStore {
   toasts: TToastItem[];
-  addToast: (toast: TToast) => string;
-  updateToast: (id: string, progress: number) => void;
-  removeToast: (id: string) => void;
+  add: (toast: TToast) => string;
+  update: { progress: (id: string, progress: number) => void };
+  remove: (id: string) => void;
 }
 
 export type TProgressToastOptions<T> = TTitleDescription & {

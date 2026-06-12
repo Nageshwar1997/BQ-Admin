@@ -225,6 +225,20 @@ export const FILE_EXTENSIONS = {
   video: ['mp4', 'webm', 'mov', 'mkv', 'ogg', 'm3u8'],
 } as const;
 
+export const TOAST_TYPES = [
+  'success',
+  'error',
+  'warning',
+  'progress',
+  'loading',
+  'default',
+  'custom',
+] as const;
+
+export const TOAST_TYPE = Object.fromEntries(TOAST_TYPES.map((type) => [type, type])) as {
+  [K in (typeof TOAST_TYPES)[number]]: K;
+};
+
 export const DEFAULT_POSTER = '/images/logo/BQ_gradient_logo.webp';
 
 export const VARIANT_TYPE_MAP = { COLOR: 'Color', TEXT: 'Text' } as const;

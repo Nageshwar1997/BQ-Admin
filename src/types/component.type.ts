@@ -1,4 +1,4 @@
-import type { SORT_ORDER_MAP } from '@/constants/common.constants';
+import type { SORT_ORDER_MAP, TOAST_TYPE } from '@/constants/common.constants';
 import type { FOOTER_CATEGORIES } from '@/constants/footer.constants';
 import type { IconProps } from '@iconify/react';
 import type {
@@ -11,7 +11,6 @@ import type {
 } from 'react';
 import type { ICategory } from './api.type';
 import type { TGradientPos, TScrollDirection } from './hook.type';
-import type { TToast } from './store.type';
 
 export type TClassName = { className?: string };
 
@@ -109,14 +108,18 @@ export type TCatActionHandle = {
 export type TCatTable = TCatActionHandle & TCatModal;
 
 type TCustomConfirmModal = TChildren & {
-  type: Extract<TToast['type'], 'custom'>;
+  type: typeof TOAST_TYPE.custom;
   title?: never;
   description?: never;
   buttons?: Partial<Record<'left' | 'right', Omit<IButton, 'pattern'>>>;
 };
 
 type TDefaultConfirmModal = {
-  type: Exclude<TToast['type'], 'custom' | 'loading'>;
+  type:
+    | typeof TOAST_TYPE.success
+    | typeof TOAST_TYPE.error
+    | typeof TOAST_TYPE.warning
+    | typeof TOAST_TYPE.default;
   title: string;
   children?: never;
   description?: string;

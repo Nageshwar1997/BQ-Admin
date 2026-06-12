@@ -1,10 +1,11 @@
-import { DEFAULT_POSTER, GB, KB, MB, TOOLTIP_GAP } from '@/constants/common.constants';
+import { DEFAULT_POSTER, GB, KB, MB, TOAST_TYPE, TOOLTIP_GAP } from '@/constants/common.constants';
 import useToastStore from '@/stores/toast.store';
 import type { IButton, ITooltip } from '@/types/component.type';
 import type {
   ICustomToast,
   IDefaultToast,
   ILoadingToast,
+  IProgressToast,
   TProgressToastOptions,
 } from '@/types/store.type';
 import type { CSSProperties } from 'react';
@@ -85,15 +86,19 @@ export const getTooltipArrowCss = (placement: NonNullable<ITooltip['placement']>
   }
 };
 
-const { addToast, updateToast, removeToast } = useToastStore.getState();
+const { add, update, remove } = useToastStore.getState();
 export const toaster = {
-  success: (data: Omit<IDefaultToast, 'type'>) => addToast({ ...data, type: 'success' }),
-  error: (data: Omit<IDefaultToast, 'type'>) => addToast({ ...data, type: 'error' }),
-  warning: (data: Omit<IDefaultToast, 'type'>) => addToast({ ...data, type: 'warning' }),
-  loading: (data: Omit<ILoadingToast, 'type'>) => addToast({ ...data, type: 'loading' }),
-  custom: (data: ICustomToast) => addToast(data),
-  progress: (toastId: string, progress: number) => updateToast(toastId, progress),
-  remove: (toastId: string) => removeToast(toastId),
+  success: (data: Omit<IDefaultToast, 'type'>) => add({ ...data, type: TOAST_TYPE.success }),
+  error: (data: Omit<IDefaultToast, 'type'>) => add({ ...data, type: TOAST_TYPE.error }),
+  warning: (data: Omit<IDefaultToast, 'type'>) => add({ ...data, type: TOAST_TYPE.warning }),
+  loading: (data: Omit<ILoadingToast, 'type'>) => add({ ...data, type: TOAST_TYPE.loading }),
+  custom: (data: ICustomToast) => add(data),
+  progress: {
+    start: (data: Omit<IProgressToast, 'type'>) => add({ ...data, type: TOAST_TYPE.progress }),
+    update: (toastId: string, progress: number) => update.progress(toastId, progress),
+    end: (toastId: string) => remove(toastId),
+  },
+  remove: (toastId: string) => remove(toastId),
 };
 
 export const formatFileSize = (size: number) => {
@@ -235,21 +240,19 @@ export const withProgressToast = async <T>({
   description,
   request,
 }: TProgressToastOptions<T>): Promise<T> => {
-  const toastId = toaster.loading({ title, description, progress: 0 });
+  const toastId = toaster.progress.start({ title, description, progress: 0 });
 
   try {
     const response = await request((event) => {
       if (!event.total) return;
 
-      const progress = Math.round((event.loaded * 100) / event.total);
-
-      toaster.progress(toastId, progress);
+      toaster.progress.update(toastId, Math.round((event.loaded * 100) / event.total));
     });
 
-    toaster.progress(toastId, 100);
+    toaster.progress.update(toastId, 100);
 
     return response;
   } finally {
-    toaster.remove(toastId);
+    toaster.progress.end(toastId);
   }
 };
