@@ -32,32 +32,18 @@ export class CategoryApi extends ApiRequest {
   };
 }
 
-// export class ProductApi extends ApiRequest {
-//   private routes = API_METHODS_AND_URLS.product_service;
+export class ProductApi extends ApiRequest {
+  private routes = API_METHODS_AND_URLS.product_service.product;
 
-//   /* ===================== POST API ===================== */
+  /* ===================== POST API ===================== */
 
-//   public addCategory = (data: Omit<ICategory, 'slug' | '_id'>) => {
-//     return this.request({ ...this.routes.category.add, data });
-//   };
+  public saveDraftProduct = (data: any) => {
+    return this.request({ ...this.routes.draft.save, data });
+  };
 
-//   /* ===================== POST API ===================== */
+  /* ===================== POST API ===================== */
 
-//   public updateCategory = ({ _id, ...data }: Partial<Omit<ICategory, 'slug'>> & IId) => {
-//     const { method, url } = this.routes.category.update;
-//     return this.request({ method, url: url({ categoryId: _id }), data });
-//   };
+  /* ===================== DELETE API ===================== */
 
-//   /* ===================== DELETE API ===================== */
-
-//   public deleteCategory = (categoryId: string) => {
-//     const { method, url } = this.routes.category.delete;
-//     return this.request({ method, url: url({ categoryId }) });
-//   };
-
-//   /* ===================== GET API ===================== */
-
-//   public getCategoriesByParentLevel = (params: Partial<Pick<ICategory, 'level' | 'parent'>>) => {
-//     return this.request({ ...this.routes.category.get.byParentLevel, params });
-//   };
-// }
+  /* ===================== GET API ===================== */
+}

@@ -16,6 +16,7 @@ import {
   useUploadSingleMedia,
 } from '@/services/media-service/media.service.query';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
+import { useSaveDraftProduct } from '@/services/product-service/product.service.query';
 import type {
   TAddProductStepNumber,
   TProductQuillImageRefs,
@@ -46,6 +47,7 @@ const AddNewProduct = () => {
 
   const uploadSingleMediaQuery = useUploadSingleMedia();
   const uploadMultipleMediaQuery = useUploadMultipleMedia();
+  const saveDraftProductQuery = useSaveDraftProduct();
 
   const quillRefs: TProductQuillRefs = {
     description: useRef<Quill | null>(null),
@@ -110,9 +112,12 @@ const AddNewProduct = () => {
     );
   };
 
-  const onBasicInfoSubmit = (data: TProductBasicInfo) => {
+  const onBasicInfoSubmit = async (data: TProductBasicInfo) => {
     console.log('onBasicInfoSubmit data', data);
-    handleNext();
+    await saveDraftProductQuery.mutateAsync(
+      { ...data, step: activeStep },
+      { onSuccess: handleNext },
+    );
   };
 
   const onMediaAndGallerySubmit = async (data: TProductMediaAndGallery) => {
@@ -163,19 +168,28 @@ const AddNewProduct = () => {
     handleNext();
   };
 
-  const onDescriptionAndContentSubmit = (data: TProductDescriptionAndContent) => {
+  const onDescriptionAndContentSubmit = async(data: TProductDescriptionAndContent) => {
     console.log('onDescriptionAndContentSubmit data', data);
-    handleNext();
+    await saveDraftProductQuery.mutateAsync(
+      { ...data, step: activeStep },
+      { onSuccess: handleNext },
+    );
   };
 
-  const onStockAndVariantsSubmit = (data: TProductStockAndVariants) => {
+  const onStockAndVariantsSubmit = async(data: TProductStockAndVariants) => {
     console.log('onStockAndVariantsSubmit data', data);
-    handleNext();
+    await saveDraftProductQuery.mutateAsync(
+      { ...data, step: activeStep },
+      { onSuccess: handleNext },
+    );
   };
 
-  const onTryOnConfigurationSubmit = (data: TProductTryOnConfiguration) => {
+  const onTryOnConfigurationSubmit = async (data: TProductTryOnConfiguration) => {
     console.log('onTryOnConfigurationSubmit data', data);
-    handleNext();
+    await saveDraftProductQuery.mutateAsync(
+      { ...data, step: activeStep },
+      { onSuccess: handleNext },
+    );
   };
 
   const onReviewAndConfirmSubmit = (data: TConfirmDetails) => {
