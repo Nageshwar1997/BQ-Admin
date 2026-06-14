@@ -1,6 +1,11 @@
 import { categoryApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
-import type { ICategory } from '@/types/api.type';
+import type {
+  TApiCategory,
+  TApiL1Category,
+  TApiL2Category,
+  TApiL3Category,
+} from '@/types/api.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -82,9 +87,14 @@ export const useDeleteCategory = ({ categoryId = '' }) => {
 
 export const useGetCategoriesByParentLevel = ({
   enabled = true,
-  level,
-  parent,
-}: { enabled?: boolean } & Partial<Pick<ICategory, 'level' | 'parent'>>) => {
+  ...props
+}: { enabled?: boolean } & Partial<
+  | Pick<TApiL1Category, 'level'>
+  | Pick<TApiL2Category, 'level' | 'parent'>
+  | Pick<TApiL3Category, 'level' | 'parent'>
+>) => {
+  const level = props.level;
+  const parent = 'parent' in props ? props.parent : undefined;
   return useQuery({
     queryKey: [...get.byParentLevel, level, parent],
     queryFn: () => categoryApi.getCategoriesByParentLevel({ level, parent }),
@@ -95,6 +105,6 @@ export const useGetCategoriesByParentLevel = ({
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     refetchOnReconnect: true,
-    select: (data) => (data?.categories || []) as ICategory[],
+    select: (data) => (data?.categories || []) as TApiCategory[],
   });
 };

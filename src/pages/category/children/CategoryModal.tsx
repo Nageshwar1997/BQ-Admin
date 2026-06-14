@@ -17,7 +17,7 @@ import {
   useGetCategoriesByParentLevel,
   useUpdateCategory,
 } from '@/services/product-service/category.service.query';
-import type { ICategory } from '@/types/api.type';
+import type { TApiCategory } from '@/types/api.type';
 import type { TCatModal } from '@/types/component.type';
 import type { TCategory, TConfirmDetails } from '@/types/schema.type';
 import { deepEqual, toaster } from '@/utils/common.util';
@@ -43,27 +43,32 @@ const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => 
   </div>
 );
 
-const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
+const getCategoryName = (categories: TApiCategory[] | undefined, id?: string) =>
   categories?.find((cat) => cat._id === id)?.name || '-';
 
-const getInitialData = (cat: ICategory, mainCatId?: string): TCategory => {
-  const base = { activeStep: 0, name: cat.name };
+const getInitialData = (cat: TApiCategory, mainCatId = ''): TCategory => {
   switch (cat.level) {
     case CATEGORY_LEVELS_MAP.L2:
-      return { ...base, level: CATEGORY_LEVELS_MAP.L2, mainCategory: cat.parent || '' };
+      return {
+        activeStep: 0,
+        name: cat.name,
+        level: CATEGORY_LEVELS_MAP.L2,
+        mainCategory: cat.parent,
+      };
 
     case CATEGORY_LEVELS_MAP.L3:
       return {
-        ...base,
-        level: CATEGORY_LEVELS_MAP.L3,
-        mainCategory: mainCatId || '',
-        subCategory: cat.parent || '',
-        description: cat.description || '',
+        activeStep: 0,
+        name: cat.name,
+        level: cat.level,
+        mainCategory: mainCatId,
+        subCategory: cat.parent,
+        description: cat.description,
       };
 
     case CATEGORY_LEVELS_MAP.L1:
     default:
-      return { ...base, level: CATEGORY_LEVELS_MAP.L1 };
+      return { activeStep: 0, name: cat.name, level: CATEGORY_LEVELS_MAP.L1 };
   }
 };
 
@@ -108,7 +113,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   const subCategory = useWatch({ control: detailsForm.control, name: 'subCategory' });
   const name = useWatch({ control: detailsForm.control, name: 'name' });
 
-  const setActiveStep = (step: number) => {
+  const setActiveStep = (step: TCategory['activeStep']) => {
     detailsForm.setValue('activeStep', step, { shouldDirty: false, shouldTouch: false });
   };
 
@@ -162,7 +167,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
 
     if (!trimmedName) return false;
 
-    let categories: ICategory[] = [];
+    let categories: TApiCategory[] = [];
 
     if (isL1(level)) {
       categories = level1Cats;
@@ -195,7 +200,9 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
         description: 'Make changes and try again.',
       });
     } else if (!isDuplicateCategory()) {
-      setActiveStep(Math.min(activeStep + 1, CATEGORY_MODAL_STEPS.length - 1));
+      setActiveStep(
+        Math.min(activeStep + 1, CATEGORY_MODAL_STEPS.length - 1) as TCategory['activeStep'],
+      );
     }
   };
 
@@ -217,10 +224,10 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     }
 
     if (isEditMode) {
-      const updatedPayload: Partial<Omit<ICategory, 'slug' | '_id'>> = {};
+      const updatedPayload: Partial<Omit<TApiCategory, 'slug' | '_id'>> = {};
 
       Object.keys(payload).forEach((itemKey) => {
-        const key = itemKey as keyof Omit<ICategory, 'slug' | '_id'>;
+        const key = itemKey as keyof Omit<TApiCategory, 'slug' | '_id'>;
         if (!deepEqual(payload[key], initialPayload?.[key])) {
           (updatedPayload[key] as unknown) = payload[key];
         }
@@ -269,7 +276,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               errors={detailsForm.formState.errors}
               control={detailsForm.control}
               level={level}
-              setValue={detailsForm.setValue}
+              resetField={detailsForm.resetField}
               isLevelDisabled={isEditMode}
             />
           )}
@@ -280,7 +287,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               errors={detailsForm.formState.errors}
               control={detailsForm.control}
               level={level}
-              setValue={detailsForm.setValue}
+              resetField={detailsForm.resetField}
               level1Cats={level1Cats}
               mainCategory={mainCategory || ''}
               isLevelDisabled={isEditMode}
@@ -293,11 +300,11 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               errors={detailsForm.formState.errors}
               control={detailsForm.control}
               level={level}
-              setValue={detailsForm.setValue}
+              resetField={detailsForm.resetField}
               level1Cats={level1Cats}
               level2Cats={level2Cats}
-              mainCategory={mainCategory || ''}
-              subCategory={subCategory || ''}
+              mainCategory={mainCategory}
+              subCategory={subCategory}
               isLevelDisabled={isEditMode}
             />
           )}
@@ -401,7 +408,9 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               }}
               buttonProps={{
                 onClick: () =>
-                  activeStep === 0 ? handleReset() : setActiveStep(Math.max(activeStep - 1, 0)),
+                  activeStep === 0
+                    ? handleReset()
+                    : setActiveStep(Math.max(activeStep - 1, 0) as TCategory['activeStep']),
               }}
               className="sm:max-w-36"
             />

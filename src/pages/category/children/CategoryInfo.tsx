@@ -18,7 +18,7 @@ const CategoryInfo = ({ category }: Pick<TCatTable, 'category'>) => (
     <div>
       <p className="text-primary text-sm font-semibold whitespace-nowrap">{category.name}</p>
       <p className="text-primary/45 text-xs whitespace-nowrap">{category.slug}</p>
-      {category.description && (
+      {'description' in category && category.description && (
         <p className="text-primary/30 text-xs whitespace-nowrap">{category.description}</p>
       )}
     </div>

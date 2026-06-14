@@ -24,7 +24,7 @@ import {
   useDeleteCategory,
   useGetCategoriesByParentLevel,
 } from '@/services/product-service/category.service.query';
-import type { ICategory } from '@/types/api.type';
+import type { TApiCategory } from '@/types/api.type';
 import type { TCatModal, TCatTable, TSort } from '@/types/component.type';
 import { getFilteredAndSortedCats } from '@/utils/api.util';
 import { Icon } from '@iconify/react';
@@ -46,7 +46,7 @@ const TH_TITLES = ['Category', 'Level', 'Parent', 'Actions'] as const;
 const q_cat_keys = QUERY_PARAMS_KEY_MAP.category;
 
 const ApiStatusRow = (
-  props: Record<'haveLength' | 'isError' | 'isLoading', boolean> & Pick<ICategory, 'level'>,
+  props: Record<'haveLength' | 'isError' | 'isLoading', boolean> & Pick<TApiCategory, 'level'>,
 ) => {
   const { isError, isLoading, haveLength, level } = props;
 
@@ -80,7 +80,7 @@ const ApiStatusRow = (
   );
 };
 
-const CategoryHead = ({ level }: { level: ICategory['level'] }) => {
+const CategoryHead = ({ level }: { level: TApiCategory['level'] }) => {
   const { queryParams, removeParams, setParams } = useQueryParams();
   const sortKey =
     `sort_${level}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['sort'];
@@ -142,7 +142,7 @@ const CategoryRow = (props: TCatTable & ComponentProps<'tr'>) => {
       <TableRowCell>
         <Badge content={`Level ${category.level}`} />
       </TableRowCell>
-      <TableRowCell className="text-primary/65 uppercase">{category.parent || 'N/A'}</TableRowCell>
+      <TableRowCell className="text-primary/65 uppercase">{"parent" in category ? category.parent : 'N/A'}</TableRowCell>
       <TableRowCell className="text-right">
         <CategoryActions
           category={category}

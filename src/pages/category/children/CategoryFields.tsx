@@ -2,14 +2,14 @@ import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import Tooltip from '@/components/ui/Tooltip';
 import { CATEGORY_LEVELS_MAP, EMPTY_ARRAY } from '@/constants/common.constants';
-import type { ICategory } from '@/types/api.type';
+import type { TApiCategory } from '@/types/api.type';
 import type { TCategory, TL2Category, TL3Category } from '@/types/schema.type';
 import {
   Controller,
   type Control,
   type FieldErrors,
   type UseFormRegister,
-  type UseFormSetValue,
+  type UseFormResetField,
 } from 'react-hook-form';
 
 type TCommonFields = {
@@ -17,17 +17,17 @@ type TCommonFields = {
   errors: FieldErrors<TCategory>;
   control: Control<TCategory>;
   level: TCategory['level'];
-  setValue: UseFormSetValue<TCategory>;
+  resetField: UseFormResetField<TCategory>;
   isLevelDisabled: boolean;
 };
 
 type TLevel1Fields = TCommonFields;
 type TLevel2Fields = TCommonFields & {
-  level1Cats: ICategory[] | undefined;
+  level1Cats: TApiCategory[] | undefined;
   mainCategory: TL2Category['mainCategory'];
 };
 type TLevel3Fields = Omit<TLevel2Fields, 'mainCategory'> & {
-  level2Cats: ICategory[] | undefined;
+  level2Cats: TApiCategory[] | undefined;
   mainCategory: TL3Category['mainCategory'];
   subCategory: TL3Category['subCategory'];
 };
@@ -37,7 +37,7 @@ const CommonFields = ({
   errors,
   control,
   level,
-  setValue,
+  resetField,
   isLevelDisabled,
 }: TCommonFields) => (
   <>
@@ -45,10 +45,7 @@ const CommonFields = ({
       label="Category name"
       register={register('name')}
       error={errors.name?.message}
-      inputProps={{
-        name: 'name',
-        placeholder: 'Category name',
-      }}
+      inputProps={{ name: 'name', placeholder: 'Category name' }}
     />
 
     <Tooltip title="Cannot change category level" required={isLevelDisabled}>
@@ -71,9 +68,9 @@ const CommonFields = ({
               onChange: (value) => {
                 onChange(value);
 
-                setValue('mainCategory', undefined);
-                setValue('subCategory', undefined);
-                setValue('description', undefined);
+                resetField('mainCategory');
+                resetField('subCategory');
+                resetField('description');
               },
             }}
           />
@@ -92,7 +89,7 @@ export const Level1Fields = ({
   errors,
   control,
   level,
-  setValue,
+  resetField,
   isLevelDisabled,
 }: TLevel1Fields) => {
   return (
@@ -102,7 +99,7 @@ export const Level1Fields = ({
         errors={errors}
         control={control}
         level={level}
-        setValue={setValue}
+        resetField={resetField}
         isLevelDisabled={isLevelDisabled}
       />
     </div>
@@ -118,7 +115,7 @@ export const Level2Fields = ({
   errors,
   control,
   level,
-  setValue,
+  resetField,
   level1Cats = EMPTY_ARRAY,
   mainCategory,
   isLevelDisabled,
@@ -130,7 +127,7 @@ export const Level2Fields = ({
         errors={errors}
         control={control}
         level={level}
-        setValue={setValue}
+        resetField={resetField}
         isLevelDisabled={isLevelDisabled}
       />
       <Controller
@@ -139,8 +136,8 @@ export const Level2Fields = ({
         render={({ field: { onChange } }) => (
           <Select
             label="Main category"
-            options={level1Cats?.map((cat: ICategory) => ({ label: cat.name, value: cat._id }))}
-            error={errors.mainCategory?.message}
+            options={level1Cats?.map((cat: TApiCategory) => ({ label: cat.name, value: cat._id }))}
+            error={'mainCategory' in errors ? errors.mainCategory?.message : undefined}
             selectProps={{
               value: mainCategory,
               placeholder: 'Select main category',
@@ -162,7 +159,7 @@ export const Level3Fields = ({
   errors,
   control,
   level,
-  setValue,
+  resetField,
   level1Cats = EMPTY_ARRAY,
   level2Cats = EMPTY_ARRAY,
   mainCategory,
@@ -176,7 +173,7 @@ export const Level3Fields = ({
         errors={errors}
         control={control}
         level={level}
-        setValue={setValue}
+        resetField={resetField}
         isLevelDisabled={isLevelDisabled}
       />
 
@@ -186,15 +183,15 @@ export const Level3Fields = ({
         render={({ field: { onChange } }) => (
           <Select
             label="Main category"
-            options={level1Cats?.map((cat: ICategory) => ({ label: cat.name, value: cat._id }))}
-            error={errors.mainCategory?.message}
+            options={level1Cats?.map((cat: TApiCategory) => ({ label: cat.name, value: cat._id }))}
+            error={'mainCategory' in errors ? errors.mainCategory?.message : undefined}
             selectProps={{
               value: mainCategory,
               placeholder: 'Select main category',
               onChange: (value) => {
                 onChange(value);
 
-                setValue('subCategory', undefined);
+                resetField('subCategory');
               },
             }}
           />
@@ -208,7 +205,7 @@ export const Level3Fields = ({
           <Select
             label="Sub-category"
             options={level2Cats?.map((cat) => ({ label: cat.name, value: cat._id }))}
-            error={errors.subCategory?.message}
+            error={'subCategory' in errors ? errors.subCategory?.message : undefined}
             selectProps={{
               value: subCategory,
               placeholder: 'Select sub-category',
@@ -219,7 +216,7 @@ export const Level3Fields = ({
         )}
       />
       <Input
-        label="Description"
+        label="Short description"
         register={register('description')}
         error={'description' in errors ? errors.description?.message : undefined}
         containerClassName="sm:col-span-2"

@@ -1,8 +1,8 @@
 import type ApiError from '@/classes/ApiError';
 import { SORT_ORDER_MAP } from '@/constants/common.constants';
 import type {
-  ICategory,
   IEndpoint,
+  TApiCategory,
   TGenerateQueryKeys,
   TGenerateRoutes,
   TParams,
@@ -27,7 +27,11 @@ export const handleApiSuccessToaster = (message: string, title = 'Success') => {
   toaster.success({ title, description: message });
 };
 
-export const getFilteredAndSortedCats = (categories: ICategory[], search: string, sort?: TSort) => {
+export const getFilteredAndSortedCats = (
+  categories: TApiCategory[],
+  search: string,
+  sort?: TSort,
+) => {
   const value = search?.toLowerCase().trim();
   const filtered = value
     ? categories.filter((category) =>

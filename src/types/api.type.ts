@@ -1,5 +1,5 @@
 import type { AUTH_PROVIDERS, METHOD_MAP, ROLES } from '@/constants/api.constants';
-import type { TCategory, TEmail, TLogin } from './schema.type';
+import type { TEmail, TL1Category, TL2Category, TL3Category, TLogin } from './schema.type';
 
 export type TFieldErrors = Record<string, string[]>;
 
@@ -25,10 +25,13 @@ export interface IUser extends Pick<TLogin, 'password'>, TEmail, IId, ITimeStamp
   phoneNumber: string;
 }
 
-export interface ICategory extends IId, Pick<TCategory, 'level' | 'name' | 'description'> {
-  slug: string;
-  parent?: string;
-}
+export type TApiL1Category = Pick<TL1Category, 'name' | 'level'>;
+export type TApiL2Category = Pick<TL2Category, 'name' | 'level'> & { parent: string };
+export type TApiL3Category = Pick<TL3Category, 'name' | 'level' | 'description'> & {
+  parent: string;
+};
+export type TApiCategory = (TApiL1Category | TApiL2Category | TApiL3Category) &
+  IId & { slug: string };
 
 export interface ICreateHeaders {
   user?: Partial<Pick<IUser, '_id' | 'role'>>;

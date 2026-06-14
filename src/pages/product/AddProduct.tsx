@@ -8,7 +8,7 @@ import { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import { addProductSchema } from '@/schemas/category.schema';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
-import type { ICategory } from '@/types/api.type';
+import type { TApiCategory } from '@/types/api.type';
 import type { TAddProduct } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
@@ -78,7 +78,7 @@ const AddProduct = () => {
     enabled: !!subCategory,
   });
 
-  const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
+  const getCategoryName = (categories: TApiCategory[] | undefined, id?: string) =>
     categories?.find((cat) => cat._id === id)?.name || '-';
 
   const handleStepChange = async (nextStep: number) => {
@@ -137,7 +137,7 @@ const AddProduct = () => {
             key={'Main Category'}
             label="Main category"
             register={register('mainCategory')}
-            options={level1Cats?.map((cat: ICategory) => ({
+            options={level1Cats?.map((cat: TApiCategory) => ({
               label: cat.name,
               value: cat._id,
             }))}
@@ -156,7 +156,7 @@ const AddProduct = () => {
             key={'Sub Category'}
             label="Sub-category"
             register={register('subCategory')}
-            options={level2Cats?.map((cat: ICategory) => ({
+            options={level2Cats?.map((cat: TApiCategory) => ({
               label: cat.name,
               value: cat._id,
             }))}
@@ -173,7 +173,7 @@ const AddProduct = () => {
             key={'Product Category'}
             label="Product category"
             register={register('productCategory')}
-            options={level3Cats?.map((cat: ICategory) => ({
+            options={level3Cats?.map((cat: TApiCategory) => ({
               label: cat.name,
               value: cat._id,
             }))}

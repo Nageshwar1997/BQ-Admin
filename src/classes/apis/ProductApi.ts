@@ -1,5 +1,5 @@
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
-import type { ICategory, IId } from '@/types/api.type';
+import type { IId, TApiCategory, TApiL1Category, TApiL2Category, TApiL3Category } from '@/types/api.type';
 import { ApiRequest } from '../ApiRequest';
 
 export class CategoryApi extends ApiRequest {
@@ -7,13 +7,13 @@ export class CategoryApi extends ApiRequest {
 
   /* ===================== POST API ===================== */
 
-  public addCategory = (data: Omit<ICategory, 'slug' | '_id'>) => {
+  public addCategory = (data: Omit<TApiCategory, 'slug' | '_id'>) => {
     return this.request({ ...this.routes.add, data });
   };
 
   /* ===================== PATCH API ===================== */
 
-  public updateCategory = ({ _id, ...data }: Partial<Omit<ICategory, 'slug'>> & IId) => {
+  public updateCategory = ({ _id, ...data }: Partial<Omit<TApiCategory, 'slug'>> & IId) => {
     const { method, url } = this.routes.update;
     return this.request({ method, url: url({ categoryId: _id }), data });
   };
@@ -27,7 +27,13 @@ export class CategoryApi extends ApiRequest {
 
   /* ===================== GET API ===================== */
 
-  public getCategoriesByParentLevel = (params: Partial<Pick<ICategory, 'level' | 'parent'>>) => {
+  public getCategoriesByParentLevel = (
+    params: Partial<
+      | Pick<TApiL1Category, 'level'>
+      | Pick<TApiL2Category, 'level' | 'parent'>
+      | Pick<TApiL3Category, 'level' | 'parent'>
+    >,
+  ) => {
     return this.request({ ...this.routes.get.byParentLevel, params });
   };
 }

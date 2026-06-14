@@ -9,7 +9,7 @@ import type {
   RefObject,
   VideoHTMLAttributes,
 } from 'react';
-import type { ICategory } from './api.type';
+import type { TApiCategory } from './api.type';
 import type { TGradientPos, TScrollDirection } from './hook.type';
 
 export type TClassName = { className?: string };
@@ -98,7 +98,7 @@ export interface IBreadcrumb extends TClassName {
   customPaths?: string[];
 }
 
-export type TCatModal = { category: ICategory; mainCatId?: string };
+export type TCatModal = { category: TApiCategory; mainCatId?: string };
 
 export type TCatActionHandle = {
   onEdit: (data: TCatModal) => void;
