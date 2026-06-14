@@ -36,7 +36,7 @@ import type Quill from 'quill';
 import { useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
-import AddProductConfirmForm from './children/AddProductConfirmForm';
+import AddProductConfirmFieldAndReview from './children/AddProductConfirmFieldAndReview';
 import AddProductDescriptionAndContentFields from './children/AddProductDescriptionAndContentFields';
 import AddProductMediaAndGalleryFields from './children/AddProductMediaAndGalleryFields';
 import AddProductStockAndVariantsFields from './children/AddProductStockAndVariantsFields';
@@ -253,7 +253,7 @@ const AddNewProduct = () => {
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
       onSubmit={reviewAndConfirmForm.handleSubmit(onReviewAndConfirmSubmit)}
     >
-      <AddProductConfirmForm
+      <AddProductConfirmFieldAndReview
         form={reviewAndConfirmForm}
         values={{
           basicInfo: basicInfoForm.getValues(),

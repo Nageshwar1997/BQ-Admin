@@ -86,9 +86,9 @@ const MediaAndGallery = ({ data: _ }: { data: Props['values']['mediaAndGallery']
   );
 };
 
-const AddProductConfirmForm = ({ values, form }: Props) => {
+const AddProductConfirmFieldAndReview = ({ values, form }: Props) => {
   const { basicInfo, mediaAndGallery } = values;
-  console.log('🚀 ~ AddProductConfirmForm ~ mediaAndGallery:', mediaAndGallery);
+  console.log('🚀 ~ AddProductConfirmFieldAndReview ~ mediaAndGallery:', mediaAndGallery);
   return (
     <div className="grid gap-4">
       <BasicInfo data={basicInfo} />
@@ -103,4 +103,4 @@ const AddProductConfirmForm = ({ values, form }: Props) => {
   );
 };
 
-export default AddProductConfirmForm;
+export default AddProductConfirmFieldAndReview;
