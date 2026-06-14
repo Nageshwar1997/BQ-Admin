@@ -26,19 +26,22 @@ import {
 
 export const productBasicInfoSchema = object({
   title: string({ error: 'Title is required.' })
+    .nonempty('Title is required.')
     .min(2, 'Title must be at least 2 characters.')
-    .max(150, 'Title cannot exceed 150 characters.'),
+    .max(150, 'Title cannot exceed 150 characters.')
+    .regex(REGEX.SINGLE_SPACE, 'Title cannot contain consecutive spaces.'),
+
   brand: string({ error: 'Brand is required.' })
+    .nonempty('Brand is required.')
     .min(2, 'Brand must be at least 2 characters.')
     .max(80, 'Brand cannot exceed 80 characters.'),
-  originalPrice: number({ error: 'Original price is required.' }).min(
-    1,
-    'Original price must be greater than 0.',
-  ),
-  sellingPrice: number({ error: 'Selling price is required.' }).min(
-    1,
-    'Selling price must be greater than 0.',
-  ),
+
+  originalPrice: number({ error: 'Original price is required.' })
+    .nonnegative('Original price cannot be negative.')
+    .positive('Original price must be greater than 0.'),
+  sellingPrice: number({ error: 'Selling price is required.' })
+    .nonnegative('Selling price cannot be negative.')
+    .positive('Selling price must be greater than 0.'),
   l1Category: object(
     {
       id: string({ error: '(L1) Main category is required.' }).regex(
@@ -49,6 +52,7 @@ export const productBasicInfoSchema = object({
     },
     { error: '(L1) Main category is required.' },
   ),
+
   l2Category: object(
     {
       id: string({ error: '(L2) Sub-category is required.' }).regex(
@@ -59,6 +63,7 @@ export const productBasicInfoSchema = object({
     },
     { error: '(L2) Sub-category is required.' },
   ),
+
   l3Category: object(
     {
       id: string({ error: '(L3) Product category is required.' }).regex(
@@ -184,7 +189,9 @@ const imagesSchema = array(
 
 export const productMediaAndGallerySchema = object({
   thumbnail: thumbnailSchema,
+
   images: imagesSchema,
+
   video: videoSchema.optional(),
 });
 
@@ -194,13 +201,19 @@ export const productMediaAndGallerySchema = object({
 
 export const productDescriptionAndContentSchema = object({
   shortDescription: string('Short description is required.')
+    .nonempty('Short description is required.')
     .min(10, 'Short description must be at least 10 characters.')
     .max(300, 'Short description cannot exceed 300 characters.'),
+
   description: string('Description is required.')
+    .nonempty('Description is required.')
     .refine((value) => value !== '<p><br></p>', 'Description is required.')
     .min(107, 'Description must be at least 100 characters.'),
+
   instructions: string().min(20, 'Usage instructions must be at least 10 characters.').optional(),
+
   ingredients: string().min(20, 'Ingredients must be at least 10 characters.').optional(),
+
   additional: string().min(20, 'Additional details must be at least 10 characters.').optional(),
 });
 
@@ -212,30 +225,29 @@ const variantSchema = object({
   type: z_enum(VARIANT_TYPE, { error: 'Variant type is required.' }),
 
   label: string({ error: 'Variant label is required.' })
-    .min(1, 'Variant label is required.')
+    .nonempty('Variant label is required.')
     .min(2, 'Variant label must be at least 2 characters.')
     .max(100, 'Variant label cannot exceed 100 characters.'),
 
-  value: string({ error: 'Variant value is required.' }).min(1, 'Variant value is required.'),
+  value: string({ error: 'Variant value is required.' }).nonempty('Variant value is required.'),
 
-  originalPrice: number({ error: 'Original price is required.' }).min(
-    1,
-    'Original price must be greater than 0.',
-  ),
-
-  sellingPrice: number({ error: 'Selling price is required.' }).min(
-    1,
-    'Selling price must be greater than 0.',
-  ),
+  originalPrice: number({ error: 'Original price is required.' })
+    .nonnegative('Original price cannot be negative.')
+    .positive('Original price must be greater than 0.'),
+  sellingPrice: number({ error: 'Selling price is required.' })
+    .nonnegative('Selling price cannot be negative.')
+    .positive('Selling price must be greater than 0.'),
 
   stock: number({ error: 'Stock is required' })
     .int('Stock must be a whole number.')
     .min(1, 'Stock must be greater than 0.')
     .max(100, 'Stock cannot exceed 100.'),
+
   stockThreshold: number({ error: 'Stock threshold is required' })
     .int('Stock threshold must be a whole number.')
     .min(1, 'Stock threshold must be greater than 0.')
     .max(10, 'Stock threshold cannot exceed 10.'),
+
   thumbnail: custom<File | string>((value) => !!value, { error: 'Variant thumbnail is required.' })
     .superRefine((value, ctx) => {
       if (value instanceof File) {
@@ -265,6 +277,7 @@ const variantSchema = object({
       }
     })
     .optional(),
+
   images: array(
     custom<File | string>((value) => !!value, { error: 'Variant image is required.' }),
     { error: 'At least one variant image is required.' },
@@ -372,10 +385,12 @@ const variantSchema = object({
 
 export const withoutVariantsSchema = object({
   hasVariants: literal(false),
+
   stock: number({ error: 'Stock is required' })
     .int('Stock must be a whole number.')
     .min(1, 'Stock must be greater than 0.')
     .max(100, 'Stock cannot exceed 100.'),
+
   stockThreshold: number({ error: 'Stock threshold is required' })
     .int('Stock threshold must be a whole number.')
     .min(1, 'Stock threshold must be greater than 0.')
@@ -392,10 +407,10 @@ export const withoutVariantsSchema = object({
 
 export const withVariantsSchema = object({
   hasVariants: literal(true),
-  variants: array(variantSchema, { error: 'At least one variant is required.' }).min(
-    1,
-    'Minimum one variant is required.',
-  ),
+
+  variants: array(variantSchema, { error: 'At least one variant is required.' })
+    .nonempty('At least one variant is required.')
+    .min(1, 'Minimum one variant is required.'),
 });
 
 export const productStockAndVariantsSchema = discriminatedUnion(
