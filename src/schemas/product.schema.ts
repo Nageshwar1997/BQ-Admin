@@ -39,9 +39,11 @@ export const productBasicInfoSchema = object({
   originalPrice: number({ error: 'Original price is required.' })
     .nonnegative('Original price cannot be negative.')
     .positive('Original price must be greater than 0.'),
+
   sellingPrice: number({ error: 'Selling price is required.' })
     .nonnegative('Selling price cannot be negative.')
     .positive('Selling price must be greater than 0.'),
+
   l1Category: object(
     {
       id: string({ error: '(L1) Main category is required.' }).regex(
