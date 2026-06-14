@@ -25,14 +25,12 @@ import {
 /* -------------------------------------------------------------------------- */
 
 export const productBasicInfoSchema = object({
-  title: string()
+  title: string({ error: 'Title is required.' })
     .min(2, 'Title must be at least 2 characters.')
     .max(150, 'Title cannot exceed 150 characters.'),
-
-  brand: string()
+  brand: string({ error: 'Brand is required.' })
     .min(2, 'Brand must be at least 2 characters.')
     .max(80, 'Brand cannot exceed 80 characters.'),
-
   originalPrice: number({ error: 'Original price is required.' }).min(
     1,
     'Original price must be greater than 0.',

@@ -41,7 +41,11 @@ export class ProductApi extends ApiRequest {
     return this.request({ ...this.routes.draft.save, data });
   };
 
-  /* ===================== POST API ===================== */
+  /* ===================== PATCH API ===================== */
+
+  public publishDraftProduct = () => {
+    return this.request(this.routes.draft.publish);
+  };
 
   /* ===================== DELETE API ===================== */
 

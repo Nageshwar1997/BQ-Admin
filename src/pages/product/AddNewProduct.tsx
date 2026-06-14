@@ -16,7 +16,10 @@ import {
   useUploadSingleMedia,
 } from '@/services/media-service/media.service.query';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
-import { useSaveDraftProduct } from '@/services/product-service/product.service.query';
+import {
+  usePublishProduct,
+  useSaveDraftProduct,
+} from '@/services/product-service/product.service.query';
 import type {
   TAddProductStepNumber,
   TProductQuillImageRefs,
@@ -48,6 +51,7 @@ const AddNewProduct = () => {
   const uploadSingleMediaQuery = useUploadSingleMedia();
   const uploadMultipleMediaQuery = useUploadMultipleMedia();
   const saveDraftProductQuery = useSaveDraftProduct();
+  const publishDraftProductQuery = usePublishProduct();
 
   const quillRefs: TProductQuillRefs = {
     description: useRef<Quill | null>(null),
@@ -168,7 +172,7 @@ const AddNewProduct = () => {
     handleNext();
   };
 
-  const onDescriptionAndContentSubmit = async(data: TProductDescriptionAndContent) => {
+  const onDescriptionAndContentSubmit = async (data: TProductDescriptionAndContent) => {
     console.log('onDescriptionAndContentSubmit data', data);
     await saveDraftProductQuery.mutateAsync(
       { ...data, step: activeStep },
@@ -176,7 +180,7 @@ const AddNewProduct = () => {
     );
   };
 
-  const onStockAndVariantsSubmit = async(data: TProductStockAndVariants) => {
+  const onStockAndVariantsSubmit = async (data: TProductStockAndVariants) => {
     console.log('onStockAndVariantsSubmit data', data);
     await saveDraftProductQuery.mutateAsync(
       { ...data, step: activeStep },
@@ -192,9 +196,8 @@ const AddNewProduct = () => {
     );
   };
 
-  const onReviewAndConfirmSubmit = (data: TConfirmDetails) => {
-    console.log('onReviewAndConfirmSubmit data', data);
-    handleNext();
+  const onReviewAndConfirmSubmit = async (_data: TConfirmDetails) => {
+    await publishDraftProductQuery.mutateAsync();
   };
 
   const handleBack = () => {

@@ -24,3 +24,22 @@ export const useSaveDraftProduct = () => {
     },
   });
 };
+
+export const usePublishProduct = () => {
+  return useMutation({
+    mutationKey: draft.publish,
+    mutationFn: productApi.publishDraftProduct,
+    onMutate: () => {
+      const toastId = toaster.loading({
+        title: 'Please wait...',
+        description: 'Sending your product for approval...',
+      });
+      return { toastId };
+    },
+    onSuccess: async ({ message }) => handleApiSuccessToaster(message),
+    onError: (error) => handleApiErrorToaster(error),
+    onSettled: (_data, _error, _variables, context) => {
+      if (context?.toastId) toaster.remove(context.toastId);
+    },
+  });
+};
