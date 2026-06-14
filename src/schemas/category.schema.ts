@@ -51,24 +51,24 @@ const baseCategorySchema = object({
   ),
 
   name: string({ error: 'Category name is required.' })
-    .nonempty('Category name cannot be empty.')
+    .nonempty('Category name is required.')
     .min(2, 'Category name must be at least 2 characters.')
     .max(120, 'Category name cannot exceed 120 characters.')
     .regex(REGEX.SINGLE_SPACE, 'Category name cannot contain consecutive spaces.'),
 
   mainCategory: string({ error: 'Main category is required.' })
-    .nonempty('Main category cannot be empty.')
+    .nonempty('Main category is required.')
     .regex(REGEX.MONGODB_ID, 'Main category must be a valid ID.'),
 
   subCategory: string({ error: 'Sub-category is required.' })
-    .nonempty('Sub-category cannot be empty.')
+    .nonempty('Sub-category is required.')
     .regex(REGEX.MONGODB_ID, 'Sub-category must be a valid ID.'),
 
   description: string({ error: 'Description is required.' })
-    .nonempty('Description cannot be empty.')
-    .min(10, 'Description must be at least 10 characters.')
-    .max(150, 'Description cannot exceed 150 characters.')
-    .regex(REGEX.SINGLE_SPACE, 'Description cannot contain consecutive spaces.'),
+    .nonempty('Short description is required.')
+    .min(10, 'Short description must be at least 10 characters.')
+    .max(150, 'Short description cannot exceed 150 characters.')
+    .regex(REGEX.SINGLE_SPACE, 'Short description cannot contain consecutive spaces.'),
 });
 
 /* -------------------------------------------------------------------------- */
