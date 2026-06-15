@@ -2,15 +2,18 @@ import type { IconProps } from '@iconify/react';
 import type Quill from 'quill';
 import type { ToolbarProps } from 'quill/modules/toolbar';
 import type {
-  Dispatch,
   InputHTMLAttributes,
   ReactNode,
   RefObject,
   SelectHTMLAttributes,
-  SetStateAction,
   TextareaHTMLAttributes,
 } from 'react';
-import type { UseFormRegisterReturn, UseFormSetValue } from 'react-hook-form';
+import type {
+  FieldPath,
+  FieldValues,
+  UseFormRegisterReturn,
+  UseFormSetValue,
+} from 'react-hook-form';
 import type { ITooltip, TClassName, TContainerClassName, TQuillImageRef } from './component.type';
 
 type LeftIcon = { left: IconProps | string; right?: never };
@@ -143,11 +146,10 @@ export type TQuillImageBlot = {
   value(node: HTMLElement): unknown;
 };
 
-export interface IProcessQuillContent {
+export interface IProcessQuillContent<T extends FieldValues> {
   quillRef: RefObject<Quill | null>;
   imagesRef: RefObject<TQuillImageRef[]>;
-  setValue: UseFormSetValue<any>;
-  fieldName: any;
-  folderName: string;
-  setLoading?: Dispatch<SetStateAction<boolean>>;
+  setValue: UseFormSetValue<T>;
+  field: FieldPath<T>;
+  folder: string;
 }

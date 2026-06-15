@@ -1,0 +1,71 @@
+import { useUploadMultipleMedia } from '@/services/media-service/media.service.query';
+import type { IProcessQuillContent } from '@/types/input.type';
+import { toaster } from '@/utils/common.util';
+import { useCallback } from 'react';
+import type { FieldPathValue, FieldValues } from 'react-hook-form';
+
+const getQuillContent = (value: string) => {
+  if (!value || value === '<p><br></p>') return undefined;
+
+  return value;
+};
+
+export const useProcessQuillContent = <T extends FieldValues>() => {
+  const { mutateAsync } = useUploadMultipleMedia();
+
+  const processQuillContent = useCallback(
+    async ({ quillRef, imagesRef, setValue, field, folder }: IProcessQuillContent<T>) => {
+      if (!quillRef.current) return '';
+
+      const quill = quillRef.current;
+      let content = quill.root.innerHTML;
+
+      const images = imagesRef.current;
+      const files = images.map(({ file }) => file).filter((file): file is File => Boolean(file));
+
+      if (!files.length) {
+        setValue(field, content as FieldPathValue<T, typeof field>);
+        return getQuillContent(content);
+      }
+
+      const formData = new FormData();
+
+      files.forEach((file) => {
+        formData.append('files', file);
+      });
+
+      formData.append('folder', folder);
+
+      const data = await mutateAsync({
+        data: formData,
+        toasterInfo: {
+          title: 'Please wait...',
+          description: 'Uploading content files...',
+        },
+      });
+
+      const urls: string[] = data?.urls?.filter(Boolean) || [];
+
+      if (urls.length !== files.length) {
+        toaster.error({
+          title: 'Upload failed',
+          description: 'Some files could not be uploaded.',
+        });
+
+        throw new Error('File upload count mismatch');
+      }
+
+      images.forEach(({ blobUrl }, index) => {
+        content = content.replace(blobUrl, urls[index]);
+      });
+
+      quill.root.innerHTML = content;
+      setValue(field, content as FieldPathValue<T, typeof field>);
+
+      return getQuillContent(content);
+    },
+    [mutateAsync],
+  );
+
+  return { processQuillContent };
+};
