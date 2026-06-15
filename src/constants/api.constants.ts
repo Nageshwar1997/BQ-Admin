@@ -1,4 +1,3 @@
-import envs from '@/envs';
 import { createQueryKeys, createRouteHelper } from '@/utils/api.util';
 
 export const METHOD_MAP = {
@@ -9,19 +8,9 @@ export const METHOD_MAP = {
   DELETE: 'delete',
 } as const;
 
-export const API_BASE_URLS = {
-  gateway: envs.urls.gateway,
-  'user-service': `${envs.urls.gateway}/api/v1/user-service`,
-  'product-service': `${envs.urls.gateway}/api/v1/product-service`,
-  'media-service': `${envs.urls.gateway}/api/v1/media-service`,
-};
-
 export const METHODS_AND_PATHS = {
   base: '/api/v1',
   gateway: {
-    home: { method: METHOD_MAP.GET, path: '/' },
-    health: { method: METHOD_MAP.GET, path: '/health' },
-    wakeUp: { method: METHOD_MAP.GET, path: '/wake-up' },
     refreshAccessToken: { method: METHOD_MAP.POST, path: '/refresh-access-token' },
   },
   user_service: {
