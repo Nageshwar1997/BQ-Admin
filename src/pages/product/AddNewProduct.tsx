@@ -169,7 +169,10 @@ const AddNewProduct = () => {
       mediaAndGalleryForm.setValue('video', videoResponse.url);
     }
 
-    handleNext();
+    await saveDraftProductQuery.mutateAsync(
+      { thumbnail: thumbnailResponse.url, images: imagesResponse.urls, video: videoResponse?.url, step: activeStep },
+      { onSuccess: handleNext },
+    );
   };
 
   const onDescriptionAndContentSubmit = async (data: TProductDescriptionAndContent) => {
