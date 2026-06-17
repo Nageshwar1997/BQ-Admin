@@ -24,8 +24,10 @@ export const useProcessQuillContent = <T extends FieldValues>() => {
       const files = images.map(({ file }) => file).filter((file): file is File => Boolean(file));
 
       if (!files.length) {
-        setValue(field, content as FieldPathValue<T, typeof field>);
-        return getQuillContent(content);
+        const finalContent = getQuillContent(content);
+
+        setValue(field, finalContent as FieldPathValue<T, typeof field>);
+        return finalContent;
       }
 
       const formData = new FormData();
@@ -68,9 +70,11 @@ export const useProcessQuillContent = <T extends FieldValues>() => {
 
       imagesRef.current = [];
 
-      setValue(field, content as FieldPathValue<T, typeof field>);
+      const finalContent = getQuillContent(content);
 
-      return getQuillContent(content);
+      setValue(field, finalContent as FieldPathValue<T, typeof field>);
+
+      return finalContent;
     },
     [mutateAsync],
   );

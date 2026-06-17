@@ -212,11 +212,29 @@ export const productDescriptionAndContentSchema = object({
     .refine((value) => value !== '<p><br></p>', 'Description is required.')
     .min(107, 'Description must be at least 100 characters.'),
 
-  instructions: string().min(20, 'Usage instructions must be at least 10 characters.').optional(),
+  instructions: string()
+    .optional()
+    .refine(
+      (value) =>
+        value === undefined || value === '' || value === '<p><br></p>' || value.length >= 20,
+      'Usage instructions must be at least 10 characters.',
+    ),
 
-  ingredients: string().min(20, 'Ingredients must be at least 10 characters.').optional(),
+  ingredients: string()
+    .optional()
+    .refine(
+      (value) =>
+        value === undefined || value === '' || value === '<p><br></p>' || value.length >= 20,
+      'Ingredients must be at least 10 characters.',
+    ),
 
-  additional: string().min(20, 'Additional details must be at least 10 characters.').optional(),
+  additional: string()
+    .optional()
+    .refine(
+      (value) =>
+        value === undefined || value === '' || value === '<p><br></p>' || value.length >= 20,
+      'Additional details must be at least 10 characters.',
+    ),
 });
 
 /* -------------------------------------------------------------------------- */

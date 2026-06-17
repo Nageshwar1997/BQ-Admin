@@ -229,7 +229,6 @@ const AddNewProduct = () => {
     mediaAndGalleryForm.setValue('thumbnail', thumbnailUrl);
     mediaAndGalleryForm.setValue('images', finalImages);
 
-    console.log("🚀 ~ onMediaAndGallerySubmit ~ videoUrl:", videoUrl)
     if (videoUrl) {
       mediaAndGalleryForm.setValue('video', videoUrl);
     }
@@ -246,44 +245,46 @@ const AddNewProduct = () => {
   };
 
   const onDescriptionAndContentSubmit = async (data: TProductDescriptionAndContent) => {
-    const description = await processQuillContent({
-      field: 'description',
-      folder: basicInfoForm.getValues().title,
-      imagesRef: imageRefs.description,
-      quillRef: quillRefs.description,
-      setValue: descriptionAndContentForm.setValue,
-    });
+    const title = basicInfoForm.getValues().title;
+    const [descriptionResponse, additionalResponse, ingredientsResponse, instructionsResponse] =
+      await Promise.all([
+        processQuillContent({
+          field: 'description',
+          folder: title,
+          imagesRef: imageRefs.description,
+          quillRef: quillRefs.description,
+          setValue: descriptionAndContentForm.setValue,
+        }),
+        processQuillContent({
+          field: 'additional',
+          folder: title,
+          imagesRef: imageRefs.additional,
+          quillRef: quillRefs.additional,
+          setValue: descriptionAndContentForm.setValue,
+        }),
+        processQuillContent({
+          field: 'ingredients',
+          folder: title,
+          imagesRef: imageRefs.ingredients,
+          quillRef: quillRefs.ingredients,
+          setValue: descriptionAndContentForm.setValue,
+        }),
+        processQuillContent({
+          field: 'instructions',
+          folder: title,
+          imagesRef: imageRefs.instructions,
+          quillRef: quillRefs.instructions,
+          setValue: descriptionAndContentForm.setValue,
+        }),
+      ]);
 
-    const additional = await processQuillContent({
-      field: 'additional',
-      folder: basicInfoForm.getValues().title,
-      imagesRef: imageRefs.additional,
-      quillRef: quillRefs.additional,
-      setValue: descriptionAndContentForm.setValue,
-    });
-
-    const ingredients = await processQuillContent({
-      field: 'ingredients',
-      folder: basicInfoForm.getValues().title,
-      imagesRef: imageRefs.ingredients,
-      quillRef: quillRefs.ingredients,
-      setValue: descriptionAndContentForm.setValue,
-    });
-
-    const instructions = await processQuillContent({
-      field: 'instructions',
-      folder: basicInfoForm.getValues().title,
-      imagesRef: imageRefs.instructions,
-      quillRef: quillRefs.instructions,
-      setValue: descriptionAndContentForm.setValue,
-    });
     await saveDraftProductQuery.mutateAsync(
       {
         shortDescription: data.shortDescription,
-        description,
-        instructions,
-        ingredients,
-        additional,
+        description: descriptionResponse,
+        instructions: instructionsResponse,
+        ingredients: ingredientsResponse,
+        additional: additionalResponse,
         step: activeStep,
       },
       { onSuccess: handleNext },
