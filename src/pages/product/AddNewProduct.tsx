@@ -308,10 +308,94 @@ const AddNewProduct = () => {
   };
 
   const onStockAndVariantsSubmit = async (data: TProductStockAndVariants) => {
-    console.log('onStockAndVariantsSubmit data', data);
+    // No variants
+    if (!data.hasVariants) {
+      await saveDraftProductQuery.mutateAsync(
+        { ...data, step: activeStep },
+        { onSuccess: handleNext },
+      );
+
+      return;
+    }
+
+    const folder = basicInfoForm.getValues().title;
+
+    const updatedVariants = await Promise.all(
+      data.variants.map(async (variant) => {
+        const existingImageUrls: string[] = [];
+        const newImageFiles: File[] = [];
+
+        variant.images.forEach((image) => {
+          if (typeof image === 'string') {
+            existingImageUrls.push(image);
+          } else {
+            newImageFiles.push(image);
+          }
+        });
+
+        const thumbnailPromise =
+          variant.thumbnail instanceof File
+            ? (() => {
+                const formData = new FormData();
+
+                formData.append('file', variant.thumbnail);
+                formData.append('folder', folder);
+
+                return uploadSingleMediaQuery.mutateAsync({
+                  data: formData,
+                  toasterInfo: {
+                    title: 'Please wait...',
+                    description: `Uploading ${variant.label} thumbnail...`,
+                  },
+                });
+              })()
+            : Promise.resolve(null);
+
+        const imagesPromise =
+          newImageFiles.length > 0
+            ? (() => {
+                const formData = new FormData();
+
+                newImageFiles.forEach((file) => {
+                  formData.append('files', file);
+                });
+
+                formData.append('folder', folder);
+
+                return uploadMultipleMediaQuery.mutateAsync({
+                  data: formData,
+                  toasterInfo: {
+                    title: 'Please wait...',
+                    description: `Uploading ${variant.label} images...`,
+                  },
+                });
+              })()
+            : Promise.resolve(null);
+
+        const [thumbnailResponse, imagesResponse] = await Promise.all([
+          thumbnailPromise,
+          imagesPromise,
+        ]);
+
+        return {
+          ...variant,
+          thumbnail: thumbnailResponse?.url ?? variant.thumbnail,
+          images: [...existingImageUrls, ...(imagesResponse?.urls ?? [])],
+        };
+      }),
+    );
+
+    stockAndVariantsForm.setValue('variants', updatedVariants);
+
     await saveDraftProductQuery.mutateAsync(
-      { ...data, step: activeStep },
-      { onSuccess: handleNext },
+      {
+        hasVariants: true,
+        variants: updatedVariants,
+        step: activeStep,
+      },
+      {
+        onSuccess: handleNext,
+      },
     );
   };
 
