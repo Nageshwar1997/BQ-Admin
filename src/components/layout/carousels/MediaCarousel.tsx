@@ -20,7 +20,7 @@ const MediaCarousel = ({
       className={`w-full [&>div]:justify-start ${className}`}
       gradientClassNames={gradientClassNames}
     >
-      <div className="flex items-center gap-2 p-2 media-carousel">
+      <div className="media-carousel flex items-center gap-2 p-2">
         {media.map((item, i) => (
           <div
             key={item.url}
@@ -31,9 +31,7 @@ const MediaCarousel = ({
             }}
             onClick={() => onClick(i)}
             className={`group relative size-14 shrink-0 overflow-hidden rounded-md border shadow-xs transition-colors duration-300 hover:opacity-100 md:size-16 lg:size-20 ${
-              i === selected
-                  ? 'border-tertiary opacity-100'
-                  : 'border-primary/30 opacity-90'
+              i === selected ? 'border-tertiary opacity-100' : 'border-primary/30 opacity-90'
             } ${item.type === 'video' ? 'relative' : ''}`}
           >
             {item.type === 'video' ? (
@@ -47,6 +45,7 @@ const MediaCarousel = ({
                   </div>
                 )}
                 <VideoPlayer
+                  key={item.url}
                   videoProps={{ src: item.url, autoPlay: false }}
                   className="aspect-square h-full w-full cursor-pointer object-cover"
                 />
@@ -63,7 +62,7 @@ const MediaCarousel = ({
             {handleRemove && (
               <button
                 type="button"
-                className="bg-tertiary/80 absolute top-0.5 right-0.5 z-1 flex size-4 items-center justify-center cursor-pointer rounded-full"
+                className="bg-tertiary/80 absolute top-0.5 right-0.5 z-1 flex size-4 cursor-pointer items-center justify-center rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRemove(i);

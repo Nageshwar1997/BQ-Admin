@@ -129,53 +129,116 @@ const AddNewProduct = () => {
   const onMediaAndGallerySubmit = async (data: TProductMediaAndGallery) => {
     const basicInfo = basicInfoForm.getValues();
 
-    const thumbnailFormData = new FormData();
-    thumbnailFormData.append('file', data.thumbnail);
-    thumbnailFormData.append('folder', basicInfo.title);
+    let thumbnailUrl = typeof data.thumbnail === 'string' ? data.thumbnail : '';
 
-    const imagesFormData = new FormData();
+    let videoUrl = typeof data.video === 'string' ? data.video : undefined;
+
+    const existingImageUrls: string[] = [];
+    const newImageFiles: File[] = [];
+
     data.images.forEach((image) => {
-      imagesFormData.append('files', image);
+      if (typeof image === 'string') {
+        existingImageUrls.push(image);
+      } else {
+        newImageFiles.push(image);
+      }
     });
-    imagesFormData.append('folder', basicInfo.title);
 
-    const videoFormData = new FormData();
-    if (data.video) {
+    const uploadPromises: Promise<unknown>[] = [];
+
+    // Thumbnail upload
+    if (data.thumbnail instanceof File) {
+      const thumbnailFormData = new FormData();
+
+      thumbnailFormData.append('file', data.thumbnail);
+      thumbnailFormData.append('folder', basicInfo.title);
+
+      uploadPromises.push(
+        uploadSingleMediaQuery.mutateAsync({
+          data: thumbnailFormData,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading thumbnail',
+          },
+        }),
+      );
+    } else {
+      uploadPromises.push(Promise.resolve(null));
+    }
+
+    // Images upload
+    if (newImageFiles.length) {
+      const imagesFormData = new FormData();
+
+      newImageFiles.forEach((file) => {
+        imagesFormData.append('files', file);
+      });
+
+      imagesFormData.append('folder', basicInfo.title);
+
+      uploadPromises.push(
+        uploadMultipleMediaQuery.mutateAsync({
+          data: imagesFormData,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading images',
+          },
+        }),
+      );
+    } else {
+      uploadPromises.push(Promise.resolve(null));
+    }
+
+    // Video upload
+    if (data.video instanceof File) {
+      const videoFormData = new FormData();
+
       videoFormData.append('file', data.video);
       videoFormData.append('folder', basicInfo.title);
+
+      uploadPromises.push(
+        uploadSingleMediaQuery.mutateAsync({
+          data: videoFormData,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading video',
+          },
+        }),
+      );
+    } else {
+      uploadPromises.push(Promise.resolve(null));
     }
 
-    const [thumbnailResponse, imagesResponse, videoResponse] = await Promise.all([
-      uploadSingleMediaQuery.mutateAsync({
-        data: thumbnailFormData,
-        toasterInfo: { title: 'Please wait...', description: 'Uploading thumbnail' },
-      }),
-      uploadMultipleMediaQuery.mutateAsync({
-        data: imagesFormData,
-        toasterInfo: { title: 'Please wait...', description: 'Uploading images' },
-      }),
-      data.video
-        ? uploadSingleMediaQuery.mutateAsync({
-            data: videoFormData,
-            toasterInfo: { title: 'Please wait...', description: 'Uploading video' },
-          })
-        : Promise.resolve(null),
-    ]);
+    const [thumbnailResponse, imagesResponse, videoResponse] = await Promise.all(uploadPromises);
 
-    mediaAndGalleryForm.setValue('thumbnail', thumbnailResponse.url);
-    if (imagesResponse.urls) {
-      mediaAndGalleryForm.setValue('images', imagesResponse.urls);
+    if (thumbnailResponse && typeof thumbnailResponse === 'object' && 'url' in thumbnailResponse) {
+      thumbnailUrl = thumbnailResponse.url as string;
     }
 
-    if (videoResponse) {
-      mediaAndGalleryForm.setValue('video', videoResponse.url);
+    if (videoResponse && typeof videoResponse === 'object' && 'url' in videoResponse) {
+      videoUrl = videoResponse.url as string;
+    }
+
+    const uploadedImageUrls =
+      imagesResponse && typeof imagesResponse === 'object' && 'urls' in imagesResponse
+        ? ((imagesResponse.urls as string[]) ?? [])
+        : [];
+
+    const finalImages = [...existingImageUrls, ...uploadedImageUrls];
+
+    mediaAndGalleryForm.setValue('thumbnail', thumbnailUrl);
+    mediaAndGalleryForm.setValue('images', finalImages);
+
+    console.log("🚀 ~ onMediaAndGallerySubmit ~ videoUrl:", videoUrl)
+    if (videoUrl) {
+      mediaAndGalleryForm.setValue('video', videoUrl);
     }
 
     await saveDraftProductQuery.mutateAsync(
       {
-        thumbnail: thumbnailResponse.url,
-        images: imagesResponse.urls,
-        video: videoResponse?.url,
+        thumbnail: thumbnailUrl,
+        images: finalImages,
+        video: videoUrl,
         step: activeStep,
       },
       { onSuccess: handleNext },
@@ -183,7 +246,6 @@ const AddNewProduct = () => {
   };
 
   const onDescriptionAndContentSubmit = async (data: TProductDescriptionAndContent) => {
-
     const description = await processQuillContent({
       field: 'description',
       folder: basicInfoForm.getValues().title,
