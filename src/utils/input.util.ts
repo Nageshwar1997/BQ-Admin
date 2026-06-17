@@ -143,29 +143,46 @@ export const toggleLinkId = (quill: Quill) => {
 
 // Block dragged or copied image
 export const blockDraggedOrCopiedImage = (delta: Delta): boolean => {
-  let block = false;
+  const isAllowedImage = (src: string) => {
+    if (src.startsWith('blob:')) return true;
 
-  delta.ops.forEach((op) => {
-    if (op.insert && typeof op.insert === 'object' && 'image' in op.insert) {
-      const image = op.insert.image as { src: string; alt?: string; id?: string };
+    try {
+      const url = new URL(src);
 
-      const isAllowedURL = image.src.startsWith('blob:');
-
-      if (!isAllowedURL) {
-        block = true;
-        return;
-      }
+      return url.hostname === 'res.cloudinary.com';
+    } catch {
+      return false;
     }
+  };
+
+  const hasForbiddenImage = delta.ops.some((op) => {
+    if (!op.insert || typeof op.insert !== 'object') {
+      return false;
+    }
+
+    if (!('image' in op.insert)) {
+      return false;
+    }
+
+    const image = op.insert.image as { src: string; alt?: string; id?: string };
+
+    const src = typeof image === 'string' ? image : image?.src;
+
+    if (!src) {
+      return true;
+    }
+
+    return !isAllowedImage(src);
   });
 
-  if (block) {
+  if (hasForbiddenImage) {
     toaster.error({
       title: 'You cannot copy, drag & drop images here.',
       description: 'Please upload it using the upload image button.',
     });
   }
 
-  return block;
+  return hasForbiddenImage;
 };
 
 // Toolbar builder

@@ -3,6 +3,7 @@ import Button from '@/components/ui/Button';
 import Stepper from '@/components/ui/Stepper';
 import { ADD_PRODUCT_STEPS, CATEGORY_LEVELS_MAP, EMPTY_ARRAY } from '@/constants/common.constants';
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
+import { useProcessQuillContent } from '@/hooks/useProcessQuillContent';
 import {
   productBasicInfoSchema,
   productDescriptionAndContentSchema,
@@ -47,6 +48,7 @@ import AddProductTryOnConfigurationFields from './children/AddProductTryOnConfig
 
 const AddNewProduct = () => {
   const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(0);
+  const { processQuillContent } = useProcessQuillContent<TProductDescriptionAndContent>();
 
   const uploadSingleMediaQuery = useUploadSingleMedia();
   const uploadMultipleMediaQuery = useUploadMultipleMedia();
@@ -170,15 +172,56 @@ const AddNewProduct = () => {
     }
 
     await saveDraftProductQuery.mutateAsync(
-      { thumbnail: thumbnailResponse.url, images: imagesResponse.urls, video: videoResponse?.url, step: activeStep },
+      {
+        thumbnail: thumbnailResponse.url,
+        images: imagesResponse.urls,
+        video: videoResponse?.url,
+        step: activeStep,
+      },
       { onSuccess: handleNext },
     );
   };
 
   const onDescriptionAndContentSubmit = async (data: TProductDescriptionAndContent) => {
     console.log('onDescriptionAndContentSubmit data', data);
+
+    const description = await processQuillContent({
+      field: 'description',
+      folder: basicInfoForm.getValues().title,
+      imagesRef: imageRefs.description,
+      quillRef: quillRefs.description,
+      setValue: descriptionAndContentForm.setValue,
+    });
+    const additional = await processQuillContent({
+      field: 'additional',
+      folder: basicInfoForm.getValues().title,
+      imagesRef: imageRefs.description,
+      quillRef: quillRefs.description,
+      setValue: descriptionAndContentForm.setValue,
+    });
+    const ingredients = await processQuillContent({
+      field: 'ingredients',
+      folder: basicInfoForm.getValues().title,
+      imagesRef: imageRefs.description,
+      quillRef: quillRefs.description,
+      setValue: descriptionAndContentForm.setValue,
+    });
+    const instructions = await processQuillContent({
+      field: 'instructions',
+      folder: basicInfoForm.getValues().title,
+      imagesRef: imageRefs.description,
+      quillRef: quillRefs.description,
+      setValue: descriptionAndContentForm.setValue,
+    });
     await saveDraftProductQuery.mutateAsync(
-      { ...data, step: activeStep },
+      {
+        shortDescription: data.shortDescription,
+        description,
+        instructions,
+        ingredients,
+        additional,
+        step: activeStep,
+      },
       { onSuccess: handleNext },
     );
   };
