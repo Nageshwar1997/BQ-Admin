@@ -4,11 +4,7 @@ import ColorInput from '@/components/ui/inputs/colorInput';
 import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
-import {
-  EMPTY_ARRAY,
-  PRODUCT_VARIANT_ACTIONS,
-  VARIANT_TYPE_MAP,
-} from '@/constants/common.constants';
+import { PRODUCT_VARIANT_ACTIONS, VARIANT_TYPE_MAP } from '@/constants/common.constants';
 import { PRODUCT_VARIANT_INPUT_MAP_DATA, STOCKS_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type {
   TProductBasicInfo,
@@ -31,15 +27,6 @@ type Props = {
 };
 
 const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
-  const {
-    clearErrors,
-    control,
-    formState: { errors },
-    register,
-    resetField,
-    setValue,
-  } = form;
-
   const EMPTY_VARIANT = {
     type: VARIANT_TYPE_MAP.COLOR,
     label: '',
@@ -52,17 +39,17 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
     images: [],
   };
 
-  const { fields, append, remove } = useFieldArray({ control, name: 'variants' });
+  const { fields, append, remove } = useFieldArray({ control: form.control, name: 'variants' });
 
-  const hasVariants = useWatch({ control, name: 'hasVariants' });
+  const hasVariants = useWatch({ control: form.control, name: 'hasVariants' });
 
-  const variants = useWatch({ control, name: 'variants' });
+  const variants = useWatch({ control: form.control, name: 'variants' });
 
   return (
     <div className="grid gap-6">
       <Checkbox
-        register={register('hasVariants')}
-        error={errors.hasVariants?.message}
+        register={form.register('hasVariants')}
+        error={form.formState.errors.hasVariants?.message}
         content={
           <div className="grid">
             <p>Product has variants</p>
@@ -93,7 +80,10 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
       {hasVariants ? (
         fields.map((field, index) => {
           const currentVariant = variants?.[index];
-          const error = 'variants' in errors ? errors.variants?.[index] : undefined;
+          const error =
+            'variants' in form.formState.errors
+              ? form.formState.errors.variants?.[index]
+              : undefined;
           return (
             <div
               key={field.id}
@@ -152,13 +142,15 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                     key={`${name}-${type}`}
                     control={form.control}
                     name={`variants.${index}.${name}`}
-                    render={({ field: { onChange, value } }) => {
+                    render={({ field }) => {
                       const { label, placeholder1, placeholder2 } = input;
 
-                      const currVal = currentVariant?.[name];
-                      const hasValue = Array.isArray(currVal) ? currVal.length > 0 : !!currVal;
+                      const value = currentVariant?.[name];
+                      const hasValue = Array.isArray(value) ? value.length > 0 : !!value;
 
                       const placeholder = hasValue ? placeholder2 : placeholder1;
+
+                      const isImages = name === 'images';
 
                       return (
                         <FileInput
@@ -167,38 +159,29 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                             name,
                             placeholder,
                             value,
-                            multiple: name === 'images',
+                            multiple: isImages,
                             onChange: ({ target: { files } }) => {
                               if (!files?.length) return;
+                              const newValue = isImages
+                                ? [...(currentVariant?.images || []), ...(Array.from(files) || [])]
+                                : files[0];
 
-                              const newFiles = Array.from(files) || EMPTY_ARRAY;
-
-                              if (name === 'thumbnail') {
-                                onChange(newFiles[0]);
-                              } else {
-                                const oldFiles = currentVariant?.images || EMPTY_ARRAY;
-
-                                onChange([...oldFiles, ...newFiles]);
-                              }
+                              field.onChange(newValue);
                             },
                           }}
                           errors={toErrorMessageArray<TProductStockAndVariants>(error?.[name])}
                           handleRemove={(imgIdx) => {
-                            if (name === 'images') {
-                              const oldImages = currentVariant?.images || EMPTY_ARRAY;
+                            const oldImages = currentVariant?.images;
 
-                              const nextValue = oldImages.filter(
-                                (_, currentIndex) => currentIndex !== imgIdx,
-                              );
+                            const nextValue = isImages
+                              ? oldImages?.filter((_, currentIndex) => currentIndex !== imgIdx)
+                              : undefined;
 
-                              setValue(`variants.${index}.${name}`, nextValue, {
-                                shouldDirty: true,
-                                shouldTouch: true,
-                                shouldValidate: true,
-                              });
-                            } else {
-                              resetField(`variants.${index}.${name}`);
-                            }
+                            form.setValue(`variants.${index}.${name}`, nextValue, {
+                              shouldDirty: true,
+                              shouldTouch: true,
+                              shouldValidate: true,
+                            });
                           }}
                         />
                       );
@@ -208,7 +191,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                   <Input
                     key={`${name}-${type}`}
                     label={input.label}
-                    register={register(
+                    register={form.register(
                       `variants.${index}.${name}`,
                       input.type === 'number' ? { valueAsNumber: true } : {},
                     )}
@@ -228,12 +211,12 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                       onClick: () => {
                         if (action.content === 'Remove') {
                           if (fields?.length === 1) {
-                            setValue('hasVariants', false);
+                            form.setValue('hasVariants', false);
                           }
                           remove(index);
                         } else if (action.content === 'Clear') {
-                          setValue(`variants.${index}`, EMPTY_VARIANT);
-                          clearErrors(`variants.${index}`);
+                          form.setValue(`variants.${index}`, EMPTY_VARIANT);
+                          form.clearErrors(`variants.${index}`);
                         } else if (action.content === 'Add') {
                           const isInvalid =
                             !currentVariant.type ||
@@ -266,8 +249,10 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
             <Input
               key={input.name}
               label={input.label}
-              register={register(input.name, { valueAsNumber: true })}
-              error={(errors as FieldErrors<TProductWithoutVariant>)[input.name]?.message}
+              register={form.register(input.name, { valueAsNumber: true })}
+              error={
+                (form.formState.errors as FieldErrors<TProductWithoutVariant>)[input.name]?.message
+              }
               inputProps={{ type: input.type, placeholder: input.placeholder }}
             />
           ))}

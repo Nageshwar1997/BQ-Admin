@@ -1,5 +1,5 @@
 import FileInput from '@/components/ui/inputs/FileInput';
-import { EMPTY_ARRAY, FILE_MIME } from '@/constants/common.constants';
+import { FILE_MIME } from '@/constants/common.constants';
 import { PRODUCT_MEDIA_AND_GALLERY_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type { TProductMediaAndGallery } from '@/types/schema.type';
 import { toErrorMessageArray } from '@/utils/form.util';
@@ -28,7 +28,7 @@ const AddProductMediaAndGalleryFields = ({ form }: Props) => {
             key={name}
             control={form.control}
             name={name}
-            render={({ field: { value, onChange } }) => (
+            render={({ field }) => (
               <FileInput
                 label={label}
                 fileInputProps={{
@@ -41,26 +41,24 @@ const AddProductMediaAndGalleryFields = ({ form }: Props) => {
                   onChange: ({ target: { files } }) => {
                     if (!files?.length) return;
                     if (isImages) {
-                      const oldFiles = images || EMPTY_ARRAY;
-                      onChange([...oldFiles, ...Array.from(files)]);
+                      const oldFiles = images || [];
+                      field.onChange([...oldFiles, ...Array.from(files)]);
                     } else {
-                      onChange(files[0]);
+                      field.onChange(files[0]);
                     }
                   },
                 }}
                 errors={toErrorMessageArray<TProductMediaAndGallery>(form.formState.errors[name])}
                 handleRemove={(index) => {
-                  if (isImages) {
-                    const nextValue = images.filter((_, currentIndex) => currentIndex !== index);
+                  const nextValue = isImages
+                    ? images.filter((_, currentIndex) => currentIndex !== index)
+                    : undefined;
 
-                    form.setValue(name, nextValue, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    });
-                  } else {
-                    form.resetField(name);
-                  }
+                  form.setValue(name, nextValue, {
+                    shouldDirty: true,
+                    shouldTouch: true,
+                    shouldValidate: true,
+                  });
                 }}
                 containerClassName={isImages ? 'col-span-2' : ''}
               />
