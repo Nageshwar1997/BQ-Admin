@@ -14,7 +14,17 @@ export const useProcessQuillContent = <T extends FieldValues>() => {
   const { mutateAsync } = useUploadMultipleMedia();
 
   const processQuillContent = useCallback(
-    async ({ quillRef, imagesRef, setValue, field, folder }: IProcessQuillContent<T>) => {
+    async ({
+      quillRef,
+      imagesRef,
+      setValue,
+      field,
+      folder,
+      toasterInfo = {
+        title: 'Please wait...',
+        description: 'Uploading content files...',
+      },
+    }: IProcessQuillContent<T>) => {
       if (!quillRef.current) return '';
 
       const quill = quillRef.current;
@@ -38,13 +48,7 @@ export const useProcessQuillContent = <T extends FieldValues>() => {
 
       formData.append('folder', folder);
 
-      const data = await mutateAsync({
-        data: formData,
-        toasterInfo: {
-          title: 'Please wait...',
-          description: 'Uploading content files...',
-        },
-      });
+      const data = await mutateAsync({ data: formData, toasterInfo });
 
       const urls: string[] = data?.urls?.filter(Boolean) || [];
 

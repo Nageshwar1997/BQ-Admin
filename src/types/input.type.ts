@@ -14,7 +14,7 @@ import type {
   UseFormRegisterReturn,
   UseFormSetValue,
 } from 'react-hook-form';
-import type { ITooltip, TClassName, TContainerClassName, TQuillImageRef } from './component.type';
+import type { ITooltip, TClassName, TContainerClassName, TQuillImageRef, TTitleDescription } from './component.type';
 
 type LeftIcon = { left: IconProps | string; right?: never };
 
@@ -152,4 +152,5 @@ export interface IProcessQuillContent<T extends FieldValues> {
   setValue: UseFormSetValue<T>;
   field: FieldPath<T>;
   folder: string;
+  toasterInfo?: Partial<TTitleDescription>
 }

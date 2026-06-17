@@ -254,6 +254,10 @@ const AddNewProduct = () => {
           imagesRef: imageRefs.description,
           quillRef: quillRefs.description,
           setValue: descriptionAndContentForm.setValue,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading description images...',
+          },
         }),
         processQuillContent({
           field: 'additional',
@@ -261,6 +265,10 @@ const AddNewProduct = () => {
           imagesRef: imageRefs.additional,
           quillRef: quillRefs.additional,
           setValue: descriptionAndContentForm.setValue,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading additional info images...',
+          },
         }),
         processQuillContent({
           field: 'ingredients',
@@ -268,6 +276,10 @@ const AddNewProduct = () => {
           imagesRef: imageRefs.ingredients,
           quillRef: quillRefs.ingredients,
           setValue: descriptionAndContentForm.setValue,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading ingredients images...',
+          },
         }),
         processQuillContent({
           field: 'instructions',
@@ -275,6 +287,10 @@ const AddNewProduct = () => {
           imagesRef: imageRefs.instructions,
           quillRef: quillRefs.instructions,
           setValue: descriptionAndContentForm.setValue,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading instructions images...',
+          },
         }),
       ]);
 
