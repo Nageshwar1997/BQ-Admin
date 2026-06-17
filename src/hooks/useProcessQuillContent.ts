@@ -56,10 +56,18 @@ export const useProcessQuillContent = <T extends FieldValues>() => {
       }
 
       images.forEach(({ blobUrl }, index) => {
-        content = content.replace(blobUrl, urls[index]);
+        content = content.split(blobUrl).join(urls[index]);
       });
 
       quill.root.innerHTML = content;
+
+      // Cleanup uploaded blobs
+      images.forEach(({ blobUrl }) => {
+        URL.revokeObjectURL(blobUrl);
+      });
+
+      imagesRef.current = [];
+
       setValue(field, content as FieldPathValue<T, typeof field>);
 
       return getQuillContent(content);

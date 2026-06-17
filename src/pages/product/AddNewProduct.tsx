@@ -183,7 +183,6 @@ const AddNewProduct = () => {
   };
 
   const onDescriptionAndContentSubmit = async (data: TProductDescriptionAndContent) => {
-    console.log('onDescriptionAndContentSubmit data', data);
 
     const description = await processQuillContent({
       field: 'description',
@@ -192,25 +191,28 @@ const AddNewProduct = () => {
       quillRef: quillRefs.description,
       setValue: descriptionAndContentForm.setValue,
     });
+
     const additional = await processQuillContent({
       field: 'additional',
       folder: basicInfoForm.getValues().title,
-      imagesRef: imageRefs.description,
-      quillRef: quillRefs.description,
+      imagesRef: imageRefs.additional,
+      quillRef: quillRefs.additional,
       setValue: descriptionAndContentForm.setValue,
     });
+
     const ingredients = await processQuillContent({
       field: 'ingredients',
       folder: basicInfoForm.getValues().title,
-      imagesRef: imageRefs.description,
-      quillRef: quillRefs.description,
+      imagesRef: imageRefs.ingredients,
+      quillRef: quillRefs.ingredients,
       setValue: descriptionAndContentForm.setValue,
     });
+
     const instructions = await processQuillContent({
       field: 'instructions',
       folder: basicInfoForm.getValues().title,
-      imagesRef: imageRefs.description,
-      quillRef: quillRefs.description,
+      imagesRef: imageRefs.instructions,
+      quillRef: quillRefs.instructions,
       setValue: descriptionAndContentForm.setValue,
     });
     await saveDraftProductQuery.mutateAsync(

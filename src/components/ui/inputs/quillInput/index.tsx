@@ -117,9 +117,6 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
         }
       }
 
-      // Cache current blob URLs for cleanup on unmount
-      const blobUrls = imagesRef?.current.map((image) => image.blobUrl);
-
       return () => {
         quill.root.removeEventListener('scroll', handleScroll);
 
@@ -127,11 +124,13 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
           ref.current = null;
         }
 
-        container.innerHTML = '';
+        imagesRef?.current.forEach((image) => {
+          URL.revokeObjectURL(image.blobUrl);
+        });
 
-        if (blobUrls) {
-          blobUrls.forEach((url) => URL.revokeObjectURL(url));
-        }
+        imagesRef?.current.splice(0);
+
+        container.innerHTML = '';
       };
     }, []);
 
