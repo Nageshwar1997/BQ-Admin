@@ -192,6 +192,23 @@ const FileInput = ({
     return url;
   };
 
+  const handlePreviewRemove = (index: number) => {
+    setPreviews((prev) => {
+      const nextPreviews = prev.filter((_, currentIndex) => currentIndex !== index);
+
+      if (!nextPreviews.length) {
+        setShowImageModal(false);
+        setCurrentIndex(null);
+      } else if (currentIndex !== null && currentIndex >= nextPreviews.length) {
+        setCurrentIndex(nextPreviews.length - 1);
+      }
+
+      return nextPreviews;
+    });
+
+    handleRemove?.(index);
+  };
+
   useEffect(() => {
     const value = fileInputProps.value;
 
@@ -268,7 +285,7 @@ const FileInput = ({
               setCurrentIndex(i);
               setShowImageModal(true);
             }}
-            handleRemove={handleRemove}
+            handleRemove={handlePreviewRemove}
           />
         </div>
       )}
@@ -280,7 +297,7 @@ const FileInput = ({
           opened={showImageModal}
           media={previews}
           setCurrentIndex={setCurrentIndex}
-          handleRemove={handleRemove}
+          handleRemove={handlePreviewRemove}
         />
       )}
     </div>
