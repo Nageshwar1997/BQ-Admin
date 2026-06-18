@@ -177,7 +177,7 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
   },
   {
     title: 'TryOn configuration',
-    description: 'Setup TryOn type and configure TryOn details',
+    description: 'Setup TryOn category and configure TryOn details',
     icon: 'solar:face-scan-square-linear',
   },
   {

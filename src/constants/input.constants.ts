@@ -270,16 +270,16 @@ export const PRODUCT_TRYON_INPUT_MAP_DATA = [
     type: 'checkbox',
   },
   {
-    name: 'type',
-    label: 'Try-on type',
+    name: 'category',
+    label: 'Try-on category',
     type: 'select',
-    placeholder: 'Select try-on type',
+    placeholder: 'Select try-on category',
   },
   {
-    name: 'subType',
-    label: 'Try-on sub-type',
+    name: 'subCategory',
+    label: 'Try-on sub-category',
     type: 'select',
-    placeholder: 'Select try-on sub-type',
+    placeholder: 'Select try-on sub-category',
   },
 ] as const;
 

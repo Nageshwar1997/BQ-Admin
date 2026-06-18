@@ -1,5 +1,7 @@
 import { MediaCarouselWithParentMedia } from '@/components/layout/carousels/MediaCarouselWithParentMedia';
+import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/inputs/Checkbox';
+import { QuillContent } from '@/components/ui/QuillContent';
 import type { TClassName } from '@/types/component.type';
 import type {
   TConfirmDetails,
@@ -46,6 +48,7 @@ const KeyValue = ({
 };
 
 const BasicInfo = ({ data }: { data: Props['values']['basicInfo'] }) => {
+  if (!Object.keys(data).length) return null;
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
       <Heading title="Basic Information" />
@@ -66,8 +69,31 @@ const BasicInfo = ({ data }: { data: Props['values']['basicInfo'] }) => {
   );
 };
 
+const DescriptionAndContent = ({ data }: { data: Props['values']['descriptionAndContent'] }) => {
+  if (!Object.keys(data).length) return null;
+  const { shortDescription, ...restData } = data;
+  return (
+    <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
+      <Heading title="Basic Information" />
+      <KeyValue label="Short description" value={shortDescription} />
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6">
+        {Object.entries(restData).map(([key, content]) => {
+          if (!content) return null;
+          return (
+            <KeyValue
+              key={key}
+              label={key}
+              value={<QuillContent content={content} className="lg:prose-sm!" />}
+            />
+          );
+        })}
+      </div>
+    </section>
+  );
+};
+
 const MediaAndGallery = ({ data }: { data: Props['values']['mediaAndGallery'] }) => {
-  if (!data) return null;
+  if (!Object.keys(data).length) return null;
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
       <Heading title="Media and Gallery" />
@@ -104,13 +130,102 @@ const MediaAndGallery = ({ data }: { data: Props['values']['mediaAndGallery'] })
   );
 };
 
+const StockAndVariants = ({ data }: { data: Props['values']['stockAndVariants'] }) => {
+  if (!Object.keys(data).length) return null;
+  const { hasVariants } = data;
+
+  const variants = hasVariants ? data.variants : undefined;
+  const stocks = !hasVariants ? data : undefined;
+  return (
+    <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
+      <Heading title={hasVariants ? 'Variants' : 'Stock'} />
+      {stocks && (
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6">
+          <KeyValue label="Stock" value={stocks?.stock} />
+          <KeyValue label="Stock Threshold" value={stocks.stockThreshold} />
+        </div>
+      )}
+      {variants &&
+        variants.map((variant, index) => (
+          <div
+            key={index}
+            className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6"
+          >
+            <KeyValue label="Label" value={variant.label} />
+            <KeyValue
+              label={variant.type === 'Color' ? 'Color' : 'Value'}
+              value={
+                variant.type === 'Color' ? (
+                  <div style={{ backgroundColor: variant.value }} className="w-fit px-5 py-2" />
+                ) : (
+                  variant.value
+                )
+              }
+            />
+            <KeyValue label="Stock" value={variant?.stock} />
+            <KeyValue label="Stock Threshold" value={variant.stockThreshold} />
+            <KeyValue
+              label="Selling Price"
+              value={formatINRCurrency(variant.sellingPrice)}
+              className="[&>div]:text-primary-green"
+            />
+            <KeyValue label="Original Price" value={formatINRCurrency(variant.originalPrice)} />
+            {variant.thumbnail && (
+              <KeyValue
+                label="Thumbnail"
+                value={
+                  <MediaCarouselWithParentMedia
+                    media={[{ type: 'image', url: variant.thumbnail as string }]}
+                  />
+                }
+              />
+            )}
+            <KeyValue
+              label={variant.images.length > 1 ? 'Images' : 'Image'}
+              value={
+                <MediaCarouselWithParentMedia
+                  media={variant.images.map((image) => ({ type: 'image', url: image as string }))}
+                />
+              }
+            />
+          </div>
+        ))}
+    </section>
+  );
+};
+
+const TryOnConfiguration = ({ data }: { data: Props['values']['tryOnConfiguration'] }) => {
+  if (!Object.keys(data).length || !data.enabled || !data.tryon) return null;
+
+  return (
+    <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
+      <div className="flex items-center justify-between gap-4">
+        <Heading title="Try-On" />
+        <Button pattern="secondary" content="Try-On" className="w-fit! rounded-md py-2.5!" />
+      </div>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6">
+        <KeyValue label="Category" value={data.tryon.category} />
+        <KeyValue label="Sub-Category" value={data.tryon.subCategory} />
+      </div>
+    </section>
+  );
+};
+
 const AddProductConfirmFieldAndReview = ({ values, form }: Props) => {
-  const { basicInfo, mediaAndGallery } = values;
-  console.log('🚀 ~ AddProductConfirmFieldAndReview ~ mediaAndGallery:', mediaAndGallery);
+  const {
+    basicInfo,
+    mediaAndGallery,
+    descriptionAndContent,
+    stockAndVariants,
+    tryOnConfiguration,
+  } = values;
   return (
     <div className="grid gap-4">
       <BasicInfo data={basicInfo} />
       <MediaAndGallery data={mediaAndGallery} />
+      <DescriptionAndContent data={descriptionAndContent} />
+      <StockAndVariants data={stockAndVariants} />
+      <TryOnConfiguration data={tryOnConfiguration} />
       <Checkbox
         register={form.register('confirm')}
         error={form.formState.errors.confirm?.message}

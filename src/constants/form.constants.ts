@@ -63,12 +63,12 @@ export const TRY_ON_MAP = {
   SKIN: ['MOISTURIZER', 'SERUM', 'TONER', 'CLEANSER'],
 } as const;
 
-export const TRY_ON_TYPES = Object.keys(TRY_ON_MAP) as (keyof typeof TRY_ON_MAP)[];
+export const TRY_ON_CATEGORIES = Object.keys(TRY_ON_MAP) as (keyof typeof TRY_ON_MAP)[];
 
-export const TRYON_ALL_SUB_TYPES = Object.values(TRY_ON_MAP).flat();
+export const TRYON_ALL_SUB_CATEGORIES = Object.values(TRY_ON_MAP).flat();
 
-export const TRYON_TYPE = Object.fromEntries(
-  TRY_ON_TYPES.map((category) => [category, category]),
+export const TRYON_CATEGORY_MAP = Object.fromEntries(
+  TRY_ON_CATEGORIES.map((category) => [category, category]),
 ) as {
   [K in keyof typeof TRY_ON_MAP]: K;
 };

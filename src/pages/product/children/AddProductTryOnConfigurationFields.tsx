@@ -1,6 +1,6 @@
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Select from '@/components/ui/inputs/Select';
-import { TRY_ON_MAP, TRY_ON_TYPES } from '@/constants/form.constants';
+import { TRY_ON_MAP, TRY_ON_CATEGORIES } from '@/constants/form.constants';
 import { PRODUCT_TRYON_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type { TProductTryOnConfiguration } from '@/types/schema.type';
 import { useMemo } from 'react';
@@ -20,9 +20,9 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
   const enabled = useWatch({ control, name: 'enabled' });
   const tryOn = useWatch({ control, name: 'tryon' });
 
-  const subTypes = useMemo(() => {
-    return tryOn?.type ? TRY_ON_MAP[tryOn.type] : [];
-  }, [tryOn?.type]);
+  const subCategories = useMemo(() => {
+    return tryOn?.category ? TRY_ON_MAP[tryOn.category] : [];
+  }, [tryOn?.category]);
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -34,20 +34,20 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
             name={`tryon.${input.name}`}
             control={control}
             render={({ field: { onChange, value } }) => {
-              const options = input.name === 'subType' ? subTypes : TRY_ON_TYPES;
+              const options = input.name === 'subCategory' ? subCategories : TRY_ON_CATEGORIES;
               console.log('🚀 ~ AddProductTryOnConfigurationFields ~ options:', options);
               return (
                 <Select
                   label={input.label}
                   error={'tryon' in errors ? errors.tryon?.[input.name]?.message : undefined}
-                  options={options.map((type) => ({ label: type, value: type }))}
+                  options={options.map((category) => ({ label: category, value: category }))}
                   selectProps={{
                     value,
                     placeholder: input.placeholder,
-                    disabled: input.name === 'subType' && !tryOn?.type,
+                    disabled: input.name === 'subCategory' && !tryOn?.category,
                     onChange: (value) => {
-                      if (input.name === 'type') {
-                        resetField('tryon.subType');
+                      if (input.name === 'category') {
+                        resetField('tryon.subCategory');
                       }
                       onChange(value);
                     },

@@ -6,7 +6,7 @@ import {
   VARIANT_TYPE,
   VARIANT_TYPE_MAP,
 } from '@/constants/common.constants';
-import { TRY_ON_MAP, TRYON_TYPE } from '@/constants/form.constants';
+import { TRY_ON_MAP, TRYON_CATEGORY_MAP } from '@/constants/form.constants';
 import { REGEX } from '@/constants/regex.constants';
 import { formatFileSize } from '@/utils/common.util';
 import {
@@ -444,39 +444,47 @@ export const productStockAndVariantsSchema = discriminatedUnion(
 /* -------------------------------------------------------------------------- */
 
 const enabledTryOnSchema = discriminatedUnion(
-  'type',
+  'category',
   [
     object({
-      type: literal(TRYON_TYPE.LIP),
-      subType: z_enum(TRY_ON_MAP[TRYON_TYPE.LIP], { error: `TryOn sub-type is required.` }),
+      category: literal(TRYON_CATEGORY_MAP.LIP),
+      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.LIP], { error: `TryOn sub-category is required.` }),
     }),
 
     object({
-      type: literal(TRYON_TYPE.EYE),
-      subType: z_enum(TRY_ON_MAP[TRYON_TYPE.EYE], { error: `TryOn sub-type is required.` }),
+      category: literal(TRYON_CATEGORY_MAP.EYE),
+      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.EYE], { error: `TryOn sub-category is required.` }),
     }),
 
     object({
-      type: literal(TRYON_TYPE.HAIR),
-      subType: z_enum(TRY_ON_MAP[TRYON_TYPE.HAIR], { error: `TryOn sub-type is required.` }),
+      category: literal(TRYON_CATEGORY_MAP.HAIR),
+      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.HAIR], {
+        error: `TryOn sub-category is required.`,
+      }),
     }),
 
     object({
-      type: literal(TRYON_TYPE.FACE),
-      subType: z_enum(TRY_ON_MAP[TRYON_TYPE.FACE], { error: `TryOn sub-type is required.` }),
+      category: literal(TRYON_CATEGORY_MAP.FACE),
+      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.FACE], {
+        error: `TryOn sub-category is required.`,
+      }),
     }),
 
     object({
-      type: literal(TRYON_TYPE.NAIL),
-      subType: z_enum(TRY_ON_MAP[TRYON_TYPE.NAIL], { error: `TryOn sub-type is required.` }),
+      category: literal(TRYON_CATEGORY_MAP.NAIL),
+      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.NAIL], {
+        error: `TryOn sub-category is required.`,
+      }),
     }),
 
     object({
-      type: literal(TRYON_TYPE.SKIN),
-      subType: z_enum(TRY_ON_MAP[TRYON_TYPE.SKIN], { error: `TryOn sub-type is required.` }),
+      category: literal(TRYON_CATEGORY_MAP.SKIN),
+      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.SKIN], {
+        error: `TryOn sub-category is required.`,
+      }),
     }),
   ],
-  { error: 'TryOn type is required.' },
+  { error: 'TryOn category is required.' },
 );
 
 export const productTryOnConfigurationSchema = discriminatedUnion(
