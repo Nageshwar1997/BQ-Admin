@@ -18,6 +18,7 @@ import {
 } from '@/services/media-service/media.service.query';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
 import {
+  useGetDraftProduct,
   usePublishProduct,
   useSaveDraftProduct,
 } from '@/services/product-service/product.service.query';
@@ -37,7 +38,7 @@ import type {
 } from '@/types/schema.type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
 import AddProductConfirmFieldAndReview from './children/AddProductConfirmFieldAndReview';
@@ -54,6 +55,11 @@ const AddNewProduct = () => {
   const uploadMultipleMediaQuery = useUploadMultipleMedia();
   const saveDraftProductQuery = useSaveDraftProduct();
   const publishDraftProductQuery = usePublishProduct();
+  const {
+    data: draftProduct,
+    isLoading: isDraftProductLoading,
+    isError: isDraftProductError,
+  } = useGetDraftProduct();
 
   const quillRefs: TProductQuillRefs = {
     description: useRef<Quill | null>(null),
@@ -479,6 +485,29 @@ const AddNewProduct = () => {
       />
     </form>,
   ];
+
+  useEffect(() => {
+    if (!draftProduct || isDraftProductLoading || isDraftProductError) return;
+
+    if (draftProduct.basicInfo) {
+      basicInfoForm.reset(draftProduct.basicInfo);
+    }
+    if (draftProduct.mediaAndGallery) {
+      mediaAndGalleryForm.reset(draftProduct.mediaAndGallery);
+    }
+
+    if (draftProduct.descriptionAndContent) {
+      descriptionAndContentForm.reset(draftProduct.descriptionAndContent);
+    }
+
+    if (draftProduct.stockAndVariants) {
+      stockAndVariantsForm.reset(draftProduct.stockAndVariants);
+    }
+
+    if (draftProduct.tryOnConfiguration) {
+      tryOnConfigurationForm.reset(draftProduct.tryOnConfiguration);
+    }
+  }, [draftProduct]);
 
   return (
     <div className="h-full w-full">

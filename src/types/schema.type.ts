@@ -62,3 +62,11 @@ export type TProductWithoutVariant = zodInfer<typeof withoutVariantsSchema>;
 export type TProductStockAndVariants = zodInfer<typeof productStockAndVariantsSchema>;
 
 export type TProductTryOnConfiguration = zodInfer<typeof productTryOnConfigurationSchema>;
+
+export interface TDraftProduct {
+  basicInfo: TProductBasicInfo;
+  mediaAndGallery: TProductMediaAndGallery;
+  descriptionAndContent: TProductDescriptionAndContent;
+  stockAndVariants: TProductStockAndVariants;
+  tryOnConfiguration: TProductTryOnConfiguration;
+}

@@ -1,5 +1,11 @@
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
-import type { IId, TApiCategory, TApiL1Category, TApiL2Category, TApiL3Category } from '@/types/api.type';
+import type {
+  IId,
+  TApiCategory,
+  TApiL1Category,
+  TApiL2Category,
+  TApiL3Category,
+} from '@/types/api.type';
 import { ApiRequest } from '../ApiRequest';
 
 export class CategoryApi extends ApiRequest {
@@ -56,4 +62,8 @@ export class ProductApi extends ApiRequest {
   /* ===================== DELETE API ===================== */
 
   /* ===================== GET API ===================== */
+
+  public getDraftProduct = () => {
+    return this.request(this.routes.draft.get);
+  };
 }

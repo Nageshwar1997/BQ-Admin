@@ -1,12 +1,15 @@
 import { productApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
+import type { TDraftProduct } from '@/types/schema.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const { draft } = API_QUERY_KEYS.product_service.product;
 
 export const useSaveDraftProduct = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: draft.save,
     mutationFn: productApi.saveDraftProduct,
@@ -17,7 +20,10 @@ export const useSaveDraftProduct = () => {
       });
       return { toastId };
     },
-    onSuccess: async ({ message }) => handleApiSuccessToaster(message),
+    onSuccess: async ({ message }) => {
+      await queryClient.invalidateQueries({ queryKey: [draft.get] });
+      handleApiSuccessToaster(message);
+    },
     onError: (error) => handleApiErrorToaster(error),
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
@@ -41,5 +47,14 @@ export const usePublishProduct = () => {
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
     },
+  });
+};
+
+export const useGetDraftProduct = () => {
+  return useQuery({
+    queryKey: [draft.get],
+    queryFn: productApi.getDraftProduct,
+    retry: false,
+    select: (data) => data?.draft as Partial<TDraftProduct> | undefined,
   });
 };
