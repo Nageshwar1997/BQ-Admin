@@ -184,25 +184,6 @@ const StockAndVariants = ({
             key={index}
             className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6"
           >
-            <KeyValue label="Label" value={variant.label} />
-            <KeyValue
-              label={variant.type === 'Color' ? 'Color' : 'Value'}
-              value={
-                variant.type === 'Color' ? (
-                  <div style={{ backgroundColor: variant.value }} className="w-fit px-5 py-2" />
-                ) : (
-                  variant.value
-                )
-              }
-            />
-            <KeyValue label="Stock" value={variant?.stock} />
-            <KeyValue label="Stock Threshold" value={variant.stockThreshold} />
-            <KeyValue
-              label="Selling Price"
-              value={formatINRCurrency(variant.sellingPrice)}
-              className="[&>div]:text-primary-green"
-            />
-            <KeyValue label="Original Price" value={formatINRCurrency(variant.originalPrice)} />
             {variant.thumbnail && (
               <KeyValue
                 label="Thumbnail"
@@ -223,6 +204,25 @@ const StockAndVariants = ({
                 />
               }
             />
+            <KeyValue label="Label" value={variant.label} />
+            <KeyValue
+              label={variant.type === 'Color' ? 'Color' : 'Value'}
+              value={
+                variant.type === 'Color' ? (
+                  <div style={{ backgroundColor: variant.value }} className="w-fit px-5 py-2" />
+                ) : (
+                  variant.value
+                )
+              }
+            />
+            <KeyValue label="Stock" value={variant?.stock} />
+            <KeyValue label="Stock Threshold" value={variant.stockThreshold} />
+            <KeyValue
+              label="Selling Price"
+              value={formatINRCurrency(variant.sellingPrice)}
+              className="[&>div]:text-primary-green"
+            />
+            <KeyValue label="Original Price" value={formatINRCurrency(variant.originalPrice)} />
           </div>
         ))}
     </section>
