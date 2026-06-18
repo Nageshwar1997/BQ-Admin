@@ -3,7 +3,7 @@ import type Quill from 'quill';
 import type { ToolbarProps } from 'quill/modules/toolbar';
 import type {
   InputHTMLAttributes,
-  ReactNode,
+  ReactElement,
   RefObject,
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
@@ -14,7 +14,13 @@ import type {
   UseFormRegisterReturn,
   UseFormSetValue,
 } from 'react-hook-form';
-import type { ITooltip, TClassName, TContainerClassName, TQuillImageRef, TTitleDescription } from './component.type';
+import type {
+  ITooltip,
+  TClassName,
+  TContainerClassName,
+  TQuillImageRef,
+  TTitleDescription,
+} from './component.type';
 
 type LeftIcon = { left: IconProps | string; right?: never };
 
@@ -37,13 +43,13 @@ export interface IInput extends IBaseInput {
 }
 
 export interface ICheckbox extends Omit<IBaseInput, 'needRef' | 'icons' | 'label'> {
-  content?: string | ReactNode;
+  content?: string | ReactElement;
   checkboxProps: Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
   tooltipRequired?: boolean;
   tooltip?: Pick<ITooltip, 'required' | 'description' | 'title' | 'placement'>;
 }
 
-type TOption = { label: string | ReactNode; value: string };
+type TOption = { label: string | ReactElement; value: string };
 
 export interface IRadio extends TClassName, TContainerClassName, Pick<IBaseInput, 'error'> {
   value: string;
@@ -152,5 +158,5 @@ export interface IProcessQuillContent<T extends FieldValues> {
   setValue: UseFormSetValue<T>;
   field: FieldPath<T>;
   folder: string;
-  toasterInfo?: Partial<TTitleDescription>
+  toasterInfo?: Partial<TTitleDescription>;
 }

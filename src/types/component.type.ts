@@ -5,6 +5,7 @@ import type {
   ButtonHTMLAttributes,
   ComponentProps,
   JSX,
+  ReactElement,
   ReactNode,
   RefObject,
   VideoHTMLAttributes,
@@ -16,7 +17,7 @@ export type TClassName = { className?: string };
 
 export type TContainerClassName = { containerClassName?: string };
 
-export type TChildren = { children: ReactNode };
+export type TChildren = { children: ReactNode | ReactElement };
 
 export interface IButton extends TClassName {
   buttonProps?: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'content'>;
@@ -154,3 +155,9 @@ export interface IMediaCarouselWithParent
 }
 
 export type TQuillImageRef = { id: string; file: File; blobUrl: string };
+
+export type TPageWrapper = TChildren &
+  TContainerClassName &
+  TClassName & {
+    navbar?: { components?: ReactElement[]; buttons?: Partial<IButton & TChildren>[] };
+  };

@@ -3,7 +3,6 @@ import PageWrapper from '@/components/layout/containers/PageWrapper';
 import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
 import LoadingText from '@/components/layout/loaders/LoadingText';
 import ConfirmModal from '@/components/layout/modals/ConfirmModal';
-import Navbar from '@/components/layout/navbar';
 import {
   Table,
   TableBody,
@@ -142,7 +141,9 @@ const CategoryRow = (props: TCatTable & ComponentProps<'tr'>) => {
       <TableRowCell>
         <Badge content={`Level ${category.level}`} />
       </TableRowCell>
-      <TableRowCell className="text-primary/65 uppercase">{"parent" in category ? category.parent : 'N/A'}</TableRowCell>
+      <TableRowCell className="text-primary/65 uppercase">
+        {'parent' in category ? category.parent : 'N/A'}
+      </TableRowCell>
       <TableRowCell className="text-right">
         <CategoryActions
           category={category}
@@ -424,9 +425,9 @@ const Categories = () => {
   return (
     <Fragment>
       {queryParams[q_cat_keys.mode] === q_cat_keys.add && <CategoryModal />}
-      <PageWrapper>
-        <Navbar
-          buttons={[
+      <PageWrapper
+        navbar={{
+          buttons: [
             {
               content: 'Clear',
               pattern: 'secondary',
@@ -440,9 +441,9 @@ const Categories = () => {
               leftIcon: { icon: 'solar:add-circle-linear', className: '*:stroke-[2.5]' },
               buttonProps: { onClick: () => setParams({ [q_cat_keys.mode]: q_cat_keys.add }) },
             },
-          ]}
-        />
-
+          ],
+        }}
+      >
         <div>
           <L1Table />
         </div>
