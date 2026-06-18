@@ -49,7 +49,7 @@ import AddProductStockAndVariantsFields from './children/AddProductStockAndVaria
 import AddProductTryOnConfigurationFields from './children/AddProductTryOnConfigurationFields';
 
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(1);
+  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(0);
   const { processQuillContent } = useProcessQuillContent<TProductDescriptionAndContent>();
 
   const uploadSingleMediaQuery = useUploadSingleMedia();
