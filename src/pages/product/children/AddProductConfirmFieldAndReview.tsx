@@ -2,6 +2,7 @@ import { MediaCarouselWithParentMedia } from '@/components/layout/carousels/Medi
 import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import { QuillContent } from '@/components/ui/QuillContent';
+import type { TAddProductStepNumber } from '@/types/common.type';
 import type { TClassName } from '@/types/component.type';
 import type {
   TConfirmDetails,
@@ -25,6 +26,7 @@ type Props = {
     stockAndVariants: TProductStockAndVariants;
     tryOnConfiguration: TProductTryOnConfiguration;
   };
+  onEdit: (step: TAddProductStepNumber) => void;
 };
 
 const Heading = ({ title }: { title: string }) => (

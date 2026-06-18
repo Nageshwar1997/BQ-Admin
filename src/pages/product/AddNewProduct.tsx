@@ -418,12 +418,12 @@ const AddNewProduct = () => {
     }
   };
 
-const onTryOnConfigurationSubmit = async (data: TProductTryOnConfiguration) => {
-  await saveStepIfChanged(data, draftProduct?.tryOnConfiguration, {
-    ...data,
-    step: activeStep,
-  });
-};
+  const onTryOnConfigurationSubmit = async (data: TProductTryOnConfiguration) => {
+    await saveStepIfChanged(data, draftProduct?.tryOnConfiguration, {
+      ...data,
+      step: activeStep,
+    });
+  };
 
   const onReviewAndConfirmSubmit = async (_data: TConfirmDetails) => {
     await publishDraftProductQuery.mutateAsync();
@@ -487,6 +487,7 @@ const onTryOnConfigurationSubmit = async (data: TProductTryOnConfiguration) => {
     >
       <AddProductConfirmFieldAndReview
         form={reviewAndConfirmForm}
+        onEdit={(step) => setActiveStep(step)}
         values={{
           basicInfo: basicInfoForm.getValues(),
           mediaAndGallery: mediaAndGalleryForm.getValues(),
