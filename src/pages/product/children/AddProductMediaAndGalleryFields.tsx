@@ -1,11 +1,15 @@
 import FileInput from '@/components/ui/inputs/FileInput';
 import { FILE_MIME } from '@/constants/common.constants';
 import { PRODUCT_MEDIA_AND_GALLERY_INPUT_MAP_DATA } from '@/constants/input.constants';
+import type { TAddProductStepNumber } from '@/types/common.type';
 import type { TProductMediaAndGallery } from '@/types/schema.type';
 import { toErrorMessageArray } from '@/utils/form.util';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
-type Props = { form: UseFormReturn<TProductMediaAndGallery> };
+type Props = {
+  form: UseFormReturn<TProductMediaAndGallery>;
+  onEdit: (step: TAddProductStepNumber) => void;
+};
 
 const AddProductMediaAndGalleryFields = ({ form }: Props) => {
   const images = useWatch({ control: form.control, name: 'images' });

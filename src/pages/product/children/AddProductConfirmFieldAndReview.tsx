@@ -29,10 +29,15 @@ type Props = {
   onEdit: (step: TAddProductStepNumber) => void;
 };
 
-const Heading = ({ title }: { title: string }) => (
+const Heading = ({ title, onEdit }: { title: string; onEdit: () => void }) => (
   <div className="text-primary flex items-center gap-2">
     <h4 className="font-semibold">{title}</h4>
-    <Icon icon="solar:pen-2-linear" className="[&>g]:stroke-2" />
+    <Icon
+      icon="solar:pen-2-linear"
+      className="cursor-pointer [&>g]:stroke-2 hover:scale-110 duration-200 hover:text-blue-crayola-c"
+      role="button"
+      onClick={onEdit}
+    />
   </div>
 );
 
@@ -49,11 +54,17 @@ const KeyValue = ({
   );
 };
 
-const BasicInfo = ({ data }: { data: Props['values']['basicInfo'] }) => {
+const BasicInfo = ({
+  data,
+  onEdit,
+}: {
+  data: Props['values']['basicInfo'];
+  onEdit: () => void;
+}) => {
   if (!Object.keys(data).length) return null;
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
-      <Heading title="Basic Information" />
+      <Heading title="Basic Information" onEdit={onEdit} />
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6">
         <KeyValue label="Title" value={data.title} />
         <KeyValue label="Brand" value={data.brand} />
@@ -71,12 +82,18 @@ const BasicInfo = ({ data }: { data: Props['values']['basicInfo'] }) => {
   );
 };
 
-const DescriptionAndContent = ({ data }: { data: Props['values']['descriptionAndContent'] }) => {
+const DescriptionAndContent = ({
+  data,
+  onEdit,
+}: {
+  data: Props['values']['descriptionAndContent'];
+  onEdit: () => void;
+}) => {
   if (!Object.keys(data).length) return null;
   const { shortDescription, ...restData } = data;
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
-      <Heading title="Basic Information" />
+      <Heading title="Basic Information" onEdit={onEdit} />
       <KeyValue label="Short description" value={shortDescription} />
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6">
         {Object.entries(restData).map(([key, content]) => {
@@ -94,11 +111,17 @@ const DescriptionAndContent = ({ data }: { data: Props['values']['descriptionAnd
   );
 };
 
-const MediaAndGallery = ({ data }: { data: Props['values']['mediaAndGallery'] }) => {
+const MediaAndGallery = ({
+  data,
+  onEdit,
+}: {
+  data: Props['values']['mediaAndGallery'];
+  onEdit: () => void;
+}) => {
   if (!Object.keys(data).length) return null;
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
-      <Heading title="Media and Gallery" />
+      <Heading title="Media and Gallery" onEdit={onEdit} />
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6">
         <KeyValue
           label="Thumbnail"
@@ -132,7 +155,13 @@ const MediaAndGallery = ({ data }: { data: Props['values']['mediaAndGallery'] })
   );
 };
 
-const StockAndVariants = ({ data }: { data: Props['values']['stockAndVariants'] }) => {
+const StockAndVariants = ({
+  data,
+  onEdit,
+}: {
+  data: Props['values']['stockAndVariants'];
+  onEdit: () => void;
+}) => {
   if (!Object.keys(data).length) return null;
   const { hasVariants } = data;
 
@@ -140,7 +169,7 @@ const StockAndVariants = ({ data }: { data: Props['values']['stockAndVariants'] 
   const stocks = !hasVariants ? data : undefined;
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
-      <Heading title={hasVariants ? 'Variants' : 'Stock'} />
+      <Heading title={hasVariants ? 'Variants' : 'Stock'} onEdit={onEdit} />
       {stocks && (
         <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6">
           <KeyValue label="Stock" value={stocks?.stock} />
@@ -196,13 +225,19 @@ const StockAndVariants = ({ data }: { data: Props['values']['stockAndVariants'] 
   );
 };
 
-const TryOnConfiguration = ({ data }: { data: Props['values']['tryOnConfiguration'] }) => {
+const TryOnConfiguration = ({
+  data,
+  onEdit,
+}: {
+  data: Props['values']['tryOnConfiguration'];
+  onEdit: () => void;
+}) => {
   if (!Object.keys(data).length || !data.enabled || !data.tryon) return null;
 
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
       <div className="flex items-center justify-between gap-4">
-        <Heading title="Try-On" />
+        <Heading title="Try-On" onEdit={onEdit} />
         <Button pattern="secondary" content="Try-On" className="w-fit! rounded-md py-2.5!" />
       </div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6">
@@ -213,7 +248,7 @@ const TryOnConfiguration = ({ data }: { data: Props['values']['tryOnConfiguratio
   );
 };
 
-const AddProductConfirmFieldAndReview = ({ values, form }: Props) => {
+const AddProductConfirmFieldAndReview = ({ values, form, onEdit }: Props) => {
   const {
     basicInfo,
     mediaAndGallery,
@@ -223,11 +258,11 @@ const AddProductConfirmFieldAndReview = ({ values, form }: Props) => {
   } = values;
   return (
     <div className="grid gap-4">
-      <BasicInfo data={basicInfo} />
-      <MediaAndGallery data={mediaAndGallery} />
-      <DescriptionAndContent data={descriptionAndContent} />
-      <StockAndVariants data={stockAndVariants} />
-      <TryOnConfiguration data={tryOnConfiguration} />
+      <BasicInfo data={basicInfo} onEdit={() => onEdit(0)} />
+      <MediaAndGallery data={mediaAndGallery} onEdit={() => onEdit(1)} />
+      <DescriptionAndContent data={descriptionAndContent} onEdit={() => onEdit(2)} />
+      <StockAndVariants data={stockAndVariants} onEdit={() => onEdit(3)} />
+      <TryOnConfiguration data={tryOnConfiguration} onEdit={() => onEdit(4)} />
       <Checkbox
         register={form.register('confirm')}
         error={form.formState.errors.confirm?.message}

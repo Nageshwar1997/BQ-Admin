@@ -1,13 +1,15 @@
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Select from '@/components/ui/inputs/Select';
-import { TRY_ON_MAP, TRY_ON_CATEGORIES } from '@/constants/form.constants';
+import { TRY_ON_CATEGORIES, TRY_ON_MAP } from '@/constants/form.constants';
 import { PRODUCT_TRYON_INPUT_MAP_DATA } from '@/constants/input.constants';
+import type { TAddProductStepNumber } from '@/types/common.type';
 import type { TProductTryOnConfiguration } from '@/types/schema.type';
 import { useMemo } from 'react';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
 type Props = {
   form: UseFormReturn<TProductTryOnConfiguration>;
+  onEdit: (step: TAddProductStepNumber) => void;
 };
 const AddProductTryOnConfigurationFields = ({ form }: Props) => {
   const {
