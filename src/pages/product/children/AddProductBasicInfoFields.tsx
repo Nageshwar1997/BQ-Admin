@@ -28,7 +28,7 @@ const AddProductBasicInfoFields = ({ form, categories }: Props) => {
             ...(input.type === 'number' && { valueAsNumber: true }),
           })}
           error={form.formState.errors[input.name]?.message}
-          inputProps={{ type: input.type, placeholder: input.placeholder }}
+          inputProps={{ type: input.type, placeholder: input.placeholder, name: input.name }}
         />
       ))}
       <div className="grid gap-4 sm:col-span-2 sm:grid-cols-3">

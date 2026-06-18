@@ -11,7 +11,7 @@ const getQuillContent = (value: string) => {
 };
 
 export const useProcessQuillContent = <T extends FieldValues>() => {
-  const { mutateAsync } = useUploadMultipleMedia();
+  const { mutateAsync, isPending } = useUploadMultipleMedia();
 
   const processQuillContent = useCallback(
     async ({
@@ -83,5 +83,5 @@ export const useProcessQuillContent = <T extends FieldValues>() => {
     [mutateAsync],
   );
 
-  return { processQuillContent };
+  return { processQuillContent, isPending };
 };

@@ -46,6 +46,7 @@ const MediaCarousel = ({
                 )}
                 <VideoPlayer
                   key={item.url}
+                  showPosterOnly={true}
                   videoProps={{ src: item.url, autoPlay: false }}
                   className="aspect-square h-full w-full cursor-pointer object-cover"
                 />

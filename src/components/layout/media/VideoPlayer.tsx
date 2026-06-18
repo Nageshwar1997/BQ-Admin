@@ -1,11 +1,17 @@
-import { EMPTY_OBJECT } from '@/constants/common.constants';
+import { EMPTY_OBJECT, VIDEO_PLACEHOLDER } from '@/constants/common.constants';
 import type { IVideoPlayer } from '@/types/component.type';
 import { convertVideoToPoster } from '@/utils/common.util';
 import Hls from 'hls.js';
 import { useEffect, useRef, useState } from 'react';
 
-const VideoPlayer = ({ className = '', videoProps = EMPTY_OBJECT, ref }: IVideoPlayer) => {
+const VideoPlayer = ({
+  className = '',
+  videoProps = EMPTY_OBJECT,
+  ref,
+  showPosterOnly,
+}: IVideoPlayer) => {
   const videoRef = useRef<HTMLVideoElement | null>(ref?.current ?? null);
+
   const [poster, setPoster] = useState<string | undefined>(videoProps.poster);
 
   useEffect(() => {
@@ -37,6 +43,8 @@ const VideoPlayer = ({ className = '', videoProps = EMPTY_OBJECT, ref }: IVideoP
   }, [videoProps.src, videoProps.poster]);
 
   useEffect(() => {
+    if (showPosterOnly) return;
+
     const video = videoRef.current;
 
     if (!video || !videoProps.src) return;
@@ -84,22 +92,30 @@ const VideoPlayer = ({ className = '', videoProps = EMPTY_OBJECT, ref }: IVideoP
     return () => {
       hls?.destroy();
     };
-  }, [videoProps.src, videoProps.autoPlay, videoProps]);
+  }, [videoProps.src, videoProps.autoPlay, showPosterOnly]);
 
   return (
     <div className={`h-full w-full ${className}`}>
-      <video
-        key={videoProps.src}
-        ref={videoRef}
-        {...videoProps}
-        playsInline={videoProps.playsInline ?? true}
-        autoPlay={videoProps.autoPlay ?? true}
-        muted={videoProps.muted ?? true}
-        loop={videoProps.loop ?? false}
-        controls={videoProps.controls ?? false}
-        className={`aspect-auto h-full w-full object-cover ${videoProps.className ?? ''}`}
-        poster={poster}
-      />
+      {showPosterOnly ? (
+        <img
+          src={poster || VIDEO_PLACEHOLDER}
+          alt="video-thumbnail"
+          className={`aspect-auto h-full w-full object-cover ${videoProps.className ?? ''}`}
+        />
+      ) : (
+        <video
+          key={videoProps.src}
+          ref={videoRef}
+          {...videoProps}
+          playsInline={videoProps.playsInline ?? true}
+          autoPlay={videoProps.autoPlay ?? true}
+          muted={videoProps.muted ?? true}
+          loop={videoProps.loop ?? false}
+          controls={videoProps.controls ?? false}
+          className={`aspect-auto h-full w-full object-cover ${videoProps.className ?? ''}`}
+          poster={poster}
+        />
+      )}
     </div>
   );
 };

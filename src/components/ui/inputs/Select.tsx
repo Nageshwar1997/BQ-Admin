@@ -44,28 +44,12 @@ const Select = ({
       className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}
     >
       <div className="relative h-10 lg:h-12">
-        <InputLabel children={label} onClick={handleToggle} className="z-2" />
+        <InputLabel children={label} onClick={handleToggle} className="z-2 cursor-pointer" />
         <div
           className={`border-primary/10 bg-smoke-eerie flex h-full w-full items-center gap-1 overflow-hidden rounded-lg border ${className}`}
         >
           {/* Left Icon */}
           <InputIcon {...icons} position="left" />
-          {/* Hidden */}
-          {/* <select
-            {...register}
-            {...selectProps}
-            ref={setSelectRef}
-            id={selectProps.id || selectProps.name}
-            onBlur={handleBlur}
-            onChange={handleChange}
-            className="sr-only"
-          >
-            {options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select> */}
           <div
             className={`text-primary line-clamp-1 flex h-full w-full flex-1 items-center justify-between border-none bg-transparent p-3 text-sm font-normal ${selectProps.disabled ? 'cursor-no-drop' : 'cursor-pointer'}`}
             onClick={handleToggle}

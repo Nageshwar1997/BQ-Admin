@@ -1,4 +1,11 @@
-import { DEFAULT_POSTER, GB, KB, MB, TOAST_TYPE, TOOLTIP_GAP } from '@/constants/common.constants';
+import {
+  GB,
+  KB,
+  MB,
+  TOAST_TYPE,
+  TOOLTIP_GAP,
+  VIDEO_PLACEHOLDER,
+} from '@/constants/common.constants';
 import useToastStore from '@/stores/toast.store';
 import type { IButton, ITooltip } from '@/types/component.type';
 import type {
@@ -232,7 +239,7 @@ function getPosterFromBlobVideo(blobVideoUrl: string, timeInSeconds = 0): Promis
 
       const ctx = canvas.getContext('2d');
       if (!ctx) {
-        resolve(DEFAULT_POSTER);
+        resolve(VIDEO_PLACEHOLDER);
         return;
       }
 
@@ -244,7 +251,7 @@ function getPosterFromBlobVideo(blobVideoUrl: string, timeInSeconds = 0): Promis
 
     video.addEventListener('error', () => {
       if (!posterCreated && !isCancelled) {
-        resolve(DEFAULT_POSTER); // no console.error to avoid noise
+        resolve(VIDEO_PLACEHOLDER); // no console.error to avoid noise
       }
     });
 
@@ -259,7 +266,7 @@ function getPosterFromBlobVideo(blobVideoUrl: string, timeInSeconds = 0): Promis
 export function convertVideoToPoster(videoUrl: string): Promise<string> {
   return new Promise((resolve) => {
     if (!videoUrl) {
-      resolve(DEFAULT_POSTER);
+      resolve(VIDEO_PLACEHOLDER);
       return;
     }
 
@@ -276,16 +283,16 @@ export function convertVideoToPoster(videoUrl: string): Promise<string> {
       // Case 2: Blob URL or direct video file → async extract
       if (videoUrl.startsWith('blob:') || /\.(mp4|webm|ogg|m3u8|mov)$/i.test(videoUrl)) {
         getPosterFromBlobVideo(videoUrl)
-          .then((poster) => resolve(poster || DEFAULT_POSTER))
-          .catch(() => resolve(DEFAULT_POSTER));
+          .then((poster) => resolve(poster || VIDEO_PLACEHOLDER))
+          .catch(() => resolve(VIDEO_PLACEHOLDER));
         return;
       }
 
       // Fallback
-      resolve(DEFAULT_POSTER);
+      resolve(VIDEO_PLACEHOLDER);
     } catch (error) {
       console.error('Failed to create poster URL', error);
-      resolve(DEFAULT_POSTER);
+      resolve(VIDEO_PLACEHOLDER);
     }
   });
 }

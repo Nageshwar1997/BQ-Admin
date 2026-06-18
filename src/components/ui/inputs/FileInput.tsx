@@ -192,7 +192,6 @@ const FileInput = ({
     return url;
   };
 
-
   useEffect(() => {
     const value = fileInputProps.value;
 
@@ -282,6 +281,7 @@ const FileInput = ({
           media={previews}
           setCurrentIndex={setCurrentIndex}
           handleRemove={handleRemove}
+          videoProps={{ controls: true }}
         />
       )}
     </div>

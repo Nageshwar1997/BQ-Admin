@@ -92,6 +92,7 @@ export interface IFooterOptionList {
 export interface IVideoPlayer extends TClassName {
   videoProps: VideoHTMLAttributes<HTMLVideoElement>;
   ref?: RefObject<HTMLVideoElement | null>;
+  showPosterOnly?: boolean;
 }
 
 export interface IBreadcrumb extends TClassName {

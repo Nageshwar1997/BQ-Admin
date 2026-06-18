@@ -56,7 +56,8 @@ import AddProductTryOnConfigurationFields from './children/AddProductTryOnConfig
 
 const AddProduct = () => {
   const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(0);
-  const { processQuillContent } = useProcessQuillContent<TProductDescriptionAndContent>();
+  const { processQuillContent, isPending: isContentUploadPending } =
+    useProcessQuillContent<TProductDescriptionAndContent>();
 
   const { navigate } = usePathParams();
 
@@ -141,6 +142,8 @@ const AddProduct = () => {
     saveData: T & { step: number },
     options?: { ignoreValues?: unknown[] },
   ) => {
+    if (saveDraftProductQuery.isPending) return;
+
     if (isDeepEqual(currentData, draftData, options ?? { ignoreValues: [undefined, null] })) {
       handleNext();
       return;
@@ -154,6 +157,8 @@ const AddProduct = () => {
   };
 
   const onMediaAndGallerySubmit = async (data: TProductMediaAndGallery) => {
+    if (uploadSingleMediaQuery.isPending || uploadMultipleMediaQuery.isPending) return;
+
     const hasNewFiles =
       data.thumbnail instanceof File ||
       data.video instanceof File ||
@@ -284,6 +289,8 @@ const AddProduct = () => {
   };
 
   const onDescriptionAndContentSubmit = async (data: TProductDescriptionAndContent) => {
+    if (isContentUploadPending) return;
+
     const [descriptionResponse, additionalResponse, ingredientsResponse, instructionsResponse] =
       await Promise.all([
         processQuillContent({
@@ -348,6 +355,14 @@ const AddProduct = () => {
 
   const onStockAndVariantsSubmit = async (data: TProductStockAndVariants) => {
     // No variants
+    if (
+      uploadSingleMediaQuery.isPending ||
+      uploadMultipleMediaQuery.isPending ||
+      saveDraftProductQuery.isPending
+    ) {
+      return;
+    }
+
     if (!data.hasVariants) {
       await saveStepIfChanged(data, draftProduct?.stockAndVariants, { ...data, step: activeStep });
 
@@ -433,6 +448,7 @@ const AddProduct = () => {
   };
 
   const onReviewAndConfirmSubmit = async (_data: TConfirmDetails) => {
+    if (publishDraftProductQuery.isPending) return;
     await publishDraftProductQuery.mutateAsync();
   };
 
@@ -545,11 +561,22 @@ const AddProduct = () => {
 
           <div className="flex justify-between gap-3">
             <Button pattern="secondary" content="Back" buttonProps={{ onClick: handleBack }} />
-
             <Button
               pattern="primary"
-              content={activeStep === ADD_PRODUCT_STEPS.length - 1 ? 'Submit' : 'Save & Next'}
-              buttonProps={{ type: 'submit', form: ADD_PRODUCT_FORM_ID_MAP[activeStep] }}
+              content={activeStep === ADD_PRODUCT_STEPS.length - 1 ? 'Submit' : 'Continue'}
+              buttonProps={{
+                type: 'submit',
+                form: ADD_PRODUCT_FORM_ID_MAP[activeStep],
+                disabled:
+                  isContentUploadPending ||
+                  saveDraftProductQuery.isPending ||
+                  publishDraftProductQuery.isPending ||
+                  basicInfoForm.formState.isSubmitting ||
+                  mediaAndGalleryForm.formState.isSubmitting ||
+                  descriptionAndContentForm.formState.isSubmitting ||
+                  stockAndVariantsForm.formState.isSubmitting ||
+                  tryOnConfigurationForm.formState.isSubmitting,
+              }}
             />
           </div>
         </div>

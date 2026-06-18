@@ -241,7 +241,7 @@ export const TOAST_TYPE = Object.fromEntries(TOAST_TYPES.map((type) => [type, ty
   [K in (typeof TOAST_TYPES)[number]]: K;
 };
 
-export const DEFAULT_POSTER = '/images/logo/BQ_gradient_logo.webp';
+export const VIDEO_PLACEHOLDER = '/images/Video-Placeholder.webp';
 
 export const VARIANT_TYPE_MAP = { COLOR: 'Color', TEXT: 'Text' } as const;
 

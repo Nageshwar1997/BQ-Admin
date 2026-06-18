@@ -6,9 +6,7 @@ import type { LabelHTMLAttributes } from 'react';
 export const InputError = ({ error, className = '' }: { error?: string } & TClassName) => {
   if (!error) return null;
   return (
-    <p
-      className={`text-red-c flex w-full items-center gap-1 text-start text-[11px] ${className}`}
-    >
+    <p className={`text-red-c flex w-full items-center gap-1 text-start text-[11px] ${className}`}>
       <Icon icon="solar:info-circle-linear" className="size-3 shrink-0" />
       <span className="line-clamp-2 leading-none whitespace-pre-line first-letter:uppercase">
         {error}
@@ -59,7 +57,8 @@ export const InputLabel = (props: LabelHTMLAttributes<HTMLLabelElement>) => {
   return (
     <label
       {...props}
-      className={`text-primary/50 border-primary/10 bg-smoke-eerie absolute top-0 left-3 -translate-y-1/2 transform cursor-pointer rounded-sm border px-1 py-0.5 pt-1 text-[10px] leading-none md:px-2 ${props.className}`}
+      htmlFor={props.htmlFor || ''}
+      className={`text-primary/50 border-primary/10 bg-smoke-eerie absolute top-0 left-3 -translate-y-1/2 transform rounded-sm border px-1 py-0.5 pt-1 text-[10px] leading-none md:px-2 ${props.htmlFor ? 'cursor-pointer' : 'cursor-default'} ${props.className}`}
     />
   );
 };
