@@ -149,7 +149,7 @@ export interface IMediaCarousel
 }
 
 export interface IMediaCarouselWithParent
-  extends TClassName, IVideo, Pick<IMediaCarousel, 'media' | 'selected' | 'handleRemove'> {
+  extends TClassName, Partial<IVideo>, Pick<IMediaCarousel, 'media' | 'selected' | 'handleRemove'> {
   needButtonControls?: boolean;
 }
 

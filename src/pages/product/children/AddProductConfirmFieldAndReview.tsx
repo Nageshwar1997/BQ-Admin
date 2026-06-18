@@ -1,3 +1,4 @@
+import { MediaCarouselWithParentMedia } from '@/components/layout/carousels/MediaCarouselWithParentMedia';
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import type { TClassName } from '@/types/component.type';
 import type {
@@ -65,22 +66,39 @@ const BasicInfo = ({ data }: { data: Props['values']['basicInfo'] }) => {
   );
 };
 
-const MediaAndGallery = ({ data: _ }: { data: Props['values']['mediaAndGallery'] }) => {
+const MediaAndGallery = ({ data }: { data: Props['values']['mediaAndGallery'] }) => {
+  if (!data) return null;
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
       <Heading title="Media and Gallery" />
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6">
-        {/* <KeyValue label="Title" value={data.title} />
-        <KeyValue label="Brand" value={data.brand} />
         <KeyValue
-          label="Selling Price"
-          value={formatINRCurrency(data.sellingPrice)}
-          className="[&>div]:text-primary-green"
+          label="Thumbnail"
+          value={
+            <MediaCarouselWithParentMedia
+              media={[{ type: 'image', url: data.thumbnail as string }]}
+            />
+          }
         />
-        <KeyValue label="Original Price" value={formatINRCurrency(data.originalPrice)} />
-        <KeyValue label="Main Category" value={data.l1CategoryName} />
-        <KeyValue label="Sub-Category" value={data.l2CategoryName} />
-        <KeyValue label="Product Category" value={data.l3CategoryName} /> */}
+        <KeyValue
+          label={data.images.length > 1 ? 'Images' : 'Image'}
+          value={
+            <MediaCarouselWithParentMedia
+              media={data.images.map((image) => ({ type: 'image', url: image as string }))}
+            />
+          }
+        />
+        {data?.video && (
+          <KeyValue
+            label="Video"
+            value={
+              <MediaCarouselWithParentMedia
+                media={[{ type: 'video', url: data?.video as string }]}
+                videoProps={{ autoPlay: false, muted: true, controls: true }}
+              />
+            }
+          />
+        )}
       </div>
     </section>
   );
