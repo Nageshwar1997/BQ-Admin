@@ -56,8 +56,5 @@ export const useGetDraftProduct = () => {
     queryFn: productApi.getDraftProduct,
     retry: false,
     select: (data) => data?.draft as Partial<TDraftProduct> | undefined,
-    // refetchOnWindowFocus: false,
-    // refetchOnMount: false,
-    // refetchOnReconnect: false,
   });
 };
