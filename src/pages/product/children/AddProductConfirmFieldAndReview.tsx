@@ -1,5 +1,4 @@
 import MediaCarouselWithModal from '@/components/layout/carousels/MediaCarouselWithModal';
-import { MediaCarouselWithParentMedia } from '@/components/layout/carousels/MediaCarouselWithParentMedia';
 import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import { QuillContent } from '@/components/ui/QuillContent';
@@ -127,7 +126,10 @@ const MediaAndGallery = ({
         <KeyValue
           label="Thumbnail"
           value={
-            <MediaCarouselWithModal media={[{ type: 'image', url: data.thumbnail as string }]} />
+            <MediaCarouselWithModal
+              media={[{ type: 'image', url: data.thumbnail as string }]}
+              gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
+            />
           }
         />
         <KeyValue
@@ -135,6 +137,7 @@ const MediaAndGallery = ({
           value={
             <MediaCarouselWithModal
               media={data.images.map((image) => ({ type: 'image', url: image as string }))}
+              gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
             />
           }
         />
@@ -142,7 +145,10 @@ const MediaAndGallery = ({
           <KeyValue
             label="Video"
             value={
-              <MediaCarouselWithModal media={[{ type: 'video', url: data?.video as string }]} />
+              <MediaCarouselWithModal
+                media={[{ type: 'video', url: data?.video as string }]}
+                gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
+              />
             }
           />
         )}
@@ -201,8 +207,9 @@ const StockAndVariants = ({
               <KeyValue
                 label="Thumbnail"
                 value={
-                  <MediaCarouselWithParentMedia
+                  <MediaCarouselWithModal
                     media={[{ type: 'image', url: variant.thumbnail as string }]}
+                    gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
                   />
                 }
               />
@@ -210,8 +217,9 @@ const StockAndVariants = ({
             <KeyValue
               label={variant.images.length > 1 ? 'Images' : 'Image'}
               value={
-                <MediaCarouselWithParentMedia
+                <MediaCarouselWithModal
                   media={variant.images.map((image) => ({ type: 'image', url: image as string }))}
+                  gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
                 />
               }
             />
