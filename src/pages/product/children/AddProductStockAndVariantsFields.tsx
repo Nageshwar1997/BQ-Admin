@@ -6,7 +6,6 @@ import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
 import { PRODUCT_VARIANT_ACTIONS, VARIANT_TYPE_MAP } from '@/constants/common.constants';
 import { PRODUCT_VARIANT_INPUT_MAP_DATA, STOCKS_INPUT_MAP_DATA } from '@/constants/input.constants';
-import type { TAddProductStepNumber } from '@/types/common.type';
 import type {
   TProductBasicInfo,
   TProductStockAndVariants,
@@ -25,7 +24,6 @@ import {
 type Props = {
   form: UseFormReturn<TProductStockAndVariants>;
   defaultPrices: Pick<TProductBasicInfo, 'originalPrice' | 'sellingPrice'>;
-  onEdit: (step: TAddProductStepNumber) => void;
 };
 
 const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {

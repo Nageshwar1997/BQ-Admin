@@ -6,18 +6,15 @@ import {
   PRODUCT_CATEGORIES_SELECT_MAP_DATA,
 } from '@/constants/input.constants';
 import type { TApiCategory } from '@/types/api.type';
-import type { TAddProductStepNumber } from '@/types/common.type';
 import type { TProductBasicInfo } from '@/types/schema.type';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
-const AddProductBasicInfoFields = ({
-  form,
-  categories,
-}: {
+type Props = {
   form: UseFormReturn<TProductBasicInfo>;
   categories: Record<keyof typeof CATEGORY_LEVELS_MAP, TApiCategory[]>;
-  onEdit: (step: TAddProductStepNumber) => void;
-}) => {
+};
+
+const AddProductBasicInfoFields = ({ form, categories }: Props) => {
   const l1Category = useWatch({ control: form.control, name: 'l1Category' });
   const l2Category = useWatch({ control: form.control, name: 'l2Category' });
 
