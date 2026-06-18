@@ -36,6 +36,7 @@ import type {
   TProductStockAndVariants,
   TProductTryOnConfiguration,
 } from '@/types/schema.type';
+import { isDeepEqual } from '@/utils/common.util';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
 import { useEffect, useRef, useState } from 'react';
@@ -124,15 +125,34 @@ const AddNewProduct = () => {
     );
   };
 
+  const saveStepIfChanged = async <T extends unknown>(
+    currentData: T,
+    draftData: T | undefined,
+    saveData: T & { step: number },
+  ) => {
+    if (isDeepEqual(currentData, draftData)) {
+      handleNext();
+      return;
+    }
+
+    await saveDraftProductQuery.mutateAsync(saveData, { onSuccess: handleNext });
+  };
+
   const onBasicInfoSubmit = async (data: TProductBasicInfo) => {
-    console.log('onBasicInfoSubmit data', data);
-    await saveDraftProductQuery.mutateAsync(
-      { ...data, step: activeStep },
-      { onSuccess: handleNext },
-    );
+    await saveStepIfChanged(data, draftProduct?.basicInfo, { ...data, step: activeStep });
   };
 
   const onMediaAndGallerySubmit = async (data: TProductMediaAndGallery) => {
+    const hasNewFiles =
+      data.thumbnail instanceof File ||
+      data.video instanceof File ||
+      data.images.some((image) => image instanceof File);
+
+    if (!hasNewFiles && isDeepEqual(draftProduct?.mediaAndGallery, data)) {
+      handleNext();
+      return;
+    }
+
     const basicInfo = basicInfoForm.getValues();
 
     let thumbnailUrl = typeof data.thumbnail === 'string' ? data.thumbnail : '';
@@ -300,118 +320,110 @@ const AddNewProduct = () => {
         }),
       ]);
 
-    await saveDraftProductQuery.mutateAsync(
-      {
-        shortDescription: data.shortDescription,
-        description: descriptionResponse,
-        instructions: instructionsResponse,
-        ingredients: ingredientsResponse,
-        additional: additionalResponse,
-        step: activeStep,
-      },
-      { onSuccess: handleNext },
-    );
+    const payload = {
+      shortDescription: data.shortDescription,
+      description: descriptionResponse as string,
+      instructions: instructionsResponse,
+      ingredients: ingredientsResponse,
+      additional: additionalResponse,
+    };
+
+    await saveStepIfChanged(payload, draftProduct?.descriptionAndContent, {
+      ...payload,
+      step: activeStep,
+    });
   };
 
   const onStockAndVariantsSubmit = async (data: TProductStockAndVariants) => {
     // No variants
     if (!data.hasVariants) {
-      await saveDraftProductQuery.mutateAsync(
-        { ...data, step: activeStep },
-        { onSuccess: handleNext },
-      );
+      await saveStepIfChanged(data, draftProduct?.stockAndVariants, { ...data, step: activeStep });
 
       return;
+    } else {
+      const folder = basicInfoForm.getValues().title;
+
+      const updatedVariants = await Promise.all(
+        data.variants.map(async (variant) => {
+          const existingImageUrls: string[] = [];
+          const newImageFiles: File[] = [];
+
+          variant.images.forEach((image) => {
+            if (typeof image === 'string') {
+              existingImageUrls.push(image);
+            } else {
+              newImageFiles.push(image);
+            }
+          });
+
+          const thumbnailPromise =
+            variant.thumbnail instanceof File
+              ? (() => {
+                  const formData = new FormData();
+
+                  formData.append('file', variant.thumbnail);
+                  formData.append('folder', folder);
+
+                  return uploadSingleMediaQuery.mutateAsync({
+                    data: formData,
+                    toasterInfo: {
+                      title: 'Please wait...',
+                      description: `Uploading ${variant.label} thumbnail...`,
+                    },
+                  });
+                })()
+              : Promise.resolve(null);
+
+          const imagesPromise =
+            newImageFiles.length > 0
+              ? (() => {
+                  const formData = new FormData();
+
+                  newImageFiles.forEach((file) => {
+                    formData.append('files', file);
+                  });
+
+                  formData.append('folder', folder);
+
+                  return uploadMultipleMediaQuery.mutateAsync({
+                    data: formData,
+                    toasterInfo: {
+                      title: 'Please wait...',
+                      description: `Uploading ${variant.label} images...`,
+                    },
+                  });
+                })()
+              : Promise.resolve(null);
+
+          const [thumbnailResponse, imagesResponse] = await Promise.all([
+            thumbnailPromise,
+            imagesPromise,
+          ]);
+
+          return {
+            ...variant,
+            thumbnail: thumbnailResponse?.url ?? variant.thumbnail,
+            images: [...existingImageUrls, ...(imagesResponse?.urls ?? [])],
+          };
+        }),
+      );
+
+      stockAndVariantsForm.setValue('variants', updatedVariants);
+
+      await saveStepIfChanged(
+        { hasVariants: true, variants: updatedVariants },
+        draftProduct?.stockAndVariants,
+        { hasVariants: true, variants: updatedVariants, step: activeStep },
+      );
     }
-
-    const folder = basicInfoForm.getValues().title;
-
-    const updatedVariants = await Promise.all(
-      data.variants.map(async (variant) => {
-        const existingImageUrls: string[] = [];
-        const newImageFiles: File[] = [];
-
-        variant.images.forEach((image) => {
-          if (typeof image === 'string') {
-            existingImageUrls.push(image);
-          } else {
-            newImageFiles.push(image);
-          }
-        });
-
-        const thumbnailPromise =
-          variant.thumbnail instanceof File
-            ? (() => {
-                const formData = new FormData();
-
-                formData.append('file', variant.thumbnail);
-                formData.append('folder', folder);
-
-                return uploadSingleMediaQuery.mutateAsync({
-                  data: formData,
-                  toasterInfo: {
-                    title: 'Please wait...',
-                    description: `Uploading ${variant.label} thumbnail...`,
-                  },
-                });
-              })()
-            : Promise.resolve(null);
-
-        const imagesPromise =
-          newImageFiles.length > 0
-            ? (() => {
-                const formData = new FormData();
-
-                newImageFiles.forEach((file) => {
-                  formData.append('files', file);
-                });
-
-                formData.append('folder', folder);
-
-                return uploadMultipleMediaQuery.mutateAsync({
-                  data: formData,
-                  toasterInfo: {
-                    title: 'Please wait...',
-                    description: `Uploading ${variant.label} images...`,
-                  },
-                });
-              })()
-            : Promise.resolve(null);
-
-        const [thumbnailResponse, imagesResponse] = await Promise.all([
-          thumbnailPromise,
-          imagesPromise,
-        ]);
-
-        return {
-          ...variant,
-          thumbnail: thumbnailResponse?.url ?? variant.thumbnail,
-          images: [...existingImageUrls, ...(imagesResponse?.urls ?? [])],
-        };
-      }),
-    );
-
-    stockAndVariantsForm.setValue('variants', updatedVariants);
-
-    await saveDraftProductQuery.mutateAsync(
-      {
-        hasVariants: true,
-        variants: updatedVariants,
-        step: activeStep,
-      },
-      {
-        onSuccess: handleNext,
-      },
-    );
   };
 
-  const onTryOnConfigurationSubmit = async (data: TProductTryOnConfiguration) => {
-    console.log('onTryOnConfigurationSubmit data', data);
-    await saveDraftProductQuery.mutateAsync(
-      { ...data, step: activeStep },
-      { onSuccess: handleNext },
-    );
-  };
+const onTryOnConfigurationSubmit = async (data: TProductTryOnConfiguration) => {
+  await saveStepIfChanged(data, draftProduct?.tryOnConfiguration, {
+    ...data,
+    step: activeStep,
+  });
+};
 
   const onReviewAndConfirmSubmit = async (_data: TConfirmDetails) => {
     await publishDraftProductQuery.mutateAsync();

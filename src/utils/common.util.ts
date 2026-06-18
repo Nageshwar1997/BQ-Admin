@@ -120,8 +120,48 @@ export const formatFileSize = (size: number) => {
   return `${Number.isInteger(value) ? value : value.toFixed(2)} GB`;
 };
 
-export const deepEqual = <T>(obj1: T, obj2: T): boolean => {
+export const isDeepEqual = <T>(obj1: T, obj2: T): boolean => {
   if (obj1 === obj2) return true;
+
+  // Date
+  if (obj1 instanceof Date && obj2 instanceof Date) {
+    return obj1.getTime() === obj2.getTime();
+  }
+
+  // File
+  if (obj1 instanceof File && obj2 instanceof File) {
+    return (
+      obj1.name === obj2.name &&
+      obj1.size === obj2.size &&
+      obj1.type === obj2.type &&
+      obj1.lastModified === obj2.lastModified
+    );
+  }
+
+  // Set
+  if (obj1 instanceof Set && obj2 instanceof Set) {
+    if (obj1.size !== obj2.size) return false;
+
+    const arr1 = [...obj1];
+    const arr2 = [...obj2];
+
+    return arr1.every((item, index) => isDeepEqual(item, arr2[index]));
+  }
+
+  // Map
+  if (obj1 instanceof Map && obj2 instanceof Map) {
+    if (obj1.size !== obj2.size) return false;
+
+    for (const [key, value] of obj1.entries()) {
+      if (!obj2.has(key)) return false;
+
+      if (!isDeepEqual(value, obj2.get(key))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   if (typeof obj1 !== 'object' || typeof obj2 !== 'object' || obj1 === null || obj2 === null) {
     return false;
@@ -135,7 +175,7 @@ export const deepEqual = <T>(obj1: T, obj2: T): boolean => {
   if (isArray1 && isArray2) {
     if (obj1.length !== obj2.length) return false;
 
-    return obj1.every((item, index) => deepEqual(item, obj2[index]));
+    return obj1.every((item, index) => isDeepEqual(item, obj2[index]));
   }
 
   const keys1 = Object.keys(obj1) as (keyof T)[];
@@ -143,7 +183,11 @@ export const deepEqual = <T>(obj1: T, obj2: T): boolean => {
 
   if (keys1.length !== keys2.length) return false;
 
-  return keys1.every((key) => deepEqual(obj1[key], obj2[key]));
+  return keys1.every((key) => {
+    if (!(key in obj2)) return false;
+
+    return isDeepEqual(obj1[key], obj2[key]);
+  });
 };
 
 function getPosterFromBlobVideo(blobVideoUrl: string, timeInSeconds = 0): Promise<string> {

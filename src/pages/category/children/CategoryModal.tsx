@@ -20,7 +20,7 @@ import {
 import type { TApiCategory } from '@/types/api.type';
 import type { TCatModal } from '@/types/component.type';
 import type { TCategory, TConfirmDetails } from '@/types/schema.type';
-import { deepEqual, toaster } from '@/utils/common.util';
+import { isDeepEqual, toaster } from '@/utils/common.util';
 import { setErrorToForm } from '@/utils/form.util';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
@@ -189,7 +189,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
 
   const hasChanges = (data: TCategory) => {
     if (!initialPayload) return true;
-    return !deepEqual(getPayload(data), initialPayload);
+    return !isDeepEqual(getPayload(data), initialPayload);
   };
 
   const handleNext = async (data: TCategory) => {
@@ -228,7 +228,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
 
       Object.keys(payload).forEach((itemKey) => {
         const key = itemKey as keyof Omit<TApiCategory, 'slug' | '_id'>;
-        if (!deepEqual(payload[key], initialPayload?.[key])) {
+        if (!isDeepEqual(payload[key], initialPayload?.[key])) {
           (updatedPayload[key] as unknown) = payload[key];
         }
       });
