@@ -1,8 +1,14 @@
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import Button from '@/components/ui/Button';
 import Stepper from '@/components/ui/Stepper';
-import { ADD_PRODUCT_STEPS, CATEGORY_LEVELS_MAP, EMPTY_ARRAY } from '@/constants/common.constants';
+import {
+  ADD_PRODUCT_STEPS,
+  CATEGORY_LEVELS_MAP,
+  EMPTY_ARRAY,
+  ROUTES,
+} from '@/constants/common.constants';
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
+import usePathParams from '@/hooks/usePathParams';
 import { useProcessQuillContent } from '@/hooks/useProcessQuillContent';
 import {
   productBasicInfoSchema,
@@ -51,6 +57,8 @@ import AddProductTryOnConfigurationFields from './children/AddProductTryOnConfig
 const AddProduct = () => {
   const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(0);
   const { processQuillContent } = useProcessQuillContent<TProductDescriptionAndContent>();
+
+  const { navigate } = usePathParams();
 
   const uploadSingleMediaQuery = useUploadSingleMedia();
   const uploadMultipleMediaQuery = useUploadMultipleMedia();
@@ -429,11 +437,11 @@ const AddProduct = () => {
   };
 
   const handleBack = () => {
-    setActiveStep((prev) => (prev > 0 ? prev - 1 : prev) as TAddProductStepNumber);
-  };
-
-  const handleSaveDraft = async () => {
-    console.log('Save Draft');
+    if (activeStep > 0) {
+      setActiveStep((prev) => (prev > 0 ? prev - 1 : prev) as TAddProductStepNumber);
+    } else {
+      navigate(`/${ROUTES.PRODUCTS.BASE}`);
+    }
   };
 
   const stepFields = [
@@ -536,15 +544,11 @@ const AddProduct = () => {
           {stepFields[activeStep]}
 
           <div className="flex justify-between gap-3">
-            <Button
-              pattern="secondary"
-              content={activeStep === 0 ? 'Save draft' : 'Back'}
-              buttonProps={{ onClick: activeStep === 0 ? handleSaveDraft : handleBack }}
-            />
+            <Button pattern="secondary" content="Back" buttonProps={{ onClick: handleBack }} />
 
             <Button
               pattern="primary"
-              content={activeStep === ADD_PRODUCT_STEPS.length - 1 ? 'Save' : 'Save & Next'}
+              content={activeStep === ADD_PRODUCT_STEPS.length - 1 ? 'Submit' : 'Save & Next'}
               buttonProps={{ type: 'submit', form: ADD_PRODUCT_FORM_ID_MAP[activeStep] }}
             />
           </div>

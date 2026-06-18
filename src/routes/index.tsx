@@ -31,8 +31,8 @@ const routes: RouteObject[] = [
           {
             index: true,
             lazy: async () => {
-              const { default: AddNewProduct } = await import('@/pages/product/AddNewProduct');
-              return { Component: AddNewProduct };
+              const { default: Products } = await import('@/pages/product/Products');
+              return { Component: Products };
             },
           },
           {
