@@ -36,7 +36,6 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
             control={control}
             render={({ field: { onChange, value } }) => {
               const options = input.name === 'subCategory' ? subCategories : TRY_ON_CATEGORIES;
-              console.log('🚀 ~ AddProductTryOnConfigurationFields ~ options:', options);
               return (
                 <Select
                   label={input.label}

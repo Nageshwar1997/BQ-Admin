@@ -203,6 +203,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
               <div className="flex items-center justify-center gap-2 sm:col-span-2">
                 {PRODUCT_VARIANT_ACTIONS.map((action) => (
                   <Button
+                    key={action.content}
                     pattern="outline"
                     content={action.content}
                     className={`border-none ${action.className}`}

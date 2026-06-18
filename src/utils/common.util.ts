@@ -120,7 +120,16 @@ export const formatFileSize = (size: number) => {
   return `${Number.isInteger(value) ? value : value.toFixed(2)} GB`;
 };
 
-export const isDeepEqual = <T>(obj1: T, obj2: T): boolean => {
+export const isDeepEqual = <T>(
+  obj1: T,
+  obj2: T,
+  options?: { ignoreValues?: unknown[] },
+): boolean => {
+  const ignoreValues = options?.ignoreValues ?? [];
+
+  const shouldIgnore = (value: unknown) =>
+    ignoreValues.some((ignored) => Object.is(ignored, value));
+
   if (obj1 === obj2) return true;
 
   // Date
@@ -145,7 +154,7 @@ export const isDeepEqual = <T>(obj1: T, obj2: T): boolean => {
     const arr1 = [...obj1];
     const arr2 = [...obj2];
 
-    return arr1.every((item, index) => isDeepEqual(item, arr2[index]));
+    return arr1.every((item, index) => isDeepEqual(item, arr2[index], options));
   }
 
   // Map
@@ -155,7 +164,7 @@ export const isDeepEqual = <T>(obj1: T, obj2: T): boolean => {
     for (const [key, value] of obj1.entries()) {
       if (!obj2.has(key)) return false;
 
-      if (!isDeepEqual(value, obj2.get(key))) {
+      if (!isDeepEqual(value, obj2.get(key), options)) {
         return false;
       }
     }
@@ -175,18 +184,28 @@ export const isDeepEqual = <T>(obj1: T, obj2: T): boolean => {
   if (isArray1 && isArray2) {
     if (obj1.length !== obj2.length) return false;
 
-    return obj1.every((item, index) => isDeepEqual(item, obj2[index]));
+    return obj1.every((item, index) => isDeepEqual(item, obj2[index], options));
   }
 
-  const keys1 = Object.keys(obj1) as (keyof T)[];
-  const keys2 = Object.keys(obj2) as (keyof T)[];
+  const keys1 = Object.keys(obj1).filter(
+    (key) => !shouldIgnore(obj1[key as keyof T]),
+  ) as (keyof T)[];
+
+  const keys2 = Object.keys(obj2).filter(
+    (key) => !shouldIgnore(obj2[key as keyof T]),
+  ) as (keyof T)[];
 
   if (keys1.length !== keys2.length) return false;
 
   return keys1.every((key) => {
-    if (!(key in obj2)) return false;
+    const value1 = obj1[key];
+    const value2 = obj2[key];
 
-    return isDeepEqual(obj1[key], obj2[key]);
+    if (shouldIgnore(value1) && shouldIgnore(value2)) {
+      return true;
+    }
+
+    return isDeepEqual(value1, value2, options);
   });
 };
 

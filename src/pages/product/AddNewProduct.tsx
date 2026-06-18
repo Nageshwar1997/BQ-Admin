@@ -49,7 +49,7 @@ import AddProductStockAndVariantsFields from './children/AddProductStockAndVaria
 import AddProductTryOnConfigurationFields from './children/AddProductTryOnConfigurationFields';
 
 const AddNewProduct = () => {
-  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(5);
+  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(1);
   const { processQuillContent } = useProcessQuillContent<TProductDescriptionAndContent>();
 
   const uploadSingleMediaQuery = useUploadSingleMedia();
@@ -61,6 +61,8 @@ const AddNewProduct = () => {
     isLoading: isDraftProductLoading,
     isError: isDraftProductError,
   } = useGetDraftProduct();
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const quillRefs: TProductQuillRefs = {
     description: useRef<Quill | null>(null),
@@ -100,6 +102,8 @@ const AddNewProduct = () => {
     resolver: zodResolver(confirmDetailsSchema),
   });
 
+  const title = useWatch({ control: basicInfoForm.control, name: 'title' });
+
   const l1Category = useWatch({ control: basicInfoForm.control, name: 'l1Category' });
   const l2Category = useWatch({ control: basicInfoForm.control, name: 'l2Category' });
 
@@ -125,12 +129,13 @@ const AddNewProduct = () => {
     );
   };
 
-  const saveStepIfChanged = async <T extends unknown>(
+  const saveStepIfChanged = async <T extends Record<string, unknown>>(
     currentData: T,
     draftData: T | undefined,
     saveData: T & { step: number },
+    options?: { ignoreValues?: unknown[] },
   ) => {
-    if (isDeepEqual(currentData, draftData)) {
+    if (isDeepEqual(currentData, draftData, options ?? { ignoreValues: [undefined, null] })) {
       handleNext();
       return;
     }
@@ -148,12 +153,14 @@ const AddNewProduct = () => {
       data.video instanceof File ||
       data.images.some((image) => image instanceof File);
 
-    if (!hasNewFiles && isDeepEqual(draftProduct?.mediaAndGallery, data)) {
-      handleNext();
+    if (!hasNewFiles) {
+      await saveStepIfChanged(data, draftProduct?.mediaAndGallery, {
+        ...data,
+        step: activeStep,
+      });
+
       return;
     }
-
-    const basicInfo = basicInfoForm.getValues();
 
     let thumbnailUrl = typeof data.thumbnail === 'string' ? data.thumbnail : '';
 
@@ -177,7 +184,7 @@ const AddNewProduct = () => {
       const thumbnailFormData = new FormData();
 
       thumbnailFormData.append('file', data.thumbnail);
-      thumbnailFormData.append('folder', basicInfo.title);
+      thumbnailFormData.append('folder', title);
 
       uploadPromises.push(
         uploadSingleMediaQuery.mutateAsync({
@@ -200,7 +207,7 @@ const AddNewProduct = () => {
         imagesFormData.append('files', file);
       });
 
-      imagesFormData.append('folder', basicInfo.title);
+      imagesFormData.append('folder', title);
 
       uploadPromises.push(
         uploadMultipleMediaQuery.mutateAsync({
@@ -220,7 +227,7 @@ const AddNewProduct = () => {
       const videoFormData = new FormData();
 
       videoFormData.append('file', data.video);
-      videoFormData.append('folder', basicInfo.title);
+      videoFormData.append('folder', title);
 
       uploadPromises.push(
         uploadSingleMediaQuery.mutateAsync({
@@ -271,7 +278,6 @@ const AddNewProduct = () => {
   };
 
   const onDescriptionAndContentSubmit = async (data: TProductDescriptionAndContent) => {
-    const title = basicInfoForm.getValues().title;
     const [descriptionResponse, additionalResponse, ingredientsResponse, instructionsResponse] =
       await Promise.all([
         processQuillContent({
@@ -341,8 +347,6 @@ const AddNewProduct = () => {
 
       return;
     } else {
-      const folder = basicInfoForm.getValues().title;
-
       const updatedVariants = await Promise.all(
         data.variants.map(async (variant) => {
           const existingImageUrls: string[] = [];
@@ -362,7 +366,7 @@ const AddNewProduct = () => {
                   const formData = new FormData();
 
                   formData.append('file', variant.thumbnail);
-                  formData.append('folder', folder);
+                  formData.append('folder', title);
 
                   return uploadSingleMediaQuery.mutateAsync({
                     data: formData,
@@ -383,7 +387,7 @@ const AddNewProduct = () => {
                     formData.append('files', file);
                   });
 
-                  formData.append('folder', folder);
+                  formData.append('folder', title);
 
                   return uploadMultipleMediaQuery.mutateAsync({
                     data: formData,
@@ -419,10 +423,7 @@ const AddNewProduct = () => {
   };
 
   const onTryOnConfigurationSubmit = async (data: TProductTryOnConfiguration) => {
-    await saveStepIfChanged(data, draftProduct?.tryOnConfiguration, {
-      ...data,
-      step: activeStep,
-    });
+    await saveStepIfChanged(data, draftProduct?.tryOnConfiguration, { ...data, step: activeStep });
   };
 
   const onReviewAndConfirmSubmit = async (_data: TConfirmDetails) => {
@@ -522,16 +523,14 @@ const AddNewProduct = () => {
     }
   }, [draftProduct]);
 
+  useEffect(() => {
+    containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [activeStep]);
+
   return (
-    <div className="h-full w-full">
-      <Navbar buttons={[{ content: 'Save Draft', leftIcon: { icon: 'solar:diskette-linear' } }]} />
-      <Stepper
-        steps={ADD_PRODUCT_STEPS}
-        activeStep={activeStep}
-        // TODO: Remove onStepClick after done
-        onStepClick={(step) => setActiveStep(step as TAddProductStepNumber)}
-        className="mt-4 p-4!"
-      >
+    <div className="h-full w-full" ref={containerRef}>
+      <Navbar />
+      <Stepper steps={ADD_PRODUCT_STEPS} activeStep={activeStep} className="mt-4 p-4!">
         <div className="flex flex-col gap-5">
           <div>
             <p className="text-primary text-sm font-semibold">
