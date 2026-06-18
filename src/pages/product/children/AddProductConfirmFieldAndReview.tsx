@@ -1,3 +1,4 @@
+import MediaCarouselWithModal from '@/components/layout/carousels/MediaCarouselWithModal';
 import { MediaCarouselWithParentMedia } from '@/components/layout/carousels/MediaCarouselWithParentMedia';
 import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/inputs/Checkbox';
@@ -34,7 +35,7 @@ const Heading = ({ title, onEdit }: { title: string; onEdit: () => void }) => (
     <h4 className="font-semibold">{title}</h4>
     <Icon
       icon="solar:pen-2-linear"
-      className="cursor-pointer [&>g]:stroke-2 hover:scale-110 duration-200 hover:text-blue-crayola-c"
+      className="hover:text-blue-crayola-c cursor-pointer duration-200 hover:scale-110 [&>g]:stroke-2"
       role="button"
       onClick={onEdit}
     />
@@ -126,15 +127,13 @@ const MediaAndGallery = ({
         <KeyValue
           label="Thumbnail"
           value={
-            <MediaCarouselWithParentMedia
-              media={[{ type: 'image', url: data.thumbnail as string }]}
-            />
+            <MediaCarouselWithModal media={[{ type: 'image', url: data.thumbnail as string }]} />
           }
         />
         <KeyValue
           label={data.images.length > 1 ? 'Images' : 'Image'}
           value={
-            <MediaCarouselWithParentMedia
+            <MediaCarouselWithModal
               media={data.images.map((image) => ({ type: 'image', url: image as string }))}
             />
           }
@@ -143,10 +142,7 @@ const MediaAndGallery = ({
           <KeyValue
             label="Video"
             value={
-              <MediaCarouselWithParentMedia
-                media={[{ type: 'video', url: data?.video as string }]}
-                videoProps={{ autoPlay: false, muted: true, controls: true }}
-              />
+              <MediaCarouselWithModal media={[{ type: 'video', url: data?.video as string }]} />
             }
           />
         )}
