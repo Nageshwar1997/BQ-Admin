@@ -46,7 +46,7 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
               >
                 {path.replace('-', ' ')}
               </span>
-              {!isLast && <Icon icon="solar:alt-arrow-down-linear" />}
+              {!isLast && <Icon icon="solar:alt-arrow-right-linear" />}
             </div>
           );
         })}
