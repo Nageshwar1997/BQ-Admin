@@ -61,7 +61,7 @@ const Navbar = ({
         )}
       </div>
       <Breadcrumb className="p-4" />
-      {children && <div className="p-4">{children}</div>}
+      {children && <div className="border-t-silver/30 border-t p-4">{children}</div>}
     </div>
   );
 };

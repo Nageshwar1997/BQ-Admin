@@ -1,4 +1,4 @@
-import Navbar from '@/components/layout/navbar';
+import PageWrapper from '@/components/layout/containers/PageWrapper';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
@@ -42,8 +42,9 @@ const SearchAndSort = () => {
           disabled: !queryParams.status || queryParams.status === 'draft',
         }}
         icons={{
-          right: { icon: 'solar:magnifer-linear', className: 'size-4 md:size-5 text-primary/50' },
+          right: { icon: 'solar:magnifer-linear', className: 'size-4 text-primary/50' },
         }}
+        containerClassName="[&>div]:h-10!"
       />
       <Button
         pattern="outline"
@@ -58,7 +59,7 @@ const SearchAndSort = () => {
             }
           },
         }}
-        className="border-primary/10 bg-smoke-eerie size-10 max-w-fit p-2! lg:size-12"
+        className="border-primary/10 bg-smoke-eerie size-10! max-w-fit p-2!"
       />
     </div>
   );
@@ -69,9 +70,9 @@ const Products = () => {
   const { navigate } = usePathParams();
 
   return (
-    <div className="">
-      <Navbar
-        buttons={[
+    <PageWrapper
+      navbar={{
+        buttons: [
           {
             content: 'Add Product',
             pattern: 'primary',
@@ -79,8 +80,8 @@ const Products = () => {
             leftIcon: { icon: 'solar:add-circle-linear', className: '*:stroke-[2.5]' },
             buttonProps: { onClick: () => navigate(ROUTES.PRODUCTS.ADD) },
           },
-        ]}
-        components={[
+        ],
+        components: [
           <Select
             options={[
               { label: 'All', value: 'all' },
@@ -101,14 +102,14 @@ const Products = () => {
                 }
               },
             }}
-            containerClassName="max-w-32.5"
+            containerClassName="max-w-32.5! w-full"
           />,
-        ]}
-        className="[&>:nth-last-child(2)]:border-b-silver/30 [&>:nth-last-child(2)]:border-b [&>div]:py-2"
-      >
-        {queryParams.status && queryParams.status !== 'draft' && <SearchAndSort />}
-      </Navbar>
-    </div>
+        ],
+        children: <SearchAndSort />,
+      }}
+    >
+      <div className="">Products</div>
+    </PageWrapper>
   );
 };
 

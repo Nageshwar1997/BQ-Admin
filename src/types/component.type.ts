@@ -160,5 +160,8 @@ export type TQuillImageRef = { id: string; file: File; blobUrl: string };
 export type TPageWrapper = TChildren &
   TContainerClassName &
   TClassName & {
-    navbar?: { components?: ReactElement[]; buttons?: Partial<IButton & TChildren>[] };
+    navbar?: {
+      components?: ReactElement[];
+      buttons?: Partial<IButton & TChildren>[];
+    } & Partial<TChildren>;
   };
