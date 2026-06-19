@@ -444,9 +444,7 @@ const Categories = () => {
           ],
         }}
       >
-        <div>
-          <L1Table />
-        </div>
+        <L1Table />
       </PageWrapper>
     </Fragment>
   );
