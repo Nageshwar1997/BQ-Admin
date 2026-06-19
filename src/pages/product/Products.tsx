@@ -126,7 +126,7 @@ const Products = () => {
         children: <SearchAndSort />,
       }}
     >
-      <div className="border-primary/10 bg-secondary-invert rounded-xl border">
+      <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
         <ScrollableGradientContainer
           direction="horizontal"
           gradientClassNames={{ left: 'from-secondary-invert', right: 'from-secondary-invert' }}
