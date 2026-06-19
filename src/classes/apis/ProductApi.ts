@@ -1,10 +1,13 @@
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
+import type { SORT_ORDER_MAP } from '@/constants/common.constants';
 import type {
   IId,
+  ITimeStamp,
   TApiCategory,
   TApiL1Category,
   TApiL2Category,
   TApiL3Category,
+  TProductStatus,
 } from '@/types/api.type';
 import { ApiRequest } from '../ApiRequest';
 
@@ -65,5 +68,17 @@ export class ProductApi extends ApiRequest {
 
   public getDraftProduct = () => {
     return this.request(this.routes.draft.get);
+  };
+
+  public getDashboardProducts = (params: {
+    page?: string;
+    limit?: string;
+    search?: string;
+    status?: TProductStatus;
+    category?: string;
+    sortBy?: keyof ITimeStamp;
+    sortOrder?: (typeof SORT_ORDER_MAP)[keyof typeof SORT_ORDER_MAP];
+  }) => {
+    return this.request({ ...this.routes.get.dashboard, params });
   };
 }

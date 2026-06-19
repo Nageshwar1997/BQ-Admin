@@ -6,7 +6,9 @@ import { ROUTES } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
-import { useState } from 'react';
+import { useGetDashboardProducts } from '@/services/product-service/product.service.query';
+import { useEffect, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 
 const SearchAndSort = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
@@ -68,6 +70,16 @@ const SearchAndSort = () => {
 const Products = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const { navigate } = usePathParams();
+  const { ref, inView } = useInView();
+
+  const { data, hasNextPage, fetchNextPage } = useGetDashboardProducts({ limit: '10' });
+  console.log('🚀 ~ Products ~ data:', data);
+
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, fetchNextPage]);
 
   return (
     <PageWrapper

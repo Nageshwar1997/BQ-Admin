@@ -110,3 +110,15 @@ export const AUTH_PROVIDERS = ['MANUAL', 'GOOGLE', 'LINKEDIN', 'GITHUB'] as cons
 export const ROLES = ['USER', 'SELLER', 'ADMIN', 'MASTER'] as const;
 
 export const HEADERS_KEYS = { loginRole: 'X-Login-Role' } as const;
+
+export const PRODUCT_STATUSES = ['DELETED', 'PENDING', 'PUBLISHED', 'REJECTED', 'BLOCKED'] as const;
+
+export const PRODUCT_STATUS_MAP = Object.fromEntries(
+  PRODUCT_STATUSES.map((status) => [status, status]),
+) as {
+  [K in (typeof PRODUCT_STATUSES)[number]]: K;
+};
+
+export const ROLES_MAP = Object.fromEntries(ROLES.map((role) => [role, role])) as {
+  [K in (typeof ROLES)[number]]: K;
+};

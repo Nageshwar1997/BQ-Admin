@@ -1,5 +1,23 @@
-import type { AUTH_PROVIDERS, METHOD_MAP, ROLES } from '@/constants/api.constants';
-import type { TEmail, TL1Category, TL2Category, TL3Category, TLogin } from './schema.type';
+import type {
+  AUTH_PROVIDERS,
+  METHOD_MAP,
+  PRODUCT_STATUSES,
+  ROLES,
+} from '@/constants/api.constants';
+import type {
+  TEmail,
+  TL1Category,
+  TL2Category,
+  TL3Category,
+  TLogin,
+  TProductBasicInfo,
+  TProductDescriptionAndContent,
+  TProductMediaAndGallery,
+  TProductStockAndVariants,
+  TProductTryOnConfiguration,
+  TProductWithoutVariant,
+  TProductWithVariant,
+} from './schema.type';
 
 export type TFieldErrors = Record<string, string[]>;
 
@@ -112,3 +130,67 @@ export type TGenerateQueryKeys<
         >
       : never;
 };
+
+export type TProductStatus = (typeof PRODUCT_STATUSES)[number];
+
+export type IApiProduct = IId &
+  ITimeStamp &
+  Omit<TProductBasicInfo, 'l1Category' | 'l2Category' | 'l3Category'> &
+  TProductDescriptionAndContent &
+  Record<keyof TProductMediaAndGallery, string> &
+  Pick<TProductStockAndVariants, 'hasVariants'> &
+  (
+    | TProductWithoutVariant
+    | (Pick<TProductWithVariant, 'hasVariants'> & {
+        variants: (Omit<TProductWithVariant['variants'][number], 'images' | 'thumbnail'> & {
+          sku: string;
+          discount: number;
+          images: string[];
+          thumbnail?: string;
+        } & IId)[];
+      })
+  ) & {
+    category: string;
+    tryon: TProductTryOnConfiguration & { configured: boolean };
+    seller: string;
+    sku: string;
+    slug: string;
+    discount: number;
+    saleCount: number;
+    returnCount: number;
+    reviews: string[];
+    totalReviews: number;
+    averageRating: number;
+    totalRating: number;
+    status: TProductStatus;
+    history?: {
+      approvedBy?: string | null | undefined;
+      approvedAt?: string | null | undefined;
+      blockedBy?: string | null | undefined;
+      blockedAt?: string | null | undefined;
+      rejectedBy?: string | null | undefined;
+      rejectedAt?: string | null | undefined;
+      rejectReason?: string | null | undefined;
+    };
+  };
+
+export type TApiProductPopulated = Omit<IApiProduct, 'category'> & {
+  category: TApiCategory;
+  seller: unknown;
+};
+
+/*
+type TProductWithVariant = {
+    hasVariants: true;
+    variants: {
+
+        images: (string | File)[];
+        thumbnail?: string | File | undefined;
+    }[];
+
+    ye mera variant he mujhe isme file type hatake string dena he aur baki saari fields rakhni he aur ek chij
+*/
+/*
+    sku: { type: String, required: true, trim: true, uppercase: true },
+    discount: { type: Number, min: 0, max: 100, default: 0 },
+*/

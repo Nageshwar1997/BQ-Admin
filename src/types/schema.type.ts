@@ -1,5 +1,4 @@
 import type {
-  addProductSchema,
   categorySchema,
   l1CategorySchema,
   l2CategorySchema,
@@ -36,8 +35,6 @@ export type TPasswords = zodInfer<typeof passwordsSchema>;
 export type TChangePassword = zodInfer<typeof changePasswordSchema>;
 
 export type TLogin = zodInfer<typeof loginSchema>;
-// TODO: Remove it later
-export type TAddProduct = zodInfer<typeof addProductSchema>;
 
 /* ================ CATEGORY SCHEMA TYPES ================ */
 export type TL1Category = zodInfer<typeof l1CategorySchema>;
