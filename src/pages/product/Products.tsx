@@ -1,4 +1,6 @@
 import PageWrapper from '@/components/layout/containers/PageWrapper';
+import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
+import { Table, TableBody, TableHead, TableHeadCell, TableRow } from '@/components/layout/table';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
@@ -73,6 +75,8 @@ const Products = () => {
   const { ref, inView } = useInView();
 
   const { data, hasNextPage, fetchNextPage } = useGetDashboardProducts({ limit: '10' });
+  const counts = data?.counts;
+
   console.log('🚀 ~ Products ~ data:', data);
 
   useEffect(() => {
@@ -93,34 +97,69 @@ const Products = () => {
             buttonProps: { onClick: () => navigate(ROUTES.PRODUCTS.ADD) },
           },
         ],
-        components: [
-          <Select
-            options={[
-              { label: 'All', value: 'all' },
-              { label: 'Published', value: 'published' },
-              { label: 'Pending', value: 'pending' },
-              { label: 'Draft', value: 'draft' },
-            ]}
-            selectProps={{
-              value: queryParams.status || 'all',
-              onChange: (value) => {
-                if (!value || value === 'all') {
-                  removeParams(['status', 'search']);
-                } else if (value) {
-                  if (value === 'draft') {
-                    removeParams(['search']);
+        ...(counts && {
+          components: [
+            <Select
+              options={[
+                { label: 'All', value: 'all' },
+                { label: 'Published', value: 'published' },
+                { label: 'Pending', value: 'pending' },
+                { label: 'Draft', value: 'draft' },
+              ]}
+              selectProps={{
+                value: queryParams.status || 'all',
+                onChange: (value) => {
+                  if (!value || value === 'all') {
+                    removeParams(['status', 'search']);
+                  } else if (value) {
+                    if (value === 'draft') {
+                      removeParams(['search']);
+                    }
+                    setParams({ status: value.toString() });
                   }
-                  setParams({ status: value.toString() });
-                }
-              },
-            }}
-            containerClassName="max-w-32.5! w-full"
-          />,
-        ],
+                },
+              }}
+              containerClassName="max-w-32.5! w-full"
+            />,
+          ],
+        }),
         children: <SearchAndSort />,
       }}
     >
-      <div className="">Products</div>
+      <div className="border-primary/10 bg-secondary-invert rounded-xl border">
+        <ScrollableGradientContainer
+          direction="horizontal"
+          gradientClassNames={{ left: 'from-secondary-invert', right: 'from-secondary-invert' }}
+        >
+          <Table>
+            <TableHead>
+              <TableRow>
+                {[
+                  'S. No',
+                  'Thumbnail',
+                  'Title',
+                  'Brand',
+                  'Category',
+                  'Sell Count',
+                  'Return Count',
+                  'Avg. Rating',
+                  'Has Variants',
+                  'Try-On',
+                  'Sku',
+                  'Slug',
+                  'Status',
+                  'Action',
+                ].map((title) => (
+                  <TableHeadCell className="first:text-left last:text-right" key={title}>
+                    {title}
+                  </TableHeadCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>Hello</TableBody>
+          </Table>
+        </ScrollableGradientContainer>
+      </div>
     </PageWrapper>
   );
 };

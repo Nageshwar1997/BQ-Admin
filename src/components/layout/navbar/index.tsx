@@ -4,7 +4,7 @@ import Theme from '@/components/ui/Theme';
 import useUserStore from '@/stores/user.store';
 import type { IButton, TChildren, TClassName } from '@/types/component.type';
 import { Icon } from '@iconify/react';
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 
 const Navbar = ({
   buttons,
@@ -38,7 +38,8 @@ const Navbar = ({
         </div>
         {(components || buttons) && (
           <div className="base:gap-3 flex flex-1 items-center justify-end gap-2 md:gap-4">
-            {components && components.map((component) => component)}
+            {components &&
+              components.map((component, index) => <Fragment key={index}>{component}</Fragment>)}
             {buttons &&
               buttons.map((props, idx) => {
                 const { children, ...rest } = props;

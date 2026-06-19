@@ -133,7 +133,7 @@ export type TGenerateQueryKeys<
 
 export type TProductStatus = (typeof PRODUCT_STATUSES)[number];
 
-export type IApiProduct = IId &
+export type TApiProduct = IId &
   ITimeStamp &
   Omit<TProductBasicInfo, 'l1Category' | 'l2Category' | 'l3Category'> &
   TProductDescriptionAndContent &
@@ -174,7 +174,7 @@ export type IApiProduct = IId &
     };
   };
 
-export type TApiProductPopulated = Omit<IApiProduct, 'category'> & {
+export type TApiProductPopulated = Omit<TApiProduct, 'category'> & {
   category: TApiCategory;
   seller: unknown;
 };

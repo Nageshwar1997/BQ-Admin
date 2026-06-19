@@ -1,7 +1,7 @@
 import { productApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
 import type { SORT_ORDER_MAP } from '@/constants/common.constants';
-import type { ITimeStamp, TProductStatus } from '@/types/api.type';
+import type { ITimeStamp, TApiProduct, TProductStatus } from '@/types/api.type';
 import type { TDraftProduct } from '@/types/schema.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
@@ -92,13 +92,13 @@ export const useGetDashboardProducts = (params: {
     refetchOnReconnect: true,
 
     select: (data) => {
-      console.log("🚀 ~ useGetDashboardProducts ~ data:", data)
+      console.log('🚀 ~ useGetDashboardProducts ~ data:', data);
       return {
-      products: data.pages.flatMap((page) => page.data.products),
-      counts: data.pages[0]?.data.counts,
-      pagination: data.pages[data.pages.length - 1]?.data.pagination,
-      draft: data.pages[0]?.data.draft,
-    };
+        products: data.pages.flatMap((page) => page.data.products) as TApiProduct[],
+        counts: data.pages[0]?.data.counts as Record<TProductStatus | 'ALL', number>,
+        // pagination: data.pages[data.pages.length - 1]?.data.pagination,
+        draft: data.pages[0]?.data.draft as TDraftProduct | null | undefined,
+      };
     },
   });
 };
