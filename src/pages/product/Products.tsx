@@ -114,10 +114,6 @@ const Products = () => {
     isFetchNextPageError,
   } = useGetDashboardProducts({ limit: '15' });
 
-  const counts = data?.counts;
-  const products = data?.products;
-  const draft = data?.draft;
-
   useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage();
@@ -127,7 +123,7 @@ const Products = () => {
   return (
     <PageWrapper
       navbar={{
-        ...(!draft && {
+        ...(!data?.draft && {
           buttons: [
             {
               content: 'Add Product',
@@ -138,10 +134,10 @@ const Products = () => {
             },
           ],
         }),
-        ...(counts && {
+        ...(data?.counts && {
           components: [
             <Select
-              options={Object.entries(counts ?? {})
+              options={Object.entries(data?.counts ?? {})
                 .filter(([, value]) => !!value)
                 .map(([key, value]) => ({
                   value: key,
@@ -170,7 +166,7 @@ const Products = () => {
       }}
     >
       <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
-        {products?.length && (
+        {data?.products?.length && (
           <ScrollableGradientContainer
             direction="horizontal"
             gradientClassNames={{ left: 'from-secondary-invert', right: 'from-secondary-invert' }}
@@ -184,13 +180,13 @@ const Products = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {products.map((product, index) => {
+                {data.products.map((product, index) => {
                   return (
                     <TableRow
                       key={product._id + index}
                       tabIndex={0}
                       className="border-y-primary/5 odd:bg-primary/5 even:bg-primary/2.5 border-y first:border-t-0 last:border-b-0 [&>td]:px-3 [&>td]:py-2 [&>td]:text-xs"
-                      ref={index === products.length - 4 ? ref : undefined}
+                      ref={index === data.products.length - 4 ? ref : undefined}
                     >
                       <TableRowCell>{index + 1}</TableRowCell>
                       <TableRowCell>
