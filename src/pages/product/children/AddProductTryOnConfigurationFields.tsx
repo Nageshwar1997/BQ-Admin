@@ -19,7 +19,7 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
   } = form;
 
   const enabled = useWatch({ control, name: 'enabled' });
-  const tryOn = useWatch({ control, name: 'tryon' });
+  const tryOn = useWatch({ control, name: 'tryOn' });
 
   const subCategories = useMemo(() => {
     return tryOn?.category ? TRY_ON_MAP[tryOn.category] : [];
@@ -32,14 +32,14 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
         return input.type === 'select' ? (
           <Controller
             key={input.name}
-            name={`tryon.${input.name}`}
+            name={`tryOn.${input.name}`}
             control={control}
             render={({ field: { onChange, value } }) => {
               const options = input.name === 'subCategory' ? subCategories : TRY_ON_CATEGORIES;
               return (
                 <Select
                   label={input.label}
-                  error={'tryon' in errors ? errors.tryon?.[input.name]?.message : undefined}
+                  error={'tryOn' in errors ? errors.tryOn?.[input.name]?.message : undefined}
                   options={options.map((category) => ({ label: category, value: category }))}
                   selectProps={{
                     value,
@@ -47,7 +47,7 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
                     disabled: input.name === 'subCategory' && !tryOn?.category,
                     onChange: (value) => {
                       if (input.name === 'category') {
-                        resetField('tryon.subCategory');
+                        resetField('tryOn.subCategory');
                       }
                       onChange(value);
                     },
@@ -64,7 +64,7 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
             register={register('enabled')}
             error={errors.enabled?.message}
             content="Enable TryOn"
-            checkboxProps={{ name: 'enabled', onChange: () => resetField('tryon') }}
+            checkboxProps={{ name: 'enabled', onChange: () => resetField('tryOn') }}
             containerClassName="col-span-2"
           />
         );

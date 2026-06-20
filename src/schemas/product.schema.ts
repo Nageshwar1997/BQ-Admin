@@ -491,7 +491,7 @@ export const productTryOnConfigurationSchema = discriminatedUnion(
   'enabled',
   [
     object({ enabled: literal(false) }),
-    object({ enabled: literal(true), tryon: enabledTryOnSchema }),
+    object({ enabled: literal(true), tryOn: enabledTryOnSchema }),
   ],
   { error: 'TryOn is required.' },
 );

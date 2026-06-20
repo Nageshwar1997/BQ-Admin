@@ -50,7 +50,7 @@ export const ADD_PRODUCT_FORM_ID_MAP = {
   1: 'product-media-form',
   2: 'product-description-form',
   3: 'product-variants-form',
-  4: 'product-tryon-form',
+  4: 'product-try-on-form',
   5: 'product-confirm-form',
 } as const;
 

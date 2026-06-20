@@ -13,7 +13,6 @@ import type {
   TProductBasicInfo,
   TProductDescriptionAndContent,
   TProductMediaAndGallery,
-  TProductStockAndVariants,
   TProductTryOnConfiguration,
   TProductWithoutVariant,
   TProductWithVariant,
@@ -133,30 +132,21 @@ export type TGenerateQueryKeys<
 
 export type TProductStatus = (typeof PRODUCT_STATUSES)[number];
 
-export type TApiProduct = IId &
+type TEnabledTryOn = Extract<TProductTryOnConfiguration, { enabled: true }>['tryOn'];
+
+type TApiTryOn = { enabled: false } | ({ enabled: true } & TEnabledTryOn);
+
+export type TApiProductBase = IId &
   ITimeStamp &
   Omit<TProductBasicInfo, 'l1Category' | 'l2Category' | 'l3Category'> &
   TProductDescriptionAndContent &
-  Record<keyof TProductMediaAndGallery, string> &
-  Pick<TProductStockAndVariants, 'hasVariants'> &
-  (
-    | TProductWithoutVariant
-    | (Pick<TProductWithVariant, 'hasVariants'> & {
-        variants: (Omit<TProductWithVariant['variants'][number], 'images' | 'thumbnail'> & {
-          sku: string;
-          discount: number;
-          images: string[];
-          thumbnail?: string;
-        } & IId)[];
-      })
-  ) & {
-    category: string;
-    tryon: TProductTryOnConfiguration & { configured: boolean };
+  Record<keyof TProductMediaAndGallery, string> & {
+    tryOn: TApiTryOn & { configured: boolean };
     seller: string;
     sku: string;
     slug: string;
     discount: number;
-    saleCount: number;
+    soldCount: number;
     returnCount: number;
     reviews: string[];
     totalReviews: number;
@@ -164,33 +154,34 @@ export type TApiProduct = IId &
     totalRating: number;
     status: TProductStatus;
     history?: {
-      approvedBy?: string | null | undefined;
-      approvedAt?: string | null | undefined;
-      blockedBy?: string | null | undefined;
-      blockedAt?: string | null | undefined;
-      rejectedBy?: string | null | undefined;
-      rejectedAt?: string | null | undefined;
-      rejectReason?: string | null | undefined;
+      approvedBy?: string | null;
+      approvedAt?: string | null;
+      blockedBy?: string | null;
+      blockedAt?: string | null;
+      rejectedBy?: string | null;
+      rejectedAt?: string | null;
+      rejectReason?: string | null;
     };
   };
 
-export type TApiProductPopulated = Omit<TApiProduct, 'category'> & {
-  category: TApiCategory;
-  seller: unknown;
-};
+type TApiStockAndVariants =
+  | TProductWithoutVariant
+  | (Pick<TProductWithVariant, 'hasVariants'> & {
+      variants: (Omit<TProductWithVariant['variants'][number], 'images' | 'thumbnail'> & {
+        sku: string;
+        discount: number;
+        images: string[];
+        thumbnail?: string;
+      } & IId)[];
+    });
 
-/*
-type TProductWithVariant = {
-    hasVariants: true;
-    variants: {
+export type TApiProduct = TApiProductBase &
+  TApiStockAndVariants & {
+    category: string;
+  };
 
-        images: (string | File)[];
-        thumbnail?: string | File | undefined;
-    }[];
-
-    ye mera variant he mujhe isme file type hatake string dena he aur baki saari fields rakhni he aur ek chij
-*/
-/*
-    sku: { type: String, required: true, trim: true, uppercase: true },
-    discount: { type: Number, min: 0, max: 100, default: 0 },
-*/
+export type TApiProductPopulated = TApiProductBase &
+  TApiStockAndVariants & {
+    category: TApiCategory;
+    seller: unknown;
+  };

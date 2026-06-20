@@ -236,7 +236,7 @@ const TryOnConfiguration = ({
   data: Props['values']['tryOnConfiguration'];
   onEdit: () => void;
 }) => {
-  if (!Object.keys(data).length || !data.enabled || !data.tryon) return null;
+  if (!Object.keys(data).length || !data.enabled || !data.tryOn) return null;
 
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
@@ -245,8 +245,8 @@ const TryOnConfiguration = ({
         <Button pattern="secondary" content="Try-On" className="w-fit! rounded-md py-2.5!" />
       </div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6">
-        <KeyValue label="Category" value={data.tryon.category} />
-        <KeyValue label="Sub-Category" value={data.tryon.subCategory} />
+        <KeyValue label="Category" value={data.tryOn.category} />
+        <KeyValue label="Sub-Category" value={data.tryOn.subCategory} />
       </div>
     </section>
   );
