@@ -59,7 +59,7 @@ const SearchAndSort = () => {
         icons={{
           right: { icon: 'solar:magnifer-linear', className: 'size-4 text-primary/50' },
         }}
-        containerClassName="[&>div]:h-10!"
+        containerClassName="[&>div]:h-9!"
       />
       <Button
         pattern="outline"
@@ -74,7 +74,7 @@ const SearchAndSort = () => {
             }
           },
         }}
-        className="border-primary/10 bg-smoke-eerie size-10! max-w-fit p-2!"
+        className="border-primary/10 bg-smoke-eerie size-9! max-w-fit p-2!"
       />
     </div>
   );
@@ -90,8 +90,7 @@ const Products = () => {
   });
   const counts = data?.counts;
   const products = data?.products;
-
-  console.log('🚀 ~ Products ~ data:', data);
+  const draft = data?.draft;
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -99,32 +98,33 @@ const Products = () => {
     }
   }, [inView, hasNextPage, fetchNextPage]);
 
-  console.log('product.tryOn', products?.[0]?.tryOn);
   return (
     <PageWrapper
       navbar={{
-        buttons: [
-          {
-            content: 'Add Product',
-            pattern: 'primary',
-            className: 'whitespace-nowrap',
-            leftIcon: { icon: 'solar:add-circle-linear', className: '*:stroke-[2.5]' },
-            buttonProps: { onClick: () => navigate(ROUTES.PRODUCTS.ADD) },
-          },
-        ],
+        ...(!draft && {
+          buttons: [
+            {
+              content: 'Add Product',
+              pattern: 'primary',
+              className: 'whitespace-nowrap py-2.5! px-3!',
+              leftIcon: { icon: 'solar:add-circle-linear', className: '*:stroke-[2.5]' },
+              buttonProps: { onClick: () => navigate(ROUTES.PRODUCTS.ADD) },
+            },
+          ],
+        }),
         ...(counts && {
           components: [
             <Select
-              options={[
-                { label: 'All', value: 'all' },
-                { label: 'Published', value: 'published' },
-                { label: 'Pending', value: 'pending' },
-                { label: 'Draft', value: 'draft' },
-              ]}
+              options={Object.entries(counts ?? {})
+                .filter(([, value]) => !!value)
+                .map(([key, value]) => ({
+                  value: key,
+                  label: `${key} (${value})`.toLowerCase(),
+                }))}
               selectProps={{
-                value: queryParams.status || 'all',
+                value: queryParams.status || 'ALL',
                 onChange: (value) => {
-                  if (!value || value === 'all') {
+                  if (!value || value === 'ALL') {
                     removeParams(['status', 'search']);
                   } else if (value) {
                     if (value === 'draft') {
@@ -134,7 +134,9 @@ const Products = () => {
                   }
                 },
               }}
-              containerClassName="max-w-32.5! w-full"
+              containerClassName="max-w-32! w-full [&>div]:max-h-9!"
+              className="[&>div]:first:px-2.5! [&>div]:first:text-[13px] [&>div]:first:capitalize"
+              optionsClassName="[&>ul>li]:text-xs"
             />,
           ],
         }),
@@ -176,16 +178,16 @@ const Products = () => {
                 products.map((product, index) => {
                   return (
                     <TableRow
-                      key={product._id}
+                      key={product._id + index}
                       tabIndex={0}
-                      className="border-y-primary/5 odd:bg-primary-invert even:bg-secondary-invert border-y first:border-t-0 last:border-b-0 [&>td]:text-xs"
+                      className="border-y-primary/5 odd:bg-primary/5 even:bg-primary/2.5 border-y first:border-t-0 last:border-b-0 [&>td]:px-3 [&>td]:py-2 [&>td]:text-xs"
                       ref={index === products.length - 4 ? ref : undefined}
                     >
                       <TableRowCell>{index + 1}</TableRowCell>
                       <TableRowCell>
                         <Icon
                           icon="material-symbols:eye-tracking-outline"
-                          className="hover:text-blue-crayola-c mx-auto size-4.5 cursor-pointer"
+                          className="text-primary hover:text-blue-crayola-c mx-auto size-4.5 cursor-pointer"
                         />
                       </TableRowCell>
                       <TableRowCell className="grid place-items-center">
@@ -208,7 +210,7 @@ const Products = () => {
                           {formatINRCurrency(product.originalPrice)}
                         </p>
                       </TableRowCell>
-                        <TableRowCell>{product.status}</TableRowCell>
+                      <TableRowCell>{product.status}</TableRowCell>
                       <TableRowCell>
                         {!product.hasVariants
                           ? product.stock
