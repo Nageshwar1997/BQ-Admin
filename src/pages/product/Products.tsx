@@ -13,11 +13,13 @@ import {
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
-import { ROUTES } from '@/constants/common.constants';
+import { ROUTES, SORT_ORDER_MAP } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetDashboardProducts } from '@/services/product-service/product.service.query';
+import type { TProductStatus } from '@/types/api.type';
+import type { TSort } from '@/types/component.type';
 import { formatINRCurrency } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
 import { useEffect, useState } from 'react';
@@ -73,7 +75,6 @@ const SearchAndSort = () => {
             // debounced action
             handleSearch(value);
           },
-          disabled: !queryParams.status || queryParams.status === 'draft',
         }}
         icons={{
           right: { icon: 'solar:magnifer-linear', className: 'size-4 text-primary/50' },
@@ -89,11 +90,11 @@ const SearchAndSort = () => {
             if (queryParams.sort) {
               removeParams(['sort']);
             } else {
-              setParams({ sort: 'asc' });
+              setParams({ sort: SORT_ORDER_MAP.asc });
             }
           },
         }}
-        className="border-primary/10 bg-smoke-eerie size-9! max-w-fit p-2!"
+        className="border-primary/10 bg-smoke-eerie size-9! max-w-fit shrink-0 p-2!"
       />
     </div>
   );
@@ -112,7 +113,13 @@ const Products = () => {
     isError,
     isFetchingNextPage,
     isFetchNextPageError,
-  } = useGetDashboardProducts({ limit: '15' });
+  } = useGetDashboardProducts({
+    limit: '15',
+    search: queryParams.search,
+    status: queryParams.status?.toUpperCase() as TProductStatus,
+    sortBy: 'updatedAt',
+    sortOrder: (queryParams.sort || 'desc') as TSort,
+  });
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -138,13 +145,13 @@ const Products = () => {
               options={Object.entries(data?.counts ?? {})
                 .filter(([, value]) => !!value)
                 .map(([key, value]) => ({
-                  value: key,
+                  value: key.toLowerCase(),
                   label: `${key} (${value})`.toLowerCase(),
                 }))}
               selectProps={{
-                value: queryParams.status || 'ALL',
+                value: queryParams.status || 'all',
                 onChange: (value) => {
-                  if (!value || value === 'ALL') {
+                  if (!value || value === 'all') {
                     removeParams(['status', 'search']);
                   } else if (value) {
                     if (value === 'draft') {
@@ -164,7 +171,7 @@ const Products = () => {
       }}
     >
       <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
-        {data?.products?.length && (
+        {!!data?.products?.length && (
           <ScrollableGradientContainer
             direction="horizontal"
             gradientClassNames={{ left: 'from-secondary-invert', right: 'from-secondary-invert' }}

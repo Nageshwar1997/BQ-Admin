@@ -1,7 +1,7 @@
 import { productApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
-import type { SORT_ORDER_MAP } from '@/constants/common.constants';
 import type { ITimeStamp, TApiProductPopulated, TProductStatus } from '@/types/api.type';
+import type { TSort } from '@/types/component.type';
 import type { TDraftProduct } from '@/types/schema.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
@@ -67,7 +67,7 @@ export const useGetDashboardProducts = (params: {
   status?: TProductStatus;
   category?: string;
   sortBy?: keyof ITimeStamp;
-  sortOrder?: (typeof SORT_ORDER_MAP)[keyof typeof SORT_ORDER_MAP];
+  sortOrder?: TSort;
 }) => {
   return useInfiniteQuery({
     queryKey: [...get.dashboard, ...Object.values(params)],

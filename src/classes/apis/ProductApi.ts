@@ -1,5 +1,4 @@
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
-import type { SORT_ORDER_MAP } from '@/constants/common.constants';
 import type {
   IId,
   ITimeStamp,
@@ -9,6 +8,7 @@ import type {
   TApiL3Category,
   TProductStatus,
 } from '@/types/api.type';
+import type { TSort } from '@/types/component.type';
 import { ApiRequest } from '../ApiRequest';
 
 export class CategoryApi extends ApiRequest {
@@ -77,7 +77,7 @@ export class ProductApi extends ApiRequest {
     status?: TProductStatus;
     category?: string;
     sortBy?: keyof ITimeStamp;
-    sortOrder?: (typeof SORT_ORDER_MAP)[keyof typeof SORT_ORDER_MAP];
+    sortOrder?: TSort;
   }) => {
     return this.request({ ...this.routes.get.dashboard, params });
   };
