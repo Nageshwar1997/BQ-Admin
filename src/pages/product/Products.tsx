@@ -76,9 +76,7 @@ const SearchAndSort = () => {
             handleSearch(value);
           },
         }}
-        icons={{
-          right: { icon: 'solar:magnifer-linear', className: 'size-4 text-primary/50' },
-        }}
+        icons={{ right: { icon: 'solar:magnifer-linear', className: 'size-4 text-primary/50' } }}
         containerClassName="[&>div]:h-9!"
       />
       <Button
