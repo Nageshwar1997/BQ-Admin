@@ -157,15 +157,15 @@ const Products = () => {
                   'Brand',
                   'Category',
                   'Price',
+                  'Status',
+                  'Stock',
+                  'Try-On',
+                  'Variants',
+                  'Sku',
+                  'Slug',
                   'Sold',
                   'Returned',
                   'Avg. Rating',
-                  'Variants',
-                  'Stock',
-                  'Try-On',
-                  'Sku',
-                  'Slug',
-                  'Status',
                 ].map((title) => (
                   <TableHeadCell key={title}>{title}</TableHeadCell>
                 ))}
@@ -178,7 +178,7 @@ const Products = () => {
                     <TableRow
                       key={product._id}
                       tabIndex={0}
-                      className="border-y-primary/5 border-y first:border-t-0 last:border-b-0 [&>td]:text-xs"
+                      className="border-y-primary/5 odd:bg-primary-invert even:bg-secondary-invert border-y first:border-t-0 last:border-b-0 [&>td]:text-xs"
                       ref={index === products.length - 4 ? ref : undefined}
                     >
                       <TableRowCell>{index + 1}</TableRowCell>
@@ -195,8 +195,8 @@ const Products = () => {
                           className="border-tertiary/20 aspect-square size-10 rounded-lg border object-cover"
                         />
                       </TableRowCell>
-                      <TableRowCell className="max-w-sm truncate text-left">
-                        {product.title}
+                      <TableRowCell>
+                        <p className="max-w-sm truncate text-left">{product.title}</p>
                       </TableRowCell>
                       <TableRowCell>{product.brand}</TableRowCell>
                       <TableRowCell>{product.category.name}</TableRowCell>
@@ -208,12 +208,7 @@ const Products = () => {
                           {formatINRCurrency(product.originalPrice)}
                         </p>
                       </TableRowCell>
-                      <TableRowCell>{product.soldCount}</TableRowCell>
-                      <TableRowCell>{product.returnCount}</TableRowCell>
-                      <TableRowCell>{product.averageRating}</TableRowCell>
-                      <TableRowCell>
-                        {product.hasVariants ? product.variants.length : 'N/A'}
-                      </TableRowCell>
+                        <TableRowCell>{product.status}</TableRowCell>
                       <TableRowCell>
                         {!product.hasVariants
                           ? product.stock
@@ -224,9 +219,14 @@ const Products = () => {
                           ? `${product.tryOn.category} - ${product.tryOn.subCategory}`
                           : 'N/A'}
                       </TableRowCell>
+                      <TableRowCell>
+                        {product.hasVariants ? product.variants.length : 'N/A'}
+                      </TableRowCell>
                       <TableRowCell>{product.sku}</TableRowCell>
                       <TableRowCell>{product.slug}</TableRowCell>
-                      <TableRowCell>{product.status}</TableRowCell>
+                      <TableRowCell>{product.soldCount}</TableRowCell>
+                      <TableRowCell>{product.returnCount}</TableRowCell>
+                      <TableRowCell>{product.averageRating}</TableRowCell>
                     </TableRow>
                   );
                 })
