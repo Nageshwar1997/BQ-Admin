@@ -123,17 +123,15 @@ const Products = () => {
   return (
     <PageWrapper
       navbar={{
-        ...(!data?.draft && {
-          buttons: [
-            {
-              content: 'Add Product',
-              pattern: 'primary',
-              className: 'whitespace-nowrap py-2.5! px-3!',
-              leftIcon: { icon: 'solar:add-circle-linear', className: '*:stroke-[2.5]' },
-              buttonProps: { onClick: () => navigate(ROUTES.PRODUCTS.ADD) },
-            },
-          ],
-        }),
+        buttons: [
+          {
+            content: 'Add Product',
+            pattern: 'primary',
+            className: 'whitespace-nowrap py-2.5! px-3!',
+            leftIcon: { icon: 'solar:add-circle-linear' },
+            buttonProps: { onClick: () => navigate(ROUTES.PRODUCTS.ADD) },
+          },
+        ],
         ...(data?.counts && {
           components: [
             <Select
@@ -242,15 +240,25 @@ const Products = () => {
           </ScrollableGradientContainer>
         )}
 
-        {(isLoading || isFetchingNextPage || isError || isFetchNextPageError) && (
-          <div className="flex items-center justify-center">
-            {(isLoading || isFetchingNextPage) && (
+        {(isLoading ||
+          isFetchingNextPage ||
+          isError ||
+          isFetchNextPageError ||
+          // Check if there are no products
+          (!isLoading &&
+            !isFetchingNextPage &&
+            !isError &&
+            !isFetchNextPageError &&
+            data?.products?.length === 0)) && (
+          <div
+            className={`flex items-center justify-center ${!isFetchingNextPage ? 'min-h-[40dvh]' : ''}`}
+          >
+            {isLoading || isFetchingNextPage ? (
               <LoadingText
                 text={isLoading ? 'Loading products...' : 'Loading more products...'}
                 className="my-2"
               />
-            )}
-            {(isError || isFetchNextPageError) && (
+            ) : (
               <ApiStatus
                 className="min-h-0!"
                 status={isError || isFetchNextPageError ? 'error' : 'empty'}
@@ -259,7 +267,7 @@ const Products = () => {
                     ? 'Failed to load products'
                     : isFetchNextPageError
                       ? 'Failed to load more products'
-                      : 'Products not found!'
+                      : 'No products available'
                 }
                 description={
                   isError

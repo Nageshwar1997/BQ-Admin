@@ -91,14 +91,9 @@ export const useGetDashboardProducts = (params: {
     refetchOnMount: true,
     refetchOnReconnect: true,
 
-    select: (data) => {
-      console.log('🚀 ~ useGetDashboardProducts ~ data:', data);
-      return {
-        products: data.pages.flatMap((page) => page.data.products) as TApiProductPopulated[],
-        counts: data.pages[0]?.data.counts as Record<TProductStatus | 'ALL', number>,
-        // pagination: data.pages[data.pages.length - 1]?.data.pagination,
-        draft: data.pages[0]?.data.draft as TDraftProduct | null | undefined,
-      };
-    },
+    select: (data) => ({
+      products: data.pages.flatMap((page) => page.data.products) as TApiProductPopulated[],
+      counts: data.pages[0]?.data.counts as Record<TProductStatus | 'ALL', number>,
+    }),
   });
 };
