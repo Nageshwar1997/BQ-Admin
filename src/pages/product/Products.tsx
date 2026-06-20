@@ -13,13 +13,13 @@ import {
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
-import { PRODUCT_STATUS_MAP } from '@/constants/api.constants';
 import { ROUTES } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetDashboardProducts } from '@/services/product-service/product.service.query';
 import { formatINRCurrency } from '@/utils/common.util';
+import { Icon } from '@iconify/react';
 import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 
@@ -151,6 +151,7 @@ const Products = () => {
               <TableRow>
                 {[
                   'S. No',
+                  'View',
                   'Thumbnail',
                   'Title',
                   'Brand',
@@ -165,8 +166,6 @@ const Products = () => {
                   'Sku',
                   'Slug',
                   'Status',
-                  'Update',
-                  'Action',
                 ].map((title) => (
                   <TableHeadCell key={title}>{title}</TableHeadCell>
                 ))}
@@ -183,6 +182,12 @@ const Products = () => {
                       ref={index === products.length - 4 ? ref : undefined}
                     >
                       <TableRowCell>{index + 1}</TableRowCell>
+                      <TableRowCell>
+                        <Icon
+                          icon="material-symbols:eye-tracking-outline"
+                          className="hover:text-blue-crayola-c mx-auto size-4.5 cursor-pointer"
+                        />
+                      </TableRowCell>
                       <TableRowCell className="grid place-items-center">
                         <img
                           src={product.thumbnail}
@@ -222,52 +227,6 @@ const Products = () => {
                       <TableRowCell>{product.sku}</TableRowCell>
                       <TableRowCell>{product.slug}</TableRowCell>
                       <TableRowCell>{product.status}</TableRowCell>
-                      <TableRowCell>
-                        <Select
-                          options={[
-                            PRODUCT_STATUS_MAP.PENDING,
-                            PRODUCT_STATUS_MAP.PUBLISHED,
-                            PRODUCT_STATUS_MAP.REJECTED,
-                            PRODUCT_STATUS_MAP.BLOCKED,
-                          ].map((status) => ({
-                            label: status,
-                            value: status,
-                          }))}
-                          selectProps={{ value: product.status }}
-                          optionsClassName="[&>ul>li]:text-xs"
-                          containerClassName="[&>div]:h-9"
-                          className="[&>div>span]:pr-1 [&>div>span]:text-xs"
-                        />
-                      </TableRowCell>
-                      <TableRowCell>
-                        <div className="inline-flex items-center justify-center gap-2">
-                          <Button
-                            content={{ icon: 'solar:pen-linear', className: 'size-4.5' }}
-                            pattern="outline"
-                            buttonProps={{
-                              onClick: (event) => {
-                                event.stopPropagation();
-                                // onEdit(data);
-                              },
-                            }}
-                            className="border-primary/20 hover:border-blue-crayola-c/50 hover:text-blue-crayola-c size-9! p-0!"
-                          />
-                          <Button
-                            content={{
-                              icon: 'solar:trash-bin-trash-linear',
-                              className: 'size-4.5',
-                            }}
-                            pattern="outline"
-                            buttonProps={{
-                              onClick: (event) => {
-                                event.stopPropagation();
-                                // onDelete(data.category._id)
-                              },
-                            }}
-                            className="border-primary/20 hover:border-red-c/50 hover:text-red-c size-9! p-0!"
-                          />
-                        </div>
-                      </TableRowCell>
                     </TableRow>
                   );
                 })
