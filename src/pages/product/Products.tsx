@@ -23,6 +23,25 @@ import { Icon } from '@iconify/react';
 import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 
+const TH_TITLES = [
+  'S. No',
+  'View',
+  'Thumbnail',
+  'Title',
+  'Brand',
+  'Category',
+  'Price',
+  'Status',
+  'Stock',
+  'Try-On',
+  'Variants',
+  'Sku',
+  'Slug',
+  'Sold',
+  'Returned',
+  'Avg. Rating',
+];
+
 const SearchAndSort = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const [searchQuery, setSearchQuery] = useState(queryParams?.search || '');
@@ -85,9 +104,16 @@ const Products = () => {
   const { navigate } = usePathParams();
   const { ref, inView } = useInView();
 
-  const { data, hasNextPage, fetchNextPage, isLoading, isError } = useGetDashboardProducts({
-    limit: '10',
-  });
+  const {
+    data,
+    hasNextPage,
+    fetchNextPage,
+    isLoading,
+    isError,
+    isFetchingNextPage,
+    isFetchNextPageError,
+  } = useGetDashboardProducts({ limit: '15' });
+
   const counts = data?.counts;
   const products = data?.products;
   const draft = data?.draft;
@@ -144,38 +170,21 @@ const Products = () => {
       }}
     >
       <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
-        <ScrollableGradientContainer
-          direction="horizontal"
-          gradientClassNames={{ left: 'from-secondary-invert', right: 'from-secondary-invert' }}
-        >
-          <Table className="text-xs">
-            <TableHead>
-              <TableRow>
-                {[
-                  'S. No',
-                  'View',
-                  'Thumbnail',
-                  'Title',
-                  'Brand',
-                  'Category',
-                  'Price',
-                  'Status',
-                  'Stock',
-                  'Try-On',
-                  'Variants',
-                  'Sku',
-                  'Slug',
-                  'Sold',
-                  'Returned',
-                  'Avg. Rating',
-                ].map((title) => (
-                  <TableHeadCell key={title}>{title}</TableHeadCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {products?.length ? (
-                products.map((product, index) => {
+        {products?.length && (
+          <ScrollableGradientContainer
+            direction="horizontal"
+            gradientClassNames={{ left: 'from-secondary-invert', right: 'from-secondary-invert' }}
+          >
+            <Table className="relative text-xs">
+              <TableHead>
+                <TableRow>
+                  {TH_TITLES.map((title) => (
+                    <TableHeadCell key={title}>{title}</TableHeadCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {products.map((product, index) => {
                   return (
                     <TableRow
                       key={product._id + index}
@@ -231,41 +240,42 @@ const Products = () => {
                       <TableRowCell>{product.averageRating}</TableRowCell>
                     </TableRow>
                   );
-                })
-              ) : (
-                <TableRow className="border-y-primary/5 border-y first:border-t-0 last:border-b-0">
-                  <TableRowCell colSpan={4}>
-                    {isLoading ? (
-                      <LoadingText text="Loading..." className="mx-auto my-2" />
-                    ) : (
-                      <ApiStatus
-                        className="min-h-0!"
-                        status={isError ? 'error' : 'empty'}
-                        title="Hello"
-                        description="Hello"
-                        // title={
-                        //   isError
-                        //     ? 'Failed to load categories'
-                        //     : // : haveLength
-                        //       false
-                        //       ? 'No matching categories found'
-                        //       : 'No categories available'
-                        // }
-                        // description={
-                        //   isError
-                        //     ? `Something went wrong while fetching level ${level} categories. Please try again.`
-                        //     : haveLength
-                        //       ? 'Try searching with a different keyword or clear the search.'
-                        //       : `No level ${level} categories have been added under this category yet.`
-                        // }
-                      />
-                    )}
-                  </TableRowCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </ScrollableGradientContainer>
+                })}
+              </TableBody>
+            </Table>
+          </ScrollableGradientContainer>
+        )}
+
+        {(isLoading || isFetchingNextPage || isError || isFetchNextPageError) && (
+          <div className="flex items-center justify-center">
+            {(isLoading || isFetchingNextPage) && (
+              <LoadingText
+                text={isLoading ? 'Loading products...' : 'Loading more products...'}
+                className="my-2"
+              />
+            )}
+            {(isError || isFetchNextPageError) && (
+              <ApiStatus
+                className="min-h-0!"
+                status={isError || isFetchNextPageError ? 'error' : 'empty'}
+                title={
+                  isError
+                    ? 'Failed to load products'
+                    : isFetchNextPageError
+                      ? 'Failed to load more products'
+                      : 'Products not found!'
+                }
+                description={
+                  isError
+                    ? 'Something went wrong while fetching products. Please try again.'
+                    : isFetchNextPageError
+                      ? 'Something went wrong while fetching more products. Please try again.'
+                      : 'No products have been added yet.'
+                }
+              />
+            )}
+          </div>
+        )}
       </div>
     </PageWrapper>
   );
