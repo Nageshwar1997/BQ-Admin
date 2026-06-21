@@ -17,10 +17,10 @@ import { ROUTES, SORT_ORDER_MAP } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
-import { useGetDashboardProducts, useGetDashboardProductSuggestion } from '@/services/product-service/product.service.query';
+import { useGetDashboardProducts } from '@/services/product-service/product.service.query';
 import type { TProductStatus } from '@/types/api.type';
 import type { TSort } from '@/types/component.type';
-import { formatINRCurrency } from '@/utils/common.util';
+import { formatDate, formatINRCurrency } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
 import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -35,6 +35,9 @@ const TH_TITLES = [
   'Price',
   'Status',
   'Stock',
+  'Created At',
+  'Updated At',
+  'Stock',
   'Try-On',
   'Variants',
   'Sku',
@@ -46,129 +49,43 @@ const TH_TITLES = [
 
 const SearchAndSort = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
+  const [searchQuery, setSearchQuery] = useState(queryParams?.search || '');
 
-  const [inputValue, setInputValue] = useState(queryParams?.search || '');
-  const [suggestionQuery, setSuggestionQuery] = useState(queryParams?.search || '');
-  const [showSuggestions, setShowSuggestions] = useState(false);
-
-  const debouncedSuggestionSearch = useDebounce({
+  const handleSearch = useDebounce({
     callback: (value: string) => {
-      setSuggestionQuery(value);
+      const trimmedValue = value.trim();
+      if (trimmedValue) {
+        setParams({ ...queryParams, search: trimmedValue });
+      } else {
+        removeParams(['search']);
+      }
     },
-    delay: 300,
-  });
-
-  const handleProductSearch = (value?: string) => {
-    const search = (value ?? inputValue).trim();
-
-    setShowSuggestions(false);
-
-    if (!search) {
-      removeParams(['search']);
-      return;
-    }
-
-    setParams({
-      ...queryParams,
-      search,
-    });
-  };
-
-  const { data: suggestions = [] } = useGetDashboardProductSuggestion({
-    search: suggestionQuery,
-    enabled: suggestionQuery.trim().length >= 2,
+    delay: 600,
   });
 
   return (
     <div className="flex items-center justify-between gap-3 md:gap-4">
-      <div className="relative w-full">
-        <Input
-          needRef
-          inputProps={{
-            name: 'search',
-            placeholder: 'Search products here...',
-            value: inputValue,
-            onFocus: () => {
-              if (suggestions.length > 0) {
-                setShowSuggestions(true);
-              }
-            },
-            onBlur: () => {
-              setTimeout(() => setShowSuggestions(false), 150);
-            },
-            onChange: (e) => {
-              const value = (e.target.value || '').trimStart();
-
-              setInputValue(value);
-
-              if (value.trim().length >= 2) {
-                setShowSuggestions(true);
-              } else {
-                setShowSuggestions(false);
-              }
-
-              debouncedSuggestionSearch(value);
-            },
-            onKeyDown: (e) => {
-              if (e.key === 'Enter') {
-                handleProductSearch();
-              }
-            },
-          }}
-          icons={{
-            right: {
-              icon: 'solar:magnifer-linear',
-              className: 'size-4 cursor-pointer text-primary/50',
-              onClick: () => handleProductSearch(),
-            },
-          }}
-          containerClassName="[&>div]:h-9!"
-        />
-
-        {showSuggestions && inputValue.trim().length >= 2 && suggestions.length > 0 && (
-          <div className="bg-secondary-invert border-primary/10 absolute top-full z-50 mt-2 max-h-80 w-full overflow-y-auto rounded-xl border shadow-lg">
-            {suggestions.map((product) => (
-              <button
-                key={product._id}
-                type="button"
-                className="hover:bg-primary/5 flex w-full items-center gap-3 px-3 py-2 text-left transition-colors"
-                onClick={() => {
-                  setInputValue(product.title);
-                  setSuggestionQuery(product.title);
-                  setShowSuggestions(false);
-
-                  setParams({
-                    ...queryParams,
-                    search: product.title,
-                  });
-                }}
-              >
-                <img
-                  src={product.thumbnail}
-                  alt={product.title}
-                  className="size-10 rounded-lg object-cover"
-                />
-
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{product.title}</p>
-
-                  <p className="text-tertiary truncate text-xs">{product.brand}</p>
-                </div>
-
-                <Icon
-                  icon="solar:arrow-right-up-linear"
-                  className="text-primary/40 size-4 shrink-0"
-                />
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
+      <Input
+        needRef
+        inputProps={{
+          name: 'search',
+          placeholder: 'Search products here...',
+          value: searchQuery,
+          onChange: (e) => {
+            const value = (e.target.value || '').trimStart();
+            // instant ui update
+            setSearchQuery(value);
+            // debounced action
+            handleSearch(value);
+          },
+        }}
+        icons={{ right: { icon: 'solar:magnifer-linear', className: 'size-4 text-primary/50' } }}
+        containerClassName="[&>div]:h-9!"
+      />
       <Button
         pattern="outline"
         content={{
-          icon: queryParams.sort ? 'solar:list-arrow-up-linear' : 'solar:list-arrow-down-linear',
+          icon: !!queryParams.sort ? 'solar:list-arrow-up-linear' : 'solar:list-arrow-down-linear',
           className: 'size-full',
           onClick: () => {
             if (queryParams.sort) {
@@ -309,6 +226,12 @@ const Products = () => {
                         {!product.hasVariants
                           ? product.stock
                           : product.variants?.reduce((acc, variant) => acc + variant.stock, 0)}
+                      </TableRowCell>
+                      <TableRowCell>
+                        {formatDate(product.createdAt, { month: '2-digit' })}
+                      </TableRowCell>
+                      <TableRowCell>
+                        {formatDate(product.updatedAt, { month: '2-digit' })}
                       </TableRowCell>
                       <TableRowCell>
                         {product.tryOn.enabled

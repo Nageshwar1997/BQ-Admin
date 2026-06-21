@@ -326,3 +326,12 @@ export const withProgressToast = async <T>({
     toaster.progress.end(toastId);
   }
 };
+
+export const formatDate = (date: Date | string | number, options?: Intl.DateTimeFormatOptions) => {
+  return new Intl.DateTimeFormat('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    ...options,
+  }).format(new Date(date));
+};

@@ -81,8 +81,4 @@ export class ProductApi extends ApiRequest {
   }) => {
     return this.request({ ...this.routes.get.dashboard.products, params });
   };
-
-  public getDashboardProductSuggestions = (params: { search?: string }) => {
-    return this.request({ ...this.routes.get.dashboard.suggestions, params });
-  };
 }
