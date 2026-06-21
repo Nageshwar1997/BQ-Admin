@@ -16,6 +16,15 @@ export interface IHierarchyOption {
   children?: IHierarchyOption[];
 }
 
+interface ITreeNode {
+  node: IHierarchyOption;
+  level?: number;
+  value?: string;
+  expanded: Record<string, boolean>;
+  onToggle: (value: string) => void;
+  onSelect: (value: string) => void;
+}
+
 interface IHierarchySelectProps {
   options: IHierarchyOption[];
   value?: string;
@@ -25,6 +34,84 @@ interface IHierarchySelectProps {
 const IconContainer = ({ children }: TChildren) => (
   <div className="flex size-5 shrink-0 items-center justify-center">{children}</div>
 );
+
+const TreeNode = ({ node, level = 0, value, expanded, onToggle, onSelect }: ITreeNode) => {
+  const hasChildren = !!node.children?.length;
+  const isExpanded = expanded[node.value];
+  const isSelected = value === node.value;
+
+  return (
+    <>
+      <li
+        className={`hover:bg-primary/5 flex items-center gap-2 rounded-md px-2 py-2 ${
+          isSelected ? 'bg-primary/10' : ''
+        }`}
+        style={{
+          paddingLeft: `${level * 20 + 8}px`,
+        }}
+      >
+        {hasChildren ? (
+          <button type="button" onClick={() => onToggle(node.value)} className="flex shrink-0">
+            <IconContainer>
+              <Icon
+                icon={isExpanded ? 'solar:alt-arrow-down-linear' : 'solar:alt-arrow-right-linear'}
+                className="size-4"
+              />
+            </IconContainer>
+          </button>
+        ) : (
+          <div className="w-4" />
+        )}
+
+        <IconContainer>
+          <Icon
+            icon={
+              hasChildren
+                ? isExpanded
+                  ? 'solar:folder-open-linear'
+                  : 'solar:folder-linear'
+                : 'solar:file-linear'
+            }
+            className="size-4"
+          />
+        </IconContainer>
+
+        <button
+          type="button"
+          className={`flex-1 text-left text-sm ${
+            node.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+          }`}
+          onClick={() => {
+            if (node.disabled || hasChildren) return;
+            onSelect(node.value);
+          }}
+        >
+          {node.label}
+        </button>
+
+        {isSelected && (
+          <IconContainer>
+            <Icon icon="solar:check-circle-linear" className="text-primary size-4" />
+          </IconContainer>
+        )}
+      </li>
+
+      {hasChildren &&
+        isExpanded &&
+        node.children?.map((child) => (
+          <TreeNode
+            key={child.value}
+            node={child}
+            level={level + 1}
+            value={value}
+            expanded={expanded}
+            onToggle={onToggle}
+            onSelect={onSelect}
+          />
+        ))}
+    </>
+  );
+};
 
 const HierarchySelect = ({
   options,
@@ -84,78 +171,9 @@ const HierarchySelect = ({
     return find(options)?.label;
   }, [options, value]);
 
-  const TreeNode = ({ node, level = 0 }: { node: IHierarchyOption; level?: number }) => {
-    const hasChildren = !!node.children?.length;
-    const isExpanded = expanded[node.value];
-    const isSelected = value === node.value;
-
-    return (
-      <>
-        <li
-          className={`hover:bg-primary/5 flex items-center gap-2 rounded-md px-2 py-2 ${
-            isSelected ? 'bg-primary/10' : ''
-          }`}
-          style={{
-            paddingLeft: `${level * 20 + 8}px`,
-          }}
-        >
-          {hasChildren ? (
-            <button
-              type="button"
-              onClick={() => toggleExpand(node.value)}
-              className="flex shrink-0"
-            >
-              <IconContainer>
-                <Icon
-                  icon={isExpanded ? 'solar:alt-arrow-down-linear' : 'solar:alt-arrow-right-linear'}
-                  className="size-4"
-                />
-              </IconContainer>
-            </button>
-          ) : (
-            <div className="w-4" />
-          )}
-
-          <IconContainer>
-            <Icon
-              icon={
-                hasChildren
-                  ? isExpanded
-                    ? 'solar:folder-open-linear'
-                    : 'solar:folder-linear'
-                  : 'solar:file-linear'
-              }
-              className="size-4"
-            />
-          </IconContainer>
-
-          <button
-            type="button"
-            className={`flex-1 text-left text-sm ${
-              node.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
-            }`}
-            onClick={() => {
-              if (node.disabled) return;
-
-              if (!hasChildren) {
-                onChange?.(node.value);
-                setIsOpen(false);
-              }
-            }}
-          >
-            {node.label}
-          </button>
-
-          {isSelected && <Icon icon="solar:check-circle-linear" className="text-primary size-4" />}
-        </li>
-
-        {hasChildren &&
-          isExpanded &&
-          node.children?.map((child) => (
-            <TreeNode key={child.value} node={child} level={level + 1} />
-          ))}
-      </>
-    );
+  const handleSelect = (value: string) => {
+    onChange?.(value);
+    setIsOpen(false);
   };
 
   return (
@@ -186,7 +204,16 @@ const HierarchySelect = ({
 
           <ul className="max-h-80 overflow-y-auto p-2 [scrollbar-gutter:stable]">
             {filteredOptions.length ? (
-              filteredOptions.map((node) => <TreeNode key={node.value} node={node} />)
+              filteredOptions.map((node) => (
+                <TreeNode
+                  key={node.value}
+                  node={node}
+                  value={value}
+                  expanded={expanded}
+                  onToggle={toggleExpand}
+                  onSelect={handleSelect}
+                />
+              ))
             ) : (
               <li className="p-3 text-center text-sm opacity-60">No results found</li>
             )}
