@@ -79,6 +79,10 @@ export class ProductApi extends ApiRequest {
     sortBy?: keyof ITimeStamp;
     sortOrder?: TSort;
   }) => {
-    return this.request({ ...this.routes.get.dashboard, params });
+    return this.request({ ...this.routes.get.dashboard.products, params });
+  };
+
+  public getDashboardProductSuggestions = (params: { search?: string }) => {
+    return this.request({ ...this.routes.get.dashboard.suggestions, params });
   };
 }

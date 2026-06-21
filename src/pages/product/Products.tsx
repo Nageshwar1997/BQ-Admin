@@ -17,7 +17,7 @@ import { ROUTES, SORT_ORDER_MAP } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
-import { useGetDashboardProducts } from '@/services/product-service/product.service.query';
+import { useGetDashboardProducts, useGetDashboardProductSuggestion } from '@/services/product-service/product.service.query';
 import type { TProductStatus } from '@/types/api.type';
 import type { TSort } from '@/types/component.type';
 import { formatINRCurrency } from '@/utils/common.util';
@@ -102,6 +102,9 @@ const Products = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const { navigate } = usePathParams();
   const { ref, inView } = useInView();
+
+  const {data: suggestions} = useGetDashboardProductSuggestion({ search: queryParams.search });
+  console.log("🚀 ~ Products ~ suggestions:", suggestions)
 
   const {
     data,

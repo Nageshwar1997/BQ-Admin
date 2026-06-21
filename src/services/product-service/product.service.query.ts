@@ -58,6 +58,23 @@ export const useGetDraftProduct = () => {
     queryFn: productApi.getDraftProduct,
     retry: false,
     select: (data) => data?.draft as Partial<TDraftProduct> | undefined,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    placeholderData: (prev) => prev,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+  });
+};
+
+export const useGetDashboardProductSuggestion = (params: { search?: string }) => {
+  return useQuery({
+    queryKey: [...get.dashboard.suggestions, ...Object.values(params)],
+    queryFn: () => productApi.getDashboardProductSuggestions(params),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    placeholderData: (prev) => prev,
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -70,7 +87,7 @@ export const useGetDashboardProducts = (params: {
   sortOrder?: TSort;
 }) => {
   return useInfiniteQuery({
-    queryKey: [...get.dashboard, ...Object.values(params)],
+    queryKey: [...get.dashboard.products, ...Object.values(params)],
     initialPageParam: 1,
     queryFn: ({ pageParam = 1 }) =>
       productApi.getDashboardProducts({ ...params, page: pageParam.toString() }),
@@ -90,7 +107,6 @@ export const useGetDashboardProducts = (params: {
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     refetchOnReconnect: true,
-
     select: (data) => ({
       products: data.pages.flatMap((page) => page.data.products) as TApiProductPopulated[],
       counts: data.pages[0]?.data.counts as Record<TProductStatus | 'ALL', number>,
