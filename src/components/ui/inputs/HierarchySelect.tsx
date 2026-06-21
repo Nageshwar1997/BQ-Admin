@@ -5,6 +5,7 @@ export interface IHierarchyOption {
   children?: IHierarchyOption[];
 }
 
+import type { TChildren } from '@/types/component.type';
 import { Icon } from '@iconify/react';
 import { useMemo, useState } from 'react';
 
@@ -21,6 +22,9 @@ interface IHierarchySelectProps {
   onChange?: (value: string) => void;
   placeholder?: string;
 }
+const IconContainer = ({ children }: TChildren) => (
+  <div className="flex size-5 shrink-0 items-center justify-center">{children}</div>
+);
 
 const HierarchySelect = ({
   options,
@@ -101,25 +105,29 @@ const HierarchySelect = ({
               onClick={() => toggleExpand(node.value)}
               className="flex shrink-0"
             >
-              <Icon
-                icon={isExpanded ? 'solar:alt-arrow-down-linear' : 'solar:alt-arrow-right-linear'}
-                className="size-4"
-              />
+              <IconContainer>
+                <Icon
+                  icon={isExpanded ? 'solar:alt-arrow-down-linear' : 'solar:alt-arrow-right-linear'}
+                  className="size-4"
+                />
+              </IconContainer>
             </button>
           ) : (
             <div className="w-4" />
           )}
 
-          <Icon
-            icon={
-              hasChildren
-                ? isExpanded
-                  ? 'solar:folder-open-linear'
-                  : 'solar:folder-linear'
-                : 'solar:file-linear'
-            }
-            className="size-4 shrink-0"
-          />
+          <IconContainer>
+            <Icon
+              icon={
+                hasChildren
+                  ? isExpanded
+                    ? 'solar:folder-open-linear'
+                    : 'solar:folder-linear'
+                  : 'solar:file-linear'
+              }
+              className="size-4"
+            />
+          </IconContainer>
 
           <button
             type="button"
@@ -176,7 +184,7 @@ const HierarchySelect = ({
             />
           </div>
 
-          <ul className="max-h-80 overflow-y-auto p-2">
+          <ul className="max-h-80 overflow-y-auto p-2 [scrollbar-gutter:stable]">
             {filteredOptions.length ? (
               filteredOptions.map((node) => <TreeNode key={node.value} node={node} />)
             ) : (
