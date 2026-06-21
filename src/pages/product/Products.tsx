@@ -115,7 +115,6 @@ const Products = () => {
     isFetchingNextPage,
     isFetchNextPageError,
   } = useGetDashboardProducts({
-    limit: '15',
     search: queryParams.search,
     status: queryParams.status?.toUpperCase() as TProductStatus,
     sortBy: 'updatedAt',

@@ -1,14 +1,12 @@
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
 import type {
+  IGetDashboardProductsQuery,
   IId,
-  ITimeStamp,
   TApiCategory,
   TApiL1Category,
   TApiL2Category,
   TApiL3Category,
-  TProductStatus,
 } from '@/types/api.type';
-import type { TSort } from '@/types/component.type';
 import { ApiRequest } from '../ApiRequest';
 
 export class CategoryApi extends ApiRequest {
@@ -70,15 +68,7 @@ export class ProductApi extends ApiRequest {
     return this.request(this.routes.draft.get);
   };
 
-  public getDashboardProducts = (params: {
-    page?: string;
-    limit?: string;
-    search?: string;
-    status?: TProductStatus;
-    category?: string;
-    sortBy?: keyof ITimeStamp;
-    sortOrder?: TSort;
-  }) => {
+  public getDashboardProducts = (params: IGetDashboardProductsQuery) => {
     return this.request({ ...this.routes.get.dashboard.products, params });
   };
 }

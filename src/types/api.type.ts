@@ -4,6 +4,7 @@ import type {
   PRODUCT_STATUSES,
   ROLES,
 } from '@/constants/api.constants';
+import type { TSort } from './component.type';
 import type {
   TEmail,
   TL1Category,
@@ -185,3 +186,16 @@ export type TApiProductPopulated = TApiProductBase &
     category: TApiCategory;
     seller: unknown;
   };
+
+export interface IGetDashboardProductsQuery {
+  page?: string;
+  limit?: string;
+  search?: string;
+  status?: TProductStatus;
+  category?: string;
+  sortBy?: keyof Pick<
+    TApiProduct,
+    'createdAt' | 'updatedAt' | 'title' | 'sellingPrice' | 'soldCount'
+  >;
+  sortOrder?: TSort;
+}

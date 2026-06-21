@@ -1,7 +1,10 @@
 import { productApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
-import type { ITimeStamp, TApiProductPopulated, TProductStatus } from '@/types/api.type';
-import type { TSort } from '@/types/component.type';
+import type {
+  IGetDashboardProductsQuery,
+  TApiProductPopulated,
+  TProductStatus,
+} from '@/types/api.type';
 import type { TDraftProduct } from '@/types/schema.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
@@ -66,19 +69,14 @@ export const useGetDraftProduct = () => {
   });
 };
 
-export const useGetDashboardProducts = (params: {
-  limit?: string;
-  search?: string;
-  status?: TProductStatus;
-  category?: string;
-  sortBy?: keyof ITimeStamp;
-  sortOrder?: TSort;
-}) => {
+export const useGetDashboardProducts = (
+  params: Omit<IGetDashboardProductsQuery, 'page' | 'limit'>,
+) => {
   return useInfiniteQuery({
     queryKey: [...get.dashboard.products, ...Object.values(params)],
     initialPageParam: 1,
     queryFn: ({ pageParam = 1 }) =>
-      productApi.getDashboardProducts({ ...params, page: pageParam.toString() }),
+      productApi.getDashboardProducts({ ...params, page: pageParam.toString(), limit: '15' }),
     getNextPageParam: (lastPage) => {
       const pagination = lastPage?.data?.pagination;
 
