@@ -66,15 +66,24 @@ export const useGetDraftProduct = () => {
   });
 };
 
-export const useGetDashboardProductSuggestion = (params: { search?: string }) => {
+export const useGetDashboardProductSuggestion = (params: {
+  search?: string;
+  enabled?: boolean;
+}) => {
   return useQuery({
-    queryKey: [...get.dashboard.suggestions, ...Object.values(params)],
+    queryKey: [...get.dashboard.suggestions, params.search],
     queryFn: () => productApi.getDashboardProductSuggestions(params),
     retry: false,
+    enabled: params.enabled,
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     placeholderData: (prev) => prev,
     refetchOnWindowFocus: false,
+    select: (data) =>
+      (data?.suggestions || []) as Pick<
+        TApiProductPopulated,
+        'title' | 'slug' | '_id' | 'thumbnail' | 'brand'
+      >[],
   });
 };
 
