@@ -11,6 +11,7 @@ import {
   TableRowCell,
 } from '@/components/layout/table';
 import Button from '@/components/ui/Button';
+import HierarchySelect from '@/components/ui/inputs/HierarchySelect';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import { ROUTES, SORT_ORDER_MAP } from '@/constants/common.constants';
@@ -170,6 +171,82 @@ const Products = () => {
         children: <SearchAndSort />,
       }}
     >
+      <HierarchySelect
+        options={[
+          {
+            label: 'Electronics',
+            value: 'electronics',
+            children: [
+              {
+                label: 'Mobiles',
+                value: 'mobiles',
+                children: [
+                  { label: 'Android Phones', value: 'android-phones' },
+                  { label: 'iPhones', value: 'iphones' },
+                  { label: 'Gaming Phones', value: 'gaming-phones' },
+                ],
+              },
+              {
+                label: 'Laptops',
+                value: 'laptops',
+                children: [
+                  { label: 'Gaming Laptops', value: 'gaming-laptops' },
+                  { label: 'Business Laptops', value: 'business-laptops' },
+                  { label: 'MacBooks', value: 'macbooks' },
+                ],
+              },
+            ],
+          },
+          {
+            label: 'Fashion',
+            value: 'fashion',
+            children: [
+              {
+                label: 'Men',
+                value: 'men',
+                children: [
+                  { label: 'Shirts', value: 'shirts' },
+                  { label: 'T-Shirts', value: 'tshirts' },
+                  { label: 'Jeans', value: 'jeans' },
+                ],
+              },
+              {
+                label: 'Women',
+                value: 'women',
+                children: [
+                  { label: 'Dresses', value: 'dresses' },
+                  { label: 'Tops', value: 'tops' },
+                  { label: 'Handbags', value: 'handbags' },
+                ],
+              },
+            ],
+          },
+          {
+            label: 'Beauty',
+            value: 'beauty',
+            children: [
+              {
+                label: 'Makeup',
+                value: 'makeup',
+                children: [
+                  { label: 'Lipstick', value: 'lipstick' },
+                  { label: 'Foundation', value: 'foundation' },
+                  { label: 'Mascara', value: 'mascara' },
+                ],
+              },
+              {
+                label: 'Skincare',
+                value: 'skincare',
+                children: [
+                  { label: 'Face Wash', value: 'face-wash' },
+                  { label: 'Moisturizer', value: 'moisturizer' },
+                  { label: 'Sunscreen', value: 'sunscreen' },
+                ],
+              },
+            ],
+          },
+        ]}
+      />
       <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
         {!!data?.products?.length && (
           <ScrollableGradientContainer
