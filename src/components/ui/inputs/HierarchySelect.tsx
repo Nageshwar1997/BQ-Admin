@@ -1,3 +1,4 @@
+import ApiStatus from '@/components/layout/ApiStatus';
 import { useOutsideClick } from '@/hooks/useOutsideClick';
 import type { TChildren } from '@/types/component.type';
 import type {
@@ -6,8 +7,9 @@ import type {
   IHierarchySelectTreeNode,
 } from '@/types/input.type';
 import { Icon } from '@iconify/react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ChangeEvent } from 'react';
 import { InputError, InputIcon, InputLabel } from './children';
+import Input from './Input';
 
 const IconContainer = ({ children }: TChildren) => (
   <div className="flex size-5 shrink-0 items-center justify-center">{children}</div>
@@ -120,6 +122,8 @@ const HierarchySelect = ({
 
   const containerRef = useOutsideClick<HTMLDivElement>(() => setIsOpen(false), { enabled: isOpen });
 
+  const searchValue = inputProps?.value || search;
+
   const handleToggle = () => {
     if (selectProps?.disabled || !options.length) return;
     setIsOpen((prev) => !prev);
@@ -130,6 +134,14 @@ const HierarchySelect = ({
       ...prev,
       [value]: !prev[value],
     }));
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (typeof inputProps?.value !== 'string') {
+      setSearch(e.target.value);
+    }
+
+    inputProps?.onChange?.(e);
   };
 
   const filterTree = (
@@ -157,8 +169,10 @@ const HierarchySelect = ({
       return acc;
     }, []);
   };
-
-  const filteredOptions = useMemo(() => filterTree(options, search), [options, search]);
+  const filteredOptions = useMemo(
+    () => filterTree(options, searchValue.toString()),
+    [options, searchValue.toString()],
+  );
 
   const selectedOption = useMemo(() => {
     const find = (items: IHierarchySelectOption[]): IHierarchySelectOption | undefined => {
@@ -221,17 +235,34 @@ const HierarchySelect = ({
                 } ${optionsClassName}`}
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="p-2">
-                  <input
-                    {...inputProps}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search..."
-                    className="border-primary/10 bg-smoke-eerie text-primary h-10 w-full rounded-md border px-3 text-sm outline-none"
-                  />
-                </div>
+                <Input
+                  inputProps={{
+                    ...inputProps,
+                    value: searchValue,
+                    onChange: handleSearch,
+                    placeholder: inputProps?.placeholder || 'Search here...',
+                  }}
+                  icons={{
+                    right: {
+                      icon: searchValue ? 'lucide:x' : 'lucide:search',
+                      className: `size-4 ${
+                        searchValue ? 'text-primary cursor-pointer' : 'text-primary/30'
+                      }`,
+                      onClick: () => {
+                        if (typeof inputProps?.value !== 'string') {
+                          setSearch('');
+                        }
 
-                <ul className="flex max-h-60 flex-col gap-0.5 overflow-auto px-1 py-2">
+                        inputProps?.onChange?.({
+                          target: { value: '' },
+                        } as ChangeEvent<HTMLInputElement>);
+                      },
+                    },
+                  }}
+                  containerClassName="p-2 [&>div]:h-8 [&>div]:lg:h-10 border-b border-b-primary/30"
+                />
+
+                <ul className="mb-2 flex max-h-60 flex-col gap-0.5 overflow-auto scroll-smooth px-1 py-2">
                   {filteredOptions.length ? (
                     filteredOptions.map((node) => (
                       <TreeNode
@@ -244,7 +275,12 @@ const HierarchySelect = ({
                       />
                     ))
                   ) : (
-                    <li className="p-3 text-center text-sm opacity-60">No results found</li>
+                    <ApiStatus
+                      status="empty"
+                      title="No matching options found"
+                      description="Try searching with a different keyword or clear the search."
+                      className="min-h-30!"
+                    />
                   )}
                 </ul>
               </div>

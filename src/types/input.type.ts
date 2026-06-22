@@ -80,7 +80,7 @@ export interface IHierarchySelectOption extends ISelectOption {
 }
 
 export interface IHierarchySelect extends Omit<ISelect, 'options'> {
-  inputProps?: Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'>;
+  inputProps?: IInput['inputProps'];
   options: IHierarchySelectOption[];
 }
 
