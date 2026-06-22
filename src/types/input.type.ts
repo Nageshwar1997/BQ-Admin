@@ -4,6 +4,7 @@ import type { ToolbarProps } from 'quill/modules/toolbar';
 import type {
   InputHTMLAttributes,
   ReactElement,
+  ReactNode,
   RefObject,
   SelectHTMLAttributes,
   TextareaHTMLAttributes,
@@ -49,7 +50,7 @@ export interface ICheckbox extends Omit<IBaseInput, 'needRef' | 'icons' | 'label
   tooltip?: Pick<ITooltip, 'required' | 'description' | 'title' | 'placement'>;
 }
 
-type TOption = { label: string | ReactElement; value: string };
+type TOption = { label: string | ReactNode; value: string | number };
 
 export interface IRadio extends TClassName, TContainerClassName, Pick<IBaseInput, 'error'> {
   value: string;

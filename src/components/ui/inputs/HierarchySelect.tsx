@@ -1,36 +1,29 @@
-export interface IHierarchyOption {
-  label: string;
-  value: string;
-  disabled?: boolean;
-  children?: IHierarchyOption[];
-}
-
 import type { TChildren } from '@/types/component.type';
+import type { IDropdownOption } from '@/types/input.type';
 import { Icon } from '@iconify/react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 
-export interface IHierarchyOption {
-  label: string;
-  value: string;
-  disabled?: boolean;
+export interface IHierarchyOption extends IDropdownOption {
+  searchLabel?: string;
   children?: IHierarchyOption[];
 }
 
 interface ITreeNode {
   node: IHierarchyOption;
   level?: number;
-  value?: string;
-  expanded: Record<string, boolean>;
-  onToggle: (value: string) => void;
-  onSelect: (value: string) => void;
+  value?: IDropdownOption['value'];
+  expanded: Record<IDropdownOption['value'], boolean>;
+  onToggle: (value: IDropdownOption['value']) => void;
+  onSelect: (value: IDropdownOption['value']) => void;
 }
 
 interface IHierarchySelectProps {
   options: IHierarchyOption[];
-  value?: string;
-  onChange?: (value: string) => void;
-  placeholder?: string;
+  value?: IDropdownOption['value'];
+  onChange?: (value: IDropdownOption['value']) => void;
+  placeholder?: ReactNode;
 }
+
 const IconContainer = ({ children }: TChildren) => (
   <div className="flex size-5 shrink-0 items-center justify-center">{children}</div>
 );
@@ -121,9 +114,9 @@ const HierarchySelect = ({
 }: IHierarchySelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [expanded, setExpanded] = useState<Record<string | number, boolean>>({});
 
-  const toggleExpand = (value: string) => {
+  const toggleExpand = (value: string | number) => {
     setExpanded((prev) => ({
       ...prev,
       [value]: !prev[value],
@@ -136,7 +129,9 @@ const HierarchySelect = ({
     const lower = keyword.toLowerCase();
 
     return nodes.reduce<IHierarchyOption[]>((acc, node) => {
-      const matched = node.label.toLowerCase().includes(lower);
+      const searchableText = node.searchLabel ?? (typeof node.label === 'string' ? node.label : '');
+
+      const matched = searchableText.toLowerCase().includes(lower);
 
       const children = node.children ? filterTree(node.children, keyword) : [];
 
@@ -153,7 +148,7 @@ const HierarchySelect = ({
 
   const filteredOptions = useMemo(() => filterTree(options, search), [options, search]);
 
-  const selectedLabel = useMemo(() => {
+  const selectedOption = useMemo(() => {
     const find = (items: IHierarchyOption[]): IHierarchyOption | undefined => {
       for (const item of items) {
         if (item.value === value) return item;
@@ -168,10 +163,10 @@ const HierarchySelect = ({
       return undefined;
     };
 
-    return find(options)?.label;
+    return find(options);
   }, [options, value]);
 
-  const handleSelect = (value: string) => {
+  const handleSelect = (value: string | number) => {
     onChange?.(value);
     setIsOpen(false);
   };
@@ -183,7 +178,7 @@ const HierarchySelect = ({
         className="flex h-12 w-full items-center justify-between rounded-lg border px-3"
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        <span>{selectedLabel || placeholder}</span>
+        <span>{selectedOption?.label || placeholder}</span>
 
         <Icon
           icon="solar:alt-arrow-down-linear"

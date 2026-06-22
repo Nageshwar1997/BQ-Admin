@@ -174,73 +174,179 @@ const Products = () => {
       <HierarchySelect
         options={[
           {
-            label: 'Electronics',
-            value: 'electronics',
+            label: (
+              <div className="flex items-center gap-2">
+                <Icon icon="solar:laptop-linear" className="size-4" />
+                <span>Electronics</span>
+              </div>
+            ),
+            searchLabel: 'Electronics',
+            value: 1,
             children: [
               {
                 label: 'Mobiles',
-                value: 'mobiles',
+                searchLabel: 'Mobiles',
+                value: 11,
                 children: [
-                  { label: 'Android Phones', value: 'android-phones' },
-                  { label: 'iPhones', value: 'iphones' },
-                  { label: 'Gaming Phones', value: 'gaming-phones' },
+                  {
+                    label: (
+                      <div className="flex items-center gap-2">
+                        <span>🤖</span>
+                        <span>Android Phones</span>
+                      </div>
+                    ),
+                    searchLabel: 'Android Phones',
+                    value: 111,
+                  },
+                  {
+                    label: 'iPhones',
+                    searchLabel: 'iPhones',
+                    value: 112,
+                  },
+                  {
+                    label: 'Gaming Phones',
+                    searchLabel: 'Gaming Phones',
+                    value: 113,
+                  },
                 ],
               },
               {
                 label: 'Laptops',
-                value: 'laptops',
+                searchLabel: 'Laptops',
+                value: 12,
                 children: [
-                  { label: 'Gaming Laptops', value: 'gaming-laptops' },
-                  { label: 'Business Laptops', value: 'business-laptops' },
-                  { label: 'MacBooks', value: 'macbooks' },
+                  {
+                    label: (
+                      <div className="flex items-center gap-2">
+                        <span>🎮</span>
+                        <span>Gaming Laptops</span>
+                      </div>
+                    ),
+                    searchLabel: 'Gaming Laptops',
+                    value: 121,
+                  },
+                  {
+                    label: 'Business Laptops',
+                    searchLabel: 'Business Laptops',
+                    value: 122,
+                  },
+                  {
+                    label: 'MacBooks',
+                    searchLabel: 'MacBooks',
+                    value: 123,
+                  },
                 ],
               },
             ],
           },
           {
-            label: 'Fashion',
-            value: 'fashion',
+            label: (
+              <div className="flex items-center gap-2">
+                <span>👕</span>
+                <span>Fashion</span>
+              </div>
+            ),
+            searchLabel: 'Fashion',
+            value: 2,
             children: [
               {
                 label: 'Men',
-                value: 'men',
+                searchLabel: 'Men',
+                value: 21,
                 children: [
-                  { label: 'Shirts', value: 'shirts' },
-                  { label: 'T-Shirts', value: 'tshirts' },
-                  { label: 'Jeans', value: 'jeans' },
+                  {
+                    label: (
+                      <div className="flex items-center gap-2">
+                        <span>👔</span>
+                        <span>Shirts</span>
+                      </div>
+                    ),
+                    searchLabel: 'Shirts',
+                    value: 211,
+                  },
+                  {
+                    label: 'T-Shirts',
+                    searchLabel: 'T-Shirts',
+                    value: 212,
+                  },
+                  {
+                    label: 'Jeans',
+                    searchLabel: 'Jeans',
+                    value: 213,
+                  },
                 ],
               },
               {
                 label: 'Women',
-                value: 'women',
+                searchLabel: 'Women',
+                value: 22,
                 children: [
-                  { label: 'Dresses', value: 'dresses' },
-                  { label: 'Tops', value: 'tops' },
-                  { label: 'Handbags', value: 'handbags' },
+                  {
+                    label: 'Dresses',
+                    searchLabel: 'Dresses',
+                    value: 221,
+                  },
+                  {
+                    label: 'Tops',
+                    searchLabel: 'Tops',
+                    value: 222,
+                  },
+                  {
+                    label: 'Handbags',
+                    searchLabel: 'Handbags',
+                    value: 223,
+                  },
                 ],
               },
             ],
           },
           {
             label: 'Beauty',
-            value: 'beauty',
+            searchLabel: 'Beauty',
+            value: 3,
             children: [
               {
                 label: 'Makeup',
-                value: 'makeup',
+                searchLabel: 'Makeup',
+                value: 31,
                 children: [
-                  { label: 'Lipstick', value: 'lipstick' },
-                  { label: 'Foundation', value: 'foundation' },
-                  { label: 'Mascara', value: 'mascara' },
+                  {
+                    label: 'Lipstick',
+                    searchLabel: 'Lipstick',
+                    value: 311,
+                  },
+                  {
+                    label: 'Foundation',
+                    searchLabel: 'Foundation',
+                    value: 312,
+                  },
+                  {
+                    label: 'Mascara',
+                    searchLabel: 'Mascara',
+                    value: 313,
+                  },
                 ],
               },
               {
                 label: 'Skincare',
-                value: 'skincare',
+                searchLabel: 'Skincare',
+                value: 32,
                 children: [
-                  { label: 'Face Wash', value: 'face-wash' },
-                  { label: 'Moisturizer', value: 'moisturizer' },
-                  { label: 'Sunscreen', value: 'sunscreen' },
+                  {
+                    label: 'Face Wash',
+                    searchLabel: 'Face Wash',
+                    value: 321,
+                  },
+                  {
+                    label: 'Moisturizer',
+                    searchLabel: 'Moisturizer',
+                    value: 322,
+                  },
+                  {
+                    label: 'Sunscreen',
+                    searchLabel: 'Sunscreen',
+                    value: 323,
+                  },
                 ],
               },
             ],
