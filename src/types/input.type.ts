@@ -58,20 +58,39 @@ export interface IRadio extends TClassName, TContainerClassName, Pick<IBaseInput
   options: TOption[];
 }
 
-export interface IDropdownOption extends Pick<TOption, 'label'> {
-  value: TOption['value'] | number;
+export interface ISelectOption extends Pick<TOption, 'label'> {
+  value: TOption['value'];
   disabled?: boolean;
 }
 
 export interface ISelect extends Omit<IBaseInput, 'needRef' | 'register'> {
   selectProps: Pick<SelectHTMLAttributes<HTMLSelectElement>, 'disabled'> &
-    Partial<Pick<InputHTMLAttributes<HTMLInputElement>, 'placeholder'>> & {
-      value: IDropdownOption['value'];
-      onChange: (value: IDropdownOption['value']) => void;
+    Pick<InputHTMLAttributes<HTMLInputElement>, 'placeholder'> & {
+      value: ISelectOption['value'];
+      onChange: (value: ISelectOption['value']) => void;
     };
-  options: IDropdownOption[];
+  options: ISelectOption[];
   optionsClassName?: string;
   position?: 'top' | 'bottom';
+}
+
+export interface IHierarchySelectOption extends ISelectOption {
+  searchLabel?: string;
+  children?: IHierarchySelectOption[];
+}
+
+export interface IHierarchySelect extends Omit<ISelect, 'options'> {
+  inputProps?: Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'>;
+  options: IHierarchySelectOption[];
+}
+
+export interface IHierarchySelectTreeNode {
+  node: IHierarchySelectOption;
+  level?: number;
+  value?: ISelectOption['value'];
+  expanded: Record<ISelectOption['value'], boolean>;
+  onToggle: (value: ISelectOption['value']) => void;
+  onSelect: (value: ISelectOption['value']) => void;
 }
 
 export interface IColorInput

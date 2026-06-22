@@ -1,34 +1,24 @@
 import type { TChildren } from '@/types/component.type';
-import type { IDropdownOption } from '@/types/input.type';
+import type {
+  IHierarchySelect,
+  IHierarchySelectOption,
+  IHierarchySelectTreeNode,
+} from '@/types/input.type';
 import { Icon } from '@iconify/react';
-import { useMemo, useState, type ReactNode } from 'react';
-
-export interface IHierarchyOption extends IDropdownOption {
-  searchLabel?: string;
-  children?: IHierarchyOption[];
-}
-
-interface ITreeNode {
-  node: IHierarchyOption;
-  level?: number;
-  value?: IHierarchyOption['value'];
-  expanded: Record<IHierarchyOption['value'], boolean>;
-  onToggle: (value: IHierarchyOption['value']) => void;
-  onSelect: (value: IHierarchyOption['value']) => void;
-}
-
-interface IHierarchySelectProps {
-  options: IHierarchyOption[];
-  value?: IHierarchyOption['value'];
-  onChange?: (value: IHierarchyOption['value']) => void;
-  placeholder?: ReactNode;
-}
+import { useMemo, useState } from 'react';
 
 const IconContainer = ({ children }: TChildren) => (
   <div className="flex size-5 shrink-0 items-center justify-center">{children}</div>
 );
 
-const TreeNode = ({ node, level = 0, value, expanded, onToggle, onSelect }: ITreeNode) => {
+const TreeNode = ({
+  node,
+  level = 0,
+  value,
+  expanded,
+  onToggle,
+  onSelect,
+}: IHierarchySelectTreeNode) => {
   const hasChildren = !!node.children?.length;
   const isExpanded = expanded[node.value];
   const isSelected = value === node.value;
@@ -112,10 +102,16 @@ const TreeNode = ({ node, level = 0, value, expanded, onToggle, onSelect }: ITre
 
 const HierarchySelect = ({
   options,
-  value,
-  onChange,
-  placeholder = 'Select Category',
-}: IHierarchySelectProps) => {
+  selectProps,
+  className,
+  containerClassName,
+  error,
+  icons,
+  label,
+  optionsClassName,
+  position,
+  inputProps,
+}: IHierarchySelect) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState<Record<string | number, boolean>>({});
@@ -127,12 +123,15 @@ const HierarchySelect = ({
     }));
   };
 
-  const filterTree = (nodes: IHierarchyOption[], keyword: string): IHierarchyOption[] => {
+  const filterTree = (
+    nodes: IHierarchySelectOption[],
+    keyword: string,
+  ): IHierarchySelectOption[] => {
     if (!keyword.trim()) return nodes;
 
     const lower = keyword.toLowerCase();
 
-    return nodes.reduce<IHierarchyOption[]>((acc, node) => {
+    return nodes.reduce<IHierarchySelectOption[]>((acc, node) => {
       const searchableText = node.searchLabel ?? (typeof node.label === 'string' ? node.label : '');
 
       const matched = searchableText.toLowerCase().includes(lower);
@@ -153,9 +152,9 @@ const HierarchySelect = ({
   const filteredOptions = useMemo(() => filterTree(options, search), [options, search]);
 
   const selectedOption = useMemo(() => {
-    const find = (items: IHierarchyOption[]): IHierarchyOption | undefined => {
+    const find = (items: IHierarchySelectOption[]): IHierarchySelectOption | undefined => {
       for (const item of items) {
-        if (item.value === value) return item;
+        if (item.value === selectProps.value) return item;
 
         if (item.children?.length) {
           const found = find(item.children);
@@ -168,10 +167,10 @@ const HierarchySelect = ({
     };
 
     return find(options);
-  }, [options, value]);
+  }, [options, selectProps.value]);
 
   const handleSelect = (value: string | number) => {
-    onChange?.(value);
+    selectProps.onChange(value);
     setIsOpen(false);
   };
 
@@ -182,7 +181,7 @@ const HierarchySelect = ({
         className="flex h-12 w-full cursor-pointer items-center justify-between rounded-lg border px-3"
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        <span>{selectedOption?.label || placeholder}</span>
+        <span>{selectedOption?.label || selectProps.placeholder || 'Select'}</span>
 
         <Icon
           icon="solar:alt-arrow-down-linear"
@@ -194,6 +193,7 @@ const HierarchySelect = ({
         <div className="absolute z-50 mt-2 w-full rounded-lg border bg-white shadow-lg">
           <div className="p-2">
             <input
+              {...inputProps}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search..."
@@ -207,7 +207,7 @@ const HierarchySelect = ({
                 <TreeNode
                   key={node.value}
                   node={node}
-                  value={value}
+                  value={selectProps.value}
                   expanded={expanded}
                   onToggle={toggleExpand}
                   onSelect={handleSelect}

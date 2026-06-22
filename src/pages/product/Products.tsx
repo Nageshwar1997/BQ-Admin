@@ -174,9 +174,11 @@ const Products = () => {
       }}
     >
       <HierarchySelect
-        value={val}
-        placeholder="Select Category"
-        onChange={(v) => setVal(v)}
+        selectProps={{
+          value: val,
+          placeholder: 'Select Category',
+          onChange: (v) => setVal(v),
+        }}
         options={[
           {
             label: (
