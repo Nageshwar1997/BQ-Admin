@@ -20,11 +20,12 @@ import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesHierarchy } from '@/services/product-service/category.service.query';
 import { useGetDashboardProducts } from '@/services/product-service/product.service.query';
-import type { TProductStatus } from '@/types/api.type';
+import type { TCategoryHierarchy, TProductStatus } from '@/types/api.type';
 import type { TSort } from '@/types/component.type';
+import type { IHierarchySelectOption } from '@/types/input.type';
 import { formatDate, formatINRCurrency } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 
 const TH_TITLES = [
@@ -108,8 +109,11 @@ const Products = () => {
   const { navigate } = usePathParams();
   const { ref, inView } = useInView();
 
-  const {data:hierarchy} = useGetCategoriesHierarchy();
-  console.log("🚀 ~ Products ~ hierarchy:", hierarchy)
+  const {
+    data: hierarchy,
+    isLoading: isLoadingHierarchy,
+    isError: isErrorHierarchy,
+  } = useGetCategoriesHierarchy();
 
   const {
     data,
@@ -127,6 +131,20 @@ const Products = () => {
   });
 
   const [val, setVal] = useState<number | string>('');
+  console.log('🚀 ~ Products ~ val:', val);
+
+  const categories = useMemo(() => {
+    const mapCategoryHierarchy = (categories: TCategoryHierarchy[]): IHierarchySelectOption[] => {
+      return categories.map((category) => ({
+        label: category.name,
+        searchLabel: category.name,
+        value: category._id,
+        children: category.subcategories.length ? mapCategoryHierarchy(category.subcategories) : [],
+      }));
+    };
+
+    return hierarchy ? mapCategoryHierarchy(hierarchy) : [];
+  }, [hierarchy]);
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -182,189 +200,11 @@ const Products = () => {
           value: val,
           placeholder: 'Select Category',
           onChange: (v) => setVal(v),
+          disabled: isLoadingHierarchy || !hierarchy?.length,
         }}
         label="Select"
-        error="Hello this is error"
-        options={[
-          {
-            label: (
-              <div className="flex items-center gap-2">
-                <Icon icon="solar:laptop-linear" className="size-4" />
-                <span>Electronics</span>
-              </div>
-            ),
-            searchLabel: 'Electronics',
-            value: 1,
-            children: [
-              {
-                label: 'Mobiles',
-                searchLabel: 'Mobiles',
-                value: 11,
-                children: [
-                  // {
-                  //   label: (
-                  //     <div className="flex items-center gap-2">
-                  //       <span>🤖</span>
-                  //       <span>Android Phones</span>
-                  //     </div>
-                  //   ),
-                  //   searchLabel: 'Android Phones',
-                  //   value: 111,
-                  // },
-                  // {
-                  //   label: 'iPhones',
-                  //   searchLabel: 'iPhones',
-                  //   value: 112,
-                  // },
-                  // {
-                  //   label: 'Gaming Phones',
-                  //   searchLabel: 'Gaming Phones',
-                  //   value: 113,
-                  // },
-                ],
-              },
-              {
-                label: 'Laptops',
-                searchLabel: 'Laptops',
-                value: 12,
-                children: [
-                  {
-                    label: (
-                      <div className="flex items-center gap-2">
-                        <span>🎮</span>
-                        <span>Gaming Laptops</span>
-                      </div>
-                    ),
-                    searchLabel: 'Gaming Laptops',
-                    value: 121,
-                  },
-                  {
-                    label: 'Business Laptops',
-                    searchLabel: 'Business Laptops',
-                    value: 122,
-                  },
-                  {
-                    label: 'MacBooks',
-                    searchLabel: 'MacBooks',
-                    value: 123,
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            label: (
-              <div className="flex items-center gap-2">
-                <span>👕</span>
-                <span>Fashion</span>
-              </div>
-            ),
-            searchLabel: 'Fashion',
-            value: 2,
-            children: [
-              {
-                label: 'Men',
-                searchLabel: 'Men',
-                value: 21,
-                children: [
-                  {
-                    label: (
-                      <div className="flex items-center gap-2">
-                        <span>👔</span>
-                        <span>Shirts</span>
-                      </div>
-                    ),
-                    searchLabel: 'Shirts',
-                    value: 211,
-                  },
-                  {
-                    label: 'T-Shirts',
-                    searchLabel: 'T-Shirts',
-                    value: 212,
-                  },
-                  {
-                    label: 'Jeans',
-                    searchLabel: 'Jeans',
-                    value: 213,
-                  },
-                ],
-              },
-              {
-                label: 'Women',
-                searchLabel: 'Women',
-                value: 22,
-                children: [
-                  {
-                    label: 'Dresses',
-                    searchLabel: 'Dresses',
-                    value: 221,
-                  },
-                  {
-                    label: 'Tops',
-                    searchLabel: 'Tops',
-                    value: 222,
-                  },
-                  {
-                    label: 'Handbags',
-                    searchLabel: 'Handbags',
-                    value: 223,
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            label: 'Beauty',
-            searchLabel: 'Beauty',
-            value: 3,
-            children: [
-              {
-                label: 'Makeup',
-                searchLabel: 'Makeup',
-                value: 31,
-                children: [
-                  {
-                    label: 'Lipstick',
-                    searchLabel: 'Lipstick',
-                    value: 311,
-                  },
-                  {
-                    label: 'Foundation',
-                    searchLabel: 'Foundation',
-                    value: 312,
-                  },
-                  {
-                    label: 'Mascara',
-                    searchLabel: 'Mascara',
-                    value: 313,
-                  },
-                ],
-              },
-              {
-                label: 'Skincare',
-                searchLabel: 'Skincare',
-                value: 32,
-                children: [
-                  {
-                    label: 'Face Wash',
-                    searchLabel: 'Face Wash',
-                    value: 321,
-                  },
-                  {
-                    label: 'Moisturizer',
-                    searchLabel: 'Moisturizer',
-                    value: 322,
-                  },
-                  {
-                    label: 'Sunscreen',
-                    searchLabel: 'Sunscreen',
-                    value: 323,
-                  },
-                ],
-              },
-            ],
-          },
-        ]}
+        options={categories}
+        error={isErrorHierarchy ? 'Failed to load categories' : undefined}
       />
       <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
         {!!data?.products?.length && (

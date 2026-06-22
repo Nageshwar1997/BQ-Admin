@@ -55,10 +55,7 @@ export type TLevel2 = TCategoryLevelMap['L2'];
 export type TLevel3 = TCategoryLevelMap['L3'];
 
 type CategoryBase<TLevel extends TCategoryLevel> = IId &
-  Pick<TCategoryForm, 'name'> & {
-    slug: string;
-    level: TLevel;
-  };
+  Pick<TCategoryForm, 'name'> & { slug: string; level: TLevel };
 
 export type TL1Category = CategoryBase<TLevel1>;
 export type TL2Category = CategoryBase<TLevel2> & { parent: string };
@@ -66,7 +63,7 @@ export type TL3Category = CategoryBase<TLevel3> & { parent: string; description:
 
 export type TCategory = TL1Category | TL2Category | TL3Category;
 
-type TCategoryHierarchyNode<TLevel extends TCategoryLevel> = TLevel extends TLevel1
+export type TCategoryHierarchyNode<TLevel extends TCategoryLevel> = TLevel extends TLevel1
   ? CategoryBase<TLevel1> & { subcategories: TCategoryHierarchyNode<TLevel2>[] }
   : TLevel extends TLevel2
     ? CategoryBase<TLevel2> & {
@@ -76,9 +73,10 @@ type TCategoryHierarchyNode<TLevel extends TCategoryLevel> = TLevel extends TLev
     : CategoryBase<TLevel3> & {
         parent: string;
         description: string;
+        subcategories: never;
       };
 
-export type TCategoryHierarchy = TCategoryHierarchyNode<TLevel1>;
+export type TCategoryHierarchy = TCategoryHierarchyNode<TCategoryLevel>;
 
 export interface ICreateHeaders {
   user?: Partial<Pick<IUser, '_id' | 'role'>>;

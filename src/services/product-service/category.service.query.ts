@@ -1,6 +1,12 @@
 import { categoryApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
-import type { TCategory, TL1Category, TL2Category, TL3Category } from '@/types/api.type';
+import type {
+  TCategory,
+  TCategoryHierarchy,
+  TL1Category,
+  TL2Category,
+  TL3Category,
+} from '@/types/api.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -120,6 +126,6 @@ export const useGetCategoriesHierarchy = () => {
 
     // UX
     placeholderData: (prev) => prev,
-    select: (data) => data?.categories || [],
+    select: (data) => (data?.categories || []) as TCategoryHierarchy[],
   });
 };
