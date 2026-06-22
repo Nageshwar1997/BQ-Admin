@@ -45,7 +45,7 @@ const CommonFields = ({
       label="Category name"
       register={register('name')}
       error={errors.name?.message}
-      inputProps={{ name: 'name', placeholder: 'Category name' }}
+      inputProps={{ name: 'name', placeholder: 'Enter category name' }}
     />
 
     <Tooltip title="Cannot change category level" required={isLevelDisabled}>
