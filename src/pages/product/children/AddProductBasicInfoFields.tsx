@@ -1,17 +1,16 @@
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
-import type { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
 import {
   PRODUCT_BASIC_INFO_INPUT_MAP_DATA,
   PRODUCT_CATEGORIES_SELECT_MAP_DATA,
 } from '@/constants/input.constants';
-import type { TApiCategory } from '@/types/api.type';
+import type { TCategory, TCategoryLevelMap } from '@/types/api.type';
 import type { TProductBasicInfo } from '@/types/schema.type';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
 type Props = {
   form: UseFormReturn<TProductBasicInfo>;
-  categories: Record<keyof typeof CATEGORY_LEVELS_MAP, TApiCategory[]>;
+  categories: Record<keyof TCategoryLevelMap, TCategory[]>;
 };
 
 const AddProductBasicInfoFields = ({ form, categories }: Props) => {

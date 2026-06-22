@@ -50,7 +50,7 @@ export interface ICheckbox extends Omit<IBaseInput, 'needRef' | 'icons' | 'label
   tooltip?: Pick<ITooltip, 'required' | 'description' | 'title' | 'placement'>;
 }
 
-type TOption = { label: string | ReactNode; value: string | number };
+type TOption = { label: string | ReactNode; value: string };
 
 export interface IRadio extends TClassName, TContainerClassName, Pick<IBaseInput, 'error'> {
   value: string;
@@ -59,7 +59,7 @@ export interface IRadio extends TClassName, TContainerClassName, Pick<IBaseInput
 }
 
 export interface ISelectOption extends Pick<TOption, 'label'> {
-  value: TOption['value'];
+  value: TOption['value'] | number;
   disabled?: boolean;
 }
 

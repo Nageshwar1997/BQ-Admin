@@ -1,11 +1,6 @@
 import { categoryApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
-import type {
-  TApiCategory,
-  TApiL1Category,
-  TApiL2Category,
-  TApiL3Category,
-} from '@/types/api.type';
+import type { TCategory, TL1Category, TL2Category, TL3Category } from '@/types/api.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -88,16 +83,14 @@ export const useDeleteCategory = ({ categoryId = '' }) => {
 export const useGetCategoriesByParentLevel = ({
   enabled = true,
   ...props
-}: { enabled?: boolean } & Partial<
-  | Pick<TApiL1Category, 'level'>
-  | Pick<TApiL2Category, 'level' | 'parent'>
-  | Pick<TApiL3Category, 'level' | 'parent'>
->) => {
-  const level = props.level;
-  const parent = 'parent' in props ? props.parent : undefined;
+}: { enabled?: boolean } & (
+  | Pick<TL1Category, 'level'>
+  | Pick<TL2Category, 'level' | 'parent'>
+  | Pick<TL3Category, 'level' | 'parent'>
+)) => {
   return useQuery({
-    queryKey: [...get.byParentLevel, level, parent],
-    queryFn: () => categoryApi.getCategoriesByParentLevel({ level, parent }),
+    queryKey: [...get.byParentLevel, Object.values(props)],
+    queryFn: () => categoryApi.getCategoriesByParentLevel(props),
     staleTime: 5 * 60 * 1000, // 5 min
     gcTime: 15 * 60 * 1000, // 15 min
     enabled: enabled,
@@ -105,6 +98,28 @@ export const useGetCategoriesByParentLevel = ({
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     refetchOnReconnect: true,
-    select: (data) => (data?.categories || []) as TApiCategory[],
+    select: (data) => (data?.categories || []) as TCategory[],
+  });
+};
+
+export const useGetCategoriesHierarchy = () => {
+  return useQuery({
+    queryKey: get.byHierarchy,
+    queryFn: categoryApi.getCategoriesHierarchy,
+
+    // Cache
+    staleTime: 5 * 60 * 1000, // 5 min
+    gcTime: 15 * 60 * 1000, // 15 min
+
+    // Refetch
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+
+    // Retry
+    retry: 1,
+
+    // UX
+    placeholderData: (prev) => prev,
+    select: (data) => data?.categories || [],
   });
 };

@@ -4,12 +4,11 @@ import type {
   PRODUCT_STATUSES,
   ROLES,
 } from '@/constants/api.constants';
+import type { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
 import type { TSort } from './component.type';
 import type {
+  TCategoryForm,
   TEmail,
-  TL1Category,
-  TL2Category,
-  TL3Category,
   TLogin,
   TProductBasicInfo,
   TProductDescriptionAndContent,
@@ -43,13 +42,43 @@ export interface IUser extends Pick<TLogin, 'password'>, TEmail, IId, ITimeStamp
   phoneNumber: string;
 }
 
-export type TApiL1Category = Pick<TL1Category, 'name' | 'level'>;
-export type TApiL2Category = Pick<TL2Category, 'name' | 'level'> & { parent: string };
-export type TApiL3Category = Pick<TL3Category, 'name' | 'level' | 'description'> & {
-  parent: string;
-};
-export type TApiCategory = (TApiL1Category | TApiL2Category | TApiL3Category) &
-  IId & { slug: string };
+/* -------------------------------------------------------------------------- */
+/*                                  CATEGORY                                  */
+/* -------------------------------------------------------------------------- */
+
+export type TCategoryLevelMap = typeof CATEGORY_LEVELS_MAP;
+
+export type TCategoryLevel = TCategoryLevelMap[keyof TCategoryLevelMap];
+
+export type TLevel1 = TCategoryLevelMap['L1'];
+export type TLevel2 = TCategoryLevelMap['L2'];
+export type TLevel3 = TCategoryLevelMap['L3'];
+
+type CategoryBase<TLevel extends TCategoryLevel> = IId &
+  Pick<TCategoryForm, 'name'> & {
+    slug: string;
+    level: TLevel;
+  };
+
+export type TL1Category = CategoryBase<TLevel1>;
+export type TL2Category = CategoryBase<TLevel2> & { parent: string };
+export type TL3Category = CategoryBase<TLevel3> & { parent: string; description: string };
+
+export type TCategory = TL1Category | TL2Category | TL3Category;
+
+type TCategoryHierarchyNode<TLevel extends TCategoryLevel> = TLevel extends TLevel1
+  ? CategoryBase<TLevel1> & { subcategories: TCategoryHierarchyNode<TLevel2>[] }
+  : TLevel extends TLevel2
+    ? CategoryBase<TLevel2> & {
+        parent: string;
+        subcategories: TCategoryHierarchyNode<TLevel3>[];
+      }
+    : CategoryBase<TLevel3> & {
+        parent: string;
+        description: string;
+      };
+
+export type TCategoryHierarchy = TCategoryHierarchyNode<TLevel1>;
 
 export interface ICreateHeaders {
   user?: Partial<Pick<IUser, '_id' | 'role'>>;
@@ -183,7 +212,7 @@ export type TApiProduct = TApiProductBase &
 
 export type TApiProductPopulated = TApiProductBase &
   TApiStockAndVariants & {
-    category: TApiCategory;
+    category: TCategory;
     seller: unknown;
   };
 

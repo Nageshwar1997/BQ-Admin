@@ -2,10 +2,10 @@ import { API_METHODS_AND_URLS } from '@/constants/api.constants';
 import type {
   IGetDashboardProductsQuery,
   IId,
-  TApiCategory,
-  TApiL1Category,
-  TApiL2Category,
-  TApiL3Category,
+  TCategory,
+  TL1Category,
+  TL2Category,
+  TL3Category,
 } from '@/types/api.type';
 import { ApiRequest } from '../ApiRequest';
 
@@ -14,13 +14,13 @@ export class CategoryApi extends ApiRequest {
 
   /* ===================== POST API ===================== */
 
-  public addCategory = (data: Omit<TApiCategory, 'slug' | '_id'>) => {
+  public addCategory = (data: Omit<TCategory, 'slug' | '_id'>) => {
     return this.request({ ...this.routes.add, data });
   };
 
   /* ===================== PATCH API ===================== */
 
-  public updateCategory = ({ _id, ...data }: Partial<Omit<TApiCategory, 'slug'>> & IId) => {
+  public updateCategory = ({ _id, ...data }: Partial<Omit<TCategory, 'slug'>> & IId) => {
     const { method, url } = this.routes.update;
     return this.request({ method, url: url({ categoryId: _id }), data });
   };
@@ -35,13 +35,16 @@ export class CategoryApi extends ApiRequest {
   /* ===================== GET API ===================== */
 
   public getCategoriesByParentLevel = (
-    params: Partial<
-      | Pick<TApiL1Category, 'level'>
-      | Pick<TApiL2Category, 'level' | 'parent'>
-      | Pick<TApiL3Category, 'level' | 'parent'>
-    >,
+    params:
+      | Pick<TL1Category, 'level'>
+      | Pick<TL2Category, 'level' | 'parent'>
+      | Pick<TL3Category, 'level' | 'parent'>,
   ) => {
     return this.request({ ...this.routes.get.byParentLevel, params });
+  };
+
+  public getCategoriesHierarchy = () => {
+    return this.request(this.routes.get.byHierarchy);
   };
 }
 

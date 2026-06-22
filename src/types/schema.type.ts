@@ -37,13 +37,13 @@ export type TChangePassword = zodInfer<typeof changePasswordSchema>;
 export type TLogin = zodInfer<typeof loginSchema>;
 
 /* ================ CATEGORY SCHEMA TYPES ================ */
-export type TL1Category = zodInfer<typeof l1CategorySchema>;
+export type TL1CategoryForm = zodInfer<typeof l1CategorySchema>;
 
-export type TL2Category = zodInfer<typeof l2CategorySchema>;
+export type TL2CategoryForm = zodInfer<typeof l2CategorySchema>;
 
-export type TL3Category = zodInfer<typeof l3CategorySchema>;
+export type TL3CategoryForm = zodInfer<typeof l3CategorySchema>;
 
-export type TCategory = zodInfer<typeof categorySchema>;
+export type TCategoryForm = zodInfer<typeof categorySchema>;
 
 /* ================ PRODUCT SCHEMA TYPES ================ */
 export type TProductBasicInfo = zodInfer<typeof productBasicInfoSchema>;

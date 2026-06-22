@@ -18,6 +18,7 @@ import { ROUTES, SORT_ORDER_MAP } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
+import { useGetCategoriesHierarchy } from '@/services/product-service/category.service.query';
 import { useGetDashboardProducts } from '@/services/product-service/product.service.query';
 import type { TProductStatus } from '@/types/api.type';
 import type { TSort } from '@/types/component.type';
@@ -107,6 +108,9 @@ const Products = () => {
   const { navigate } = usePathParams();
   const { ref, inView } = useInView();
 
+  const {data:hierarchy} = useGetCategoriesHierarchy();
+  console.log("🚀 ~ Products ~ hierarchy:", hierarchy)
+
   const {
     data,
     hasNextPage,
@@ -180,7 +184,7 @@ const Products = () => {
           onChange: (v) => setVal(v),
         }}
         label="Select"
-        error='Hello this is error'
+        error="Hello this is error"
         options={[
           {
             label: (

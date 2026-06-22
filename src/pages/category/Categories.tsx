@@ -23,7 +23,7 @@ import {
   useDeleteCategory,
   useGetCategoriesByParentLevel,
 } from '@/services/product-service/category.service.query';
-import type { TApiCategory } from '@/types/api.type';
+import type { TCategory } from '@/types/api.type';
 import type { TCatModal, TCatTable, TSort } from '@/types/component.type';
 import { getFilteredAndSortedCats } from '@/utils/api.util';
 import { Icon } from '@iconify/react';
@@ -45,7 +45,7 @@ const TH_TITLES = ['Category', 'Level', 'Parent', 'Actions'] as const;
 const q_cat_keys = QUERY_PARAMS_KEY_MAP.category;
 
 const ApiStatusRow = (
-  props: Record<'haveLength' | 'isError' | 'isLoading', boolean> & Pick<TApiCategory, 'level'>,
+  props: Record<'haveLength' | 'isError' | 'isLoading', boolean> & Pick<TCategory, 'level'>,
 ) => {
   const { isError, isLoading, haveLength, level } = props;
 
@@ -79,7 +79,7 @@ const ApiStatusRow = (
   );
 };
 
-const CategoryHead = ({ level }: { level: TApiCategory['level'] }) => {
+const CategoryHead = ({ level }: { level: TCategory['level'] }) => {
   const { queryParams, removeParams, setParams } = useQueryParams();
   const sortKey =
     `sort_${level}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['sort'];
