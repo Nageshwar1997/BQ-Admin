@@ -260,6 +260,7 @@ const HierarchySelect = ({
                     },
                   }}
                   containerClassName="p-2 [&>div]:h-8 [&>div]:lg:h-10 border-b border-b-primary/30"
+                  className="bg-silver-jet/8!"
                 />
 
                 <ul className="mb-2 flex max-h-60 flex-col gap-0.5 overflow-auto scroll-smooth px-1 py-2">
