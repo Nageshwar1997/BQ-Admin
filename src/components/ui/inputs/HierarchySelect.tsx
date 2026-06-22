@@ -11,16 +11,16 @@ export interface IHierarchyOption extends IDropdownOption {
 interface ITreeNode {
   node: IHierarchyOption;
   level?: number;
-  value?: IDropdownOption['value'];
-  expanded: Record<IDropdownOption['value'], boolean>;
-  onToggle: (value: IDropdownOption['value']) => void;
-  onSelect: (value: IDropdownOption['value']) => void;
+  value?: IHierarchyOption['value'];
+  expanded: Record<IHierarchyOption['value'], boolean>;
+  onToggle: (value: IHierarchyOption['value']) => void;
+  onSelect: (value: IHierarchyOption['value']) => void;
 }
 
 interface IHierarchySelectProps {
   options: IHierarchyOption[];
-  value?: IDropdownOption['value'];
-  onChange?: (value: IDropdownOption['value']) => void;
+  value?: IHierarchyOption['value'];
+  onChange?: (value: IHierarchyOption['value']) => void;
   placeholder?: ReactNode;
 }
 

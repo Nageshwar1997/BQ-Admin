@@ -66,8 +66,8 @@ export interface IDropdownOption extends Pick<TOption, 'label'> {
 export interface ISelect extends Omit<IBaseInput, 'needRef' | 'register'> {
   selectProps: Pick<SelectHTMLAttributes<HTMLSelectElement>, 'disabled'> &
     Partial<Pick<InputHTMLAttributes<HTMLInputElement>, 'placeholder'>> & {
-      value?: IDropdownOption['value'];
-      onChange?: (value: IDropdownOption['value']) => void;
+      value: IDropdownOption['value'];
+      onChange: (value: IDropdownOption['value']) => void;
     };
   options: IDropdownOption[];
   optionsClassName?: string;
