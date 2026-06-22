@@ -179,6 +179,8 @@ const Products = () => {
           placeholder: 'Select Category',
           onChange: (v) => setVal(v),
         }}
+        label="Select"
+        error='Hello this is error'
         options={[
           {
             label: (
@@ -369,8 +371,8 @@ const Products = () => {
             <Table className="relative text-xs">
               <TableHead>
                 <TableRow>
-                  {TH_TITLES.map((title) => (
-                    <TableHeadCell key={title}>{title}</TableHeadCell>
+                  {TH_TITLES.map((title, index) => (
+                    <TableHeadCell key={`th-${index}`}>{title}</TableHeadCell>
                   ))}
                 </TableRow>
               </TableHead>
