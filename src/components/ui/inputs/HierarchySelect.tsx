@@ -211,7 +211,7 @@ const HierarchySelect = ({
           <InputIcon {...icons} position="left" />
 
           <div
-            className={`text-primary line-clamp-1 flex h-full w-full flex-1 items-center justify-between border-none bg-transparent p-3 text-sm font-normal ${
+            className={`text-primary line-clamp-1 flex h-full w-full flex-1 items-center justify-between gap-0.5 border-none bg-transparent p-3 text-sm font-normal ${
               selectProps.disabled ? 'cursor-no-drop' : 'cursor-pointer'
             }`}
             onClick={handleToggle}
