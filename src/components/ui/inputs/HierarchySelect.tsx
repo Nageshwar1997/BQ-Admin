@@ -38,23 +38,38 @@ const TreeNode = ({ node, level = 0, value, expanded, onToggle, onSelect }: ITre
       <li
         className={`hover:bg-primary/5 flex items-center gap-2 rounded-md px-2 py-2 ${
           isSelected ? 'bg-primary/10' : ''
-        }`}
-        style={{
-          paddingLeft: `${level * 20 + 8}px`,
+        } ${node.disabled ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
+        style={{ paddingLeft: `${level * 10}px` }}
+        onClick={() => {
+          if (node.disabled) return;
+
+          if (hasChildren) {
+            onToggle(node.value);
+            return;
+          }
+
+          onSelect(node.value);
         }}
       >
-        {hasChildren ? (
-          <button type="button" onClick={() => onToggle(node.value)} className="flex shrink-0">
-            <IconContainer>
+        <button
+          type="button"
+          onClick={(e) => {
+            if (!hasChildren) return;
+
+            e.stopPropagation();
+            onToggle(node.value);
+          }}
+          className="flex shrink-0"
+        >
+          <IconContainer>
+            {hasChildren ? (
               <Icon
                 icon={isExpanded ? 'solar:alt-arrow-down-linear' : 'solar:alt-arrow-right-linear'}
-                className="size-4"
+                className="size-4 cursor-pointer"
               />
-            </IconContainer>
-          </button>
-        ) : (
-          <div className="w-4" />
-        )}
+            ) : null}
+          </IconContainer>
+        </button>
 
         <IconContainer>
           <Icon
@@ -69,18 +84,7 @@ const TreeNode = ({ node, level = 0, value, expanded, onToggle, onSelect }: ITre
           />
         </IconContainer>
 
-        <button
-          type="button"
-          className={`flex-1 text-left text-sm ${
-            node.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
-          }`}
-          onClick={() => {
-            if (node.disabled || hasChildren) return;
-            onSelect(node.value);
-          }}
-        >
-          {node.label}
-        </button>
+        <span className="flex-1 text-left text-sm">{node.label}</span>
 
         {isSelected && (
           <IconContainer>
@@ -175,7 +179,7 @@ const HierarchySelect = ({
     <div className="relative w-full">
       <button
         type="button"
-        className="flex h-12 w-full items-center justify-between rounded-lg border px-3"
+        className="flex h-12 w-full cursor-pointer items-center justify-between rounded-lg border px-3"
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <span>{selectedOption?.label || placeholder}</span>

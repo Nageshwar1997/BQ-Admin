@@ -122,6 +122,8 @@ const Products = () => {
     sortOrder: (queryParams.sort || 'desc') as TSort,
   });
 
+  const [val, setVal] = useState<number | string>('');
+
   useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage();
@@ -172,6 +174,9 @@ const Products = () => {
       }}
     >
       <HierarchySelect
+        value={val}
+        placeholder="Select Category"
+        onChange={(v) => setVal(v)}
         options={[
           {
             label: (
@@ -188,26 +193,26 @@ const Products = () => {
                 searchLabel: 'Mobiles',
                 value: 11,
                 children: [
-                  {
-                    label: (
-                      <div className="flex items-center gap-2">
-                        <span>🤖</span>
-                        <span>Android Phones</span>
-                      </div>
-                    ),
-                    searchLabel: 'Android Phones',
-                    value: 111,
-                  },
-                  {
-                    label: 'iPhones',
-                    searchLabel: 'iPhones',
-                    value: 112,
-                  },
-                  {
-                    label: 'Gaming Phones',
-                    searchLabel: 'Gaming Phones',
-                    value: 113,
-                  },
+                  // {
+                  //   label: (
+                  //     <div className="flex items-center gap-2">
+                  //       <span>🤖</span>
+                  //       <span>Android Phones</span>
+                  //     </div>
+                  //   ),
+                  //   searchLabel: 'Android Phones',
+                  //   value: 111,
+                  // },
+                  // {
+                  //   label: 'iPhones',
+                  //   searchLabel: 'iPhones',
+                  //   value: 112,
+                  // },
+                  // {
+                  //   label: 'Gaming Phones',
+                  //   searchLabel: 'Gaming Phones',
+                  //   value: 113,
+                  // },
                 ],
               },
               {
