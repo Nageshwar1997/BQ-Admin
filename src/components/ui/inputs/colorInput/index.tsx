@@ -37,54 +37,50 @@ const ColorInput = ({
       ref={containerRef}
       className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}
     >
-      <div className="relative h-10 lg:h-12">
+      <div className="relative">
         <InputLabel children={label} onClick={handleToggle} className="z-2" />
         <div
-          className={`border-primary/10 bg-smoke-eerie flex h-full w-full items-center gap-1 overflow-hidden rounded-lg border ${className}`}
+          className={`text-primary border-primary/10 bg-smoke-eerie line-clamp-1 flex flex-1 items-center justify-between gap-1 rounded-lg border px-3 text-[13px] font-normal ${className}`}
         >
-          <div className="text-primary line-clamp-1 flex h-full w-full flex-1 items-center justify-between border-none bg-transparent text-sm font-normal">
-            <div className="h-full p-2 [&_span]:p-0">
-              <div
-                className={`border-primary/10 ${disabled ? 'cursor-no-drop' : 'cursor-pointer'} rounded border p-1`}
-                style={{ backgroundColor: `${color.hex}` }}
-                onClick={handleToggle}
-              >
-                <InputIcon
-                  position="left"
-                  left={{
-                    icon: 'mage:color-picker-fill',
-                    className: '[&>path]:last:stroke-primary [&>path]:last:fill-primary-invert',
-                  }}
-                />
-              </div>
-            </div>
-            <span className={`line-clamp-1 flex-1 ${!value ? 'text-primary/50 text-xs' : ''}`}>
-              {value || placeholder}
-            </span>
+          <div
+            className={`border-primary/10 ${disabled ? 'cursor-no-drop' : 'cursor-pointer'} rounded border p-0.5 xl:p-1`}
+            style={{ backgroundColor: `${color.hex}` }}
+            onClick={handleToggle}
+          >
             <InputIcon
-              position="right"
-              right={{
-                icon: isOpen ? 'pepicons-pop:color-picker-off' : 'pepicons-pop:color-picker',
-                className: `${disabled ? 'cursor-no-drop' : 'cursor-pointer'}`,
-                onClick: handleToggle,
+              position="left"
+              left={{
+                icon: 'mage:color-picker-fill',
+                className: '[&>path]:last:stroke-primary [&>path]:last:fill-primary-invert',
               }}
             />
-            {isOpen && (
-              <div
-                className={`border-primary/10 bg-smoke-eerie absolute left-0 z-3 w-full overflow-hidden rounded-lg border shadow-md ${
-                  position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
-                }`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ColorPicker
-                  hideInput={['hsv']}
-                  color={color}
-                  onChange={handleChange}
-                  onChangeComplete={!disabled ? setColor : undefined}
-                />
-              </div>
-            )}
           </div>
+          <span className={`line-clamp-1 flex-1 py-2 xl:py-3 ${!value ? 'text-primary/30' : ''}`}>
+            {value?.toUpperCase() || placeholder}
+          </span>
+          <InputIcon
+            position="right"
+            right={{
+              icon: isOpen ? 'pepicons-pop:color-picker-off' : 'pepicons-pop:color-picker',
+              className: `${disabled ? 'cursor-no-drop' : 'cursor-pointer'}`,
+              onClick: handleToggle,
+            }}
+          />
+          {isOpen && (
+            <div
+              className={`border-primary/10 bg-smoke-eerie absolute left-0 z-3 w-full overflow-hidden rounded-lg border shadow-md ${
+                position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ColorPicker
+                hideInput={['hsv']}
+                color={color}
+                onChange={handleChange}
+                onChangeComplete={!disabled ? setColor : undefined}
+              />
+            </div>
+          )}
         </div>
       </div>
       <InputError error={error} />
