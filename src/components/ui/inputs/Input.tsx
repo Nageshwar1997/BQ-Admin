@@ -29,7 +29,7 @@ const Input = ({
       <div className="relative">
         <InputLabel children={label} htmlFor={inputProps?.name} />
         <div
-          className={`border-primary bg-smoke-eerie flex items-center gap-3 overflow-hidden rounded-lg border px-3 ${className}`}
+          className={`border-primary/10 bg-smoke-eerie flex items-center gap-3 overflow-hidden rounded-lg border px-3 ${className}`}
         >
           {/* Left Icon */}
           <InputIcon {...icons} position="left" />
