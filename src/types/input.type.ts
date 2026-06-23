@@ -23,13 +23,9 @@ import type {
   TTitleDescription,
 } from './component.type';
 
-type LeftIcon = { left: IconProps | string; right?: never };
 
-type RightIcon = { right: IconProps; left?: never };
 
-type NoIcon = { left?: undefined; right?: undefined };
-
-type InputIcons = LeftIcon | RightIcon | NoIcon;
+type InputIcons = { left?: IconProps | ReactNode; right?: IconProps | ReactNode };
 
 export interface IBaseInput extends TClassName, TContainerClassName {
   needRef?: boolean;
