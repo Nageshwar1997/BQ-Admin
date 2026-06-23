@@ -60,7 +60,7 @@ const SearchAndSort = () => {
   }, [hierarchy]);
 
   return (
-    <div className="flex items-center justify-between gap-3 md:gap-4">
+    <div className="base:flex-row flex flex-col items-center justify-between gap-3 md:gap-4">
       <Input
         needRef
         inputProps={{
@@ -75,7 +75,7 @@ const SearchAndSort = () => {
             handleSearch(value);
           },
         }}
-        containerClassName='max-w-xs w-full'
+        containerClassName="max-w-xs! w-full"
         icons={{ right: { icon: 'solar:magnifer-linear', className: 'size-4 text-primary/50' } }}
       />
       <HierarchySelect
@@ -102,7 +102,8 @@ const SearchAndSort = () => {
         }}
         options={categories}
         error={isError ? 'Failed to load categories' : undefined}
-        containerClassName="md:min-w-40 max-w-xs w-full"
+        containerClassName="min-w-40 max-w-xs! w-full"
+        optionsClassName="base:w-max base:right-0 base:left-auto sm:w-full sm:left-0 sm:right-auto"
       />
     </div>
   );
@@ -156,7 +157,7 @@ const Products = () => {
           {
             content: 'Add Product',
             pattern: 'primary',
-            className: 'whitespace-nowrap py-2.5! px-3!',
+            className: 'whitespace-nowrap',
             leftIcon: { icon: 'solar:add-circle-linear' },
             buttonProps: { onClick: () => navigate(ROUTES.PRODUCTS.ADD) },
           },
@@ -183,8 +184,8 @@ const Products = () => {
                   }
                 },
               }}
-              containerClassName="max-w-32! w-full [&>div]:max-h-9!"
-              className="[&>div]:first:px-2.5! [&>div]:first:text-[13px] [&>div]:first:capitalize"
+              containerClassName="max-w-32! w-full"
+              className="[&>div]:first:capitalize"
               optionsClassName="[&>ul>li]:text-xs"
             />,
           ],
