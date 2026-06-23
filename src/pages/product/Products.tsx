@@ -34,7 +34,6 @@ const TH_TITLES = [
   'Thumbnail',
   'Title',
   'Brand',
-  'Category',
   'Price',
   'Status',
   'Stock',
@@ -162,6 +161,7 @@ const Products = () => {
     status: queryParams.status?.toUpperCase() as TProductStatus,
     sortBy: 'updatedAt',
     sortOrder: (queryParams.sort || 'desc') as TSort,
+    category: queryParams.category,
   });
 
   useEffect(() => {
@@ -254,7 +254,6 @@ const Products = () => {
                         <p className="max-w-sm truncate text-left">{product.title}</p>
                       </TableRowCell>
                       <TableRowCell>{product.brand}</TableRowCell>
-                      <TableRowCell>{product.category.name}</TableRowCell>
                       <TableRowCell className="font-medium">
                         <p className="text-primary-green">
                           {formatINRCurrency(product.sellingPrice)}
