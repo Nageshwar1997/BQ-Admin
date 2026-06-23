@@ -136,7 +136,7 @@ const ProductDetails = () => {
   // const { pathParams } = usePathParams();
   // const { data: product } = useGetProductBySlug(pathParams.slug || '');
 
-  const { queryParams, setParams:_, removeParams:__ } = useQueryParams();
+  const { queryParams, setParams: _, removeParams: __ } = useQueryParams();
 
   const media = useMemo(() => {
     const images = product.images.map((img) => ({ url: img, type: 'image' as const }));
@@ -154,7 +154,7 @@ const ProductDetails = () => {
 
   return (
     <PageWrapper>
-      <div className="flex gap-8 border">
+      <div className="flex gap-8">
         {/* LEFT SECTION */}
         <div className="relative w-full">
           <MediaCarouselWithParentMedia media={media} needButtonControls={false} />
@@ -168,7 +168,15 @@ const ProductDetails = () => {
           </div>
         </div>
         {/* RIGHT SECTION */}
-        <div className="w-full">Right</div>
+        <div className="w-full">
+          <div>
+            <p className="mb-2 text-sm font-medium text-[#999] dark:text-[#bbb]">{product.brand}</p>
+            <h1 className="mb-3 text-3xl font-bold text-black md:text-4xl dark:text-white">
+              {product.title}
+            </h1>
+            <p className="text-base text-[#666] dark:text-[#999]">{product.shortDescription}</p>
+          </div>
+        </div>
       </div>
     </PageWrapper>
   );
