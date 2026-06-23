@@ -70,11 +70,7 @@ export type TCategoryHierarchyNode<TLevel extends TCategoryLevel> = TLevel exten
         parent: string;
         subcategories: TCategoryHierarchyNode<TLevel3>[];
       }
-    : CategoryBase<TLevel3> & {
-        parent: string;
-        description: string;
-        subcategories: never;
-      };
+    : CategoryBase<TLevel3> & { parent: string; description: string; subcategories: never };
 
 export type TCategoryHierarchy = TCategoryHierarchyNode<TCategoryLevel>;
 
@@ -109,7 +105,6 @@ type TUrl<FullPath extends string> =
 
 interface IGeneratedEndpoint<T extends IEndpoint, FullPath extends string> {
   method: Uppercase<T['method']>;
-
   url: TUrl<FullPath>;
 }
 
@@ -166,7 +161,7 @@ type TApiTryOn = { enabled: false } | ({ enabled: true } & TEnabledTryOn);
 
 export type TApiProductBase = IId &
   ITimeStamp &
-  Omit<TProductBasicInfo, 'l1Category' | 'l2Category' | 'l3Category'> &
+  Pick<TProductBasicInfo, 'title' | 'brand' | 'sellingPrice' | 'originalPrice'> &
   TProductDescriptionAndContent &
   Record<keyof TProductMediaAndGallery, string> & {
     tryOn: TApiTryOn & { configured: boolean };
@@ -203,20 +198,14 @@ type TApiStockAndVariants =
       } & IId)[];
     });
 
-export type TApiProduct = TApiProductBase &
-  TApiStockAndVariants & {
-    category: string;
-  };
+export type TApiProduct = TApiProductBase & TApiStockAndVariants & { category: string };
 
 export type TApiProductPopulated = TApiProductBase &
-  TApiStockAndVariants & {
-    category: TCategory;
-    seller: unknown;
-  };
+  TApiStockAndVariants & { category: TCategory; seller: unknown };
 
 export type TProductSortBy = keyof Pick<
   TApiProduct,
-  'createdAt' | 'updatedAt' | 'title' | 'sellingPrice' | "originalPrice" | 'soldCount'
+  'createdAt' | 'updatedAt' | 'title' | 'sellingPrice' | 'originalPrice' | 'soldCount'
 >;
 
 export interface IGetDashboardProductsQuery {
