@@ -27,6 +27,7 @@ import { formatDate, formatINRCurrency } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { Link } from 'react-router-dom';
 
 const SearchAndSort = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
@@ -236,10 +237,12 @@ const Products = () => {
                     >
                       <TableRowCell>{index + 1}</TableRowCell>
                       <TableRowCell>
-                        <Icon
-                          icon="material-symbols:eye-tracking-outline"
-                          className="text-primary hover:text-blue-crayola-c mx-auto size-4.5 cursor-pointer"
-                        />
+                        <Link className="size-4.5 block mx-auto shrink-0" to={product.slug}>
+                          <Icon
+                            icon="material-symbols:eye-tracking-outline"
+                            className="text-primary hover:text-blue-crayola-c mx-auto size-full"
+                          />
+                        </Link>
                       </TableRowCell>
                       <TableRowCell className="grid place-items-center">
                         <img
