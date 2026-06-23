@@ -46,19 +46,19 @@ const Select = ({
       <div className="relative">
         <InputLabel children={label} onClick={handleToggle} className="z-2 cursor-pointer" />
         <div
-          className={`border-primary/10 bg-smoke-eerie flex h-full w-full items-center gap-3 overflow-hidden rounded-lg border ${className}`}
+          className={`border-primary/10 bg-smoke-eerie flex items-center gap-3 overflow-hidden rounded-lg border px-3 ${className}`}
         >
           {/* Left Icon */}
           <InputIcon {...icons} position="left" />
           <div
-            className={`text-primary flex h-full w-full flex-1 items-center justify-between gap-0.5 border-none bg-transparent px-3 text-[13px] ${selectProps.disabled ? 'cursor-no-drop' : 'cursor-pointer'}`}
+            className={`text-primary flex flex-1 items-center justify-between gap-0.5 border-none bg-transparent text-[13px] ${selectProps.disabled ? 'cursor-no-drop' : 'cursor-pointer'}`}
             onClick={handleToggle}
           >
-            <p
+            <span
               className={`flex-1 truncate py-2 xl:py-3 ${!selected?.value ? 'text-primary/30' : ''}`}
             >
               {selected?.label || selectProps?.placeholder}
-            </p>
+            </span>
             <Icon
               icon="solar:alt-arrow-down-linear"
               className={`size-4 transition-transform md:size-5 ${
@@ -89,7 +89,7 @@ const Select = ({
                           setIsOpen(false);
                         }}
                       >
-                        <span>{option.label}</span>
+                        <span className="flex-1 text-left text-[13px]">{option.label}</span>
                         {active && (
                           <Icon
                             icon="solar:unread-linear"

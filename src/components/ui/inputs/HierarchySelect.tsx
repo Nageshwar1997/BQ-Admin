@@ -30,7 +30,7 @@ const TreeNode = ({
   return (
     <>
       <li
-        className={`hover:bg-primary/5 text-tertiary flex items-center gap-2 rounded-sm p-2 text-sm ${
+        className={`hover:bg-primary/5 text-tertiary flex items-center gap-2 rounded-sm px-2 py-1.5 text-[13px] ${
           isSelected ? 'bg-primary/8' : ''
         } ${node.disabled ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
         style={{ paddingLeft: `${level * 10}px` }}
@@ -78,7 +78,7 @@ const TreeNode = ({
           />
         </IconContainer>
 
-        <span className="flex-1 text-left text-sm">{node.label}</span>
+        <span className="flex-1 text-left text-[13px]">{node.label}</span>
 
         {isSelected && (
           <IconContainer>
@@ -202,22 +202,22 @@ const HierarchySelect = ({
       ref={containerRef}
       className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}
     >
-      <div className="relative h-10 lg:h-12">
+      <div className="relative">
         <InputLabel children={label} onClick={handleToggle} className="z-2 cursor-pointer" />
 
         <div
-          className={`border-primary/10 bg-smoke-eerie flex h-full w-full items-center gap-1 overflow-hidden rounded-lg border ${className}`}
+          className={`border-primary/10 bg-smoke-eerie flex items-center gap-3 overflow-hidden rounded-lg border px-3 ${className}`}
         >
           <InputIcon {...icons} position="left" />
 
           <div
-            className={`text-primary line-clamp-1 flex h-full w-full flex-1 items-center justify-between gap-0.5 border-none bg-transparent p-3 text-sm font-normal ${
+            className={`text-primary flex flex-1 items-center justify-between gap-0.5 border-none bg-transparent text-[13px] ${
               selectProps.disabled ? 'cursor-no-drop' : 'cursor-pointer'
             }`}
             onClick={handleToggle}
           >
             <span
-              className={`line-clamp-1 ${!selectedOption?.value ? 'text-primary/50 text-xs' : ''}`}
+              className={`flex-1 truncate py-2 xl:py-3 ${!selectedOption?.value ? 'text-primary/30' : ''}`}
             >
               {selectedOption?.label || selectProps.placeholder || 'Select'}
             </span>
@@ -236,6 +236,7 @@ const HierarchySelect = ({
                 onClick={(e) => e.stopPropagation()}
               >
                 <Input
+                  needRef={true}
                   inputProps={{
                     ...inputProps,
                     value: searchValue,
@@ -244,10 +245,8 @@ const HierarchySelect = ({
                   }}
                   icons={{
                     right: {
-                      icon: searchValue ? 'lucide:x' : 'lucide:search',
-                      className: `size-4 ${
-                        searchValue ? 'text-primary cursor-pointer' : 'text-primary/30'
-                      }`,
+                      icon: searchValue ? 'lucide:x' : 'solar:magnifer-linear',
+                      className: `size-4 text-primary ${searchValue ? 'cursor-pointer' : 'opacity-30'}`,
                       onClick: () => {
                         if (typeof inputProps?.value !== 'string') {
                           setSearch('');
@@ -259,11 +258,11 @@ const HierarchySelect = ({
                       },
                     },
                   }}
-                  containerClassName="p-2 [&>div]:h-8 [&>div]:lg:h-10 border-b border-b-primary/30"
-                  className="bg-silver-jet/8!"
+                  containerClassName="p-2 border-b border-b-primary/20"
+                  className="bg-silver-jet/8! [&_input]:py-2!"
                 />
 
-                <ul className="mb-2 flex max-h-60 flex-col gap-0.5 overflow-auto scroll-smooth px-1 py-2">
+                <ul className="flex max-h-60 flex-col gap-0.5 overflow-auto scroll-smooth p-1">
                   {filteredOptions.length ? (
                     filteredOptions.map((node) => (
                       <TreeNode
