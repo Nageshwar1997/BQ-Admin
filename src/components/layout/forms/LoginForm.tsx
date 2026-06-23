@@ -138,7 +138,13 @@ const LoginForm = () => {
                 }}
                 icons={
                   isPhone
-                    ? { left: '+91' }
+                    ? {
+                        left: (
+                          <span className="text-primary/50 border-r-primary/30 items-center border-r py-2 pr-3 text-[13px] leading-0 capitalize">
+                            +91
+                          </span>
+                        ),
+                      }
                     : isPassword
                       ? {
                           right: {

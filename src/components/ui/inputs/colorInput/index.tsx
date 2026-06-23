@@ -48,8 +48,7 @@ const ColorInput = ({
             onClick={handleToggle}
           >
             <InputIcon
-              position="left"
-              left={{
+              icon={{
                 icon: 'mage:color-picker-fill',
                 className: '[&>path]:last:stroke-primary [&>path]:last:fill-primary-invert',
               }}
@@ -59,8 +58,7 @@ const ColorInput = ({
             {value?.toUpperCase() || placeholder}
           </span>
           <InputIcon
-            position="right"
-            right={{
+            icon={{
               icon: isOpen ? 'pepicons-pop:color-picker-off' : 'pepicons-pop:color-picker',
               className: `${disabled ? 'cursor-no-drop' : 'cursor-pointer'}`,
               onClick: handleToggle,

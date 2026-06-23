@@ -1,8 +1,8 @@
 import type { TClassName } from '@/types/component.type';
-import type { IInput } from '@/types/input.type';
+import type { TInputIcon } from '@/types/input.type';
 import { isIconProps } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
-import { isValidElement, type LabelHTMLAttributes } from 'react';
+import { type LabelHTMLAttributes } from 'react';
 
 export const InputError = ({ error, className = '' }: { error?: string } & TClassName) => {
   if (!error) return null;
@@ -16,47 +16,14 @@ export const InputError = ({ error, className = '' }: { error?: string } & TClas
   );
 };
 
-export const InputIcon = ({
-  position,
-  ...props
-}: IInput['icons'] & { position: 'left' | 'right' }) => {
-  if (!props) return null;
+export const InputIcon = ({ icon }: { icon?: TInputIcon }) => {
+  if (!icon) return null;
 
-  // 👉 LEFT
-  if (props.left && position === 'left') {
-    const value = props.left;
-
-    if (typeof value === 'string') {
-      return (
-        <p className="text-primary/50 border-r-primary/30 items-center border-r py-2 pr-3 text-[13px] leading-0 capitalize">
-          {value}
-        </p>
-      );
-    }
-
-    if (isIconProps(value)) {
-      return <Icon {...value} className={`shrink-0 ${value.className || ''}`} />;
-    }
-
-    if (isValidElement(value)) {
-      return value;
-    }
+  if (isIconProps(icon)) {
+    return <Icon {...icon} className={`shrink-0 ${icon.className || ''}`} />;
   }
 
-  // 👉 RIGHT
-  if (props.right && position === 'right') {
-    const value = props.right;
-
-    if (isIconProps(value)) {
-      return <Icon {...value} className={`shrink-0 ${value.className || ''}`} />;
-    }
-
-    if (isValidElement(value)) {
-      return value;
-    }
-  }
-
-  return null;
+  return icon;
 };
 
 export const InputLabel = (props: LabelHTMLAttributes<HTMLLabelElement>) => {

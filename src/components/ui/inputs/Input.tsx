@@ -32,7 +32,7 @@ const Input = ({
           className={`border-primary/10 bg-smoke-eerie flex items-center gap-3 overflow-hidden rounded-lg border px-3 ${className}`}
         >
           {/* Left Icon */}
-          <InputIcon {...icons} position="left" />
+          <InputIcon icon={icons?.left} />
           {/* Input */}
           <input
             aria-autocomplete="none"
@@ -45,7 +45,7 @@ const Input = ({
             className={`text-primary placeholder:text-primary/30 autofill-effect min-w-0 flex-1 border-none bg-transparent py-2 text-[13px] outline-hidden placeholder:text-[13px] focus:border-none focus:outline-hidden disabled:cursor-not-allowed xl:py-3 ${inputProps?.className || ''}`}
           />
           {/* Right Icon */}
-          <InputIcon {...icons} position="right" />
+          <InputIcon icon={icons?.right} />
         </div>
       </div>
       <InputError error={error} />

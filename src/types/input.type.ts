@@ -23,13 +23,11 @@ import type {
   TTitleDescription,
 } from './component.type';
 
-
-
-type InputIcons = { left?: IconProps | ReactNode; right?: IconProps | ReactNode };
+export type TInputIcon = IconProps | ReactElement;
 
 export interface IBaseInput extends TClassName, TContainerClassName {
   needRef?: boolean;
-  icons?: InputIcons;
+  icons?: Partial<Record<'left' | 'right', TInputIcon>>;
   register?: UseFormRegisterReturn;
   label?: string;
   error?: string;

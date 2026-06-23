@@ -49,7 +49,7 @@ const Select = ({
           className={`border-primary/10 bg-smoke-eerie flex items-center gap-3 overflow-hidden rounded-lg border px-3 ${className}`}
         >
           {/* Left Icon */}
-          <InputIcon {...icons} position="left" />
+          <InputIcon icon={icons?.left} />
           <div
             className={`text-primary flex flex-1 items-center justify-between gap-0.5 border-none bg-transparent text-[13px] ${selectProps.disabled ? 'cursor-no-drop' : 'cursor-pointer'}`}
             onClick={handleToggle}
@@ -104,7 +104,7 @@ const Select = ({
             )}
           </div>
           {/* Right Icon */}
-          <InputIcon {...icons} position="right" />
+          <InputIcon icon={icons?.right} />
         </div>
       </div>
       <InputError error={error} />

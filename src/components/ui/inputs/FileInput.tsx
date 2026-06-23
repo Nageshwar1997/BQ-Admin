@@ -70,11 +70,11 @@ const MediaErrorStyle = ({ errors }: Pick<IFileInput, 'errors'>) => {
 const InputWrapper = ({ children, icons }: TChildren & Pick<IFileInput, 'icons'>) => (
   <div className="flex items-center justify-between gap-3">
     {/* Left Icon */}
-    <InputIcon {...icons} position="left" />
+    <InputIcon icon={icons?.left} />
     {/* Main Section */}
     {children}
     {/* Right Icon */}
-    <InputIcon {...icons} position="right" />
+    <InputIcon icon={icons?.right} />
   </div>
 );
 
