@@ -159,11 +159,16 @@ type TEnabledTryOn = Extract<TProductTryOnConfiguration, { enabled: true }>['try
 
 type TApiTryOn = { enabled: false } | ({ enabled: true } & TEnabledTryOn);
 
+
+type TRemoveFileType<T> = {
+  [K in keyof T]: T[K] extends (infer U)[] ? Exclude<U, File>[] : Exclude<T[K], File>;
+};
+
 export type TApiProductBase = IId &
   ITimeStamp &
   Pick<TProductBasicInfo, 'title' | 'brand' | 'sellingPrice' | 'originalPrice'> &
   TProductDescriptionAndContent &
-  Record<keyof TProductMediaAndGallery, string> & {
+  TRemoveFileType<TProductMediaAndGallery> & {
     tryOn: TApiTryOn & { configured: boolean };
     seller: string;
     sku: string;

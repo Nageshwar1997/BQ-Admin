@@ -99,3 +99,12 @@ export const useGetDashboardProducts = (
     }),
   });
 };
+
+export const useGetProductBySlug = (slug: string) => {
+  return useQuery({
+    queryKey: [...get.bySlug({ slug }), slug],
+    queryFn: () => productApi.getProductBySlug(slug),
+    enabled: !!slug,
+    select: (data) => data?.product as TApiProductPopulated | undefined,
+  });
+};

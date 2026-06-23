@@ -79,7 +79,7 @@ export const ROUTES = {
   PRODUCTS: {
     BASE: 'products',
     ADD: 'add',
-    PRODUCT_ID: ':productId',
+    PRODUCT_ID: ':slug',
     CATEGORY_L1: ':categoryL1',
     CATEGORY_L2: ':categoryL2',
     CATEGORY_L3: ':categoryL3',
