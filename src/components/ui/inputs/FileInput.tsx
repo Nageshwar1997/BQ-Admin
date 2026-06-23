@@ -3,6 +3,7 @@ import { MediaModal } from '@/components/layout/modals/MediaModal';
 import { FILE_EXTENSIONS, FILE_MIME } from '@/constants/common.constants';
 import type { TChildren, TMediaResource } from '@/types/component.type';
 import type { IFileInput } from '@/types/input.type';
+import { isIconProps } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { InputError, InputIcon, InputLabel } from './children';
@@ -67,14 +68,14 @@ const MediaErrorStyle = ({ errors }: Pick<IFileInput, 'errors'>) => {
 };
 
 const InputWrapper = ({ children, icons }: TChildren & Pick<IFileInput, 'icons'>) => (
-  <>
+  <div className="flex items-center justify-between gap-3">
     {/* Left Icon */}
     <InputIcon {...icons} position="left" />
     {/* Main Section */}
     {children}
     {/* Right Icon */}
     <InputIcon {...icons} position="right" />
-  </>
+  </div>
 );
 
 const InputWithoutIconClick = ({
@@ -85,7 +86,7 @@ const InputWithoutIconClick = ({
 }: Pick<IFileInput, 'fileInputProps' | 'className' | 'icons'> & TChildren) => (
   <label
     htmlFor={fileInputProps.name}
-    className={`border-primary/10 bg-smoke-eerie group flex h-full w-full items-center gap-1 overflow-hidden rounded-lg border ${className}`}
+    className={`border-primary/10 bg-smoke-eerie group block rounded-lg border px-3 ${className}`}
   >
     <InputWrapper icons={icons}>{children}</InputWrapper>
   </label>
@@ -97,11 +98,9 @@ const InputWithIconClick = ({
   children,
   icons,
 }: Pick<IFileInput, 'fileInputProps' | 'className' | 'icons'> & TChildren) => (
-  <div
-    className={`border-primary/10 bg-smoke-eerie group flex h-full w-full items-center gap-1 overflow-hidden rounded-lg border ${className}`}
-  >
+  <div className={`border-primary/10 bg-smoke-eerie group rounded-lg border px-3 ${className}`}>
     <InputWrapper icons={icons}>
-      <label htmlFor={fileInputProps.name} className="h-full flex-1">
+      <label htmlFor={fileInputProps.name} className="block">
         {children}
       </label>
     </InputWrapper>
@@ -124,9 +123,10 @@ const CenterContent = ({ fileInputProps }: Pick<IFileInput, 'fileInputProps'>) =
 
   return (
     <div
-      className={`flex h-full w-full flex-1 items-center justify-start border-none bg-transparent p-3 text-sm font-normal outline-hidden focus:border-none focus:outline-hidden ${fileInputProps?.disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${fileInputProps?.className || ''}`}
+      role="button"
+      className={`flex-1 border-none bg-transparent text-[13px] font-normal outline-hidden focus:border-none focus:outline-hidden ${fileInputProps?.disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${fileInputProps?.className || ''}`}
     >
-      <p className="text-primary/30 line-clamp-1 text-xs">
+      <p className="text-primary/30 line-clamp-1 w-max py-2 xl:py-3">
         {fileInputProps?.placeholder
           ? fileInputProps.placeholder
           : fileInputProps.multiple
@@ -152,7 +152,8 @@ const MainSection = ({
   icons,
   ...props
 }: Pick<IFileInput, 'fileInputProps' | 'className' | 'icons'>) => {
-  return (typeof icons?.left === 'object' && icons?.left?.onClick) || icons?.right?.onClick ? (
+  return (isIconProps(icons?.left) && icons?.left?.onClick) ||
+    (isIconProps(icons?.right) && icons?.right?.onClick) ? (
     <InputWithIconClick {...props} icons={icons}>
       <CenterContent {...props} />
     </InputWithIconClick>
@@ -232,7 +233,7 @@ const FileInput = ({
   }, []);
   return (
     <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
-      <div className="relative h-10 lg:h-12">
+      <div className="relative">
         <InputLabel children={label} htmlFor={fileInputProps.name} />
         <MainSection fileInputProps={fileInputProps} {...props} />
       </div>
