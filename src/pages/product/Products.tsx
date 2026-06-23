@@ -114,10 +114,14 @@ const SearchAndSort = () => {
           disabled: isLoading || !hierarchy?.length,
         }}
         icons={{
-          right: {
-            icon: "lucide:x",
-            className: ""
-        }}}
+          ...(queryParams.category && {
+            right: {
+              icon: 'lucide:x',
+              className: 'cursor-pointer size-4',
+              onClick: () => removeParams(['category']),
+            },
+          }),
+        }}
         options={categories}
         error={isError ? 'Failed to load categories' : undefined}
         containerClassName="[&>div]:h-9! min-w-[200px]"
