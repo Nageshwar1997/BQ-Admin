@@ -51,7 +51,7 @@ const Select = ({
           {/* Left Icon */}
           <InputIcon icon={icons?.left} />
           <div
-            className={`text-primary flex flex-1 items-center justify-between gap-0.5 border-none bg-transparent text-[13px] ${selectProps.disabled ? 'cursor-no-drop' : 'cursor-pointer'}`}
+            className={`text-primary flex flex-1 items-center justify-between gap-0.5 truncate border-none bg-transparent text-[13px] ${selectProps.disabled ? 'cursor-no-drop' : 'cursor-pointer'}`}
             onClick={handleToggle}
           >
             <span

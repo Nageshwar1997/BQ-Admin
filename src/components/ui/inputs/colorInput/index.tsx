@@ -40,7 +40,7 @@ const ColorInput = ({
       <div className="relative">
         <InputLabel children={label} onClick={handleToggle} className="z-2" />
         <div
-          className={`text-primary border-primary/10 bg-smoke-eerie flex flex-1 items-center justify-between gap-1 rounded-lg border px-3 text-[13px] ${className}`}
+          className={`text-primary border-primary/10 bg-smoke-eerie flex flex-1 items-center justify-between gap-1 truncate rounded-lg border px-3 text-[13px] ${className}`}
         >
           <div
             className={`border-primary/10 ${disabled ? 'cursor-no-drop' : 'cursor-pointer'} rounded border p-0.5 xl:p-1`}

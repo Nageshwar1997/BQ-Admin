@@ -1,3 +1,4 @@
+import type { TProductSortBy } from '@/types/api.type';
 import { createQueryKeys, createRouteHelper } from '@/utils/api.util';
 
 export const METHOD_MAP = {
@@ -127,3 +128,23 @@ export const PRODUCT_STATUS_MAP = Object.fromEntries(
 export const ROLES_MAP = Object.fromEntries(ROLES.map((role) => [role, role])) as {
   [K in (typeof ROLES)[number]]: K;
 };
+
+export const PRODUCTS_TABLE_TITLES: { label: string; sortKey?: TProductSortBy | never }[] = [
+  { label: 'S. No' },
+  { label: 'View' },
+  { label: 'Thumbnail' },
+  { label: 'Title', sortKey: 'title' },
+  { label: 'Brand' },
+  { label: 'Price', sortKey: 'sellingPrice' },
+  { label: 'Status' },
+  { label: 'Stock' },
+  { label: 'Created At', sortKey: 'createdAt' },
+  { label: 'Updated At', sortKey: 'updatedAt' },
+  { label: 'Try-On' },
+  { label: 'Variants' },
+  { label: 'Sku' },
+  { label: 'Slug' },
+  { label: 'Sold', sortKey: 'soldCount' },
+  { label: 'Returned' },
+  { label: 'Avg. Rating' },
+] as const;

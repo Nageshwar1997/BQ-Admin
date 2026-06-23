@@ -214,15 +214,17 @@ export type TApiProductPopulated = TApiProductBase &
     seller: unknown;
   };
 
+export type TProductSortBy = keyof Pick<
+  TApiProduct,
+  'createdAt' | 'updatedAt' | 'title' | 'sellingPrice' | 'soldCount'
+>;
+
 export interface IGetDashboardProductsQuery {
-  page?: string;
-  limit?: string;
+  page: string;
+  limit: string;
   search?: string;
   status?: TProductStatus;
   category?: string;
-  sortBy?: keyof Pick<
-    TApiProduct,
-    'createdAt' | 'updatedAt' | 'title' | 'sellingPrice' | 'soldCount'
-  >;
+  sortBy?: TProductSortBy;
   sortOrder?: TSort;
 }

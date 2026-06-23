@@ -10,44 +10,23 @@ import {
   TableRow,
   TableRowCell,
 } from '@/components/layout/table';
-import Button from '@/components/ui/Button';
 import HierarchySelect from '@/components/ui/inputs/HierarchySelect';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
+import { PRODUCTS_TABLE_TITLES } from '@/constants/api.constants';
 import { ROUTES, SORT_ORDER_MAP } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesHierarchy } from '@/services/product-service/category.service.query';
 import { useGetDashboardProducts } from '@/services/product-service/product.service.query';
-import type { TCategoryHierarchy, TProductStatus } from '@/types/api.type';
+import type { TCategoryHierarchy, TProductSortBy, TProductStatus } from '@/types/api.type';
 import type { TSort } from '@/types/component.type';
 import type { IHierarchySelectOption } from '@/types/input.type';
 import { formatDate, formatINRCurrency } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-
-const TH_TITLES = [
-  'S. No',
-  'View',
-  'Thumbnail',
-  'Title',
-  'Brand',
-  'Price',
-  'Status',
-  'Stock',
-  'Created At',
-  'Updated At',
-  'Stock',
-  'Try-On',
-  'Variants',
-  'Sku',
-  'Slug',
-  'Sold',
-  'Returned',
-  'Avg. Rating',
-];
 
 const SearchAndSort = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
@@ -96,6 +75,7 @@ const SearchAndSort = () => {
             handleSearch(value);
           },
         }}
+        containerClassName='max-w-xs w-full'
         icons={{ right: { icon: 'solar:magnifer-linear', className: 'size-4 text-primary/50' } }}
       />
       <HierarchySelect
@@ -122,22 +102,7 @@ const SearchAndSort = () => {
         }}
         options={categories}
         error={isError ? 'Failed to load categories' : undefined}
-        containerClassName="min-w-40 max-w-xs w-full"
-      />
-      <Button
-        pattern="outline"
-        content={{
-          icon: !!queryParams.sort ? 'solar:list-arrow-up-linear' : 'solar:list-arrow-down-linear',
-          className: 'size-full',
-          onClick: () => {
-            if (queryParams.sort) {
-              removeParams(['sort']);
-            } else {
-              setParams({ sort: SORT_ORDER_MAP.asc });
-            }
-          },
-        }}
-        className="border-primary/10 bg-smoke-eerie size-9! max-w-fit shrink-0 p-2!"
+        containerClassName="md:min-w-40 max-w-xs w-full"
       />
     </div>
   );
@@ -159,10 +124,24 @@ const Products = () => {
   } = useGetDashboardProducts({
     search: queryParams.search,
     status: queryParams.status?.toUpperCase() as TProductStatus,
-    sortBy: 'updatedAt',
-    sortOrder: (queryParams.sort || 'desc') as TSort,
+    sortBy: (queryParams.sortBy || 'updatedAt') as TProductSortBy,
+    sortOrder: (queryParams.sortOrder || SORT_ORDER_MAP.desc) as TSort,
     category: queryParams.category,
   });
+
+  const handleSort = (sortBy: TProductSortBy) => {
+    const currentSortBy = queryParams.sortBy;
+    const currentSortOrder = queryParams.sortOrder || SORT_ORDER_MAP.desc;
+
+    const nextOrder =
+      currentSortBy === sortBy
+        ? currentSortOrder === SORT_ORDER_MAP.asc
+          ? SORT_ORDER_MAP.desc
+          : SORT_ORDER_MAP.asc
+        : SORT_ORDER_MAP.desc;
+
+    setParams({ sortBy, sortOrder: nextOrder });
+  };
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -222,8 +201,28 @@ const Products = () => {
             <Table className="relative text-xs">
               <TableHead>
                 <TableRow>
-                  {TH_TITLES.map((title, index) => (
-                    <TableHeadCell key={`th-${index}`}>{title}</TableHeadCell>
+                  {PRODUCTS_TABLE_TITLES.map(({ label, sortKey }, index) => (
+                    <TableHeadCell
+                      key={`th-${index}`}
+                      className={`${sortKey ? 'hover:text-primary/90 cursor-pointer select-none' : ''} `}
+                      onClick={() => sortKey && handleSort(sortKey)}
+                    >
+                      <div className="flex items-center justify-center gap-1">
+                        {label}
+                        {sortKey && (
+                          <Icon
+                            icon={
+                              queryParams.sortBy === sortKey
+                                ? queryParams.sortOrder === SORT_ORDER_MAP.asc
+                                  ? 'solar:alt-arrow-up-linear'
+                                  : 'solar:alt-arrow-down-linear'
+                                : 'solar:sort-linear'
+                            }
+                            className="size-3.5 shrink-0"
+                          />
+                        )}
+                      </div>
+                    </TableHeadCell>
                   ))}
                 </TableRow>
               </TableHead>

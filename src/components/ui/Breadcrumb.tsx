@@ -20,7 +20,7 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
   return (
     <ScrollableGradientContainer direction="horizontal" className="[&>div]:justify-start">
       <div className={`text-secondary flex items-center gap-2 ${className}`}>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 truncate">
           <span
             className={`truncate capitalize ${
               finalPathName !== '/' ? 'cursor-pointer' : 'opacity-80'
@@ -37,7 +37,7 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
           const isLast = index === activePaths.length - 1;
 
           return (
-            <div key={index} className="flex items-center gap-2">
+            <div key={index} className="flex items-center gap-2 truncate">
               <span
                 className={`truncate capitalize ${
                   !isLast && finalPathName !== targetPath ? 'cursor-pointer' : 'opacity-80'
