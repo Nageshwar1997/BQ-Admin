@@ -124,9 +124,9 @@ const CenterContent = ({ fileInputProps }: Pick<IFileInput, 'fileInputProps'>) =
   return (
     <div
       role="button"
-      className={`flex-1 border-none bg-transparent text-[13px] font-normal outline-hidden focus:border-none focus:outline-hidden ${fileInputProps?.disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${fileInputProps?.className || ''}`}
+      className={`flex-1 border-none bg-transparent text-[13px] outline-hidden focus:border-none focus:outline-hidden ${fileInputProps?.disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${fileInputProps?.className || ''}`}
     >
-      <p className="text-primary/30 line-clamp-1 w-max py-2 xl:py-3">
+      <p className="text-primary/30 w-max truncate py-2 xl:py-3">
         {fileInputProps?.placeholder
           ? fileInputProps.placeholder
           : fileInputProps.multiple

@@ -43,20 +43,22 @@ const Select = ({
       ref={containerRef}
       className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}
     >
-      <div className="relative h-10 lg:h-12">
+      <div className="relative">
         <InputLabel children={label} onClick={handleToggle} className="z-2 cursor-pointer" />
         <div
-          className={`border-primary/10 bg-smoke-eerie flex h-full w-full items-center gap-1 overflow-hidden rounded-lg border ${className}`}
+          className={`border-primary/10 bg-smoke-eerie flex h-full w-full items-center gap-3 overflow-hidden rounded-lg border ${className}`}
         >
           {/* Left Icon */}
           <InputIcon {...icons} position="left" />
           <div
-            className={`text-primary line-clamp-1 flex h-full w-full flex-1 items-center justify-between gap-0.5 border-none bg-transparent p-3 text-sm font-normal ${selectProps.disabled ? 'cursor-no-drop' : 'cursor-pointer'}`}
+            className={`text-primary flex h-full w-full flex-1 items-center justify-between gap-0.5 border-none bg-transparent px-3 text-[13px] ${selectProps.disabled ? 'cursor-no-drop' : 'cursor-pointer'}`}
             onClick={handleToggle}
           >
-            <span className={`line-clamp-1 ${!selected?.value ? 'text-primary/50 text-xs' : ''}`}>
+            <p
+              className={`flex-1 truncate py-2 xl:py-3 ${!selected?.value ? 'text-primary/30' : ''}`}
+            >
               {selected?.label || selectProps?.placeholder}
-            </span>
+            </p>
             <Icon
               icon="solar:alt-arrow-down-linear"
               className={`size-4 transition-transform md:size-5 ${
@@ -69,14 +71,14 @@ const Select = ({
                   position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
                 } ${optionsClassName}`}
               >
-                <ul className="flex max-h-60 flex-col gap-0.5 overflow-auto px-1 py-2">
+                <ul className="flex max-h-60 flex-col gap-0.5 overflow-auto p-1">
                   {options.map((option) => {
                     const active = selected?.value === option.value;
                     return (
                       <li
                         key={option.value}
                         ref={active ? selectedOptionRef : null}
-                        className={`hover:bg-primary/5 text-tertiary flex cursor-pointer items-center justify-between gap-2 rounded-sm p-2 text-sm ${
+                        className={`hover:bg-primary/5 text-tertiary flex cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-[13px] ${
                           active ? 'bg-primary/8' : ''
                         }`}
                         onClick={(e) => {
