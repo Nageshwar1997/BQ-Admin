@@ -54,6 +54,8 @@ const SearchAndSort = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const [searchQuery, setSearchQuery] = useState(queryParams?.search || '');
 
+  const { data: hierarchy, isLoading, isError } = useGetCategoriesHierarchy();
+
   const handleSearch = useDebounce({
     callback: (value: string) => {
       const trimmedValue = value.trim();
@@ -65,6 +67,19 @@ const SearchAndSort = () => {
     },
     delay: 600,
   });
+
+  const categories = useMemo(() => {
+    const mapCategoryHierarchy = (categories: TCategoryHierarchy[]): IHierarchySelectOption[] => {
+      return categories.map((category) => ({
+        label: category.name,
+        searchLabel: category.name,
+        value: category._id,
+        children: category.subcategories.length ? mapCategoryHierarchy(category.subcategories) : [],
+      }));
+    };
+
+    return hierarchy ? mapCategoryHierarchy(hierarchy) : [];
+  }, [hierarchy]);
 
   return (
     <div className="flex items-center justify-between gap-3 md:gap-4">
@@ -84,6 +99,28 @@ const SearchAndSort = () => {
         }}
         icons={{ right: { icon: 'solar:magnifer-linear', className: 'size-4 text-primary/50' } }}
         containerClassName="[&>div]:h-9!"
+      />
+      <HierarchySelect
+        selectProps={{
+          value: queryParams.category || '',
+          placeholder: 'Select Category',
+          onChange: (value) => {
+            if (value) {
+              setParams({ category: `${value}` });
+            } else {
+              removeParams(['category']);
+            }
+          },
+          disabled: isLoading || !hierarchy?.length,
+        }}
+        icons={{
+          right: {
+            icon: "lucide:x",
+            className: ""
+        }}}
+        options={categories}
+        error={isError ? 'Failed to load categories' : undefined}
+        containerClassName="[&>div]:h-9! min-w-[200px]"
       />
       <Button
         pattern="outline"
@@ -110,12 +147,6 @@ const Products = () => {
   const { ref, inView } = useInView();
 
   const {
-    data: hierarchy,
-    isLoading: isLoadingHierarchy,
-    isError: isErrorHierarchy,
-  } = useGetCategoriesHierarchy();
-
-  const {
     data,
     hasNextPage,
     fetchNextPage,
@@ -129,22 +160,6 @@ const Products = () => {
     sortBy: 'updatedAt',
     sortOrder: (queryParams.sort || 'desc') as TSort,
   });
-
-  const [val, setVal] = useState<number | string>('');
-  console.log('🚀 ~ Products ~ val:', val);
-
-  const categories = useMemo(() => {
-    const mapCategoryHierarchy = (categories: TCategoryHierarchy[]): IHierarchySelectOption[] => {
-      return categories.map((category) => ({
-        label: category.name,
-        searchLabel: category.name,
-        value: category._id,
-        children: category.subcategories.length ? mapCategoryHierarchy(category.subcategories) : [],
-      }));
-    };
-
-    return hierarchy ? mapCategoryHierarchy(hierarchy) : [];
-  }, [hierarchy]);
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -195,17 +210,6 @@ const Products = () => {
         children: <SearchAndSort />,
       }}
     >
-      <HierarchySelect
-        selectProps={{
-          value: val,
-          placeholder: 'Select Category',
-          onChange: (v) => setVal(v),
-          disabled: isLoadingHierarchy || !hierarchy?.length,
-        }}
-        label="Select"
-        options={categories}
-        error={isErrorHierarchy ? 'Failed to load categories' : undefined}
-      />
       <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
         {!!data?.products?.length && (
           <ScrollableGradientContainer

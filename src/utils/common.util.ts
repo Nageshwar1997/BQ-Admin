@@ -15,6 +15,7 @@ import type {
   IProgressToast,
   TProgressToastOptions,
 } from '@/types/store.type';
+import type { IconProps } from '@iconify/react';
 import type { CSSProperties } from 'react';
 
 export const getButtonCss = (pattern: IButton['pattern']) => {
@@ -334,4 +335,8 @@ export const formatDate = (date: Date | string | number, options?: Intl.DateTime
     year: 'numeric',
     ...options,
   }).format(new Date(date));
+};
+
+export const isIconProps = (value: unknown): value is IconProps => {
+  return typeof value === 'object' && value !== null && 'icon' in value;
 };

@@ -22,7 +22,7 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
       <div className={`text-secondary flex items-center gap-2 ${className}`}>
         <div className="flex items-center gap-2">
           <span
-            className={`line-clamp-1 capitalize ${
+            className={`truncate capitalize ${
               finalPathName !== '/' ? 'cursor-pointer' : 'opacity-80'
             }`}
             onClick={() => handleNavigate(-1)}
@@ -39,7 +39,7 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
           return (
             <div key={index} className="flex items-center gap-2">
               <span
-                className={`line-clamp-1 capitalize ${
+                className={`truncate capitalize ${
                   !isLast && finalPathName !== targetPath ? 'cursor-pointer' : 'opacity-80'
                 }`}
                 onClick={!isLast ? () => handleNavigate(index) : undefined}
