@@ -216,7 +216,7 @@ export type TApiProductPopulated = TApiProductBase &
 
 export type TProductSortBy = keyof Pick<
   TApiProduct,
-  'createdAt' | 'updatedAt' | 'title' | 'sellingPrice' | 'soldCount'
+  'createdAt' | 'updatedAt' | 'title' | 'sellingPrice' | "originalPrice" | 'soldCount'
 >;
 
 export interface IGetDashboardProductsQuery {

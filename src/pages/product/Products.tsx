@@ -165,12 +165,10 @@ const Products = () => {
         ...(data?.counts && {
           components: [
             <Select
-              options={Object.entries(data?.counts ?? {})
-                .filter(([, value]) => !!value)
-                .map(([key, value]) => ({
-                  value: key.toLowerCase(),
-                  label: `${key} (${value})`.toLowerCase(),
-                }))}
+              options={Object.entries(data?.counts ?? {}).map(([key, value]) => ({
+                value: key.toLowerCase(),
+                label: `${key} (${value})`.toLowerCase(),
+              }))}
               selectProps={{
                 value: queryParams.status || 'all',
                 onChange: (value) => {
@@ -254,13 +252,11 @@ const Products = () => {
                         <p className="max-w-sm truncate text-left">{product.title}</p>
                       </TableRowCell>
                       <TableRowCell>{product.brand}</TableRowCell>
-                      <TableRowCell className="font-medium">
-                        <p className="text-primary-green">
-                          {formatINRCurrency(product.sellingPrice)}
-                        </p>
-                        <p className="text-primary-red">
-                          {formatINRCurrency(product.originalPrice)}
-                        </p>
+                      <TableRowCell className="text-primary-green font-medium">
+                        {formatINRCurrency(product.sellingPrice)}
+                      </TableRowCell>
+                      <TableRowCell className="text-primary-red font-medium">
+                        {formatINRCurrency(product.originalPrice)}
                       </TableRowCell>
                       <TableRowCell>{product.status}</TableRowCell>
                       <TableRowCell>
