@@ -98,7 +98,6 @@ const SearchAndSort = () => {
           },
         }}
         icons={{ right: { icon: 'solar:magnifer-linear', className: 'size-4 text-primary/50' } }}
-        containerClassName="[&>div]:h-9!"
       />
       <HierarchySelect
         selectProps={{
@@ -124,7 +123,7 @@ const SearchAndSort = () => {
         }}
         options={categories}
         error={isError ? 'Failed to load categories' : undefined}
-        containerClassName="[&>div]:h-9! min-w-[200px]"
+        containerClassName="min-w-40 max-w-xs w-full"
       />
       <Button
         pattern="outline"

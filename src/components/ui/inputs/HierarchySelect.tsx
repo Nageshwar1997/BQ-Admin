@@ -241,6 +241,7 @@ const HierarchySelect = ({
                     value: searchValue,
                     onChange: handleSearch,
                     placeholder: inputProps?.placeholder || 'Search here...',
+                    className: `py-2! ${inputProps?.className || ''}`,
                   }}
                   icons={{
                     right: {
@@ -258,7 +259,7 @@ const HierarchySelect = ({
                     },
                   }}
                   containerClassName="p-2 border-b border-b-primary/20"
-                  className="bg-silver-jet/8! [&_input]:py-2!"
+                  className="bg-silver-jet/8!"
                 />
 
                 <ul className="flex max-h-60 flex-col gap-0.5 overflow-auto scroll-smooth p-1">
