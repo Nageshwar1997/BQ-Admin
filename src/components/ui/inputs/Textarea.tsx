@@ -27,10 +27,10 @@ const Textarea = ({
 
   return (
     <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
-      <div className="relative max-h-max min-h-20 lg:min-h-24">
+      <div className="relative">
         <InputLabel children={label} htmlFor={textAreaProps?.name} />
         <div
-          className={`border-primary/10 bg-smoke-eerie h-full w-full overflow-hidden rounded-lg border p-1 ${className}`}
+          className={`border-primary/10 bg-smoke-eerie overflow-hidden rounded-lg border ${className}`}
         >
           {/* Textarea */}
           <textarea
@@ -41,7 +41,7 @@ const Textarea = ({
             id={textAreaProps.id || textAreaProps.name}
             onChange={handleChange}
             rows={textAreaProps.rows || 5}
-            className={`text-primary placeholder:text-primary/30 autofill-effect block h-full w-full flex-1 resize-y border-none bg-transparent p-2 text-sm font-normal outline-hidden placeholder:text-xs focus:border-none focus:outline-hidden disabled:cursor-not-allowed ${textAreaProps?.className || ''}`}
+            className={`text-primary placeholder:text-primary/30 autofill-effect block w-full resize-y border-none bg-transparent px-3 py-2 text-[13px] outline-hidden placeholder:text-[13px] focus:border-none focus:outline-hidden disabled:cursor-not-allowed xl:py-3 ${textAreaProps?.className || ''}`}
           />
         </div>
       </div>
