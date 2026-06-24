@@ -279,12 +279,13 @@ const ProductDetails = () => {
 
   const media = useMemo(() => {
     const images = product.images.map((img) => ({ url: img, type: 'image' as const }));
+    const thumbnail = { url: product.thumbnail, type: 'image' as const };
 
     if (product.video) {
-      return [...images, { url: product.video, type: 'video' as const }];
+      return [thumbnail, ...images, { url: product.video, type: 'video' as const }];
     }
 
-    return images;
+    return [thumbnail, ...images];
   }, [product]);
 
   const variant = useMemo(() => {
@@ -351,8 +352,8 @@ const ProductDetails = () => {
           </div>
           {/* Price */}
           <div className="bg-tertiary-invert/50 rounded-xl p-4">
-            <div className="flex items-baseline gap-4">
-              <span className="text-razzle-dazzle-rose-c text-4xl font-bold">
+            <div className="flex items-baseline gap-3">
+              <span className="text-razzle-dazzle-rose-c text-3xl font-bold">
                 {formatINRCurrency(sellingPrice)}
               </span>
               <span className="text-tertiary/60 text-xl line-through">

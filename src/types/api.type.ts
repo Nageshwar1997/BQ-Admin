@@ -159,7 +159,6 @@ type TEnabledTryOn = Extract<TProductTryOnConfiguration, { enabled: true }>['try
 
 type TApiTryOn = { enabled: false } | ({ enabled: true } & TEnabledTryOn);
 
-
 type TRemoveFileType<T> = {
   [K in keyof T]: T[K] extends (infer U)[] ? Exclude<U, File>[] : Exclude<T[K], File>;
 };
@@ -195,7 +194,7 @@ export type TApiProductBase = IId &
 type TApiStockAndVariants =
   | TProductWithoutVariant
   | (Pick<TProductWithVariant, 'hasVariants'> & {
-      variants: (Omit<TProductWithVariant['variants'][number], 'images' | 'thumbnail'> & {
+      variants: (TRemoveFileType<TProductWithVariant['variants'][number]> & {
         sku: string;
         discount: number;
         images: string[];
