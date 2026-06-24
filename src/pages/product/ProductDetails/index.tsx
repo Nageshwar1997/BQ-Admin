@@ -3,6 +3,7 @@
 import { MediaCarouselWithParentMedia } from '@/components/layout/carousels/MediaCarouselWithParentMedia';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
+import Button from '@/components/ui/Button';
 import { product } from '@/constants/common.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import { formatINRCurrency } from '@/utils/common.util';
@@ -50,7 +51,7 @@ const ProductDetails = () => {
 
   return (
     <PageWrapper>
-      <div className="flex gap-8">
+      <div className="grid gap-8 lg:grid-cols-2">
         {/* LEFT SECTION */}
         <div className="relative w-full">
           <MediaCarouselWithParentMedia media={media} needButtonControls={false} />
@@ -98,6 +99,29 @@ const ProductDetails = () => {
             </span>
             <span className="text-tertiary text-sm">({product.totalReviews} reviews)</span>
           </div>
+          <div className="bg-tertiary-invert/50 border-battleship-davys-gray/20 rounded-2xl border p-5">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div>
+                <p className="text-silver-jet-2 text-xs font-medium tracking-wider uppercase">
+                  Category
+                </p>
+                <p className="text-primary mt-1 font-semibold">{product.category.name}</p>
+              </div>
+              <div>
+                <p className="text-silver-jet-2 text-xs font-medium tracking-wider uppercase">
+                  SKU
+                </p>
+                <p className="text-primary mt-1 font-semibold">{product.sku}</p>
+              </div>
+
+              <div>
+                <p className="text-silver-jet-2 text-xs font-medium tracking-wider uppercase">
+                  Slug
+                </p>
+                <p className="text-primary mt-1 font-semibold break-all">{product.slug}</p>
+              </div>
+            </div>
+          </div>
           {/* Price */}
           <div className="bg-tertiary-invert/50 rounded-xl p-4">
             <div className="flex items-baseline gap-3">
@@ -127,6 +151,27 @@ const ProductDetails = () => {
               </span>
             </div>
           </div>
+
+          {product.tryOn.enabled && (
+            <div className="bg-tertiary-invert/50 rounded-lg px-4 py-3">
+              <div className="flex items-center gap-2 text-sm">
+                <div
+                  className={`shrink-0 rounded-full p-1 ${product.tryOn.configured ? 'bg-jade-c/40' : 'bg-princeton-orange-c/40'}`}
+                >
+                  <div
+                    className={`rounded-full p-1 ${product.tryOn.configured ? 'bg-jade-c' : 'bg-princeton-orange-c'}`}
+                  />
+                </div>
+                <div className="text-secondary/70 leading-normal font-medium">
+                  <div className="flex gap-1">
+                    <span className="font-semibold">Try-On:</span>
+                    <p className="capitalize">{product.tryOn.category.toLowerCase()} -</p>
+                    <p className="capitalize">{product.tryOn.subCategory.toLowerCase()}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Variants */}
           {product.hasVariants && product.variants.length > 0 && (
             <div className="space-y-2">
@@ -136,7 +181,7 @@ const ProductDetails = () => {
                 </p>
               )}
 
-              <ScrollableGradientContainer direction="horizontal" containerClassName="max-h-fit">
+              <ScrollableGradientContainer direction="horizontal" containerClassName="max-h-20">
                 <div className="flex items-center gap-3">
                   {product.variants.map((v, index) => {
                     const isColor = v.type === 'Color';
@@ -173,6 +218,11 @@ const ProductDetails = () => {
               </ScrollableGradientContainer>
             </div>
           )}
+
+          <div className="flex gap-4 lg:gap-6">
+            <Button content="Try-On" pattern="secondary" />
+            <Button content="Add Review" pattern="primary" />
+          </div>
         </div>
       </div>
     </PageWrapper>
