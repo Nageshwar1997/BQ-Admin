@@ -5,6 +5,7 @@ import PageWrapper from '@/components/layout/containers/PageWrapper';
 import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
 import Button from '@/components/ui/Button';
 import Select from '@/components/ui/inputs/Select';
+import { QuillContent } from '@/components/ui/QuillContent';
 import { PRODUCT_STATUS_TRANSITIONS } from '@/constants/api.constants';
 import { product } from '@/constants/common.constants';
 import useQueryParams from '@/hooks/useQueryParams';
@@ -111,6 +112,7 @@ const ProductDetails = () => {
           />,
         ],
       }}
+      className="flex flex-col gap-8"
     >
       <div className="grid flex-col items-start gap-6 lg:grid-cols-2">
         <div className="w-full lg:sticky lg:top-37">
@@ -303,6 +305,7 @@ const ProductDetails = () => {
             />
             <Button content="Add Review" pattern="primary" />
           </div>
+          <QuillContent content={product.description} className='' />
         </div>
       </div>
     </PageWrapper>
