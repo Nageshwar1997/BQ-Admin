@@ -157,7 +157,10 @@ export type TProductStatus = (typeof PRODUCT_STATUSES)[number];
 
 type TEnabledTryOn = Extract<TProductTryOnConfiguration, { enabled: true }>['tryOn'];
 
-type TApiTryOn = { enabled: false } | ({ enabled: true } & TEnabledTryOn);
+type TApiTryOn =
+  | { enabled: boolean; configured: false }
+  | ({ enabled: false; configured: true } & Partial<TEnabledTryOn>)
+  | ({ enabled: true; configured: true } & TEnabledTryOn);
 
 type TRemoveFileType<T> = {
   [K in keyof T]: T[K] extends (infer U)[] ? Exclude<U, File>[] : Exclude<T[K], File>;
@@ -168,7 +171,7 @@ export type TApiProductBase = IId &
   Pick<TProductBasicInfo, 'title' | 'brand' | 'sellingPrice' | 'originalPrice'> &
   TProductDescriptionAndContent &
   TRemoveFileType<TProductMediaAndGallery> & {
-    tryOn: TApiTryOn & { configured: boolean };
+    tryOn: TApiTryOn;
     seller: string;
     sku: string;
     slug: string;

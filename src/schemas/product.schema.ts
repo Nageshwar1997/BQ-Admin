@@ -448,12 +448,16 @@ const enabledTryOnSchema = discriminatedUnion(
   [
     object({
       category: literal(TRYON_CATEGORY_MAP.LIP),
-      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.LIP], { error: `TryOn sub-category is required.` }),
+      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.LIP], {
+        error: `TryOn sub-category is required.`,
+      }),
     }),
 
     object({
       category: literal(TRYON_CATEGORY_MAP.EYE),
-      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.EYE], { error: `TryOn sub-category is required.` }),
+      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.EYE], {
+        error: `TryOn sub-category is required.`,
+      }),
     }),
 
     object({
@@ -490,7 +494,7 @@ const enabledTryOnSchema = discriminatedUnion(
 export const productTryOnConfigurationSchema = discriminatedUnion(
   'enabled',
   [
-    object({ enabled: literal(false) }),
+    object({ enabled: literal(false), tryOn: enabledTryOnSchema.optional() }),
     object({ enabled: literal(true), tryOn: enabledTryOnSchema }),
   ],
   { error: 'TryOn is required.' },

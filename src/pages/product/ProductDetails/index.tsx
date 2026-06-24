@@ -152,26 +152,32 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {product.tryOn.enabled && (
-            <div className="bg-tertiary-invert/50 rounded-lg px-4 py-3">
-              <div className="flex items-center gap-2 text-sm">
-                <div
-                  className={`shrink-0 rounded-full p-1 ${product.tryOn.configured ? 'bg-jade-c/40' : 'bg-princeton-orange-c/40'}`}
-                >
-                  <div
-                    className={`rounded-full p-1 ${product.tryOn.configured ? 'bg-jade-c' : 'bg-princeton-orange-c'}`}
-                  />
-                </div>
-                <div className="text-secondary/70 leading-normal font-medium">
-                  <div className="flex gap-1">
-                    <span className="font-semibold">Try-On:</span>
-                    <p className="capitalize">{product.tryOn.category.toLowerCase()} -</p>
-                    <p className="capitalize">{product.tryOn.subCategory.toLowerCase()}</p>
-                  </div>
-                </div>
+          <div className="bg-tertiary-invert/50 border-battleship-davys-gray/20 rounded-2xl border p-5">
+            <div className="flex justify-between gap-4">
+              <h4 className="font-semibold">Try On:</h4>
+              <div>
+                <p className="text-silver-jet-2 text-xs font-medium tracking-wider uppercase">
+                  Category
+                </p>
+                <p className="text-primary mt-1 font-semibold">
+                  {product.tryOn.configured ? product.tryOn.category : 'Not Configured'}
+                </p>
+              </div>
+              <div>
+                <p className="text-silver-jet-2 text-xs font-medium tracking-wider uppercase">
+                  Sub-category
+                </p>
+                <p className="text-primary mt-1 font-semibold">
+                  {product.tryOn.configured ? product.tryOn.subCategory : 'Not Configured'}
+                </p>
               </div>
             </div>
-          )}
+            <div className="mt-4 flex gap-4">
+              <Button content={product.tryOn.enabled ? 'Disable' : 'Enable'} pattern="tertiary" />
+              <Button content="Configure" pattern="tertiary" />
+            </div>
+          </div>
+
           {/* Variants */}
           {product.hasVariants && product.variants.length > 0 && (
             <div className="space-y-2">
@@ -220,7 +226,11 @@ const ProductDetails = () => {
           )}
 
           <div className="flex gap-4 lg:gap-6">
-            <Button content="Try-On" pattern="secondary" />
+            <Button
+              content="Try-On"
+              pattern="secondary"
+              buttonProps={{ disabled: !product.tryOn.enabled }}
+            />
             <Button content="Add Review" pattern="primary" />
           </div>
         </div>

@@ -237,7 +237,7 @@ const Products = () => {
                     >
                       <TableRowCell>{index + 1}</TableRowCell>
                       <TableRowCell>
-                        <Link className="size-4.5 block mx-auto shrink-0" to={product.slug}>
+                        <Link className="mx-auto block size-4.5 shrink-0" to={product.slug}>
                           <Icon
                             icon="material-symbols:eye-tracking-outline"
                             className="text-primary hover:text-blue-crayola-c mx-auto size-full"
@@ -274,7 +274,7 @@ const Products = () => {
                         {formatDate(product.updatedAt, { month: '2-digit' })}
                       </TableRowCell>
                       <TableRowCell>
-                        {product.tryOn.enabled
+                        {product.tryOn.configured
                           ? `${product.tryOn.category} - ${product.tryOn.subCategory}`
                           : 'N/A'}
                       </TableRowCell>
