@@ -50,19 +50,21 @@ const ProductDetails = () => {
   }, [variant?.discount, product.discount]);
 
   return (
-    <PageWrapper>
-      <div className="grid gap-8 lg:grid-cols-2">
-        {/* LEFT SECTION */}
-        <div className="relative w-full">
-          <MediaCarouselWithParentMedia media={media} needButtonControls={false} />
-          <div className="absolute inset-x-0 top-0 flex items-center justify-between px-4 py-2">
-            <span className="bg-razzle-dazzle-rose-c rounded-full px-2 pt-1 pb-0.5 text-sm">
-              -{discount.toFixed(Number.isInteger(discount) ? 0 : 2)}%
-            </span>
+    <PageWrapper className="">
+      <div className="grid flex-col items-start gap-6 lg:grid-cols-2">
+        <div className="w-full lg:sticky lg:top-37">
+          {/* LEFT SECTION */}
+          <div className="relative w-full">
+            <MediaCarouselWithParentMedia media={media} needButtonControls={false} />
+            <div className="absolute inset-x-0 top-0 flex items-center justify-between px-4 py-2">
+              <span className="bg-razzle-dazzle-rose-c rounded-full px-2 pt-1 pb-0.5 text-sm">
+                -{discount.toFixed(Number.isInteger(discount) ? 0 : 2)}%
+              </span>
+            </div>
           </div>
         </div>
         {/* RIGHT SECTION */}
-        <div className="flex w-full min-w-0 flex-col gap-6">
+        <div className="flex w-full flex-col gap-6 lg:sticky lg:top-37">
           <div>
             <p className="text-tertiary mb-1 text-sm font-medium">{product.brand}</p>
             <h1 className="text-primary mb-2 text-3xl font-bold md:text-4xl">{product.title}</h1>
@@ -186,8 +188,11 @@ const ProductDetails = () => {
                   <span className="font-semibold">Variant:</span> {variant.label}
                 </p>
               )}
-
-              <ScrollableGradientContainer direction="horizontal" containerClassName="max-h-20">
+              <ScrollableGradientContainer
+                direction="horizontal"
+                containerClassName="max-h-20"
+                className="[&>div]:justify-start"
+              >
                 <div className="flex items-center gap-3">
                   {product.variants.map((v, index) => {
                     const isColor = v.type === 'Color';
