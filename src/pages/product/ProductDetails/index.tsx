@@ -6,6 +6,7 @@ import ScrollableGradientContainer from '@/components/layout/containers/Scrollab
 import Button from '@/components/ui/Button';
 import { product } from '@/constants/common.constants';
 import useQueryParams from '@/hooks/useQueryParams';
+import type { TMediaOption } from '@/types/component.type';
 import { formatINRCurrency } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
 import { useMemo } from 'react';
@@ -18,22 +19,50 @@ const ProductDetails = () => {
 
   const { queryParams, setParams, removeParams: __ } = useQueryParams();
 
-  const media = useMemo(() => {
-    const images = product.images.map((img) => ({ url: img, type: 'image' as const }));
-    const thumbnail = { url: product.thumbnail, type: 'image' as const };
-
-    if (product.video) {
-      return [thumbnail, ...images, { url: product.video, type: 'video' as const }];
-    }
-
-    return [thumbnail, ...images];
-  }, [product]);
-
   const variant = useMemo(() => {
     return product.hasVariants
       ? product.variants.find((variant) => variant.sku === queryParams.v)
       : null;
   }, [queryParams.v]);
+
+  const media = useMemo(() => {
+    const medias: TMediaOption[] = [
+      { url: product.thumbnail, type: 'image' as const },
+      ...product.images.map((image) => ({ url: image, type: 'image' as const })),
+    ];
+
+    if (product.hasVariants) {
+      product.variants.forEach((variant) => {
+        if (variant.thumbnail) {
+          medias.push({ url: variant.thumbnail, type: 'image' as const });
+        }
+
+        medias.push(...variant.images.map((image) => ({ url: image, type: 'image' as const })));
+      });
+    }
+
+    if (product.video) {
+      medias.push({ url: product.video, type: 'video' as const });
+    }
+
+    return medias;
+  }, [product]);
+
+  const selectedMediaIndex = useMemo(() => {
+    if (!variant) {
+      return 0;
+    }
+
+    const mediaUrl = variant.thumbnail || variant.images?.[0];
+
+    if (!mediaUrl) {
+      return 0;
+    }
+
+    const index = media.findIndex((item) => item.type === 'image' && item.url === mediaUrl);
+
+    return index >= 0 ? index : 0;
+  }, [media, variant]);
 
   const { discount, originalPrice, sellingPrice, stock } = useMemo(() => {
     return {
@@ -55,7 +84,11 @@ const ProductDetails = () => {
         <div className="w-full lg:sticky lg:top-37">
           {/* LEFT SECTION */}
           <div className="relative w-full">
-            <MediaCarouselWithParentMedia media={media} needButtonControls={false} />
+            <MediaCarouselWithParentMedia
+              media={media}
+              needButtonControls={false}
+              selected={selectedMediaIndex}
+            />
             <div className="absolute inset-x-0 top-0 flex items-center justify-between px-4 py-2">
               <span className="bg-razzle-dazzle-rose-c rounded-full px-2 pt-1 pb-0.5 text-sm">
                 -{discount.toFixed(Number.isInteger(discount) ? 0 : 2)}%

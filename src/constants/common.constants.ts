@@ -309,7 +309,7 @@ export const product: TApiProductPopulated = {
         'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771372/Beautinique/Images/Testing/2026/06/18/b00931cc-b620-4bb2-bba7-fb5ae3a3a94d.png',
       ],
       thumbnail:
-        'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771403/Beautinique/Images/Testing/2026/06/18/2b9d853e-e728-4444-b64c-a97a259409f0.png',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAPf_062JKWOBQr9rKxfyjLtlwzCn6Wwx_fJ6vQDIAgQ&s=10',
       _id: '6b1000000000000000000101',
     },
     {
@@ -326,7 +326,7 @@ export const product: TApiProductPopulated = {
         'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771372/Beautinique/Images/Testing/2026/06/18/b00931cc-b620-4bb2-bba7-fb5ae3a3a94d.png',
       ],
       thumbnail:
-        'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771403/Beautinique/Images/Testing/2026/06/18/2b9d853e-e728-4444-b64c-a97a259409f0.png',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxrWsdJFvBx8g6CtZnXj9S9xcOtMmEysWTAz1M-HSrxg&s=10',
       _id: '6b1000000000000000000101',
     },
     {
@@ -343,7 +343,7 @@ export const product: TApiProductPopulated = {
         'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771372/Beautinique/Images/Testing/2026/06/18/b00931cc-b620-4bb2-bba7-fb5ae3a3a94d.png',
       ],
       thumbnail:
-        'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771403/Beautinique/Images/Testing/2026/06/18/2b9d853e-e728-4444-b64c-a97a259409f0.png',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQR8Lf_XMIGZBtayJpJNPFmmCALIgEqjfv2qj3bedJAQw&s=10',
       _id: '6b1000000000000000000101',
     },
     {
@@ -360,7 +360,7 @@ export const product: TApiProductPopulated = {
         'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771372/Beautinique/Images/Testing/2026/06/18/b00931cc-b620-4bb2-bba7-fb5ae3a3a94d.png',
       ],
       thumbnail:
-        'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771403/Beautinique/Images/Testing/2026/06/18/2b9d853e-e728-4444-b64c-a97a259409f0.png',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvgvfPocDqVi-wSk5zVBZlrQyn1wPTbVcNzxCkjuMtsA&s=10',
       _id: '6b1000000000000000000101',
     },
     {
@@ -377,7 +377,7 @@ export const product: TApiProductPopulated = {
         'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771372/Beautinique/Images/Testing/2026/06/18/b00931cc-b620-4bb2-bba7-fb5ae3a3a94d.png',
       ],
       thumbnail:
-        'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771403/Beautinique/Images/Testing/2026/06/18/2b9d853e-e728-4444-b64c-a97a259409f0.png',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBB4LQTn0vRq4ydPLp-uTj_lEUHOHYWUU18JlCq5KuMw&s=10',
       _id: '6b1000000000000000000101',
     },
     {
@@ -394,7 +394,7 @@ export const product: TApiProductPopulated = {
         'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771372/Beautinique/Images/Testing/2026/06/18/b00931cc-b620-4bb2-bba7-fb5ae3a3a94d.png',
       ],
       thumbnail:
-        'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771403/Beautinique/Images/Testing/2026/06/18/2b9d853e-e728-4444-b64c-a97a259409f0.png',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrnoeCDSTNv_vdY7dQ3yRL9g0bGCq9ZsTFWUiki63hrQ&s',
       _id: '6b1000000000000000000101',
     },
     {
@@ -411,7 +411,7 @@ export const product: TApiProductPopulated = {
         'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771372/Beautinique/Images/Testing/2026/06/18/b00931cc-b620-4bb2-bba7-fb5ae3a3a94d.png',
       ],
       thumbnail:
-        'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771403/Beautinique/Images/Testing/2026/06/18/2b9d853e-e728-4444-b64c-a97a259409f0.png',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwO0wY2zmLQ-AFOwPUfj_GWNfC4AVxIUeIKEocoo0a9g&s=10',
       _id: '6b1000000000000000000101',
     },
     {
@@ -428,7 +428,7 @@ export const product: TApiProductPopulated = {
         'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771372/Beautinique/Images/Testing/2026/06/18/b00931cc-b620-4bb2-bba7-fb5ae3a3a94d.png',
       ],
       thumbnail:
-        'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771403/Beautinique/Images/Testing/2026/06/18/2b9d853e-e728-4444-b64c-a97a259409f0.png',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRanF6GQIUoXHkdMxSEjn1M0-apMwKj6vkYUvIU_LD41A&s',
       _id: '6b1000000000000000000101',
     },
     {
@@ -445,7 +445,7 @@ export const product: TApiProductPopulated = {
         'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771372/Beautinique/Images/Testing/2026/06/18/b00931cc-b620-4bb2-bba7-fb5ae3a3a94d.png',
       ],
       thumbnail:
-        'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771403/Beautinique/Images/Testing/2026/06/18/2b9d853e-e728-4444-b64c-a97a259409f0.png',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXCsW10nAjoXFTDiXZW7Y-fPj9YPUX0aDKyIj-R9lhYw&s=10',
       _id: '6b1000000000000000000101',
     },
     {
@@ -462,7 +462,7 @@ export const product: TApiProductPopulated = {
         'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771372/Beautinique/Images/Testing/2026/06/18/b00931cc-b620-4bb2-bba7-fb5ae3a3a94d.png',
       ],
       thumbnail:
-        'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771403/Beautinique/Images/Testing/2026/06/18/2b9d853e-e728-4444-b64c-a97a259409f0.png',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcEtgwsl_RXzvDz017Iajjg475FaZTXdUgp5-WP_qZSw&s=10',
       _id: '6b1000000000000000000101',
     },
     {
@@ -479,7 +479,7 @@ export const product: TApiProductPopulated = {
         'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771372/Beautinique/Images/Testing/2026/06/18/b00931cc-b620-4bb2-bba7-fb5ae3a3a94d.png',
       ],
       thumbnail:
-        'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771403/Beautinique/Images/Testing/2026/06/18/2b9d853e-e728-4444-b64c-a97a259409f0.png',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzJiL2savWoGa11xgA0dE_0XjhbdeZokBLo_dScmZJKg&s=10',
       _id: '6b1000000000000000000101',
     },
     {
@@ -496,7 +496,7 @@ export const product: TApiProductPopulated = {
         'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771372/Beautinique/Images/Testing/2026/06/18/b00931cc-b620-4bb2-bba7-fb5ae3a3a94d.png',
       ],
       thumbnail:
-        'https://res.cloudinary.com/dqp7b3we7/image/upload/f_auto,q_auto/v1781771403/Beautinique/Images/Testing/2026/06/18/2b9d853e-e728-4444-b64c-a97a259409f0.png',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1QXI4lXK8Rnwo9U39d9W9pitoerhgpnJU1_EkGBspsA&s=10',
       _id: '6b1000000000000000000101',
     },
   ],
