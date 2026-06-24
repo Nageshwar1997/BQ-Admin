@@ -4,6 +4,8 @@ import { MediaCarouselWithParentMedia } from '@/components/layout/carousels/Medi
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
 import Button from '@/components/ui/Button';
+import Select from '@/components/ui/inputs/Select';
+import { PRODUCT_STATUS_TRANSITIONS } from '@/constants/api.constants';
 import { product } from '@/constants/common.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import type { TMediaOption } from '@/types/component.type';
@@ -17,7 +19,7 @@ const ProductDetails = () => {
   // const { pathParams } = usePathParams();
   // const { data: product } = useGetProductBySlug(pathParams.slug || '');
 
-  const { queryParams, setParams, removeParams: __ } = useQueryParams();
+  const { queryParams, setParams, removeParams } = useQueryParams();
 
   const variant = useMemo(() => {
     return product.hasVariants
@@ -79,7 +81,37 @@ const ProductDetails = () => {
   }, [variant?.discount, product.discount]);
 
   return (
-    <PageWrapper className="">
+    <PageWrapper
+      navbar={{
+        components: [
+          <Select
+            options={
+              PRODUCT_STATUS_TRANSITIONS[product.status]?.map((status) => ({
+                label: status.toLowerCase(),
+                value: status,
+              })) ?? []
+            }
+            selectProps={{
+              value: product.status,
+              onChange: (value) => {
+                if (!value || value === 'all') {
+                  removeParams(['status', 'search']);
+                } else if (value) {
+                  if (value === 'draft') {
+                    removeParams(['search']);
+                  }
+                  setParams({ status: value.toString() });
+                }
+              },
+              placeholder: 'Update status',
+            }}
+            containerClassName="max-w-40! w-full"
+            className="[&>div]:first:capitalize"
+            optionsClassName="[&>ul>li]:text-xs"
+          />,
+        ],
+      }}
+    >
       <div className="grid flex-col items-start gap-6 lg:grid-cols-2">
         <div className="w-full lg:sticky lg:top-37">
           {/* LEFT SECTION */}
