@@ -46,7 +46,7 @@ export const productBasicInfoSchema = object({
 
   l1Category: object(
     {
-      id: string({ error: '(L1) Main category is required.' }).regex(
+      _id: string({ error: '(L1) Main category is required.' }).regex(
         REGEX.MONGODB_ID,
         '(L1) Main category must be a valid ID.',
       ),
@@ -57,7 +57,7 @@ export const productBasicInfoSchema = object({
 
   l2Category: object(
     {
-      id: string({ error: '(L2) Sub-category is required.' }).regex(
+      _id: string({ error: '(L2) Sub-category is required.' }).regex(
         REGEX.MONGODB_ID,
         '(L2) Sub-category must be a valid ID.',
       ),
@@ -68,7 +68,7 @@ export const productBasicInfoSchema = object({
 
   l3Category: object(
     {
-      id: string({ error: '(L3) Product category is required.' }).regex(
+      _id: string({ error: '(L3) Product category is required.' }).regex(
         REGEX.MONGODB_ID,
         '(L3) Product category must be a valid ID.',
       ),

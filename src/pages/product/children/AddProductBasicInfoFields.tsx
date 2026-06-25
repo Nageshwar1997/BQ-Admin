@@ -52,12 +52,12 @@ const AddProductBasicInfoFields = ({ form, categories }: Props) => {
                   error={
                     form.formState.errors[name]?.message ||
                     form.formState.errors[name]?.name?.message ||
-                    form.formState.errors[name]?.id?.message
+                    form.formState.errors[name]?._id?.message
                   }
                   options={options}
                   position="top"
                   selectProps={{
-                    value: value?.id,
+                    value: value?._id,
                     placeholder,
                     disabled: isL2 ? !l1Category : isL3 ? !l2Category : !options.length,
                     onChange: (value) => {
