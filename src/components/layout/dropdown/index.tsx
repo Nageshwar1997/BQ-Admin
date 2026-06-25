@@ -53,9 +53,10 @@ const Dropdown = ({
       ref={ref}
     >
       <button
-        className="bg-primary-invert group flex w-full items-center justify-between gap-2 px-3 py-2 text-left transition-colors duration-300 xl:py-3"
+        className="bg-primary-invert group cursor-pointer flex w-full items-center justify-between gap-2 px-3 py-2 text-left transition-colors duration-300 xl:py-3"
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
+        role="button"
       >
         <div className="flex items-center gap-3 transition-all duration-300">
           <InputIcon icon={icons?.left} />

@@ -354,22 +354,25 @@ const ProductDetails = () => {
               />
               <Button content="Add Review" pattern="primary" />
             </div>
-            {[
-              { title: 'Description', content: product.description },
-              { title: 'Usage instructions', content: product.instructions },
-              { title: 'Ingredients', content: product.ingredients },
-              { title: 'Additional Info', content: product.additional },
-            ].map(({ content, title }, index) => {
-              if (!content) return null;
-              return (
-                <Dropdown
-                  key={index}
-                  title={title}
-                  defaultOpen={index === 0}
-                  children={<QuillContent content={content} />}
-                />
-              );
-            })}
+            <div className="space-y-4">
+              {[
+                { title: 'Description', content: product.description },
+                { title: 'Usage instructions', content: product.instructions },
+                { title: 'Ingredients', content: product.ingredients },
+                { title: 'Additional Info', content: product.additional },
+              ].map(({ content, title }, index) => {
+                if (!content) return null;
+                return (
+                  <Dropdown
+                    key={index}
+                    title={title}
+                    defaultOpen={index === 0}
+                    children={<QuillContent content={content} />}
+                    className="[&>button]:border-y-primary/30 [&>button]:border-y"
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
       ) : (
