@@ -362,7 +362,12 @@ const ProductDetails = () => {
             ].map(({ content, title }, index) => {
               if (!content) return null;
               return (
-                <Dropdown key={index} title={title} children={<QuillContent content={content} />} />
+                <Dropdown
+                  key={index}
+                  title={title}
+                  defaultOpen={index === 0}
+                  children={<QuillContent content={content} />}
+                />
               );
             })}
           </div>

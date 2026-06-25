@@ -24,14 +24,26 @@ const Dropdown = ({
   });
 
   useEffect(() => {
-    if (!containerRef.current) return;
-    if (isOpen) {
-      containerRef.current.style.maxHeight = `${containerRef.current.scrollHeight}px`;
-      containerRef.current.style.opacity = '1';
-    } else {
-      containerRef.current.style.maxHeight = '0px';
-      containerRef.current.style.opacity = '0';
-    }
+    const el = containerRef.current;
+    if (!el) return;
+
+    const updateHeight = () => {
+      if (isOpen) {
+        el.style.maxHeight = `${el.scrollHeight}px`;
+        el.style.opacity = '1';
+      } else {
+        el.style.maxHeight = '0px';
+        el.style.opacity = '0';
+      }
+    };
+
+    updateHeight();
+
+    const observer = new ResizeObserver(updateHeight);
+
+    observer.observe(el);
+
+    return () => observer.disconnect();
   }, [isOpen, options]);
   return (
     <div
@@ -47,7 +59,7 @@ const Dropdown = ({
       >
         <div className="flex items-center gap-3 transition-all duration-300">
           <InputIcon icon={icons?.left} />
-          <span className="font-medium text-sm text-primary whitespace-nowrap">{title}</span>
+          <span className="text-primary text-sm font-medium whitespace-nowrap">{title}</span>
           <InputIcon icon={icons?.right} />
         </div>
         <Icon
