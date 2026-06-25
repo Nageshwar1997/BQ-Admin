@@ -25,9 +25,11 @@ import type {
 
 export type TInputIcon = IconProps | ReactElement;
 
+export type TInputIcons = Partial<Record<'left' | 'right', TInputIcon>>
+
 export interface IBaseInput extends TClassName, TContainerClassName {
   needRef?: boolean;
-  icons?: Partial<Record<'left' | 'right', TInputIcon>>;
+  icons?: TInputIcons;
   register?: UseFormRegisterReturn;
   label?: string;
   error?: string;
@@ -44,7 +46,7 @@ export interface ICheckbox extends Omit<IBaseInput, 'needRef' | 'icons' | 'label
   tooltip?: Pick<ITooltip, 'required' | 'description' | 'title' | 'placement'>;
 }
 
-type TOption = { label: string | ReactNode; value: string };
+export type TOption = { label: string | ReactNode; value: string };
 
 export interface IRadio extends TClassName, TContainerClassName, Pick<IBaseInput, 'error'> {
   value: string;

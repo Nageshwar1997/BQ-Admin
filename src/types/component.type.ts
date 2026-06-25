@@ -12,6 +12,7 @@ import type {
 } from 'react';
 import type { TCategory } from './api.type';
 import type { TGradientPos, TScrollDirection } from './hook.type';
+import type { TInputIcons, TOption } from './input.type';
 
 export type TClassName = { className?: string };
 
@@ -153,7 +154,7 @@ export interface IMediaCarousel
 export interface IMediaCarouselWithParent
   extends
     TClassName,
-    Partial<Pick<IVideo, "videoProps">>,
+    Partial<Pick<IVideo, 'videoProps'>>,
     Pick<IMediaCarousel, 'media' | 'selected' | 'handleRemove'> {
   needButtonControls?: boolean;
 }
@@ -168,3 +169,22 @@ export type TPageWrapper = TChildren &
       buttons?: Partial<IButton & TChildren>[];
     } & Partial<TChildren>;
   };
+
+export interface IDropdownOptions extends TClassName {
+  options: TOption[];
+  selected: string;
+  onChange: (opt: TOption) => void;
+  onSelect?: () => void;
+}
+
+export interface IDropdown extends TClassName, Partial<Pick<IDropdownOptions, 'options'>> {
+  title: string | ReactElement;
+  icons?: TInputIcons;
+  children: ReactElement<{ onSelect?: () => void }>;
+  closeOnOutsideClick?: boolean;
+  isAbsolute?: boolean;
+  showShadow?: boolean;
+  closeOnOptionClick?: boolean;
+  isRounded?: boolean;
+  defaultOpen?: boolean;
+}

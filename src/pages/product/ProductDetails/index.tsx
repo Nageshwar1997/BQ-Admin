@@ -3,6 +3,7 @@
 import { MediaCarouselWithParentMedia } from '@/components/layout/carousels/MediaCarouselWithParentMedia';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
+import Dropdown from '@/components/layout/dropdown';
 import Button from '@/components/ui/Button';
 import Select from '@/components/ui/inputs/Select';
 import { QuillContent } from '@/components/ui/QuillContent';
@@ -305,7 +306,17 @@ const ProductDetails = () => {
             />
             <Button content="Add Review" pattern="primary" />
           </div>
-          <QuillContent content={product.description} className='' />
+          {[
+            { title: 'Description', content: product.description },
+            { title: 'Usage instructions', content: product.instructions },
+            { title: 'Ingredients', content: product.ingredients },
+            { title: 'Additional Info', content: product.additional },
+          ].map(({ content, title }, index) => {
+            if (!content) return null;
+            return (
+              <Dropdown key={index} title={title} children={<QuillContent content={content} />} />
+            );
+          })}
         </div>
       </div>
     </PageWrapper>
