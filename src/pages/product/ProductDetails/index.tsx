@@ -9,7 +9,7 @@ import { QuillContent } from '@/components/ui/QuillContent';
 import { PRODUCT_STATUS_TRANSITIONS } from '@/constants/api.constants';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
-import { useGetProductBySlug } from '@/services/product-service/product.service.query';
+import { useGetDashboardProductBySlug } from '@/services/product-service/product.service.query';
 import type { TMediaOption } from '@/types/component.type';
 import { formatDate, formatINRCurrency, isNullOrUndefined } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
@@ -17,7 +17,7 @@ import { useMemo } from 'react';
 
 const ProductDetails = () => {
   const { pathParams } = usePathParams();
-  const { data: product, isLoading, isError } = useGetProductBySlug(pathParams.slug || '');
+  const { data: product, isLoading, isError } = useGetDashboardProductBySlug(pathParams.slug || '');
   const { queryParams, setParams, removeParams } = useQueryParams();
 
   const variant = useMemo(() => {

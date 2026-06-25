@@ -75,8 +75,8 @@ export class ProductApi extends ApiRequest {
     return this.request({ ...this.routes.get.dashboard.products, params });
   };
 
-  public getProductBySlug = (slug: string) => {
-    const { method, url } = this.routes.get.bySlug;
+  public getDashboardProductBySlug = (slug: string) => {
+    const { method, url } = this.routes.get.dashboard.bySlug;
     return this.request({ method, url: url({ slug }) });
   };
 }
