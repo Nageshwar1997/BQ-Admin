@@ -1,8 +1,13 @@
 import { VARIANT_TYPE, VARIANT_TYPE_MAP } from '@/constants/common.constants';
-import { TRY_ON_MAP, TRYON_CATEGORY_MAP } from '@/constants/form.constants';
 import { REGEX } from '@/constants/regex.constants';
 import { formatFileSize } from '@/utils/common.util';
-import { FILE_FORMAT, FILE_MIME, MAX_SIZE } from '@beautinique/shared-constants';
+import {
+  FILE_FORMAT,
+  FILE_MIME,
+  MAX_SIZE,
+  TRY_ON_CATEGORY_MAP,
+  TRY_ON_MAP,
+} from '@beautinique/shared-constants';
 import {
   array,
   custom,
@@ -441,43 +446,43 @@ const enabledTryOnSchema = discriminatedUnion(
   'category',
   [
     object({
-      category: literal(TRYON_CATEGORY_MAP.LIP),
-      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.LIP], {
+      category: literal(TRY_ON_CATEGORY_MAP.LIP),
+      subCategory: z_enum(TRY_ON_MAP[TRY_ON_CATEGORY_MAP.LIP], {
         error: `TryOn sub-category is required.`,
       }),
     }),
 
     object({
-      category: literal(TRYON_CATEGORY_MAP.EYE),
-      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.EYE], {
+      category: literal(TRY_ON_CATEGORY_MAP.EYE),
+      subCategory: z_enum(TRY_ON_MAP[TRY_ON_CATEGORY_MAP.EYE], {
         error: `TryOn sub-category is required.`,
       }),
     }),
 
     object({
-      category: literal(TRYON_CATEGORY_MAP.HAIR),
-      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.HAIR], {
+      category: literal(TRY_ON_CATEGORY_MAP.HAIR),
+      subCategory: z_enum(TRY_ON_MAP[TRY_ON_CATEGORY_MAP.HAIR], {
         error: `TryOn sub-category is required.`,
       }),
     }),
 
     object({
-      category: literal(TRYON_CATEGORY_MAP.FACE),
-      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.FACE], {
+      category: literal(TRY_ON_CATEGORY_MAP.FACE),
+      subCategory: z_enum(TRY_ON_MAP[TRY_ON_CATEGORY_MAP.FACE], {
         error: `TryOn sub-category is required.`,
       }),
     }),
 
     object({
-      category: literal(TRYON_CATEGORY_MAP.NAIL),
-      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.NAIL], {
+      category: literal(TRY_ON_CATEGORY_MAP.NAIL),
+      subCategory: z_enum(TRY_ON_MAP[TRY_ON_CATEGORY_MAP.NAIL], {
         error: `TryOn sub-category is required.`,
       }),
     }),
 
     object({
-      category: literal(TRYON_CATEGORY_MAP.SKIN),
-      subCategory: z_enum(TRY_ON_MAP[TRYON_CATEGORY_MAP.SKIN], {
+      category: literal(TRY_ON_CATEGORY_MAP.SKIN),
+      subCategory: z_enum(TRY_ON_MAP[TRY_ON_CATEGORY_MAP.SKIN], {
         error: `TryOn sub-category is required.`,
       }),
     }),

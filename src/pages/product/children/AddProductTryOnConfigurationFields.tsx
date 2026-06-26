@@ -1,8 +1,8 @@
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Select from '@/components/ui/inputs/Select';
-import { TRY_ON_CATEGORIES, TRY_ON_MAP } from '@/constants/form.constants';
 import { PRODUCT_TRYON_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type { TProductTryOnConfiguration } from '@/types/schema.type';
+import { TRY_ON_CATEGORIES, TRY_ON_MAP } from '@beautinique/shared-constants';
 import { useMemo } from 'react';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
@@ -42,7 +42,7 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
                   error={'tryOn' in errors ? errors.tryOn?.[input.name]?.message : undefined}
                   options={options.map((category) => ({ label: category, value: category }))}
                   selectProps={{
-                    value,
+                    value: value || '',
                     placeholder: input.placeholder,
                     disabled: input.name === 'subCategory' && !tryOn?.category,
                     onChange: (value) => {
