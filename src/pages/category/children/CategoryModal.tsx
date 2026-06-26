@@ -21,7 +21,7 @@ import type { TCatModal } from '@/types/component.type';
 import type { TCategoryForm, TConfirmDetails } from '@/types/schema.type';
 import { isDeepEqual, toaster } from '@/utils/common.util';
 import { setErrorToForm } from '@/utils/form.util';
-import { CATEGORY_LEVEL_MAP } from '@beautinique/shared-constants';
+import { CATEGORY_LEVELS_MAP } from '@beautinique/shared-constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo } from 'react';
@@ -30,9 +30,9 @@ import { Level1Fields, Level2Fields, Level3Fields } from './CategoryFields';
 
 type TMode = typeof QUERY_PARAMS_KEY_MAP.category.edit | typeof QUERY_PARAMS_KEY_MAP.category.add;
 
-const isL1 = (level: TCategoryForm['level']) => level === CATEGORY_LEVEL_MAP.L1;
-const isL2 = (level: TCategoryForm['level']) => level === CATEGORY_LEVEL_MAP.L2;
-const isL3 = (level: TCategoryForm['level']) => level === CATEGORY_LEVEL_MAP.L3;
+const isL1 = (level: TCategoryForm['level']) => level === CATEGORY_LEVELS_MAP.L1;
+const isL2 = (level: TCategoryForm['level']) => level === CATEGORY_LEVELS_MAP.L2;
+const isL3 = (level: TCategoryForm['level']) => level === CATEGORY_LEVELS_MAP.L3;
 
 const DEFAULT_VALUES = FORM_DEFAULT_VALUES.category;
 
@@ -48,15 +48,15 @@ const geTCategoryFormName = (categories: TCategory[] | undefined, id?: string) =
 
 const getInitialData = (cat: TCategory, mainCatId = ''): TCategoryForm => {
   switch (cat.level) {
-    case CATEGORY_LEVEL_MAP.L2:
+    case CATEGORY_LEVELS_MAP.L2:
       return {
         activeStep: 0,
         name: cat.name,
-        level: CATEGORY_LEVEL_MAP.L2,
+        level: CATEGORY_LEVELS_MAP.L2,
         mainCategory: cat.parent,
       };
 
-    case CATEGORY_LEVEL_MAP.L3:
+    case CATEGORY_LEVELS_MAP.L3:
       return {
         activeStep: 0,
         name: cat.name,
@@ -66,22 +66,22 @@ const getInitialData = (cat: TCategory, mainCatId = ''): TCategoryForm => {
         description: cat.description,
       };
 
-    case CATEGORY_LEVEL_MAP.L1:
+    case CATEGORY_LEVELS_MAP.L1:
     default:
-      return { activeStep: 0, name: cat.name, level: CATEGORY_LEVEL_MAP.L1 };
+      return { activeStep: 0, name: cat.name, level: CATEGORY_LEVELS_MAP.L1 };
   }
 };
 
 const getPayload = (data: TCategoryForm) => {
   const { level, name } = data;
   switch (level) {
-    case CATEGORY_LEVEL_MAP.L2:
+    case CATEGORY_LEVELS_MAP.L2:
       return { name, level, parent: data.mainCategory, description: undefined };
 
-    case CATEGORY_LEVEL_MAP.L3:
+    case CATEGORY_LEVELS_MAP.L3:
       return { name, level, parent: data.subCategory, description: data.description };
 
-    case CATEGORY_LEVEL_MAP.L1:
+    case CATEGORY_LEVELS_MAP.L1:
     default:
       return { name, level, parent: undefined, description: undefined };
   }
@@ -122,20 +122,20 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   const { mutateAsync: updateCategoryAsync } = useUpdateCategory({ categoryId: category?._id });
 
   const { data: level1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
-    level: CATEGORY_LEVEL_MAP.L1,
+    level: CATEGORY_LEVELS_MAP.L1,
     enabled: !isL1(level),
   });
 
   const { data: level2Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
-    level: CATEGORY_LEVEL_MAP.L2,
+    level: CATEGORY_LEVELS_MAP.L2,
     parent: mainCategory,
-    enabled: level === CATEGORY_LEVEL_MAP.L3 && !!mainCategory,
+    enabled: level === CATEGORY_LEVELS_MAP.L3 && !!mainCategory,
   });
 
   const { data: level3Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
-    level: CATEGORY_LEVEL_MAP.L3,
+    level: CATEGORY_LEVELS_MAP.L3,
     parent: subCategory,
-    enabled: level === CATEGORY_LEVEL_MAP.L3 && !!subCategory,
+    enabled: level === CATEGORY_LEVELS_MAP.L3 && !!subCategory,
   });
 
   const initialPayload = useMemo(() => {
@@ -145,13 +145,13 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
 
   const hierarchyPreview = useMemo(() => {
     switch (level) {
-      case CATEGORY_LEVEL_MAP.L1:
+      case CATEGORY_LEVELS_MAP.L1:
         return 'This will be created as a main category.';
 
-      case CATEGORY_LEVEL_MAP.L2:
+      case CATEGORY_LEVELS_MAP.L2:
         return `Under ${geTCategoryFormName(level1Cats, mainCategory)}.`;
 
-      case CATEGORY_LEVEL_MAP.L3:
+      case CATEGORY_LEVELS_MAP.L3:
         return `Under ${geTCategoryFormName(level1Cats, mainCategory)} / ${geTCategoryFormName(
           level2Cats,
           subCategory,

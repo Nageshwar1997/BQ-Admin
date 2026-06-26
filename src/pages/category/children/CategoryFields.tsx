@@ -4,7 +4,7 @@ import Tooltip from '@/components/ui/Tooltip';
 import { EMPTY_ARRAY } from '@/constants/common.constants';
 import type { TCategory } from '@/types/api.type';
 import type { TCategoryForm, TL2CategoryForm, TL3CategoryForm } from '@/types/schema.type';
-import { CATEGORY_LEVEL_MAP } from '@beautinique/shared-constants';
+import { CATEGORY_LEVELS_MAP } from '@beautinique/shared-constants';
 import {
   Controller,
   type Control,
@@ -57,8 +57,8 @@ const CommonFields = ({
           <Select
             label="Category level"
             options={['Main', 'Sub', 'Product'].map((name, i) => ({
-              value: i + CATEGORY_LEVEL_MAP.L1,
-              label: `L${i + CATEGORY_LEVEL_MAP.L1} - ${name} category`,
+              value: i + CATEGORY_LEVELS_MAP.L1,
+              label: `L${i + CATEGORY_LEVELS_MAP.L1} - ${name} category`,
               disabled: i + 1 === level,
             }))}
             error={errors.level?.message}

@@ -2,7 +2,7 @@ import type { METHOD_MAP } from '@/constants/api.constants';
 import {
   type TAuthProvider,
   type TCategoryLevel,
-  type TCategoryLevelMap,
+  type TCategoryLevelsMap,
   type TProductStatus,
   type TRole,
   type TSort,
@@ -43,9 +43,9 @@ export interface IUser extends Pick<TLogin, 'password'>, TEmail, IId, ITimeStamp
 /*                                  CATEGORY                                  */
 /* -------------------------------------------------------------------------- */
 
-export type TLevel1 = TCategoryLevelMap['L1'];
-export type TLevel2 = TCategoryLevelMap['L2'];
-export type TLevel3 = TCategoryLevelMap['L3'];
+export type TLevel1 = TCategoryLevelsMap['L1'];
+export type TLevel2 = TCategoryLevelsMap['L2'];
+export type TLevel3 = TCategoryLevelsMap['L3'];
 
 type CategoryBase<TLevel extends TCategoryLevel> = IId &
   Pick<TCategoryForm, 'name'> & { slug: string; level: TLevel };

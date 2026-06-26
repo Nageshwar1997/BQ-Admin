@@ -1,5 +1,5 @@
 import { CATEGORY_STEPPER_STEP_COUNT } from '@/constants/common.constants';
-import { CATEGORY_LEVEL_MAP, REGEX } from '@beautinique/shared-constants';
+import { CATEGORY_LEVELS_MAP, REGEX } from '@beautinique/shared-constants';
 import { literal, object, string, union } from 'zod';
 
 /* -------------------------------------------------------------------------- */
@@ -40,7 +40,7 @@ const baseCategorySchema = object({
 /* -------------------------------------------------------------------------- */
 
 export const l1CategorySchema = baseCategorySchema.pick({ name: true, activeStep: true }).extend({
-  level: literal(CATEGORY_LEVEL_MAP.L1),
+  level: literal(CATEGORY_LEVELS_MAP.L1),
 });
 
 /* -------------------------------------------------------------------------- */
@@ -49,7 +49,7 @@ export const l1CategorySchema = baseCategorySchema.pick({ name: true, activeStep
 
 export const l2CategorySchema = baseCategorySchema
   .pick({ name: true, activeStep: true, mainCategory: true })
-  .extend({ level: literal(CATEGORY_LEVEL_MAP.L2) });
+  .extend({ level: literal(CATEGORY_LEVELS_MAP.L2) });
 
 /* -------------------------------------------------------------------------- */
 /*                               LEVEL 3 SCHEMA                               */
@@ -57,7 +57,7 @@ export const l2CategorySchema = baseCategorySchema
 
 export const l3CategorySchema = baseCategorySchema
   .pick({ name: true, activeStep: true, mainCategory: true, subCategory: true, description: true })
-  .extend({ level: literal(CATEGORY_LEVEL_MAP.L3) });
+  .extend({ level: literal(CATEGORY_LEVELS_MAP.L3) });
 
 /* -------------------------------------------------------------------------- */
 /*                              COMBINED SCHEMA                               */

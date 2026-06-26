@@ -1,4 +1,4 @@
-import { CATEGORY_LEVEL_MAP } from '@beautinique/shared-constants';
+import { CATEGORY_LEVELS_MAP } from '@beautinique/shared-constants';
 
 const passwords = { password: '', confirmPassword: '' };
 
@@ -38,7 +38,7 @@ export const FORM_DEFAULT_VALUES = {
   category: {
     activeStep: 0,
     name: '',
-    level: CATEGORY_LEVEL_MAP.L1,
+    level: CATEGORY_LEVELS_MAP.L1,
     mainCategory: '',
     subCategory: '',
     description: '',

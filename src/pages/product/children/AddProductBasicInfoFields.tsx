@@ -4,13 +4,14 @@ import {
   PRODUCT_BASIC_INFO_INPUT_MAP_DATA,
   PRODUCT_CATEGORIES_SELECT_MAP_DATA,
 } from '@/constants/input.constants';
-import type { TCategory, TCategoryLevelMap } from '@/types/api.type';
+import type { TCategory } from '@/types/api.type';
 import type { TProductBasicInfo } from '@/types/schema.type';
+import type { TCategoryLevelsMap } from '@beautinique/shared-constants';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
 type Props = {
   form: UseFormReturn<TProductBasicInfo>;
-  categories: Record<keyof TCategoryLevelMap, TCategory[]>;
+  categories: Record<keyof TCategoryLevelsMap, TCategory[]>;
 };
 
 const AddProductBasicInfoFields = ({ form, categories }: Props) => {

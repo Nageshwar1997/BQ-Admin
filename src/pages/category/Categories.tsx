@@ -21,7 +21,7 @@ import {
 import type { TCategory } from '@/types/api.type';
 import type { TCatModal, TCatTable } from '@/types/component.type';
 import { getFilteredAndSortedCats } from '@/utils/api.util';
-import { CATEGORY_LEVEL_MAP, SORT_MAP, type TSort } from '@beautinique/shared-constants';
+import { CATEGORY_LEVELS_MAP, SORT_MAP, type TSort } from '@beautinique/shared-constants';
 import { Icon } from '@iconify/react';
 import {
   Fragment,
@@ -162,7 +162,7 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
     isLoading,
     isError,
   } = useGetCategoriesByParentLevel({
-    level: CATEGORY_LEVEL_MAP.L3,
+    level: CATEGORY_LEVELS_MAP.L3,
     parent: parentCat._id,
   });
   const filteredCats = useMemo(
@@ -174,11 +174,11 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
     <div className="border-primary/10 bg-primary/2 rounded-xl border">
       <CategoryTableTopInfo
         badgeText={`${filteredCats.length}/${categories.length} items`}
-        level={CATEGORY_LEVEL_MAP.L3}
+        level={CATEGORY_LEVELS_MAP.L3}
         name={parentCat.name}
       />
       <Table>
-        <CategoryHead level={CATEGORY_LEVEL_MAP.L3} />
+        <CategoryHead level={CATEGORY_LEVELS_MAP.L3} />
         <TableBody>
           {filteredCats.length ? (
             filteredCats.map((category) => (
@@ -196,7 +196,7 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
               haveLength={!!categories.length}
               isError={isError}
               isLoading={isLoading}
-              level={CATEGORY_LEVEL_MAP.L3}
+              level={CATEGORY_LEVELS_MAP.L3}
             />
           )}
         </TableBody>
@@ -215,7 +215,7 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
     isLoading,
     isError,
   } = useGetCategoriesByParentLevel({
-    level: CATEGORY_LEVEL_MAP.L2,
+    level: CATEGORY_LEVELS_MAP.L2,
     parent: parentCat._id,
   });
   const filteredCats = useMemo(
@@ -231,11 +231,11 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
     <div className="border-primary/10 bg-primary/2 rounded-xl border">
       <CategoryTableTopInfo
         badgeText={`${filteredCats.length}/${categories.length} items`}
-        level={CATEGORY_LEVEL_MAP.L2}
+        level={CATEGORY_LEVELS_MAP.L2}
         name={parentCat.name}
       />
       <Table>
-        <CategoryHead level={CATEGORY_LEVEL_MAP.L2} />
+        <CategoryHead level={CATEGORY_LEVELS_MAP.L2} />
         <TableBody>
           {filteredCats.length ? (
             filteredCats.map((category) => (
@@ -274,7 +274,7 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
               haveLength={!!categories.length}
               isError={isError}
               isLoading={isLoading}
-              level={CATEGORY_LEVEL_MAP.L2}
+              level={CATEGORY_LEVELS_MAP.L2}
             />
           )}
         </TableBody>
@@ -294,7 +294,7 @@ const L1Table = () => {
     data: categories = EMPTY_ARRAY,
     isLoading,
     isError,
-  } = useGetCategoriesByParentLevel({ level: CATEGORY_LEVEL_MAP.L1 });
+  } = useGetCategoriesByParentLevel({ level: CATEGORY_LEVELS_MAP.L1 });
 
   const { mutateAsync: deleteCategoryAsync } = useDeleteCategory({ categoryId: deleteId });
 
@@ -332,7 +332,7 @@ const L1Table = () => {
     <div className="border-primary/10 bg-secondary-invert rounded-xl border">
       <CategoryTableTopInfo
         badgeText={`${filteredCats.length}/${categories.length} items`}
-        level={CATEGORY_LEVEL_MAP.L1}
+        level={CATEGORY_LEVELS_MAP.L1}
         name=""
         className="flex w-full flex-row-reverse items-center justify-between gap-3 space-y-0!"
       />
@@ -341,7 +341,7 @@ const L1Table = () => {
         gradientClassNames={{ left: 'from-secondary-invert', right: 'from-secondary-invert' }}
       >
         <Table>
-          <CategoryHead level={CATEGORY_LEVEL_MAP.L1} />
+          <CategoryHead level={CATEGORY_LEVELS_MAP.L1} />
           <TableBody>
             {filteredCats.length ? (
               filteredCats.map((category) => (
@@ -379,7 +379,7 @@ const L1Table = () => {
                 haveLength={!!categories.length}
                 isError={isError}
                 isLoading={isLoading}
-                level={CATEGORY_LEVEL_MAP.L3}
+                level={CATEGORY_LEVELS_MAP.L3}
               />
             )}
           </TableBody>
