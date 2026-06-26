@@ -1,7 +1,8 @@
 import type { METHOD_MAP } from '@/constants/api.constants';
-import type { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
 import {
   type TAuthProvider,
+  type TCategoryLevel,
+  type TCategoryLevelMap,
   type TProductStatus,
   type TRole,
   type TSort,
@@ -41,10 +42,6 @@ export interface IUser extends Pick<TLogin, 'password'>, TEmail, IId, ITimeStamp
 /* -------------------------------------------------------------------------- */
 /*                                  CATEGORY                                  */
 /* -------------------------------------------------------------------------- */
-
-export type TCategoryLevelMap = typeof CATEGORY_LEVELS_MAP;
-
-export type TCategoryLevel = TCategoryLevelMap[keyof TCategoryLevelMap];
 
 export type TLevel1 = TCategoryLevelMap['L1'];
 export type TLevel2 = TCategoryLevelMap['L2'];

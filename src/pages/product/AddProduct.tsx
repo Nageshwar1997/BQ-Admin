@@ -1,12 +1,7 @@
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import Button from '@/components/ui/Button';
 import Stepper from '@/components/ui/Stepper';
-import {
-  ADD_PRODUCT_STEPS,
-  CATEGORY_LEVELS_MAP,
-  EMPTY_ARRAY,
-  ROUTES,
-} from '@/constants/common.constants';
+import { ADD_PRODUCT_STEPS, EMPTY_ARRAY, ROUTES } from '@/constants/common.constants';
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import usePathParams from '@/hooks/usePathParams';
 import { useProcessQuillContent } from '@/hooks/useProcessQuillContent';
@@ -43,6 +38,7 @@ import type {
   TProductTryOnConfiguration,
 } from '@/types/schema.type';
 import { isDeepEqual } from '@/utils/common.util';
+import { CATEGORY_LEVEL_MAP } from '@beautinique/shared-constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
 import { useEffect, useRef, useState } from 'react';
@@ -115,17 +111,17 @@ const AddProduct = () => {
   const l2Category = useWatch({ control: basicInfoForm.control, name: 'l2Category' });
 
   const { data: l1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
-    level: CATEGORY_LEVELS_MAP.L1,
+    level: CATEGORY_LEVEL_MAP.L1,
   });
 
   const { data: l2Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
-    level: CATEGORY_LEVELS_MAP.L2,
+    level: CATEGORY_LEVEL_MAP.L2,
     parent: l1Category?._id,
     enabled: !!l1Category?._id,
   });
 
   const { data: l3Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
-    level: CATEGORY_LEVELS_MAP.L3,
+    level: CATEGORY_LEVEL_MAP.L3,
     parent: l2Category?._id,
     enabled: !!l2Category?._id,
   });

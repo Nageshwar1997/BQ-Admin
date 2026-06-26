@@ -142,7 +142,6 @@ export const QUERY_PARAMS_KEY_MAP = {
   sort: 'sort', // To Set Sort Order
 } as const;
 
-
 export const CATEGORY_MODAL_STEPS: StepperStep[] = [
   { title: 'Category info', description: 'Name and hierarchy', icon: 'solar:hanger-2-linear' },
   {
@@ -185,9 +184,6 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
     icon: 'solar:check-circle-linear',
   },
 ];
-
-export const CATEGORY_LEVELS_MAP = { L1: 1, L2: 2, L3: 3 } as const;
-export const CATEGORY_LEVELS = Object.values(CATEGORY_LEVELS_MAP);
 
 export const CATEGORY_STEPPER_STEP_COUNT = [0, 1] as const;
 
