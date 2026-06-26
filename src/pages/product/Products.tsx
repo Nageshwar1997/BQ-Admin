@@ -20,10 +20,15 @@ import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesHierarchy } from '@/services/product-service/category.service.query';
 import { useGetDashboardProducts } from '@/services/product-service/product.service.query';
-import type { TCategoryHierarchy, TProductSortBy } from '@/types/api.type';
+import type { TCategoryHierarchyNode, TProductSortBy } from '@/types/api.type';
 import type { IHierarchySelectOption } from '@/types/input.type';
 import { formatDate, formatINRCurrency } from '@/utils/common.util';
-import { SORT_MAP, type TProductStatus, type TSort } from '@beautinique/shared-constants';
+import {
+  SORT_MAP,
+  type TCategoryLevel,
+  type TProductStatus,
+  type TSort,
+} from '@beautinique/shared-constants';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -48,12 +53,14 @@ const SearchAndSort = () => {
   });
 
   const categories = useMemo(() => {
-    const mapCategoryHierarchy = (categories: TCategoryHierarchy[]): IHierarchySelectOption[] => {
+    const mapCategoryHierarchy = (
+      categories: TCategoryHierarchyNode<TCategoryLevel>[],
+    ): IHierarchySelectOption[] => {
       return categories.map((category) => ({
         label: category.name,
         searchLabel: category.name,
         value: category._id,
-        children: category.subcategories.length ? mapCategoryHierarchy(category.subcategories) : [],
+        children: category.subcategories?.length ? mapCategoryHierarchy(category.subcategories) : [],
       }));
     };
 

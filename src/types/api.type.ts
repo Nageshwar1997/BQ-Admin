@@ -65,7 +65,7 @@ export type TCategoryHierarchyNode<TLevel extends TCategoryLevel> = TLevel exten
       }
     : CategoryBase<TLevel3> & { parent: string; description: string; subcategories?: never };
 
-export type TCategoryHierarchy = TCategoryHierarchyNode<TCategoryLevel>;
+export type TCategoryHierarchy = TCategoryHierarchyNode<TLevel1>;
 
 export interface ICreateHeaders {
   user?: Partial<Pick<IUser, '_id' | 'role'>>;
