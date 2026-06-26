@@ -1,5 +1,4 @@
 import type ApiError from '@/classes/ApiError';
-import { SORT_ORDER_MAP } from '@/constants/common.constants';
 import type {
   IEndpoint,
   TCategory,
@@ -8,7 +7,7 @@ import type {
   TParams,
   TRouteNode,
 } from '@/types/api.type';
-import type { TSort } from '@/types/component.type';
+import { SORT_MAP, type TSort } from '@beautinique/shared-constants';
 import { toaster } from './common.util';
 
 export const handleApiErrorToaster = ({ message, globalErrors }: ApiError, title = 'Error') => {
@@ -38,7 +37,7 @@ export const getFilteredAndSortedCats = (categories: TCategory[], search: string
   if (!sort) return filtered;
 
   return [...filtered].sort((a, b) => {
-    const direction = sort === SORT_ORDER_MAP.desc ? -1 : 1;
+    const direction = sort === SORT_MAP.desc ? -1 : 1;
     return a.name.localeCompare(b.name) * direction;
   });
 };

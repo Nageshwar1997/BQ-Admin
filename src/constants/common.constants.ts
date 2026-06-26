@@ -142,7 +142,6 @@ export const QUERY_PARAMS_KEY_MAP = {
   sort: 'sort', // To Set Sort Order
 } as const;
 
-export const SORT_ORDER_MAP = { asc: 'asc', desc: 'desc' } as const;
 
 export const CATEGORY_MODAL_STEPS: StepperStep[] = [
   { title: 'Category info', description: 'Name and hierarchy', icon: 'solar:hanger-2-linear' },

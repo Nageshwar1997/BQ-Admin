@@ -14,17 +14,16 @@ import HierarchySelect from '@/components/ui/inputs/HierarchySelect';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import { PRODUCTS_TABLE_TITLES } from '@/constants/api.constants';
-import { ROUTES, SORT_ORDER_MAP } from '@/constants/common.constants';
+import { ROUTES } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesHierarchy } from '@/services/product-service/category.service.query';
 import { useGetDashboardProducts } from '@/services/product-service/product.service.query';
 import type { TCategoryHierarchy, TProductSortBy } from '@/types/api.type';
-import type { TSort } from '@/types/component.type';
 import type { IHierarchySelectOption } from '@/types/input.type';
 import { formatDate, formatINRCurrency } from '@/utils/common.util';
-import type { TProductStatus } from '@beautinique/shared-constants';
+import { SORT_MAP, type TProductStatus, type TSort } from '@beautinique/shared-constants';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -128,20 +127,20 @@ const Products = () => {
     search: queryParams.search,
     status: queryParams.status?.toUpperCase() as TProductStatus,
     sortBy: (queryParams.sortBy || 'updatedAt') as TProductSortBy,
-    sortOrder: (queryParams.sortOrder || SORT_ORDER_MAP.desc) as TSort,
+    sortOrder: (queryParams.sortOrder || SORT_MAP.desc) as TSort,
     category: queryParams.category,
   });
 
   const handleSort = (sortBy: TProductSortBy) => {
     const currentSortBy = queryParams.sortBy;
-    const currentSortOrder = queryParams.sortOrder || SORT_ORDER_MAP.desc;
+    const currentSortOrder = queryParams.sortOrder || SORT_MAP.desc;
 
     const nextOrder =
       currentSortBy === sortBy
-        ? currentSortOrder === SORT_ORDER_MAP.asc
-          ? SORT_ORDER_MAP.desc
-          : SORT_ORDER_MAP.asc
-        : SORT_ORDER_MAP.desc;
+        ? currentSortOrder === SORT_MAP.asc
+          ? SORT_MAP.desc
+          : SORT_MAP.asc
+        : SORT_MAP.desc;
 
     setParams({ sortBy, sortOrder: nextOrder });
   };
@@ -214,7 +213,7 @@ const Products = () => {
                           <Icon
                             icon={
                               queryParams.sortBy === sortKey
-                                ? queryParams.sortOrder === SORT_ORDER_MAP.asc
+                                ? queryParams.sortOrder === SORT_MAP.asc
                                   ? 'solar:alt-arrow-up-linear'
                                   : 'solar:alt-arrow-down-linear'
                                 : 'solar:sort-linear'

@@ -1,4 +1,4 @@
-import type { SORT_ORDER_MAP, TOAST_TYPE } from '@/constants/common.constants';
+import type { TOAST_TYPE } from '@/constants/common.constants';
 import type { FOOTER_CATEGORIES } from '@/constants/footer.constants';
 import type { IconProps } from '@iconify/react';
 import type {
@@ -53,8 +53,6 @@ export interface IResend extends TClassName {
   count: number;
   onResend?: () => void;
 }
-
-export type TSort = (typeof SORT_ORDER_MAP)[keyof typeof SORT_ORDER_MAP];
 
 export type TTitleDescription = {
   title: string | ReactNode;

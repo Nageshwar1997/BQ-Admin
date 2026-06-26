@@ -16,7 +16,6 @@ import {
   CATEGORY_LEVELS_MAP,
   EMPTY_ARRAY,
   QUERY_PARAMS_KEY_MAP,
-  SORT_ORDER_MAP,
 } from '@/constants/common.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import {
@@ -24,8 +23,9 @@ import {
   useGetCategoriesByParentLevel,
 } from '@/services/product-service/category.service.query';
 import type { TCategory } from '@/types/api.type';
-import type { TCatModal, TCatTable, TSort } from '@/types/component.type';
+import type { TCatModal, TCatTable } from '@/types/component.type';
 import { getFilteredAndSortedCats } from '@/utils/api.util';
+import { SORT_MAP, type TSort } from '@beautinique/shared-constants';
 import { Icon } from '@iconify/react';
 import {
   Fragment,
@@ -85,12 +85,12 @@ const CategoryHead = ({ level }: { level: TCategory['level'] }) => {
     `sort_${level}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['sort'];
 
   const handleSort = () => {
-    if (queryParams[sortKey] === SORT_ORDER_MAP.asc) {
-      setParams({ ...queryParams, [sortKey]: SORT_ORDER_MAP.desc });
-    } else if (queryParams[sortKey] === SORT_ORDER_MAP.desc) {
+    if (queryParams[sortKey] === SORT_MAP.asc) {
+      setParams({ [sortKey]: SORT_MAP.desc });
+    } else if (queryParams[sortKey] === SORT_MAP.desc) {
       removeParams([sortKey]);
     } else {
-      setParams({ ...queryParams, [sortKey]: SORT_ORDER_MAP.asc });
+      setParams({ [sortKey]: SORT_MAP.asc });
     }
   };
   return (
@@ -107,9 +107,9 @@ const CategoryHead = ({ level }: { level: TCategory['level'] }) => {
                 {title}
                 <Icon
                   icon={
-                    queryParams[sortKey] === SORT_ORDER_MAP.asc
+                    queryParams[sortKey] === SORT_MAP.asc
                       ? 'solar:arrow-up-linear'
-                      : queryParams[sortKey] === SORT_ORDER_MAP.desc
+                      : queryParams[sortKey] === SORT_MAP.desc
                         ? 'solar:arrow-down-linear'
                         : 'solar:sort-linear'
                   }

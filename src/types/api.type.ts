@@ -1,7 +1,11 @@
 import type { METHOD_MAP } from '@/constants/api.constants';
 import type { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
-import { type TAuthProvider, type TProductStatus, type TRole } from '@beautinique/shared-constants';
-import type { TSort } from './component.type';
+import {
+  type TAuthProvider,
+  type TProductStatus,
+  type TRole,
+  type TSort,
+} from '@beautinique/shared-constants';
 import type {
   TCategoryForm,
   TEmail,
