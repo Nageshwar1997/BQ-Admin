@@ -1,14 +1,8 @@
-import {
-  FILE_EXTENSIONS,
-  FILE_MIME,
-  MAX_IMAGE_FILE_SIZE,
-  MAX_VIDEO_FILE_SIZE,
-  VARIANT_TYPE,
-  VARIANT_TYPE_MAP,
-} from '@/constants/common.constants';
+import { VARIANT_TYPE, VARIANT_TYPE_MAP } from '@/constants/common.constants';
 import { TRY_ON_MAP, TRYON_CATEGORY_MAP } from '@/constants/form.constants';
 import { REGEX } from '@/constants/regex.constants';
 import { formatFileSize } from '@/utils/common.util';
+import { FILE_FORMAT, FILE_MIME, MAX_SIZE } from '@beautinique/shared-constants';
 import {
   array,
   custom,
@@ -89,10 +83,10 @@ const thumbnailSchema = custom<File | string>((value) => !!value, {
   error: 'Thumbnail is required.',
 }).superRefine((value, ctx) => {
   if (value instanceof File) {
-    if (value.size > MAX_IMAGE_FILE_SIZE) {
+    if (value.size > MAX_SIZE.IMAGE) {
       ctx.addIssue({
         code: 'custom',
-        message: `Thumbnail size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
+        message: `Thumbnail size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_SIZE.IMAGE)}.`,
       });
     }
 
@@ -101,7 +95,7 @@ const thumbnailSchema = custom<File | string>((value) => !!value, {
     if (!fileTypes.includes(value.type)) {
       ctx.addIssue({
         code: 'custom',
-        message: `Thumbnail type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+        message: `Thumbnail type must be one of: ${FILE_FORMAT.image.join(', ')}.`,
       });
     }
   } else if (typeof value === 'string') {
@@ -119,10 +113,10 @@ const videoSchema = custom<File | string>((value) => !!value, {
   error: 'Video is required.',
 }).superRefine((value, ctx) => {
   if (value instanceof File) {
-    if (value.size > MAX_VIDEO_FILE_SIZE) {
+    if (value.size > MAX_SIZE.VIDEO) {
       ctx.addIssue({
         code: 'custom',
-        message: `Video size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_VIDEO_FILE_SIZE)}.`,
+        message: `Video size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_SIZE.VIDEO)}.`,
       });
     }
 
@@ -131,7 +125,7 @@ const videoSchema = custom<File | string>((value) => !!value, {
     if (!fileTypes.includes(value.type)) {
       ctx.addIssue({
         code: 'custom',
-        message: `Video type must be one of: ${FILE_EXTENSIONS.video.join(', ')}.`,
+        message: `Video type must be one of: ${FILE_FORMAT.video.join(', ')}.`,
       });
     }
   } else if (typeof value === 'string') {
@@ -166,11 +160,11 @@ const imagesSchema = array(
           ctx.addIssue({ code: 'custom', path: [index], message: `${imageLabel} URL is invalid.` });
         }
       } else if (item instanceof File) {
-        if (item.size > MAX_IMAGE_FILE_SIZE) {
+        if (item.size > MAX_SIZE.IMAGE) {
           ctx.addIssue({
             code: 'custom',
             path: [index],
-            message: `${imageLabel} size is ${formatFileSize(item.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
+            message: `${imageLabel} size is ${formatFileSize(item.size)}. Max allowed size is ${formatFileSize(MAX_SIZE.IMAGE)}.`,
           });
         }
 
@@ -180,7 +174,7 @@ const imagesSchema = array(
           ctx.addIssue({
             code: 'custom',
             path: [index],
-            message: `${imageLabel} type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+            message: `${imageLabel} type must be one of: ${FILE_FORMAT.image.join(', ')}.`,
           });
         }
       } else {
@@ -271,10 +265,10 @@ const variantSchema = object({
   thumbnail: custom<File | string>((value) => !!value, { error: 'Variant thumbnail is required.' })
     .superRefine((value, ctx) => {
       if (value instanceof File) {
-        if (value.size > MAX_IMAGE_FILE_SIZE) {
+        if (value.size > MAX_SIZE.IMAGE) {
           ctx.addIssue({
             code: 'custom',
-            message: `Variant thumbnail size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
+            message: `Variant thumbnail size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_SIZE.IMAGE)}.`,
           });
         }
 
@@ -283,7 +277,7 @@ const variantSchema = object({
         if (!fileTypes.includes(value.type)) {
           ctx.addIssue({
             code: 'custom',
-            message: `Variant thumbnail type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+            message: `Variant thumbnail type must be one of: ${FILE_FORMAT.image.join(', ')}.`,
           });
         }
       } else if (typeof value === 'string') {
@@ -323,11 +317,11 @@ const variantSchema = object({
             });
           }
         } else if (item instanceof File) {
-          if (item.size > MAX_IMAGE_FILE_SIZE) {
+          if (item.size > MAX_SIZE.IMAGE) {
             ctx.addIssue({
               code: 'custom',
               path: [index],
-              message: `${imageLabel} size is ${formatFileSize(item.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
+              message: `${imageLabel} size is ${formatFileSize(item.size)}. Max allowed size is ${formatFileSize(MAX_SIZE.IMAGE)}.`,
             });
           }
 
@@ -337,7 +331,7 @@ const variantSchema = object({
             ctx.addIssue({
               code: 'custom',
               path: [index],
-              message: `${imageLabel} type must be one of: ${FILE_EXTENSIONS.image.join(', ')}.`,
+              message: `${imageLabel} type must be one of: ${FILE_FORMAT.image.join(', ')}.`,
             });
           }
         } else {

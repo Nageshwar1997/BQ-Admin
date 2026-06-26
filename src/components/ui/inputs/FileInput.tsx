@@ -1,9 +1,9 @@
 import MediaCarousel from '@/components/layout/carousels/MediaCarousel';
 import { MediaModal } from '@/components/layout/modals/MediaModal';
-import { FILE_EXTENSIONS, FILE_MIME } from '@/constants/common.constants';
 import type { TChildren, TMediaResource } from '@/types/component.type';
 import type { IFileInput } from '@/types/input.type';
 import { isIconProps } from '@/utils/common.util';
+import { FILE_FORMAT, FILE_MIME } from '@beautinique/shared-constants';
 import { Icon } from '@iconify/react';
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { InputError, InputIcon, InputLabel } from './children';
@@ -31,8 +31,8 @@ const getMediaType = (value: File | string): TMediaResource => {
     return 'image';
   }
 
-  const imgExtensions: readonly string[] = FILE_EXTENSIONS.image;
-  const vidExtensions: readonly string[] = FILE_EXTENSIONS.video;
+  const imgExtensions: readonly string[] = FILE_FORMAT.image;
+  const vidExtensions: readonly string[] = FILE_FORMAT.video;
 
   if (imgExtensions.includes(extension)) {
     return 'image';

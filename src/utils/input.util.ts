@@ -1,7 +1,7 @@
-import { FILE_EXTENSIONS, FILE_MIME, MAX_IMAGE_FILE_SIZE } from '@/constants/common.constants';
 import { DEFAULT_QUILL_LINK_ID } from '@/constants/input.constants';
 import type { TQuillImageRef } from '@/types/component.type';
 import type { IQuillToolbar, IToolBarOptions, TQuillToolbar } from '@/types/input.type';
+import { FILE_FORMAT, FILE_MIME, MAX_SIZE } from '@beautinique/shared-constants';
 import { nanoid } from 'nanoid';
 import type Quill from 'quill';
 import type { Delta } from 'quill';
@@ -23,17 +23,17 @@ export const insertImageIntoQuill = (quill: Quill, imagesRef: RefObject<TQuillIm
     const file = input.files[0];
 
     // Validate file size
-    if (file.size > MAX_IMAGE_FILE_SIZE) {
+    if (file.size > MAX_SIZE.IMAGE) {
       return toaster.error({
         title: 'File size limit exceeded',
-        description: `Image size is ${formatFileSize(file.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_FILE_SIZE)}.`,
+        description: `Image size is ${formatFileSize(file.size)}. Max allowed size is ${formatFileSize(MAX_SIZE.IMAGE)}.`,
       });
     }
 
     // Validate extension and file type
     const fileTypes: readonly string[] = FILE_MIME.image;
     const ext = file.name.split('.').pop()?.toLowerCase();
-    const extensions: readonly string[] = FILE_EXTENSIONS.image;
+    const extensions: readonly string[] = FILE_FORMAT.image;
 
     if (!fileTypes.includes(file.type) || !ext || !extensions.includes(ext)) {
       return toaster.error({

@@ -187,41 +187,6 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
 
 export const CATEGORY_STEPPER_STEP_COUNT = [0, 1] as const;
 
-export const KB = 1024;
-export const MB = KB * 1024;
-export const GB = MB * 1024;
-
-export const MAX_IMAGE_FILE_SIZE = 2 * MB; // 2MB
-export const MAX_VIDEO_FILE_SIZE = 50 * MB; // 50MB
-export const FILE_MIME = {
-  image: [
-    'image/jpeg',
-    'image/png',
-    'image/webp',
-    'image/jpg',
-    'image/svg+xml',
-    'image/avif',
-    'image/gif',
-    'image/heic',
-    'image/heif',
-  ],
-  video: [
-    'video/mp4',
-    'video/webm',
-    'video/quicktime', // mov
-    'video/x-matroska', // mkv
-    'video/matroska', // mkv
-    'video/ogg', // ogg
-    'application/vnd.apple.mpegurl', // m3u8
-    'application/x-mpegURL', // m3u8 fallback
-  ],
-} as const;
-
-export const FILE_EXTENSIONS = {
-  image: ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif', 'svg', 'heic', 'heif'],
-  video: ['mp4', 'webm', 'mov', 'mkv', 'ogg', 'm3u8'],
-} as const;
-
 export const TOAST_TYPES = [
   'success',
   'error',

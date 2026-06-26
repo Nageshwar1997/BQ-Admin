@@ -1,11 +1,4 @@
-import {
-  GB,
-  KB,
-  MB,
-  TOAST_TYPE,
-  TOOLTIP_GAP,
-  VIDEO_PLACEHOLDER,
-} from '@/constants/common.constants';
+import { TOAST_TYPE, TOOLTIP_GAP, VIDEO_PLACEHOLDER } from '@/constants/common.constants';
 import useToastStore from '@/stores/toast.store';
 import type { IButton, ITooltip } from '@/types/component.type';
 import type {
@@ -15,6 +8,7 @@ import type {
   IProgressToast,
   TProgressToastOptions,
 } from '@/types/store.type';
+import { GB, KB, MB } from '@beautinique/shared-constants';
 import type { IconProps } from '@iconify/react';
 import type { CSSProperties } from 'react';
 
