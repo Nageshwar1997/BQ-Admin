@@ -1,5 +1,5 @@
 import type { TQuillToolbar } from '@/types/input.type';
-import { VARIANT_TYPE, VARIANT_TYPE_MAP } from './common.constants';
+import { VARIANT_TYPES, VARIANT_TYPES_MAP } from '@beautinique/shared-constants';
 
 export const PASSWORD_KEYS = ['password', 'confirmPassword'];
 
@@ -220,8 +220,8 @@ export const PRODUCT_VARIANT_INPUT_MAP_DATA = [
   {
     name: 'type',
     type: 'radio',
-    defaultValue: VARIANT_TYPE_MAP.COLOR,
-    options: VARIANT_TYPE.map((type) => ({ label: type, value: type })),
+    defaultValue: VARIANT_TYPES_MAP.Color,
+    options: VARIANT_TYPES.map((type) => ({ label: type, value: type })),
   },
   {
     name: 'label',

@@ -203,10 +203,6 @@ export const TOAST_TYPE = Object.fromEntries(TOAST_TYPES.map((type) => [type, ty
 
 export const VIDEO_PLACEHOLDER = '/images/Video-Placeholder.webp';
 
-export const VARIANT_TYPE_MAP = { COLOR: 'Color', TEXT: 'Text' } as const;
-
-export const VARIANT_TYPE = Object.values(VARIANT_TYPE_MAP);
-
 export const PRODUCT_VARIANT_ACTIONS = [
   { content: 'Remove', className: 'bg-electric-purple-c' },
   { content: 'Clear', className: 'bg-primary-red' },

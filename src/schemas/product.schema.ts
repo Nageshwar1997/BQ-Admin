@@ -1,4 +1,3 @@
-import { VARIANT_TYPE, VARIANT_TYPE_MAP } from '@/constants/common.constants';
 import { formatFileSize } from '@/utils/common.util';
 import {
   FILE_FORMAT,
@@ -7,6 +6,8 @@ import {
   REGEX,
   TRY_ON_CATEGORY_MAP,
   TRY_ON_MAP,
+  VARIANT_TYPES,
+  VARIANT_TYPES_MAP,
 } from '@beautinique/shared-constants';
 import {
   array,
@@ -241,7 +242,7 @@ export const productDescriptionAndContentSchema = object({
 /* -------------------------------------------------------------------------- */
 
 const variantSchema = object({
-  type: z_enum(VARIANT_TYPE, { error: 'Variant type is required.' }),
+  type: z_enum(VARIANT_TYPES, { error: 'Variant type is required.' }),
 
   label: string({ error: 'Variant label is required.' })
     .nonempty('Variant label is required.')
@@ -369,7 +370,7 @@ const variantSchema = object({
   /*                               COLOR VARIANT                                */
   /* -------------------------------------------------------------------------- */
 
-  if (data.type === VARIANT_TYPE_MAP.COLOR && data.value) {
+  if (data.type === VARIANT_TYPES_MAP.Color && data.value) {
     const isValidHex = REGEX.HEX_CODE.test(data.value);
     if (!isValidHex) {
       ctx.addIssue({
@@ -384,7 +385,7 @@ const variantSchema = object({
   /*                                TEXT VARIANT                                */
   /* -------------------------------------------------------------------------- */
 
-  if (data.type === VARIANT_TYPE_MAP.TEXT && data.value) {
+  if (data.type === VARIANT_TYPES_MAP.Text && data.value) {
     if (data.value.trim().length > 50) {
       ctx.addIssue({
         code: 'custom',

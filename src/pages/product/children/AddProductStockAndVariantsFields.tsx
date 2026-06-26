@@ -4,7 +4,7 @@ import ColorInput from '@/components/ui/inputs/colorInput';
 import FileInput from '@/components/ui/inputs/FileInput';
 import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
-import { PRODUCT_VARIANT_ACTIONS, VARIANT_TYPE_MAP } from '@/constants/common.constants';
+import { PRODUCT_VARIANT_ACTIONS } from '@/constants/common.constants';
 import { PRODUCT_VARIANT_INPUT_MAP_DATA, STOCKS_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type {
   TProductBasicInfo,
@@ -14,6 +14,7 @@ import type {
 } from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
 import { toErrorMessageArray } from '@/utils/form.util';
+import { VARIANT_TYPES_MAP } from '@beautinique/shared-constants';
 import {
   Controller,
   useFieldArray,
@@ -29,7 +30,7 @@ type Props = {
 
 const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
   const EMPTY_VARIANT: TProductWithVariant['variants'][number] = {
-    type: VARIANT_TYPE_MAP.COLOR,
+    type: VARIANT_TYPES_MAP.Color,
     label: '',
     value: '',
     originalPrice: defaultPrices.originalPrice ?? NaN,
@@ -93,7 +94,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
               {PRODUCT_VARIANT_INPUT_MAP_DATA.map((input) => {
                 const { name, type } = input;
 
-                const isColorVariant = currentVariant?.type === VARIANT_TYPE_MAP.COLOR;
+                const isColorVariant = currentVariant?.type === VARIANT_TYPES_MAP.Color;
 
                 if (name === 'value') {
                   if (type === 'color' && !isColorVariant) return null;
