@@ -69,7 +69,7 @@ const cardConfig = (type: TToast['type']) => {
   }
 };
 
-const Toaster = (props: TToastItem & TClassName) => {
+export const Toaster = (props: TToastItem & TClassName) => {
   const {
     className = '',
     type,
@@ -134,7 +134,7 @@ const Toaster = (props: TToastItem & TClassName) => {
         boxShadow: `0 10px 10px 0px rgba(${config.rgb}, 0.1)`,
       }}
     >
-      <div className="bg-secondary-invert flex w-full items-center gap-2 rounded-[10.25px] p-1.5 md:p-2.5 lg:p-3 [&>svg]:size-5 [&>svg]:md:size-6 [&>svg]:lg:size-7">
+      <div className="bg-secondary-invert flex w-full items-center gap-2 rounded-[10.25px] p-1.5 md:p-2.5 lg:p-3 [&>svg]:size-5 [&>svg]:shrink-0 [&>svg]:md:size-6 [&>svg]:lg:size-7">
         {icon ??
           (type === TOAST_TYPE.progress ? (
             <CircularProgress

@@ -10,6 +10,7 @@ import type {
   TProductBasicInfo,
   TProductStockAndVariants,
   TProductWithoutVariant,
+  TProductWithVariant,
 } from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
 import { toErrorMessageArray } from '@/utils/form.util';
@@ -27,7 +28,7 @@ type Props = {
 };
 
 const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
-  const EMPTY_VARIANT = {
+  const EMPTY_VARIANT: TProductWithVariant['variants'][number] = {
     type: VARIANT_TYPE_MAP.COLOR,
     label: '',
     value: '',
