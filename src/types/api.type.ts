@@ -1,5 +1,5 @@
-import type { METHOD_MAP } from '@/constants/api.constants';
 import {
+  type TApiMethod,
   type TAuthProvider,
   type TCategoryLevel,
   type TCategoryLevelsMap,
@@ -63,7 +63,7 @@ export type TCategoryHierarchyNode<TLevel extends TCategoryLevel> = TLevel exten
         parent: string;
         subcategories: TCategoryHierarchyNode<TLevel3>[];
       }
-    : CategoryBase<TLevel3> & { parent: string; description: string; subcategories: never };
+    : CategoryBase<TLevel3> & { parent: string; description: string; subcategories?: never };
 
 export type TCategoryHierarchy = TCategoryHierarchyNode<TCategoryLevel>;
 
@@ -74,13 +74,11 @@ export interface ICreateHeaders {
   contentType?: string;
 }
 
-export type TApiMethod = (typeof METHOD_MAP)[keyof typeof METHOD_MAP];
-
 export type TRouteNode = Record<string, unknown> & { base?: string };
 
 export interface IEndpoint {
   path: string;
-  method: TApiMethod;
+  method: Lowercase<TApiMethod>;
 }
 
 export type TParams = Record<string, string | number>;
