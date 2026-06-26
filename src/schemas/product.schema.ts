@@ -1,10 +1,10 @@
 import { VARIANT_TYPE, VARIANT_TYPE_MAP } from '@/constants/common.constants';
-import { REGEX } from '@/constants/regex.constants';
 import { formatFileSize } from '@/utils/common.util';
 import {
   FILE_FORMAT,
   FILE_MIME,
   MAX_SIZE,
+  REGEX,
   TRY_ON_CATEGORY_MAP,
   TRY_ON_MAP,
 } from '@beautinique/shared-constants';
