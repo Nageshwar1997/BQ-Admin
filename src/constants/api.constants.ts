@@ -113,13 +113,7 @@ export const API_METHODS_AND_URLS = createRouteHelper(METHODS_AND_PATHS);
 
 export const API_QUERY_KEYS = createQueryKeys(METHODS_AND_PATHS);
 
-export const ROLES = ['USER', 'SELLER', 'ADMIN', 'MASTER'] as const;
-
 export const HEADERS_KEYS = { loginRole: 'X-Login-Role' } as const;
-
-export const ROLES_MAP = Object.fromEntries(ROLES.map((role) => [role, role])) as {
-  [K in (typeof ROLES)[number]]: K;
-};
 
 export const PRODUCTS_TABLE_TITLES: { label: string; sortKey?: TProductSortBy | never }[] = [
   { label: 'S. No' },
