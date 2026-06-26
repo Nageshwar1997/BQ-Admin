@@ -1,10 +1,6 @@
-import type {
-  AUTH_PROVIDERS,
-  METHOD_MAP,
-  PRODUCT_STATUSES,
-  ROLES,
-} from '@/constants/api.constants';
+import type { METHOD_MAP, ROLES } from '@/constants/api.constants';
 import type { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
+import { type TAuthProvider, type TProductStatus } from '@beautinique/shared-constants';
 import type { TSort } from './component.type';
 import type {
   TCategoryForm,
@@ -28,8 +24,6 @@ export interface ITimeStamp {
   createdAt: string;
   updatedAt: string;
 }
-
-export type TAuthProvider = (typeof AUTH_PROVIDERS)[number];
 
 export type TRole = (typeof ROLES)[number];
 
@@ -152,8 +146,6 @@ export type TGenerateQueryKeys<
         >
       : never;
 };
-
-export type TProductStatus = (typeof PRODUCT_STATUSES)[number];
 
 type TEnabledTryOn = Extract<TProductTryOnConfiguration, { enabled: true }>['tryOn'];
 

@@ -1,13 +1,10 @@
 import { productApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
-import type {
-  IGetDashboardProductsQuery,
-  TApiProductPopulated,
-  TProductStatus,
-} from '@/types/api.type';
+import type { IGetDashboardProductsQuery, TApiProductPopulated } from '@/types/api.type';
 import type { TDraftProduct } from '@/types/schema.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
+import type { TProductStatus } from '@beautinique/shared-constants';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const { draft, get } = API_QUERY_KEYS.product_service.product;
