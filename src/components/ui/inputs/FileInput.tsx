@@ -51,16 +51,10 @@ const MediaErrorStyle = ({ errors }: Pick<IFileInput, 'errors'>) => {
   return (
     <style>
       {errors
-        .map((error) => {
-          const secondWord = error.split(' ')[1];
+        .map((error, index) => {
+          if (!error) return '';
 
-          if (!secondWord || Number.isNaN(Number(secondWord))) {
-            return '';
-          }
-
-          const index = Number(secondWord);
-
-          return `.media-carousel > div:nth-child(${index}) { border-color: var(--color-red-c) !important; }`;
+          return `.media-carousel > div:nth-child(${index + 1}) { border-color: var(--color-red-c) !important; }`;
         })
         .join('\n')}
     </style>

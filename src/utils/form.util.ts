@@ -1,4 +1,5 @@
 import type { TFieldErrors } from '@/types/api.type';
+import type { IFileInput } from '@/types/input.type';
 import type { FieldErrors, FieldValues, Path, UseFormSetError } from 'react-hook-form';
 
 export const setErrorToForm = <T extends FieldValues>(
@@ -18,7 +19,7 @@ export const setErrorToForm = <T extends FieldValues>(
 
 export const toErrorMessageArray = <T extends FieldValues>(
   fieldErrors?: FieldErrors<T>,
-): string[] | undefined => {
+): IFileInput['errors'] => {
   if (!fieldErrors) return undefined;
 
   if (
@@ -29,18 +30,25 @@ export const toErrorMessageArray = <T extends FieldValues>(
     return [fieldErrors.message];
   }
 
-  return Object.values(fieldErrors)
-    .map((error) => {
-      if (
-        error &&
-        typeof error === 'object' &&
-        'message' in error &&
-        typeof error.message === 'string'
-      ) {
-        return error.message;
-      }
+  const extractMessage = (error: unknown) => {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'message' in error &&
+      typeof error.message === 'string'
+    ) {
+      return error.message;
+    }
 
-      return null;
-    })
-    .filter((message): message is string => !!message);
+    return undefined;
+  };
+
+  // fieldErrors for array fields is a sparse array (only invalid indexes are set),
+  // so mapping the array directly keeps each error at its real index.
+  // Object.values/Object.entries would skip the unset (hole) indexes and collapse positions.
+  if (Array.isArray(fieldErrors)) {
+    return fieldErrors.map(extractMessage);
+  }
+
+  return Object.values(fieldErrors).map(extractMessage);
 };

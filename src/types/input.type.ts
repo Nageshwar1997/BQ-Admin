@@ -25,7 +25,7 @@ import type {
 
 export type TInputIcon = IconProps | ReactElement;
 
-export type TInputIcons = Partial<Record<'left' | 'right', TInputIcon>>
+export type TInputIcons = Partial<Record<'left' | 'right', TInputIcon>>;
 
 export interface IBaseInput extends TClassName, TContainerClassName {
   needRef?: boolean;
@@ -102,7 +102,7 @@ export interface IFileInput extends Omit<IBaseInput, 'error' | 'register'> {
   fileInputProps: Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value'> & {
     value?: (File | string) | (File | string)[];
   };
-  errors?: string[];
+  errors?: IBaseInput['error'][];
   handleRemove?: (index: number) => void;
   mediaModalClassName?: string;
   mediaCarouselClassName?: string;
