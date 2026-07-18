@@ -235,7 +235,8 @@ const FileInput = ({
         <div className="space-y-1">
           {errors.map((error, index) => {
             if (!error) return null;
-            return <InputError key={index} error={`${index + 1}. ${error}`} />;
+            const message = errors.length > 1 ? `${index + 1}. ${error}` : error;
+            return <InputError key={index} error={message} />;
           })}
         </div>
       )}
