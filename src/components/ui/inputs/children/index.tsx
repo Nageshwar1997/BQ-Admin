@@ -8,8 +8,8 @@ export const InputError = ({ error, className = '' }: { error?: string } & TClas
   if (!error) return null;
   return (
     <p className={`text-red-c flex w-full items-center gap-1 text-start text-[11px] ${className}`}>
-      <Icon icon="solar:info-circle-linear" className="size-3 shrink-0" />
-      <span className="line-clamp-2 leading-none whitespace-pre-line first-letter:uppercase">
+      <Icon icon="solar:info-circle-linear" className="mb-0.5 shrink-0" />
+      <span className="line-clamp-2 leading-3 whitespace-pre-line first-letter:uppercase">
         {error}
       </span>
     </p>
