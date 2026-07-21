@@ -135,7 +135,7 @@ const AddProduct = () => {
   const saveStepIfChanged = async <T extends Record<string, unknown>>(
     currentData: T,
     draftData: T | undefined,
-    saveData: T & { step: number },
+    saveData: T & { step: string },
     options?: { ignoreValues?: unknown[] },
   ) => {
     if (saveDraftProductQuery.isPending) return;
@@ -149,7 +149,7 @@ const AddProduct = () => {
   };
 
   const onBasicInfoSubmit = async (data: TProductBasicInfo) => {
-    await saveStepIfChanged(data, draftProduct?.basicInfo, { ...data, step: activeStep });
+    await saveStepIfChanged(data, draftProduct?.basicInfo, { ...data, step: 'basicInfo' });
   };
 
   const onMediaAndGallerySubmit = async (data: TProductMediaAndGallery) => {
@@ -163,7 +163,7 @@ const AddProduct = () => {
     if (!hasNewFiles) {
       await saveStepIfChanged(data, draftProduct?.mediaAndGallery, {
         ...data,
-        step: activeStep,
+        step: 'mediaAndGallery',
       });
 
       return;
@@ -278,7 +278,7 @@ const AddProduct = () => {
         thumbnail: thumbnailUrl,
         images: finalImages,
         video: videoUrl,
-        step: activeStep,
+        step: 'mediaAndGallery',
       },
       { onSuccess: handleNext },
     );
@@ -345,7 +345,7 @@ const AddProduct = () => {
 
     await saveStepIfChanged(payload, draftProduct?.descriptionAndContent, {
       ...payload,
-      step: activeStep,
+      step: 'descriptionAndContent',
     });
   };
 
@@ -360,7 +360,10 @@ const AddProduct = () => {
     }
 
     if (!data.hasVariants) {
-      await saveStepIfChanged(data, draftProduct?.stockAndVariants, { ...data, step: activeStep });
+      await saveStepIfChanged(data, draftProduct?.stockAndVariants, {
+        ...data,
+        step: 'stockAndVariants',
+      });
 
       return;
     } else {
@@ -434,13 +437,16 @@ const AddProduct = () => {
       await saveStepIfChanged(
         { hasVariants: true, variants: updatedVariants },
         draftProduct?.stockAndVariants,
-        { hasVariants: true, variants: updatedVariants, step: activeStep },
+        { hasVariants: true, variants: updatedVariants, step: 'stockAndVariants' },
       );
     }
   };
 
   const onTryOnConfigurationSubmit = async (data: TProductTryOnConfiguration) => {
-    await saveStepIfChanged(data, draftProduct?.tryOnConfiguration, { ...data, step: activeStep });
+    await saveStepIfChanged(data, draftProduct?.tryOnConfiguration, {
+      ...data,
+      step: 'tryOnConfiguration',
+    });
   };
 
   const onReviewAndConfirmSubmit = async (_data: TConfirmDetails) => {

@@ -73,7 +73,7 @@ const AddProductBasicInfoFields = ({ form, categories }: Props) => {
                       if (isL2) {
                         form.resetField('l3Category');
                       }
-                      onChange({ id: value, name: catName });
+                      onChange({ _id: value, name: catName });
                     },
                   }}
                 />
