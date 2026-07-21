@@ -50,7 +50,7 @@ const LoginForm = () => {
   // -------- Handle Login Submit --------
   const handleLogin = async (data: TLogin) => {
     await mutateAsync(data, {
-      onSuccess: async ({ user }) => {
+      onSuccess: async ({ data: user }) => {
         setUser(user);
 
         const { runAllActions } = useActionsStore.getState();
