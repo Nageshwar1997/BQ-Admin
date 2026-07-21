@@ -23,7 +23,7 @@ import type { TEmail, TOtp, TPasswords } from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
 import { setErrorToForm } from '@/utils/form.util';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 const ForgotPassword = () => {
@@ -34,18 +34,22 @@ const ForgotPassword = () => {
   const { navigate } = usePathParams();
 
   /* ================= 3. API/Queries Hooks ================= */
-  const {
-    data: sendOtpData,
-    isPending: isSendingOtp,
-    mutateAsync: sendOtpAsync,
-  } = useForgotPasswordSendOtp();
-  const {
-    data: resendOtpData,
-    isPending: isResendingOtp,
-    mutateAsync: resendOtpAsync,
-  } = useForgotPasswordResendOtp();
-  const { isPending: isVerifyingOtp, mutateAsync: verifyOtpAsync } = useForgotPasswordVerifyOtp();
-  const { isPending: isRegistering, mutateAsync: registerAndSaveAsync } = useForgotPasswordSave();
+  const sendOtp = useForgotPasswordSendOtp();
+  const resendOtp = useForgotPasswordResendOtp();
+  const verifyOtp = useForgotPasswordVerifyOtp();
+  const register = useForgotPasswordSave();
+
+  const token = useMemo(() => {
+    if (!sendOtp.data) return '';
+
+    return sendOtp.data?.data;
+  }, [sendOtp.data]);
+
+  const sendCount = useMemo(() => {
+    if (!resendOtp.data) return 1;
+
+    return resendOtp.data?.data;
+  }, [resendOtp.data]);
 
   /* ================= 4. Forms ================= */
   const sendOtpForm = useForm<TEmail>({
@@ -71,21 +75,17 @@ const ForgotPassword = () => {
     confirmPassword: false,
   });
 
-  /* ================= 6. Derived Values ================= */
-  const token = sendOtpData?.token || '';
-  const sendCount = resendOtpData?.sendCount || 1;
-
   /* ================= 7. Handlers ================= */
 
   const handleSendOtp = async (data: TEmail) => {
-    await sendOtpAsync(data, {
+    await sendOtp.mutateAsync(data, {
       onSuccess: () => setCurrentStep('verify'),
       onError: ({ fieldErrors }) => setErrorToForm(sendOtpForm.setError, fieldErrors),
     });
   };
 
   const handleVerifyOtp = async (data: TOtp) => {
-    await verifyOtpAsync(
+    await verifyOtp.mutateAsync(
       { ...data, token },
       {
         onSuccess: () => setCurrentStep('save'),
@@ -95,7 +95,7 @@ const ForgotPassword = () => {
   };
 
   const handleForgotPassword = async (data: TPasswords) => {
-    await registerAndSaveAsync(
+    await register.mutateAsync(
       { ...data, token },
       {
         onSuccess: ({ user }) => setUser(user),
@@ -112,9 +112,9 @@ const ForgotPassword = () => {
       });
     }
 
-    if (isSendingOtp || isVerifyingOtp || isResendingOtp) return;
+    if (sendOtp.isPending || verifyOtp.isPending || resendOtp.isPending) return;
 
-    await resendOtpAsync(token);
+    await resendOtp.mutateAsync(token);
   };
 
   const handleBack = () => {
@@ -177,7 +177,7 @@ const ForgotPassword = () => {
                   type: EMAIL_INPUT_DATA.type,
                   placeholder: EMAIL_INPUT_DATA.placeholder,
                   autoComplete: EMAIL_INPUT_DATA.autoComplete,
-                  disabled: isSendingOtp || currentStep === 'verify',
+                  disabled: sendOtp.isPending || currentStep === 'verify',
                   readOnly: currentStep === 'verify',
                 }}
                 register={sendOtpForm.register(EMAIL_INPUT_DATA.name)}
@@ -195,7 +195,7 @@ const ForgotPassword = () => {
                       type: OTP_INPUT_DATA.type,
                       placeholder: OTP_INPUT_DATA.placeholder,
                       autoComplete: OTP_INPUT_DATA.autoComplete,
-                      disabled: isVerifyingOtp || isResendingOtp,
+                      disabled: verifyOtp.isPending || resendOtp.isPending,
                     }}
                     register={verifyOtpForm.register(OTP_INPUT_DATA.name)}
                     error={verifyOtpForm.formState.errors[OTP_INPUT_DATA.name]?.message}
@@ -224,7 +224,7 @@ const ForgotPassword = () => {
                     type: showPasswords[input.name] ? 'text' : input.type,
                     placeholder: input.placeholder,
                     autoComplete: input.autoComplete,
-                    disabled: isRegistering,
+                    disabled: register.isPending,
                   }}
                   icons={{
                     right: {
@@ -261,10 +261,10 @@ const ForgotPassword = () => {
                 type: 'submit',
                 disabled:
                   currentStep === 'send'
-                    ? isSendingOtp
+                    ? sendOtp.isPending
                     : currentStep === 'verify'
-                      ? isVerifyingOtp || isResendingOtp
-                      : isRegistering,
+                      ? verifyOtp.isPending || resendOtp.isPending
+                      : register.isPending,
               }}
               content={
                 currentStep === 'send'
