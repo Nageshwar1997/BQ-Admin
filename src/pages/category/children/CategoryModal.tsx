@@ -117,9 +117,9 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     detailsForm.setValue('activeStep', step, { shouldDirty: false, shouldTouch: false });
   };
 
-  const { mutateAsync: addCategoryAsync } = useAddCategory();
+  const addCategory = useAddCategory();
 
-  const { mutateAsync: updateCategoryAsync } = useUpdateCategory({ categoryId: category?._id });
+  const updateCategory = useUpdateCategory({ categoryId: category?._id });
 
   const { data: level1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L1,
@@ -240,7 +240,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
         });
       }
 
-      await updateCategoryAsync(
+      await updateCategory.mutateAsync(
         { ...updatedPayload, _id: category._id },
         {
           onSuccess: () => handleClose(),
@@ -251,7 +251,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
         },
       );
     } else {
-      await addCategoryAsync(payload, {
+      await addCategory.mutateAsync(payload, {
         onSuccess: () => handleClose(),
         onError: ({ fieldErrors }) => {
           setErrorToForm(detailsForm.setError, fieldErrors);
