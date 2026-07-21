@@ -37,7 +37,7 @@ const ForgotPassword = () => {
   const sendOtp = useForgotPasswordSendOtp();
   const resendOtp = useForgotPasswordResendOtp();
   const verifyOtp = useForgotPasswordVerifyOtp();
-  const register = useForgotPasswordSave();
+  const savePassword = useForgotPasswordSave();
 
   const token = useMemo(() => {
     if (!sendOtp.data) return '';
@@ -52,20 +52,11 @@ const ForgotPassword = () => {
   }, [resendOtp.data]);
 
   /* ================= 4. Forms ================= */
-  const sendOtpForm = useForm<TEmail>({
-    resolver: zodResolver(emailSchema),
-    defaultValues: FORM_DEFAULT_VALUES.email,
-  });
+  const sendOtpForm = useForm<TEmail>({ resolver: zodResolver(emailSchema) });
 
-  const verifyOtpForm = useForm<TOtp>({
-    resolver: zodResolver(otpSchema),
-    defaultValues: FORM_DEFAULT_VALUES.otp,
-  });
+  const verifyOtpForm = useForm<TOtp>({ resolver: zodResolver(otpSchema) });
 
-  const passwordForm = useForm<TPasswords>({
-    resolver: zodResolver(passwordsSchema),
-    defaultValues: FORM_DEFAULT_VALUES.passwords,
-  });
+  const passwordForm = useForm<TPasswords>({ resolver: zodResolver(passwordsSchema) });
 
   /* ================= 5. Local State ================= */
   const [currentStep, setCurrentStep] = useState<'send' | 'verify' | 'save'>('send');
@@ -95,7 +86,7 @@ const ForgotPassword = () => {
   };
 
   const handleForgotPassword = async (data: TPasswords) => {
-    await register.mutateAsync(
+    await savePassword.mutateAsync(
       { ...data, token },
       {
         onSuccess: ({ user }) => setUser(user),
@@ -224,7 +215,7 @@ const ForgotPassword = () => {
                     type: showPasswords[input.name] ? 'text' : input.type,
                     placeholder: input.placeholder,
                     autoComplete: input.autoComplete,
-                    disabled: register.isPending,
+                    disabled: savePassword.isPending,
                   }}
                   icons={{
                     right: {
@@ -264,7 +255,7 @@ const ForgotPassword = () => {
                     ? sendOtp.isPending
                     : currentStep === 'verify'
                       ? verifyOtp.isPending || resendOtp.isPending
-                      : register.isPending,
+                      : savePassword.isPending,
               }}
               content={
                 currentStep === 'send'
