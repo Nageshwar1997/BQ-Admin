@@ -296,7 +296,7 @@ const L1Table = () => {
     isError,
   } = useGetCategoriesByParentLevel({ level: CATEGORY_LEVELS_MAP.L1 });
 
-  const { mutateAsync: deleteCategoryAsync } = useDeleteCategory({ categoryId: deleteId });
+  const deleteCategory = useDeleteCategory({ categoryId: deleteId });
 
   const handleEdit = (data: TCatModal) => {
     setEditData(data);
@@ -305,7 +305,7 @@ const L1Table = () => {
   };
 
   const handleDelete = async () => {
-    await deleteCategoryAsync(deleteId, {
+    await deleteCategory.mutateAsync(deleteId, {
       onSettled: () => {
         setDeleteId('');
 

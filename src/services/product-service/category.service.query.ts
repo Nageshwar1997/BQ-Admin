@@ -1,5 +1,6 @@
 import { categoryApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
+import { EMPTY_ARRAY } from '@/constants/common.constants';
 import type {
   TCategory,
   TCategoryHierarchy,
@@ -104,7 +105,7 @@ export const useGetCategoriesByParentLevel = ({
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     refetchOnReconnect: true,
-    select: (data) => (data?.categories || []) as TCategory[],
+    select: (data) => (data?.data || EMPTY_ARRAY) as TCategory[],
   });
 };
 
@@ -126,6 +127,6 @@ export const useGetCategoriesHierarchy = () => {
 
     // UX
     placeholderData: (prev) => prev,
-    select: (data) => (data?.categories || []) as TCategoryHierarchy[],
+    select: (data) => (data?.data || EMPTY_ARRAY) as TCategoryHierarchy[],
   });
 };

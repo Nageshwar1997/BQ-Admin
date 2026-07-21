@@ -102,6 +102,6 @@ export const useGetDashboardProductBySlug = (slug: string) => {
     queryKey: [...get.dashboard.bySlug({ slug }), slug],
     queryFn: () => productApi.getDashboardProductBySlug(slug),
     enabled: !!slug,
-    select: (data) => data?.product as TApiProductPopulated | undefined,
+    select: (data) => data?.data as TApiProductPopulated | undefined,
   });
 };
