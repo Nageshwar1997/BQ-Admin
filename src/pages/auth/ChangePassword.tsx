@@ -24,7 +24,7 @@ const ChangePassword = () => {
 
   /* ================= 3. API/Queries Hooks ================= */
 
-  const { isPending, mutateAsync } = useChangePassword();
+  const changePassword = useChangePassword();
 
   /* ================= 4. Forms ================= */
 
@@ -48,7 +48,7 @@ const ChangePassword = () => {
   /* ================= 6. Handlers ================= */
 
   const handleChangePassword = async (data: TChangePassword) => {
-    await mutateAsync(
+    await changePassword.mutateAsync(
       { ...data },
       {
         onSuccess: ({ user }) => {
@@ -92,7 +92,7 @@ const ChangePassword = () => {
                   type: showPasswords[input.name] ? 'text' : input.type,
                   placeholder: input.placeholder,
                   autoComplete: input.autoComplete,
-                  disabled: isPending,
+                  disabled: changePassword.isPending,
                 }}
                 icons={{
                   right: {
@@ -119,7 +119,7 @@ const ChangePassword = () => {
             {/* -------- Submit Button -------- */}
             <Button
               pattern="primary"
-              buttonProps={{ type: 'submit', disabled: isPending || !isDirty }}
+              buttonProps={{ type: 'submit', disabled: changePassword.isPending || !isDirty }}
               content="Submit"
             />
           </div>
