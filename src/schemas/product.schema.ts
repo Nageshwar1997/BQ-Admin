@@ -3,7 +3,6 @@ import {
   FILE_FORMAT,
   FILE_MIME,
   MAX_SIZE,
-  MB,
   REGEX,
   TRY_ON_CATEGORY_MAP,
   TRY_ON_MAP,
@@ -118,7 +117,7 @@ const imageFileSchema = file('Thumbnail is required')
     [...FILE_MIME.image],
     `Invalid image type. type must be one of: ${FILE_FORMAT.image.join(', ')}.`,
   )
-  .max(0.3 * MB, `Image size exceed. Max allowed image size is ${formatFileSize(0.3 * MB)}.`);
+  .max(MAX_SIZE.IMAGE, `Image size exceed. Max allowed image size is ${formatFileSize(MAX_SIZE.IMAGE)}.`);
 
 const imageUrlSchema = url('Image is required').regex(REGEX.URL, 'Invalid image URL.');
 

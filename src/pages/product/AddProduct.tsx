@@ -251,17 +251,17 @@ const AddProduct = () => {
 
     const [thumbnailResponse, imagesResponse, videoResponse] = await Promise.all(uploadPromises);
 
-    if (thumbnailResponse && typeof thumbnailResponse === 'object' && 'url' in thumbnailResponse) {
-      thumbnailUrl = thumbnailResponse.url as string;
+    if (thumbnailResponse && typeof thumbnailResponse === 'object' && 'data' in thumbnailResponse) {
+      thumbnailUrl = thumbnailResponse.data as string;
     }
 
-    if (videoResponse && typeof videoResponse === 'object' && 'url' in videoResponse) {
-      videoUrl = videoResponse.url as string;
+    if (videoResponse && typeof videoResponse === 'object' && 'data' in videoResponse) {
+      videoUrl = videoResponse.data as string;
     }
 
     const uploadedImageUrls =
-      imagesResponse && typeof imagesResponse === 'object' && 'urls' in imagesResponse
-        ? ((imagesResponse.urls as string[]) ?? [])
+      imagesResponse && typeof imagesResponse === 'object' && 'data' in imagesResponse
+        ? ((imagesResponse.data as string[]) ?? [])
         : [];
 
     const finalImages = [...existingImageUrls, ...uploadedImageUrls];
@@ -426,8 +426,8 @@ const AddProduct = () => {
 
           return {
             ...variant,
-            thumbnail: thumbnailResponse?.url ?? variant.thumbnail,
-            images: [...existingImageUrls, ...(imagesResponse?.urls ?? [])],
+            thumbnail: thumbnailResponse?.data ?? variant.thumbnail,
+            images: [...existingImageUrls, ...(imagesResponse?.data ?? [])],
           };
         }),
       );
