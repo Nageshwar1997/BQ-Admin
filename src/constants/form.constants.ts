@@ -1,4 +1,4 @@
-import { CATEGORY_LEVELS_MAP } from './common.constants';
+import { CATEGORY_LEVELS_MAP } from '@beautinique/shared-constants';
 
 const passwords = { password: '', confirmPassword: '' };
 
@@ -43,4 +43,13 @@ export const FORM_DEFAULT_VALUES = {
     subCategory: '',
     description: '',
   },
+} as const;
+
+export const ADD_PRODUCT_FORM_ID_MAP = {
+  0: 'product-basic-info-form',
+  1: 'product-media-form',
+  2: 'product-description-form',
+  3: 'product-variants-form',
+  4: 'product-try-on-form',
+  5: 'product-confirm-form',
 } as const;

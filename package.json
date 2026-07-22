@@ -13,14 +13,16 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@beautinique/shared-constants": "^1.0.2",
     "@iconify/react": "^6.0.2",
     "@tanstack/react-table": "^8.21.3",
     "axios": "^1.15.2",
     "crypto-js": "^4.2.0",
-    "dayjs": "^1.11.20",
     "hls.js": "^1.6.16",
     "nanoid": "^5.1.9",
+    "quill": "^2.0.3",
     "react": "^19.2.5",
+    "react-color-palette": "^7.3.1",
     "react-dom": "^19.2.5",
     "react-hook-form": "^7.74.0",
     "react-intersection-observer": "^10.0.3",

@@ -1,5 +1,23 @@
-import type { AUTH_PROVIDERS, METHOD_MAP, ROLES } from '@/constants/api.constants';
-import type { TCategory, TEmail, TLogin } from './schema.type';
+import {
+  type TApiMethod,
+  type TAuthProvider,
+  type TCategoryLevel,
+  type TCategoryLevelsMap,
+  type TProductStatus,
+  type TRole,
+  type TSort,
+} from '@beautinique/shared-constants';
+import type {
+  TCategoryForm,
+  TEmail,
+  TLogin,
+  TProductBasicInfo,
+  TProductDescriptionAndContent,
+  TProductMediaAndGallery,
+  TProductTryOnConfiguration,
+  TProductWithoutVariant,
+  TProductWithVariant,
+} from './schema.type';
 
 export type TFieldErrors = Record<string, string[]>;
 
@@ -12,10 +30,6 @@ export interface ITimeStamp {
   updatedAt: string;
 }
 
-export type TAuthProvider = (typeof AUTH_PROVIDERS)[number];
-
-export type TRole = (typeof ROLES)[number];
-
 export interface IUser extends Pick<TLogin, 'password'>, TEmail, IId, ITimeStamp {
   providers: TAuthProvider[];
   role: TRole;
@@ -25,10 +39,33 @@ export interface IUser extends Pick<TLogin, 'password'>, TEmail, IId, ITimeStamp
   phoneNumber: string;
 }
 
-export interface ICategory extends IId, Pick<TCategory, 'level' | 'name' | 'description'> {
-  slug: string;
-  parent?: string;
-}
+/* -------------------------------------------------------------------------- */
+/*                                  CATEGORY                                  */
+/* -------------------------------------------------------------------------- */
+
+export type TLevel1 = TCategoryLevelsMap['L1'];
+export type TLevel2 = TCategoryLevelsMap['L2'];
+export type TLevel3 = TCategoryLevelsMap['L3'];
+
+type CategoryBase<TLevel extends TCategoryLevel> = IId &
+  Pick<TCategoryForm, 'name'> & { slug: string; level: TLevel };
+
+export type TL1Category = CategoryBase<TLevel1>;
+export type TL2Category = CategoryBase<TLevel2> & { parent: string };
+export type TL3Category = CategoryBase<TLevel3> & { parent: string; description: string };
+
+export type TCategory = TL1Category | TL2Category | TL3Category;
+
+export type TCategoryHierarchyNode<TLevel extends TCategoryLevel> = TLevel extends TLevel1
+  ? CategoryBase<TLevel1> & { subcategories: TCategoryHierarchyNode<TLevel2>[] }
+  : TLevel extends TLevel2
+    ? CategoryBase<TLevel2> & {
+        parent: string;
+        subcategories: TCategoryHierarchyNode<TLevel3>[];
+      }
+    : CategoryBase<TLevel3> & { parent: string; description: string; subcategories?: never };
+
+export type TCategoryHierarchy = TCategoryHierarchyNode<TLevel1>;
 
 export interface ICreateHeaders {
   user?: Partial<Pick<IUser, '_id' | 'role'>>;
@@ -37,13 +74,11 @@ export interface ICreateHeaders {
   contentType?: string;
 }
 
-export type TApiMethod = (typeof METHOD_MAP)[keyof typeof METHOD_MAP];
-
 export type TRouteNode = Record<string, unknown> & { base?: string };
 
 export interface IEndpoint {
   path: string;
-  method: TApiMethod;
+  method: Lowercase<TApiMethod>;
 }
 
 export type TParams = Record<string, string | number>;
@@ -61,7 +96,6 @@ type TUrl<FullPath extends string> =
 
 interface IGeneratedEndpoint<T extends IEndpoint, FullPath extends string> {
   method: Uppercase<T['method']>;
-
   url: TUrl<FullPath>;
 }
 
@@ -109,3 +143,73 @@ export type TGenerateQueryKeys<
         >
       : never;
 };
+
+type TEnabledTryOn = Extract<TProductTryOnConfiguration, { enabled: true }>['tryOn'];
+
+type TApiTryOn =
+  | { enabled: boolean; configured: false }
+  | ({ enabled: false; configured: true } & Partial<TEnabledTryOn>)
+  | ({ enabled: true; configured: true } & TEnabledTryOn);
+
+type TRemoveFileType<T> = {
+  [K in keyof T]: T[K] extends (infer U)[] ? Exclude<U, File>[] : Exclude<T[K], File>;
+};
+
+export type TApiProductBase = IId &
+  ITimeStamp &
+  Pick<TProductBasicInfo, 'title' | 'brand' | 'sellingPrice' | 'originalPrice'> &
+  TProductDescriptionAndContent &
+  TRemoveFileType<TProductMediaAndGallery> & {
+    tryOn: TApiTryOn;
+    seller: string;
+    sku: string;
+    slug: string;
+    discount: number;
+    soldCount: number;
+    returnCount: number;
+    reviews: string[];
+    totalReviews: number;
+    averageRating: number;
+    totalRating: number;
+    status: TProductStatus;
+    history?: {
+      approvedBy?: string | null;
+      approvedAt?: string | null;
+      blockedBy?: string | null;
+      blockedAt?: string | null;
+      rejectedBy?: string | null;
+      rejectedAt?: string | null;
+      rejectReason?: string | null;
+    };
+  };
+
+type TApiStockAndVariants =
+  | TProductWithoutVariant
+  | (Pick<TProductWithVariant, 'hasVariants'> & {
+      variants: (TRemoveFileType<TProductWithVariant['variants'][number]> & {
+        sku: string;
+        discount: number;
+        images: string[];
+        thumbnail?: string;
+      } & IId)[];
+    });
+
+export type TApiProduct = TApiProductBase & TApiStockAndVariants & { category: string };
+
+export type TApiProductPopulated = TApiProductBase &
+  TApiStockAndVariants & { category: TCategory; seller: unknown };
+
+export type TProductSortBy = keyof Pick<
+  TApiProduct,
+  'createdAt' | 'updatedAt' | 'title' | 'sellingPrice' | 'originalPrice' | 'soldCount'
+>;
+
+export interface IGetDashboardProductsQuery {
+  page: string;
+  limit: string;
+  search?: string;
+  status?: TProductStatus;
+  category?: string;
+  sortBy?: TProductSortBy;
+  sortOrder?: TSort;
+}

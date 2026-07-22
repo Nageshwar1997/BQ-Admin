@@ -1,4 +1,4 @@
-import type { TClassName, TMediaOption } from '@/types/component.type';
+import type { IMediaCarouselWithParent } from '@/types/component.type';
 import { useEffect } from 'react';
 import { MediaCarouselWithParentMedia } from '../carousels/MediaCarouselWithParentMedia';
 import { ModalWrapper } from './ModalWrapper';
@@ -11,14 +11,13 @@ export const MediaModal = ({
   opened,
   onClose,
   handleRemove,
-}: {
+  videoProps,
+}: Pick<IMediaCarouselWithParent, 'media' | 'className' | 'handleRemove' | 'videoProps'> & {
   currentIndex: number | null;
   setCurrentIndex: (index: number | null) => void;
-  media: TMediaOption[];
   opened: boolean;
   onClose: (isOpen: boolean) => void;
-  handleRemove?: (index: number) => void;
-} & TClassName) => {
+}) => {
   const handleClose = () => {
     onClose(false);
     setCurrentIndex(null);
@@ -43,10 +42,11 @@ export const MediaModal = ({
         needButtonControls={true}
         selected={currentIndex}
         videoProps={{
-          autoPlay: true,
-          muted: true,
-          loop: true,
-          className: 'object-contain! bg-primary/10 backdrop-blur-xs rounded-lg',
+          ...videoProps,
+          autoPlay: videoProps?.autoPlay ?? true,
+          muted: videoProps?.muted ?? true,
+          loop: videoProps?.loop ?? true,
+          className: `object-contain! bg-primary/10 backdrop-blur-xs rounded-lg ${videoProps?.className || ''}`,
         }}
       />
     </ModalWrapper>

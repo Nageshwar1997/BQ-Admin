@@ -3,7 +3,7 @@ import Input from '@/components/ui/inputs/Input';
 import { QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
 import useQueryParams from '@/hooks/useQueryParams';
-import type { ICategory } from '@/types/api.type';
+import type { TCategory } from '@/types/api.type';
 import type { TClassName } from '@/types/component.type';
 import { useEffect, useState } from 'react';
 
@@ -15,7 +15,7 @@ const QUERY_CLEAR_MAP = {
   [q_cat_keys.level.l3.search]: [],
 };
 
-const CategorySearchInput = ({ level }: Pick<ICategory, 'level'>) => {
+const CategorySearchInput = ({ level }: Pick<TCategory, 'level'>) => {
   const { queryParams, setParams } = useQueryParams();
 
   const queryKey =
@@ -82,7 +82,7 @@ const CategoryTableTopInfo = ({
   badgeText,
   level,
   className,
-}: TClassName & Pick<ICategory, 'level' | 'name'> & { badgeText: string }) => {
+}: TClassName & Pick<TCategory, 'level' | 'name'> & { badgeText: string }) => {
   return (
     <div className={`space-y-3 p-4 ${className}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">

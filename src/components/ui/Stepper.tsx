@@ -77,7 +77,7 @@ const Stepper = ({ steps, activeStep, onStepClick, className = '', children }: S
                 </span>
                 {step.description && (
                   <span
-                    className={`line-clamp-1 md:line-clamp-2 text-xs leading-4 ${
+                    className={`line-clamp-1 text-xs leading-4 md:line-clamp-2 ${
                       active ? 'text-secondary' : 'text-primary/35'
                     }`}
                   >

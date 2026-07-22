@@ -1,35 +1,36 @@
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import Tooltip from '@/components/ui/Tooltip';
-import { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
-import type { ICategory } from '@/types/api.type';
-import type { TCategory, TL2Category, TL3Category } from '@/types/schema.type';
+import { EMPTY_ARRAY } from '@/constants/common.constants';
+import type { TCategory } from '@/types/api.type';
+import type { TCategoryForm, TL2CategoryForm, TL3CategoryForm } from '@/types/schema.type';
+import { CATEGORY_LEVELS_MAP } from '@beautinique/shared-constants';
 import {
   Controller,
   type Control,
   type FieldErrors,
   type UseFormRegister,
-  type UseFormSetValue,
+  type UseFormResetField,
 } from 'react-hook-form';
 
 type TCommonFields = {
-  register: UseFormRegister<TCategory>;
-  errors: FieldErrors<TCategory>;
-  control: Control<TCategory>;
-  level: TCategory['level'];
-  setValue: UseFormSetValue<TCategory>;
+  register: UseFormRegister<TCategoryForm>;
+  errors: FieldErrors<TCategoryForm>;
+  control: Control<TCategoryForm>;
+  level: TCategoryForm['level'];
+  resetField: UseFormResetField<TCategoryForm>;
   isLevelDisabled: boolean;
 };
 
 type TLevel1Fields = TCommonFields;
 type TLevel2Fields = TCommonFields & {
-  level1Cats: ICategory[];
-  mainCategory: TL2Category['mainCategory'];
+  level1Cats: TCategory[] | undefined;
+  mainCategory: TL2CategoryForm['mainCategory'];
 };
 type TLevel3Fields = Omit<TLevel2Fields, 'mainCategory'> & {
-  level2Cats: ICategory[];
-  mainCategory: TL3Category['mainCategory'];
-  subCategory: TL3Category['subCategory'];
+  level2Cats: TCategory[] | undefined;
+  mainCategory: TL3CategoryForm['mainCategory'];
+  subCategory: TL3CategoryForm['subCategory'];
 };
 
 const CommonFields = ({
@@ -37,7 +38,7 @@ const CommonFields = ({
   errors,
   control,
   level,
-  setValue,
+  resetField,
   isLevelDisabled,
 }: TCommonFields) => (
   <>
@@ -45,10 +46,7 @@ const CommonFields = ({
       label="Category name"
       register={register('name')}
       error={errors.name?.message}
-      inputProps={{
-        name: 'name',
-        placeholder: 'Category name',
-      }}
+      inputProps={{ name: 'name', placeholder: 'Enter category name' }}
     />
 
     <Tooltip title="Cannot change category level" required={isLevelDisabled}>
@@ -71,9 +69,9 @@ const CommonFields = ({
               onChange: (value) => {
                 onChange(value);
 
-                setValue('mainCategory', undefined);
-                setValue('subCategory', undefined);
-                setValue('description', undefined);
+                resetField('mainCategory');
+                resetField('subCategory');
+                resetField('description');
               },
             }}
           />
@@ -92,7 +90,7 @@ export const Level1Fields = ({
   errors,
   control,
   level,
-  setValue,
+  resetField,
   isLevelDisabled,
 }: TLevel1Fields) => {
   return (
@@ -102,7 +100,7 @@ export const Level1Fields = ({
         errors={errors}
         control={control}
         level={level}
-        setValue={setValue}
+        resetField={resetField}
         isLevelDisabled={isLevelDisabled}
       />
     </div>
@@ -118,8 +116,8 @@ export const Level2Fields = ({
   errors,
   control,
   level,
-  setValue,
-  level1Cats,
+  resetField,
+  level1Cats = EMPTY_ARRAY,
   mainCategory,
   isLevelDisabled,
 }: TLevel2Fields) => {
@@ -130,7 +128,7 @@ export const Level2Fields = ({
         errors={errors}
         control={control}
         level={level}
-        setValue={setValue}
+        resetField={resetField}
         isLevelDisabled={isLevelDisabled}
       />
       <Controller
@@ -139,8 +137,8 @@ export const Level2Fields = ({
         render={({ field: { onChange } }) => (
           <Select
             label="Main category"
-            options={level1Cats?.map((cat: ICategory) => ({ label: cat.name, value: cat._id }))}
-            error={errors.mainCategory?.message}
+            options={level1Cats?.map((cat: TCategory) => ({ label: cat.name, value: cat._id }))}
+            error={'mainCategory' in errors ? errors.mainCategory?.message : undefined}
             selectProps={{
               value: mainCategory,
               placeholder: 'Select main category',
@@ -162,9 +160,9 @@ export const Level3Fields = ({
   errors,
   control,
   level,
-  setValue,
-  level1Cats,
-  level2Cats,
+  resetField,
+  level1Cats = EMPTY_ARRAY,
+  level2Cats = EMPTY_ARRAY,
   mainCategory,
   subCategory,
   isLevelDisabled,
@@ -176,7 +174,7 @@ export const Level3Fields = ({
         errors={errors}
         control={control}
         level={level}
-        setValue={setValue}
+        resetField={resetField}
         isLevelDisabled={isLevelDisabled}
       />
 
@@ -186,15 +184,15 @@ export const Level3Fields = ({
         render={({ field: { onChange } }) => (
           <Select
             label="Main category"
-            options={level1Cats?.map((cat: ICategory) => ({ label: cat.name, value: cat._id }))}
-            error={errors.mainCategory?.message}
+            options={level1Cats?.map((cat: TCategory) => ({ label: cat.name, value: cat._id }))}
+            error={'mainCategory' in errors ? errors.mainCategory?.message : undefined}
             selectProps={{
               value: mainCategory,
               placeholder: 'Select main category',
               onChange: (value) => {
                 onChange(value);
 
-                setValue('subCategory', undefined);
+                resetField('subCategory');
               },
             }}
           />
@@ -207,11 +205,8 @@ export const Level3Fields = ({
         render={({ field: { onChange } }) => (
           <Select
             label="Sub-category"
-            options={level2Cats?.map((cat: ICategory) => ({
-              label: cat.name,
-              value: cat._id,
-            }))}
-            error={errors.subCategory?.message}
+            options={level2Cats?.map((cat) => ({ label: cat.name, value: cat._id }))}
+            error={'subCategory' in errors ? errors.subCategory?.message : undefined}
             selectProps={{
               value: subCategory,
               placeholder: 'Select sub-category',
@@ -222,7 +217,7 @@ export const Level3Fields = ({
         )}
       />
       <Input
-        label="Description"
+        label="Short description"
         register={register('description')}
         error={'description' in errors ? errors.description?.message : undefined}
         containerClassName="sm:col-span-2"

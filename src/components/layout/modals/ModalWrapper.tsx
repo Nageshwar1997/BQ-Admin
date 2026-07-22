@@ -41,7 +41,7 @@ export const ModalWrapper = ({
         {/* HEADER */}
         {header && Object.keys(header)?.length > 0 && (
           <div
-            className={`bg-primary-invert z-20 flex max-h-16 items-center ${header?.title ? 'border-b-primary/50 sticky inset-x-0 top-0 justify-between border-b px-6 py-4' : 'border-primary/20 shadow-primary/20 absolute top-0 right-0 justify-center rounded-bl-xl border-b border-l p-3 shadow-lg'}`}
+            className={`bg-primary-invert z-20 flex max-h-16 items-center ${header?.title ? 'border-b-primary/50 sticky inset-x-0 top-0 justify-between border-b px-6 py-4' : 'border-primary/20 shadow-primary/20 absolute top-0 right-0 justify-center rounded-bl-xl border-b border-l shadow-lg'}`}
           >
             {header?.title && (
               <h2 className="flex-1 text-center text-lg font-semibold">
@@ -49,11 +49,12 @@ export const ModalWrapper = ({
               </h2>
             )}
             {header?.showCloseIcon && (
-              <Icon
-                icon="lucide:x"
-                className="text-tertiary hover:text-primary size-4 cursor-pointer transition-transform duration-300 hover:scale-110 sm:size-5"
-                onClick={onClose}
-              />
+              <div className="group cursor-pointer p-3" onClick={onClose}>
+                <Icon
+                  icon="lucide:x"
+                  className="text-tertiary group-hover:text-primary size-4 transition-all duration-300 group-hover:scale-110 sm:size-5"
+                />
+              </div>
             )}
           </div>
         )}

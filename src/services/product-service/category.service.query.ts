@@ -1,9 +1,16 @@
 import { categoryApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
-import type { ICategory } from '@/types/api.type';
+import { EMPTY_ARRAY } from '@/constants/common.constants';
+import type {
+  TCategory,
+  TCategoryHierarchy,
+  TL1Category,
+  TL2Category,
+  TL3Category,
+} from '@/types/api.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const { get, add, update, delete: remove } = API_QUERY_KEYS.product_service.category;
 
@@ -82,19 +89,44 @@ export const useDeleteCategory = ({ categoryId = '' }) => {
 
 export const useGetCategoriesByParentLevel = ({
   enabled = true,
-  level,
-  parent,
-}: { enabled?: boolean } & Partial<Pick<ICategory, 'level' | 'parent'>>) => {
+  ...props
+}: { enabled?: boolean } & (
+  | Pick<TL1Category, 'level'>
+  | Pick<TL2Category, 'level' | 'parent'>
+  | Pick<TL3Category, 'level' | 'parent'>
+)) => {
   return useQuery({
-    queryKey: [...get.byParentLevel, level, parent],
-    queryFn: () => categoryApi.getCategoriesByParentLevel({ level, parent }),
+    queryKey: [...get.byParentLevel, Object.values(props)],
+    queryFn: () => categoryApi.getCategoriesByParentLevel(props),
     staleTime: 5 * 60 * 1000, // 5 min
     gcTime: 15 * 60 * 1000, // 15 min
     enabled: enabled,
-    placeholderData: keepPreviousData,
+    placeholderData: (prev) => prev,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     refetchOnReconnect: true,
-    select: (data) => data?.categories || [],
+    select: (data) => (data?.data || EMPTY_ARRAY) as TCategory[],
+  });
+};
+
+export const useGetCategoriesHierarchy = () => {
+  return useQuery({
+    queryKey: get.byHierarchy,
+    queryFn: categoryApi.getCategoriesHierarchy,
+
+    // Cache
+    staleTime: 5 * 60 * 1000, // 5 min
+    gcTime: 15 * 60 * 1000, // 15 min
+
+    // Refetch
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+
+    // Retry
+    retry: 1,
+
+    // UX
+    placeholderData: (prev) => prev,
+    select: (data) => (data?.data || EMPTY_ARRAY) as TCategoryHierarchy[],
   });
 };

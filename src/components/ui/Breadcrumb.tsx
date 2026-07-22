@@ -20,9 +20,9 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
   return (
     <ScrollableGradientContainer direction="horizontal" className="[&>div]:justify-start">
       <div className={`text-secondary flex items-center gap-2 ${className}`}>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 truncate">
           <span
-            className={`line-clamp-1 capitalize ${
+            className={`truncate capitalize ${
               finalPathName !== '/' ? 'cursor-pointer' : 'opacity-80'
             }`}
             onClick={() => handleNavigate(-1)}
@@ -37,16 +37,16 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
           const isLast = index === activePaths.length - 1;
 
           return (
-            <div key={index} className="flex items-center gap-2">
+            <div key={index} className="flex items-center gap-2 truncate">
               <span
-                className={`line-clamp-1 capitalize ${
+                className={`truncate capitalize ${
                   !isLast && finalPathName !== targetPath ? 'cursor-pointer' : 'opacity-80'
                 }`}
                 onClick={!isLast ? () => handleNavigate(index) : undefined}
               >
                 {path.replace('-', ' ')}
               </span>
-              {!isLast && <Icon icon="solar:alt-arrow-down-linear" />}
+              {!isLast && <Icon icon="solar:alt-arrow-right-linear" />}
             </div>
           );
         })}

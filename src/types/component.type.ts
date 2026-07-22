@@ -1,23 +1,24 @@
-import type { SORT_ORDER_MAP } from '@/constants/common.constants';
+import type { TOAST_TYPE } from '@/constants/common.constants';
 import type { FOOTER_CATEGORIES } from '@/constants/footer.constants';
 import type { IconProps } from '@iconify/react';
 import type {
   ButtonHTMLAttributes,
   ComponentProps,
   JSX,
+  ReactElement,
   ReactNode,
   RefObject,
   VideoHTMLAttributes,
 } from 'react';
-import type { ICategory } from './api.type';
+import type { TCategory } from './api.type';
 import type { TGradientPos, TScrollDirection } from './hook.type';
-import type { TToast } from './store.type';
+import type { TInputIcons, TOption } from './input.type';
 
 export type TClassName = { className?: string };
 
 export type TContainerClassName = { containerClassName?: string };
 
-export type TChildren = { children: ReactNode };
+export type TChildren = { children: ReactNode | ReactElement };
 
 export interface IButton extends TClassName {
   buttonProps?: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'content'>;
@@ -52,8 +53,6 @@ export interface IResend extends TClassName {
   count: number;
   onResend?: () => void;
 }
-
-export type TSort = (typeof SORT_ORDER_MAP)[keyof typeof SORT_ORDER_MAP];
 
 export type TTitleDescription = {
   title: string | ReactNode;
@@ -92,6 +91,7 @@ export interface IFooterOptionList {
 export interface IVideoPlayer extends TClassName {
   videoProps: VideoHTMLAttributes<HTMLVideoElement>;
   ref?: RefObject<HTMLVideoElement | null>;
+  showPosterOnly?: boolean;
 }
 
 export interface IBreadcrumb extends TClassName {
@@ -99,7 +99,7 @@ export interface IBreadcrumb extends TClassName {
   customPaths?: string[];
 }
 
-export type TCatModal = { category: ICategory; mainCatId?: string };
+export type TCatModal = { category: TCategory; mainCatId?: string };
 
 export type TCatActionHandle = {
   onEdit: (data: TCatModal) => void;
@@ -109,14 +109,18 @@ export type TCatActionHandle = {
 export type TCatTable = TCatActionHandle & TCatModal;
 
 type TCustomConfirmModal = TChildren & {
-  type: Extract<TToast['type'], 'custom'>;
+  type: typeof TOAST_TYPE.custom;
   title?: never;
   description?: never;
   buttons?: Partial<Record<'left' | 'right', Omit<IButton, 'pattern'>>>;
 };
 
 type TDefaultConfirmModal = {
-  type: Exclude<TToast['type'], 'custom' | 'loading'>;
+  type:
+    | typeof TOAST_TYPE.success
+    | typeof TOAST_TYPE.error
+    | typeof TOAST_TYPE.warning
+    | typeof TOAST_TYPE.default;
   title: string;
   children?: never;
   description?: string;
@@ -129,7 +133,7 @@ export type TConfirmModal = (TCustomConfirmModal | TDefaultConfirmModal) & {
 
 export type TMediaResource = 'image' | 'video';
 
-export type TMediaOption = { type: TMediaResource; url: string; hasError?: boolean };
+export type TMediaOption = { type: TMediaResource; url: string };
 
 export interface IVideo {
   videoProps: VideoHTMLAttributes<HTMLVideoElement>;
@@ -141,12 +145,44 @@ export interface IMediaCarousel
   media: TMediaOption[];
   selected?: number | null;
   onClick: (index: number) => void;
-  onReorder?: (fromIndex: number, toIndex: number) => void;
   thumbnailRefs?: RefObject<(HTMLDivElement | null)[]>;
   handleRemove?: (index: number) => void;
 }
 
 export interface IMediaCarouselWithParent
-  extends TClassName, IVideo, Pick<IMediaCarousel, 'media' | 'selected' | 'handleRemove'> {
+  extends
+    TClassName,
+    Partial<Pick<IVideo, 'videoProps'>>,
+    Pick<IMediaCarousel, 'media' | 'selected' | 'handleRemove'> {
   needButtonControls?: boolean;
+}
+
+export type TQuillImageRef = { id: string; file: File; blobUrl: string };
+
+export type TPageWrapper = TChildren &
+  TContainerClassName &
+  TClassName & {
+    navbar?: {
+      components?: ReactElement[];
+      buttons?: Partial<IButton & TChildren>[];
+    } & Partial<TChildren>;
+  };
+
+export interface IDropdownOptions extends TClassName {
+  options: TOption[];
+  selected: string;
+  onChange: (opt: TOption) => void;
+  onSelect?: () => void;
+}
+
+export interface IDropdown extends TClassName, Partial<Pick<IDropdownOptions, 'options'>> {
+  title: string | ReactElement;
+  icons?: TInputIcons;
+  children: ReactElement<{ onSelect?: () => void }>;
+  closeOnOutsideClick?: boolean;
+  isAbsolute?: boolean;
+  showShadow?: boolean;
+  closeOnOptionClick?: boolean;
+  isRounded?: boolean;
+  defaultOpen?: boolean;
 }

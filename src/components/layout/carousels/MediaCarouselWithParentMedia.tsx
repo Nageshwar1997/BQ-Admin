@@ -33,7 +33,7 @@ export const MediaCarouselWithParentMedia = ({
   const thumbnailRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const src = useMemo(() => {
-    if (currentIndex >= media.length) {
+    if (currentIndex >= media?.length) {
       return media[media.length - 1].url;
     } else if (media[currentIndex]) {
       return media[currentIndex].url;

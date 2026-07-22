@@ -79,7 +79,7 @@ export const ROUTES = {
   PRODUCTS: {
     BASE: 'products',
     ADD: 'add',
-    PRODUCT_ID: ':productId',
+    PRODUCT_ID: ':slug',
     CATEGORY_L1: ':categoryL1',
     CATEGORY_L2: ':categoryL2',
     CATEGORY_L3: ':categoryL3',
@@ -142,8 +142,6 @@ export const QUERY_PARAMS_KEY_MAP = {
   sort: 'sort', // To Set Sort Order
 } as const;
 
-export const SORT_ORDER_MAP = { asc: 'asc', desc: 'desc' } as const;
-
 export const CATEGORY_MODAL_STEPS: StepperStep[] = [
   { title: 'Category info', description: 'Name and hierarchy', icon: 'solar:hanger-2-linear' },
   {
@@ -156,46 +154,30 @@ export const CATEGORY_MODAL_STEPS: StepperStep[] = [
 export const ADD_PRODUCT_STEPS: StepperStep[] = [
   {
     title: 'Basic information',
-    description: 'Set product type, pricing and brand details',
+    description: 'Set product title, pricing, brand and category details',
     icon: 'solar:tag-price-linear',
   },
-
-  {
-    title: 'Category and inventory',
-    description: 'Manage categories, stock and publish settings',
-    icon: 'solar:box-linear',
-  },
-
   {
     title: 'Media and gallery',
-    description: 'Upload thumbnails, product images and videos',
+    description: 'Upload product images, thumbnail and video',
     icon: 'solar:gallery-linear',
   },
-
   {
     title: 'Description and details',
-    description: 'Add descriptions, usage instructions and ingredients',
+    description:
+      'Add short description, full description, usage instructions, ingredients and additional details',
     icon: 'solar:document-text-linear',
   },
-
   {
-    title: 'Variants and pricing',
-    description: 'Configure variants, pricing and stock',
+    title: 'Product variants and stock',
+    description: 'Set product type and Configure variants, pricing and stock',
     icon: 'solar:list-check-linear',
   },
-
   {
     title: 'TryOn configuration',
-    description: 'Setup TryOn model and related assets',
+    description: 'Setup TryOn category and configure TryOn details',
     icon: 'solar:face-scan-square-linear',
   },
-
-  {
-    title: 'SEO and visibility',
-    description: 'Optimize search visibility and metadata',
-    icon: 'solar:global-linear',
-  },
-
   {
     title: 'Review and confirm',
     description: 'Verify all details before saving product',
@@ -203,15 +185,26 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
   },
 ];
 
-export const CATEGORY_LEVELS_MAP = { L1: 1, L2: 2, L3: 3 } as const;
-export const CATEGORY_LEVELS = Object.values(CATEGORY_LEVELS_MAP);
+export const CATEGORY_STEPPER_STEP_COUNT = [0, 1] as const;
 
-export const MB = 1024 ** 2;
-export const MAX_IMAGE_FILE_SIZE = 2 * MB; // 2MB
-export const MAX_VIDEO_FILE_SIZE = 50 * MB; // 50MB
-export const FILE_MIME = {
-  image: ['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'image/svg+xml'],
-  video: ['video/mp4', 'video/webm', 'video/quicktime'],
-} as const;
+export const TOAST_TYPES = [
+  'success',
+  'error',
+  'warning',
+  'progress',
+  'loading',
+  'default',
+  'custom',
+] as const;
 
-export const DEFAULT_POSTER = '/images/logo/BQ_gradient_logo.webp';
+export const TOAST_TYPE = Object.fromEntries(TOAST_TYPES.map((type) => [type, type])) as {
+  [K in (typeof TOAST_TYPES)[number]]: K;
+};
+
+export const VIDEO_PLACEHOLDER = '/images/Video-Placeholder.webp';
+
+export const PRODUCT_VARIANT_ACTIONS = [
+  { content: 'Remove', className: 'bg-electric-purple-c' },
+  { content: 'Clear', className: 'bg-primary-red' },
+  { content: 'Add', className: 'bg-primary-yellow' },
+] as const;

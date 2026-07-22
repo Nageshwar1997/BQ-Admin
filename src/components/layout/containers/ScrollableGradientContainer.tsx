@@ -27,14 +27,16 @@ const ScrollableGradientContainer = ({
 
   return (
     <div
-      className={`relative flex flex-col overflow-hidden ${isVertical ? 'h-full w-fit' : 'h-fit w-full'} ${isHorizontal ? 'h-full w-fit' : 'h-fit w-full'} ${containerClassName}`}
+      className={`relative flex h-full w-full overflow-hidden ${
+        isVertical ? 'h-full w-fit flex-col' : ''
+      } ${isHorizontal ? 'h-fit w-full flex-row' : ''} ${containerClassName}`}
     >
       {gradientKeys.map((key) => (
         <LinearGradient key={key} position={key} className={gradientClassNames[key] || ''} />
       ))}
       <div
         ref={containerRef}
-        className={`relative scroll-smooth ${isVertical ? 'flex-1 overflow-y-auto' : ''} ${isHorizontal ? 'grow overflow-x-auto whitespace-nowrap' : ''} ${className} `}
+        className={`relative scroll-smooth ${isVertical ? 'flex-1 overflow-y-auto' : ''} ${isHorizontal ? 'grow overflow-x-auto' : ''} ${className} `}
       >
         <div
           className={`flex h-full w-full gap-2 ${isVertical ? 'min-h-full flex-col' : ''} ${isHorizontal ? 'min-w-full flex-row' : ''} ${

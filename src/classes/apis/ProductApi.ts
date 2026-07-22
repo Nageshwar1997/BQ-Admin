@@ -1,5 +1,12 @@
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
-import type { ICategory, IId } from '@/types/api.type';
+import type {
+  IGetDashboardProductsQuery,
+  IId,
+  TCategory,
+  TL1Category,
+  TL2Category,
+  TL3Category,
+} from '@/types/api.type';
 import { ApiRequest } from '../ApiRequest';
 
 export class CategoryApi extends ApiRequest {
@@ -7,13 +14,13 @@ export class CategoryApi extends ApiRequest {
 
   /* ===================== POST API ===================== */
 
-  public addCategory = (data: Omit<ICategory, 'slug' | '_id'>) => {
+  public addCategory = (data: Omit<TCategory, 'slug' | '_id'>) => {
     return this.request({ ...this.routes.add, data });
   };
 
-  /* ===================== POST API ===================== */
+  /* ===================== PATCH API ===================== */
 
-  public updateCategory = ({ _id, ...data }: Partial<Omit<ICategory, 'slug'>> & IId) => {
+  public updateCategory = ({ _id, ...data }: Partial<Omit<TCategory, 'slug'>> & IId) => {
     const { method, url } = this.routes.update;
     return this.request({ method, url: url({ categoryId: _id }), data });
   };
@@ -27,37 +34,49 @@ export class CategoryApi extends ApiRequest {
 
   /* ===================== GET API ===================== */
 
-  public getCategoriesByParentLevel = (params: Partial<Pick<ICategory, 'level' | 'parent'>>) => {
+  public getCategoriesByParentLevel = (
+    params:
+      | Pick<TL1Category, 'level'>
+      | Pick<TL2Category, 'level' | 'parent'>
+      | Pick<TL3Category, 'level' | 'parent'>,
+  ) => {
     return this.request({ ...this.routes.get.byParentLevel, params });
+  };
+
+  public getCategoriesHierarchy = () => {
+    return this.request(this.routes.get.byHierarchy);
   };
 }
 
-// export class ProductApi extends ApiRequest {
-//   private routes = API_METHODS_AND_URLS.product_service;
+export class ProductApi extends ApiRequest {
+  private routes = API_METHODS_AND_URLS.product_service.product;
 
-//   /* ===================== POST API ===================== */
+  /* ===================== POST API ===================== */
 
-//   public addCategory = (data: Omit<ICategory, 'slug' | '_id'>) => {
-//     return this.request({ ...this.routes.category.add, data });
-//   };
+  public saveDraftProduct = (data: any) => {
+    return this.request({ ...this.routes.draft.save, data });
+  };
 
-//   /* ===================== POST API ===================== */
+  /* ===================== PATCH API ===================== */
 
-//   public updateCategory = ({ _id, ...data }: Partial<Omit<ICategory, 'slug'>> & IId) => {
-//     const { method, url } = this.routes.category.update;
-//     return this.request({ method, url: url({ categoryId: _id }), data });
-//   };
+  public publishDraftProduct = () => {
+    return this.request(this.routes.draft.publish);
+  };
 
-//   /* ===================== DELETE API ===================== */
+  /* ===================== DELETE API ===================== */
 
-//   public deleteCategory = (categoryId: string) => {
-//     const { method, url } = this.routes.category.delete;
-//     return this.request({ method, url: url({ categoryId }) });
-//   };
+  /* ===================== GET API ===================== */
 
-//   /* ===================== GET API ===================== */
+  public getDraftProduct = () => {
+    return this.request(this.routes.draft.get);
+  };
 
-//   public getCategoriesByParentLevel = (params: Partial<Pick<ICategory, 'level' | 'parent'>>) => {
-//     return this.request({ ...this.routes.category.get.byParentLevel, params });
-//   };
-// }
+  public getDashboardProducts = (params: IGetDashboardProductsQuery) => {
+    return this.request({ ...this.routes.get.dashboard.products, params });
+  };
+
+  public getDashboardProductBySlug = (slug: string) => {
+    const { method, url } = this.routes.get.dashboard.bySlug;
+    return this.request({ method, url: url({ slug }) });
+  };
+}

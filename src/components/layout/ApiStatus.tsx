@@ -10,7 +10,7 @@ const ApiDescription = ({ status, ...props }: TApiStatus) => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-2">
-      <div className="bg-primary/5 grid size-8 place-items-center rounded-full md:size-10">
+      <div className="bg-primary/5 grid size-8 place-items-center rounded-full md:size-10 p-2">
         <Icon
           icon={status === 'error' ? 'solar:danger-triangle-linear' : 'solar:folder-error-linear'}
           className="text-silver-jet size-full shrink-0"

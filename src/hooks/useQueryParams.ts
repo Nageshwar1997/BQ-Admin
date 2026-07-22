@@ -20,7 +20,8 @@ const useQueryParams = () => {
   ): void => {
     const currentParams = getParams();
 
-    const updatedParams = typeof params === 'function' ? params(currentParams) : params;
+    const updatedParams =
+      typeof params === 'function' ? params(currentParams) : { ...currentParams, ...params };
 
     const searchParams = new URLSearchParams();
 

@@ -1,19 +1,35 @@
 import type { IconProps } from '@iconify/react';
-import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from 'react';
-import type { UseFormRegisterReturn } from 'react-hook-form';
-import type { TClassName, TContainerClassName, TMediaOption } from './component.type';
+import type Quill from 'quill';
+import type { ToolbarProps } from 'quill/modules/toolbar';
+import type {
+  InputHTMLAttributes,
+  ReactElement,
+  ReactNode,
+  RefObject,
+  SelectHTMLAttributes,
+  TextareaHTMLAttributes,
+} from 'react';
+import type {
+  FieldPath,
+  FieldValues,
+  UseFormRegisterReturn,
+  UseFormSetValue,
+} from 'react-hook-form';
+import type {
+  ITooltip,
+  TClassName,
+  TContainerClassName,
+  TQuillImageRef,
+  TTitleDescription,
+} from './component.type';
 
-type LeftIcon = { left: IconProps | string; right?: never };
+export type TInputIcon = IconProps | ReactElement;
 
-type RightIcon = { right: IconProps; left?: never };
-
-type NoIcon = { left?: undefined; right?: undefined };
-
-type InputIcons = LeftIcon | RightIcon | NoIcon;
+export type TInputIcons = Partial<Record<'left' | 'right', TInputIcon>>;
 
 export interface IBaseInput extends TClassName, TContainerClassName {
   needRef?: boolean;
-  icons?: InputIcons;
+  icons?: TInputIcons;
   register?: UseFormRegisterReturn;
   label?: string;
   error?: string;
@@ -24,40 +40,139 @@ export interface IInput extends IBaseInput {
 }
 
 export interface ICheckbox extends Omit<IBaseInput, 'needRef' | 'icons' | 'label'> {
-  content?: string | ReactNode;
+  content?: string | ReactElement;
   checkboxProps: Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
+  tooltipRequired?: boolean;
+  tooltip?: Pick<ITooltip, 'required' | 'description' | 'title' | 'placement'>;
 }
 
-type TOption = { label: string | ReactNode; value: string };
+export type TOption = { label: string | ReactNode; value: string };
 
-export interface IRadio extends TClassName, Pick<IBaseInput, 'error'> {
+export interface IRadio extends TClassName, TContainerClassName, Pick<IBaseInput, 'error'> {
   value: string;
   onChange: (value: string) => void;
   options: TOption[];
 }
 
-export interface IDropdownOption extends Pick<TOption, 'label'> {
+export interface ISelectOption extends Pick<TOption, 'label'> {
   value: TOption['value'] | number;
   disabled?: boolean;
 }
 
 export interface ISelect extends Omit<IBaseInput, 'needRef' | 'register'> {
   selectProps: Pick<SelectHTMLAttributes<HTMLSelectElement>, 'disabled'> &
-    Partial<Pick<InputHTMLAttributes<HTMLInputElement>, 'placeholder'>> & {
-      value?: IDropdownOption['value'];
-      onChange?: (value: IDropdownOption['value']) => void;
+    Pick<InputHTMLAttributes<HTMLInputElement>, 'placeholder'> & {
+      value: ISelectOption['value'];
+      onChange: (value: ISelectOption['value']) => void;
     };
-  options: IDropdownOption[];
+  options: ISelectOption[];
   optionsClassName?: string;
-  optionsPosition?: 'top' | 'bottom';
+  position?: 'top' | 'bottom';
 }
 
-export interface IFileInput extends Omit<IBaseInput, 'error'> {
-  fileInputProps: Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
-  errors?: string[];
-  handleRemoveImage?: (index: number) => void;
-  handleReorderMedia?: (fromIndex: number, toIndex: number) => void;
-  previews?: TMediaOption[];
+export interface IHierarchySelectOption extends ISelectOption {
+  searchLabel?: string;
+  children?: IHierarchySelectOption[];
+}
+
+export interface IHierarchySelect extends Omit<ISelect, 'options'> {
+  inputProps?: IInput['inputProps'];
+  options: IHierarchySelectOption[];
+}
+
+export interface IHierarchySelectTreeNode {
+  node: IHierarchySelectOption;
+  level?: number;
+  value?: ISelectOption['value'];
+  expanded: Record<ISelectOption['value'], boolean>;
+  onToggle: (value: ISelectOption['value']) => void;
+  onSelect: (value: ISelectOption['value']) => void;
+}
+
+export interface IColorInput
+  extends
+    Pick<IBaseInput, 'className' | 'containerClassName' | 'error' | 'label'>,
+    Pick<IInput['inputProps'], 'disabled' | 'placeholder'>,
+    Pick<ISelect, 'position'> {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+export interface IFileInput extends Omit<IBaseInput, 'error' | 'register'> {
+  fileInputProps: Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value'> & {
+    value?: (File | string) | (File | string)[];
+  };
+  errors?: IBaseInput['error'][];
+  handleRemove?: (index: number) => void;
   mediaModalClassName?: string;
   mediaCarouselClassName?: string;
+}
+
+export interface ITextArea extends Omit<IBaseInput, 'icons'> {
+  textAreaProps: TextareaHTMLAttributes<HTMLTextAreaElement>;
+}
+export type TToolbarOption =
+  | { header: (1 | 2 | 3 | 4 | 5 | 6 | false)[] }
+  | 'bold'
+  | 'italic'
+  | 'underline'
+  | 'strike'
+  | { list: 'ordered' | 'bullet' }
+  | { script: 'sub' | 'super' }
+  | { indent: '-1' | '+1' }
+  | { color: string[] } // can be empty for Quill to auto-generate colors
+  | { background: string[] }
+  | { align: string[] }
+  | { direction: 'rtl' }
+  | 'link'
+  | 'image'
+  | 'video'
+  | 'code'
+  | 'clean';
+
+export type TQuillToolbar = (TToolbarOption | TToolbarOption[])[];
+
+export interface IToolBarOptions {
+  header?: (1 | 2 | 3 | 4 | 5 | 6 | false)[];
+  script?: ('sub' | 'super')[];
+  indent?: ('-1' | '+1')[];
+  color?: boolean;
+  background?: boolean;
+  align?: boolean;
+  direction?: 'rtl';
+  text?: ('bold' | 'italic' | 'underline' | 'strike' | 'link')[];
+  list?: ('ordered' | 'bullet')[];
+  media?: ('image' | 'video' | 'link')[];
+  misc?: ('code' | 'clean')[];
+}
+
+export interface IQuillInput
+  extends
+    TClassName,
+    Pick<IBaseInput, 'error' | 'label'>,
+    Pick<IInput['inputProps'], 'placeholder' | 'disabled'> {
+  value?: string;
+  needLinkButton?: boolean;
+  onChange?: (value: string) => void;
+  imagesRef?: RefObject<TQuillImageRef[]>;
+  toolbarOptions?: IToolBarOptions;
+}
+
+export interface IQuillToolbar extends ToolbarProps {
+  handlers: Record<string, (...args: unknown[]) => void>;
+}
+
+export type TQuillImageBlot = {
+  new (): HTMLElement;
+  create(value: unknown): HTMLElement;
+  value(node: HTMLElement): unknown;
+};
+
+export interface IProcessQuillContent<T extends FieldValues> {
+  quillRef: RefObject<Quill | null>;
+  imagesRef: RefObject<TQuillImageRef[]>;
+  setValue: UseFormSetValue<T>;
+  field: FieldPath<T>;
+  folder: string;
+  toasterInfo?: Partial<TTitleDescription>;
 }

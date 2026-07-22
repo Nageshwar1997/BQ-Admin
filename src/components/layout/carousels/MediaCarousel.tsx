@@ -1,6 +1,5 @@
 import type { IMediaCarousel } from '@/types/component.type';
 import { Icon } from '@iconify/react';
-import { useRef } from 'react';
 import ScrollableGradientContainer from '../containers/ScrollableGradientContainer';
 import VideoPlayer from '../media/VideoPlayer';
 
@@ -9,24 +8,11 @@ const MediaCarousel = ({
   media,
   selected,
   onClick,
-  onReorder,
   thumbnailRefs,
   handleRemove,
   gradientClassNames,
 }: IMediaCarousel) => {
-  const dragIndexRef = useRef<number | null>(null);
-  const didDragRef = useRef(false);
-
-  if (!media || media?.length === 0) return null;
-
-  const isDraggable = !!onReorder && media.length > 1;
-
-  const handleDragEnd = () => {
-    dragIndexRef.current = null;
-    window.setTimeout(() => {
-      didDragRef.current = false;
-    }, 0);
-  };
+  if (!media || media.length === 0) return null;
 
   return (
     <ScrollableGradientContainer
@@ -34,7 +20,7 @@ const MediaCarousel = ({
       className={`w-full [&>div]:justify-start ${className}`}
       gradientClassNames={gradientClassNames}
     >
-      <div className="flex items-center gap-2 p-2">
+      <div className="media-carousel flex items-center gap-2 p-2">
         {media.map((item, i) => (
           <div
             key={item.url}
@@ -43,63 +29,15 @@ const MediaCarousel = ({
                 thumbnailRefs.current[i] = el;
               }
             }}
-            draggable={isDraggable}
-            onDragStart={(e) => {
-              if (!isDraggable) return;
-
-              dragIndexRef.current = i;
-              didDragRef.current = true;
-              e.dataTransfer.effectAllowed = 'move';
-              e.dataTransfer.setData('text/plain', String(i));
-            }}
-            onDragOver={(e) => {
-              if (!isDraggable) return;
-
-              e.preventDefault();
-              e.dataTransfer.dropEffect = 'move';
-            }}
-            onDragEnter={(e) => {
-              if (!isDraggable) return;
-
-              e.preventDefault();
-
-              const fromIndex = dragIndexRef.current;
-              if (fromIndex === null || fromIndex === i) return;
-
-              onReorder?.(fromIndex, i);
-              dragIndexRef.current = i;
-            }}
-            onDrop={(e) => {
-              if (!isDraggable) return;
-
-              e.preventDefault();
-            }}
-            onDragEnd={handleDragEnd}
-            onClick={() => {
-              if (didDragRef.current) {
-                didDragRef.current = false;
-                return;
-              }
-
-              onClick(i);
-            }}
+            onClick={() => onClick(i)}
             className={`group relative size-14 shrink-0 overflow-hidden rounded-md border shadow-xs transition-colors duration-300 hover:opacity-100 md:size-16 lg:size-20 ${
-              item.hasError
-                ? 'border-red-c'
-                : i === selected
-                  ? 'border-tertiary opacity-100'
-                  : 'border-primary/30 opacity-90'
-            } ${isDraggable ? 'cursor-grab active:cursor-grabbing' : ''} ${
-              item.type === 'video' ? 'relative' : ''
-            }`}
+              i === selected ? 'border-tertiary opacity-100' : 'border-primary/30 opacity-90'
+            } ${item.type === 'video' ? 'relative' : ''}`}
           >
             {item.type === 'video' ? (
               <>
                 {i !== selected && (
-                  <div
-                    key={i}
-                    className="group pointer-events-none absolute inset-0 flex aspect-square h-full w-full items-center justify-center bg-black/50"
-                  >
+                  <div className="group pointer-events-none absolute inset-0 flex aspect-square size-full items-center justify-center bg-black/50">
                     <Icon
                       icon="solar:play-linear"
                       className="text-white opacity-90 group-hover:opacity-100"
@@ -108,6 +46,7 @@ const MediaCarousel = ({
                 )}
                 <VideoPlayer
                   key={item.url}
+                  showPosterOnly={true}
                   videoProps={{ src: item.url, autoPlay: false }}
                   className="aspect-square h-full w-full cursor-pointer object-cover"
                 />
@@ -124,7 +63,7 @@ const MediaCarousel = ({
             {handleRemove && (
               <button
                 type="button"
-                className="bg-tertiary/80 absolute top-0.5 right-0.5 z-1 size-4 cursor-pointer rounded-full"
+                className="bg-tertiary/80 absolute top-0.5 right-0.5 z-1 flex size-4 cursor-pointer items-center justify-center rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRemove(i);

@@ -1,353 +1,589 @@
-import Navbar from '@/components/layout/navbar';
+import PageWrapper from '@/components/layout/containers/PageWrapper';
 import Button from '@/components/ui/Button';
-import Stepper, { type StepperStep } from '@/components/ui/Stepper';
-import Checkbox from '@/components/ui/inputs/Checkbox';
-import Input from '@/components/ui/inputs/Input';
-// import Select from '@/components/ui/inputs/Select';
-import { CATEGORY_LEVELS_MAP } from '@/constants/common.constants';
-import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
-import { addProductSchema } from '@/schemas/category.schema';
+import Stepper from '@/components/ui/Stepper';
+import { ADD_PRODUCT_STEPS, EMPTY_ARRAY, ROUTES } from '@/constants/common.constants';
+import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
+import usePathParams from '@/hooks/usePathParams';
+import { useProcessQuillContent } from '@/hooks/useProcessQuillContent';
+import {
+  productBasicInfoSchema,
+  productDescriptionAndContentSchema,
+  productMediaAndGallerySchema,
+  productStockAndVariantsSchema,
+  productTryOnConfigurationSchema,
+} from '@/schemas/product.schema';
+import { confirmDetailsSchema } from '@/schemas/shared.schema';
+import {
+  useUploadMultipleMedia,
+  useUploadSingleMedia,
+} from '@/services/media-service/media.service.query';
 import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
-import type { ICategory } from '@/types/api.type';
-import type { TAddProduct } from '@/types/schema.type';
+import {
+  useGetDraftProduct,
+  usePublishProduct,
+  useSaveDraftProduct,
+} from '@/services/product-service/product.service.query';
+import type {
+  TAddProductStepNumber,
+  TProductQuillImageRefs,
+  TProductQuillRefs,
+} from '@/types/common.type';
+import type { TQuillImageRef } from '@/types/component.type';
+import type {
+  TConfirmDetails,
+  TProductBasicInfo,
+  TProductDescriptionAndContent,
+  TProductMediaAndGallery,
+  TProductStockAndVariants,
+  TProductTryOnConfiguration,
+} from '@/types/schema.type';
+import { isDeepEqual } from '@/utils/common.util';
+import { CATEGORY_LEVELS_MAP } from '@beautinique/shared-constants';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
-import { useForm, useWatch, type FieldPath } from 'react-hook-form';
-
-const ADD_PRODUCT_STEPS: StepperStep[] = [
-  {
-    title: 'Product info',
-    description: 'Name, brand and category',
-    icon: 'solar:box-minimalistic-linear',
-  },
-  {
-    title: 'Pricing',
-    description: 'MRP, sale price and stock',
-    icon: 'solar:tag-price-linear',
-  },
-  {
-    title: 'Media',
-    description: 'Images and preview assets',
-    icon: 'solar:gallery-linear',
-  },
-  {
-    title: 'Review',
-    description: 'Check details and publish',
-    icon: 'solar:checklist-minimalistic-linear',
-  },
-];
-
-const STEP_FIELDS: FieldPath<TAddProduct>[][] = [
-  ['title', 'brand', 'mainCategory', 'subCategory', 'productCategory'],
-  ['mrp', 'salePrice', 'stock'],
-  ['imageUrl'],
-  ['confirmDetails'],
-];
+import type Quill from 'quill';
+import { useEffect, useRef, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
+import AddProductConfirmFieldAndReview from './children/AddProductConfirmFieldAndReview';
+import AddProductDescriptionAndContentFields from './children/AddProductDescriptionAndContentFields';
+import AddProductMediaAndGalleryFields from './children/AddProductMediaAndGalleryFields';
+import AddProductStockAndVariantsFields from './children/AddProductStockAndVariantsFields';
+import AddProductTryOnConfigurationFields from './children/AddProductTryOnConfigurationFields';
 
 const AddProduct = () => {
-  const [activeStep, setActiveStep] = useState(0);
-  const activeStepData = ADD_PRODUCT_STEPS[activeStep];
+  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(0);
+  const { processQuillContent, isPending: isContentUploadPending } =
+    useProcessQuillContent<TProductDescriptionAndContent>();
 
+  const { navigate } = usePathParams();
+
+  const uploadSingleMediaQuery = useUploadSingleMedia();
+  const uploadMultipleMediaQuery = useUploadMultipleMedia();
+  const saveDraftProductQuery = useSaveDraftProduct();
+  const publishDraftProductQuery = usePublishProduct();
   const {
-    control,
-    formState: { errors },
-    getValues,
-    handleSubmit,
-    register,
-    // setValue,
-    trigger,
-  } = useForm<TAddProduct>({
-    resolver: zodResolver(addProductSchema),
-    defaultValues: FORM_DEFAULT_VALUES.addProduct,
-    mode: 'onChange',
+    data: draftProduct,
+    isLoading: isDraftProductLoading,
+    isError: isDraftProductError,
+  } = useGetDraftProduct();
+
+  const quillRefs: TProductQuillRefs = {
+    description: useRef<Quill | null>(null),
+    ingredients: useRef<Quill | null>(null),
+    instructions: useRef<Quill | null>(null),
+    additional: useRef<Quill | null>(null),
+  };
+
+  const imageRefs: TProductQuillImageRefs = {
+    description: useRef<TQuillImageRef[]>([]),
+    ingredients: useRef<TQuillImageRef[]>([]),
+    instructions: useRef<TQuillImageRef[]>([]),
+    additional: useRef<TQuillImageRef[]>([]),
+  };
+
+  const basicInfoForm = useForm<TProductBasicInfo>({
+    resolver: zodResolver(productBasicInfoSchema),
   });
 
-  const mainCategory = useWatch({ control, name: 'mainCategory' });
-  const subCategory = useWatch({ control, name: 'subCategory' });
-  const productValues = useWatch({ control });
+  const mediaAndGalleryForm = useForm<TProductMediaAndGallery>({
+    resolver: zodResolver(productMediaAndGallerySchema),
+  });
 
-  const { data: level1Cats } = useGetCategoriesByParentLevel({ level: CATEGORY_LEVELS_MAP.L1 });
-  const { data: level2Cats } = useGetCategoriesByParentLevel({
+  const descriptionAndContentForm = useForm<TProductDescriptionAndContent>({
+    resolver: zodResolver(productDescriptionAndContentSchema),
+  });
+
+  const stockAndVariantsForm = useForm<TProductStockAndVariants>({
+    resolver: zodResolver(productStockAndVariantsSchema),
+  });
+
+  const tryOnConfigurationForm = useForm<TProductTryOnConfiguration>({
+    resolver: zodResolver(productTryOnConfigurationSchema),
+  });
+
+  const reviewAndConfirmForm = useForm<TConfirmDetails>({
+    resolver: zodResolver(confirmDetailsSchema),
+  });
+
+  const title = useWatch({ control: basicInfoForm.control, name: 'title' });
+
+  const l1Category = useWatch({ control: basicInfoForm.control, name: 'l1Category' });
+  const l2Category = useWatch({ control: basicInfoForm.control, name: 'l2Category' });
+
+  const { data: l1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
+    level: CATEGORY_LEVELS_MAP.L1,
+  });
+
+  const { data: l2Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L2,
-    parent: mainCategory,
-    enabled: !!mainCategory,
+    parent: l1Category?._id,
+    enabled: !!l1Category?._id,
   });
-  const { data: level3Cats } = useGetCategoriesByParentLevel({
+
+  const { data: l3Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L3,
-    parent: subCategory,
-    enabled: !!subCategory,
+    parent: l2Category?._id,
+    enabled: !!l2Category?._id,
   });
 
-  const getCategoryName = (categories: ICategory[] | undefined, id?: string) =>
-    categories?.find((cat) => cat._id === id)?.name || '-';
+  const handleNext = () => {
+    setActiveStep(
+      (prev) => (prev < ADD_PRODUCT_STEPS.length - 1 ? prev + 1 : prev) as TAddProductStepNumber,
+    );
+  };
 
-  const handleStepChange = async (nextStep: number) => {
-    if (nextStep <= activeStep) {
-      setActiveStep(nextStep);
+  const saveStepIfChanged = async <T extends Record<string, unknown>>(
+    currentData: T,
+    draftData: T | undefined,
+    saveData: T & { step: string },
+    options?: { ignoreValues?: unknown[] },
+  ) => {
+    if (saveDraftProductQuery.isPending) return;
+
+    if (isDeepEqual(currentData, draftData, options ?? { ignoreValues: [undefined, null] })) {
+      handleNext();
       return;
     }
 
-    const fieldsToValidate = STEP_FIELDS.slice(0, nextStep).flat();
-    const isValid = await trigger(fieldsToValidate, { shouldFocus: true });
-    if (isValid) setActiveStep(nextStep);
+    await saveDraftProductQuery.mutateAsync(saveData, { onSuccess: handleNext });
   };
 
-  const handleNext = async () => {
-    const isValid = await trigger(STEP_FIELDS[activeStep], { shouldFocus: true });
-    if (isValid) setActiveStep((step) => Math.min(step + 1, ADD_PRODUCT_STEPS.length - 1));
+  const onBasicInfoSubmit = async (data: TProductBasicInfo) => {
+    await saveStepIfChanged(data, draftProduct?.basicInfo, { ...data, step: 'basicInfo' });
   };
 
-  const handlePublish = (data: TAddProduct) => {
-    console.log({
-      ...data,
-      mrp: Number(data.mrp),
-      salePrice: Number(data.salePrice),
-      stock: Number(data.stock),
+  const onMediaAndGallerySubmit = async (data: TProductMediaAndGallery) => {
+    if (uploadSingleMediaQuery.isPending || uploadMultipleMediaQuery.isPending) return;
+
+    const hasNewFiles =
+      data.thumbnail instanceof File ||
+      data.video instanceof File ||
+      data.images.some((image) => image instanceof File);
+
+    if (!hasNewFiles) {
+      await saveStepIfChanged(data, draftProduct?.mediaAndGallery, {
+        ...data,
+        step: 'mediaAndGallery',
+      });
+
+      return;
+    }
+
+    let thumbnailUrl = typeof data.thumbnail === 'string' ? data.thumbnail : '';
+
+    let videoUrl = typeof data.video === 'string' ? data.video : undefined;
+
+    const existingImageUrls: string[] = [];
+    const newImageFiles: File[] = [];
+
+    data.images.forEach((image) => {
+      if (typeof image === 'string') {
+        existingImageUrls.push(image);
+      } else {
+        newImageFiles.push(image);
+      }
+    });
+
+    const uploadPromises: Promise<unknown>[] = [];
+
+    // Thumbnail upload
+    if (data.thumbnail instanceof File) {
+      const thumbnailFormData = new FormData();
+
+      thumbnailFormData.append('file', data.thumbnail);
+      thumbnailFormData.append('folder', title);
+
+      uploadPromises.push(
+        uploadSingleMediaQuery.mutateAsync({
+          data: thumbnailFormData,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading thumbnail',
+          },
+        }),
+      );
+    } else {
+      uploadPromises.push(Promise.resolve(null));
+    }
+
+    // Images upload
+    if (newImageFiles.length) {
+      const imagesFormData = new FormData();
+
+      newImageFiles.forEach((file) => {
+        imagesFormData.append('files', file);
+      });
+
+      imagesFormData.append('folder', title);
+
+      uploadPromises.push(
+        uploadMultipleMediaQuery.mutateAsync({
+          data: imagesFormData,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading images',
+          },
+        }),
+      );
+    } else {
+      uploadPromises.push(Promise.resolve(null));
+    }
+
+    // Video upload
+    if (data.video instanceof File) {
+      const videoFormData = new FormData();
+
+      videoFormData.append('file', data.video);
+      videoFormData.append('folder', title);
+
+      uploadPromises.push(
+        uploadSingleMediaQuery.mutateAsync({
+          data: videoFormData,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading video',
+          },
+        }),
+      );
+    } else {
+      uploadPromises.push(Promise.resolve(null));
+    }
+
+    const [thumbnailResponse, imagesResponse, videoResponse] = await Promise.all(uploadPromises);
+
+    if (thumbnailResponse && typeof thumbnailResponse === 'object' && 'data' in thumbnailResponse) {
+      thumbnailUrl = thumbnailResponse.data as string;
+    }
+
+    if (videoResponse && typeof videoResponse === 'object' && 'data' in videoResponse) {
+      videoUrl = videoResponse.data as string;
+    }
+
+    const uploadedImageUrls =
+      imagesResponse && typeof imagesResponse === 'object' && 'data' in imagesResponse
+        ? ((imagesResponse.data as string[]) ?? [])
+        : [];
+
+    const finalImages = [...existingImageUrls, ...uploadedImageUrls];
+
+    mediaAndGalleryForm.setValue('thumbnail', thumbnailUrl);
+    mediaAndGalleryForm.setValue('images', finalImages);
+
+    if (videoUrl) {
+      mediaAndGalleryForm.setValue('video', videoUrl);
+    }
+
+    await saveDraftProductQuery.mutateAsync(
+      {
+        thumbnail: thumbnailUrl,
+        images: finalImages,
+        video: videoUrl,
+        step: 'mediaAndGallery',
+      },
+      { onSuccess: handleNext },
+    );
+  };
+
+  const onDescriptionAndContentSubmit = async (data: TProductDescriptionAndContent) => {
+    if (isContentUploadPending) return;
+
+    const [descriptionResponse, additionalResponse, ingredientsResponse, instructionsResponse] =
+      await Promise.all([
+        processQuillContent({
+          field: 'description',
+          folder: title,
+          imagesRef: imageRefs.description,
+          quillRef: quillRefs.description,
+          setValue: descriptionAndContentForm.setValue,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading description images...',
+          },
+        }),
+        processQuillContent({
+          field: 'additional',
+          folder: title,
+          imagesRef: imageRefs.additional,
+          quillRef: quillRefs.additional,
+          setValue: descriptionAndContentForm.setValue,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading additional info images...',
+          },
+        }),
+        processQuillContent({
+          field: 'ingredients',
+          folder: title,
+          imagesRef: imageRefs.ingredients,
+          quillRef: quillRefs.ingredients,
+          setValue: descriptionAndContentForm.setValue,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading ingredients images...',
+          },
+        }),
+        processQuillContent({
+          field: 'instructions',
+          folder: title,
+          imagesRef: imageRefs.instructions,
+          quillRef: quillRefs.instructions,
+          setValue: descriptionAndContentForm.setValue,
+          toasterInfo: {
+            title: 'Please wait...',
+            description: 'Uploading instructions images...',
+          },
+        }),
+      ]);
+
+    const payload = {
+      shortDescription: data.shortDescription,
+      description: descriptionResponse as string,
+      instructions: instructionsResponse,
+      ingredients: ingredientsResponse,
+      additional: additionalResponse,
+    };
+
+    await saveStepIfChanged(payload, draftProduct?.descriptionAndContent, {
+      ...payload,
+      step: 'descriptionAndContent',
     });
   };
 
-  const handleSaveDraft = () => {
-    const data = getValues();
-    console.log({
+  const onStockAndVariantsSubmit = async (data: TProductStockAndVariants) => {
+    // No variants
+    if (
+      uploadSingleMediaQuery.isPending ||
+      uploadMultipleMediaQuery.isPending ||
+      saveDraftProductQuery.isPending
+    ) {
+      return;
+    }
+
+    if (!data.hasVariants) {
+      await saveStepIfChanged(data, draftProduct?.stockAndVariants, {
+        ...data,
+        step: 'stockAndVariants',
+      });
+
+      return;
+    } else {
+      const updatedVariants = await Promise.all(
+        data.variants.map(async (variant) => {
+          const existingImageUrls: string[] = [];
+          const newImageFiles: File[] = [];
+
+          variant.images.forEach((image) => {
+            if (typeof image === 'string') {
+              existingImageUrls.push(image);
+            } else {
+              newImageFiles.push(image);
+            }
+          });
+
+          const thumbnailPromise =
+            variant.thumbnail instanceof File
+              ? (() => {
+                  const formData = new FormData();
+
+                  formData.append('file', variant.thumbnail);
+                  formData.append('folder', title);
+
+                  return uploadSingleMediaQuery.mutateAsync({
+                    data: formData,
+                    toasterInfo: {
+                      title: 'Please wait...',
+                      description: `Uploading ${variant.label} thumbnail...`,
+                    },
+                  });
+                })()
+              : Promise.resolve(null);
+
+          const imagesPromise =
+            newImageFiles.length > 0
+              ? (() => {
+                  const formData = new FormData();
+
+                  newImageFiles.forEach((file) => {
+                    formData.append('files', file);
+                  });
+
+                  formData.append('folder', title);
+
+                  return uploadMultipleMediaQuery.mutateAsync({
+                    data: formData,
+                    toasterInfo: {
+                      title: 'Please wait...',
+                      description: `Uploading ${variant.label} images...`,
+                    },
+                  });
+                })()
+              : Promise.resolve(null);
+
+          const [thumbnailResponse, imagesResponse] = await Promise.all([
+            thumbnailPromise,
+            imagesPromise,
+          ]);
+
+          return {
+            ...variant,
+            thumbnail: thumbnailResponse?.data ?? variant.thumbnail,
+            images: [...existingImageUrls, ...(imagesResponse?.data ?? [])],
+          };
+        }),
+      );
+
+      stockAndVariantsForm.setValue('variants', updatedVariants);
+
+      await saveStepIfChanged(
+        { hasVariants: true, variants: updatedVariants },
+        draftProduct?.stockAndVariants,
+        { hasVariants: true, variants: updatedVariants, step: 'stockAndVariants' },
+      );
+    }
+  };
+
+  const onTryOnConfigurationSubmit = async (data: TProductTryOnConfiguration) => {
+    await saveStepIfChanged(data, draftProduct?.tryOnConfiguration, {
       ...data,
-      mrp: data.mrp ? Number(data.mrp) : '',
-      salePrice: data.salePrice ? Number(data.salePrice) : '',
-      stock: data.stock ? Number(data.stock) : '',
+      step: 'tryOnConfiguration',
     });
+  };
+
+  const onReviewAndConfirmSubmit = async (_data: TConfirmDetails) => {
+    if (publishDraftProductQuery.isPending) return;
+    await publishDraftProductQuery.mutateAsync();
+  };
+
+  const handleBack = () => {
+    if (activeStep > 0) {
+      setActiveStep((prev) => (prev > 0 ? prev - 1 : prev) as TAddProductStepNumber);
+    } else {
+      navigate(`/${ROUTES.PRODUCTS.BASE}`);
+    }
   };
 
   const stepFields = [
-    {
-      title: 'Product details',
-      content: (
-        <div className="grid gap-4 md:grid-cols-2">
-          <Input
-            label="Product name"
-            register={register('title')}
-            error={errors.title?.message}
-            inputProps={{ name: 'title', placeholder: 'Product name' }}
-          />
-          <Input
-            label="Brand name"
-            register={register('brand')}
-            error={errors.brand?.message}
-            inputProps={{ name: 'brand', placeholder: 'Brand name' }}
-          />
-          {/* <Select
-            key={'Main Category'}
-            label="Main category"
-            register={register('mainCategory')}
-            options={level1Cats?.map((cat: ICategory) => ({
-              label: cat.name,
-              value: cat._id,
-            }))}
-            error={errors.mainCategory?.message}
-            selectProps={{
-              name: 'mainCategory',
-              value: mainCategory,
-              placeholder: 'Select main category',
-              onChange: () => {
-                setValue('subCategory', '');
-                setValue('productCategory', '');
-              },
-            }}
-          /> */}
-          {/* <Select
-            key={'Sub Category'}
-            label="Sub-category"
-            register={register('subCategory')}
-            options={level2Cats?.map((cat: ICategory) => ({
-              label: cat.name,
-              value: cat._id,
-            }))}
-            error={errors.subCategory?.message}
-            selectProps={{
-              name: 'subCategory',
-              value: subCategory,
-              disabled: !mainCategory,
-              placeholder: mainCategory ? 'Select sub-category' : 'Select main category first',
-              onChange: () => setValue('productCategory', ''),
-            }}
-          /> */}
-          {/* <Select
-            key={'Product Category'}
-            label="Product category"
-            register={register('productCategory')}
-            options={level3Cats?.map((cat: ICategory) => ({
-              label: cat.name,
-              value: cat._id,
-            }))}
-            error={errors.productCategory?.message}
-            selectProps={{
-              name: 'productCategory',
-              value: productValues.productCategory,
-              disabled: !subCategory,
-              placeholder: subCategory ? 'Select product category' : 'Select sub-category first',
-            }}
-          /> */}
-        </div>
-      ),
-    },
-    {
-      title: 'Pricing and stock',
-      content: (
-        <div className="grid gap-4 md:grid-cols-3">
-          <Input
-            label="MRP"
-            register={register('mrp')}
-            error={errors.mrp?.message}
-            inputProps={{ name: 'mrp', type: 'number', placeholder: 'MRP' }}
-          />
-          <Input
-            label="Sale price"
-            register={register('salePrice')}
-            error={errors.salePrice?.message}
-            inputProps={{ name: 'salePrice', type: 'number', placeholder: 'Sale price' }}
-          />
-          <Input
-            label="Stock"
-            register={register('stock')}
-            error={errors.stock?.message}
-            inputProps={{ name: 'stock', type: 'number', placeholder: 'Stock' }}
-          />
-        </div>
-      ),
-    },
-    {
-      title: 'Product media',
-      content: (
-        <div className="grid gap-4">
-          <Input
-            label="Product image URL"
-            register={register('imageUrl')}
-            error={errors.imageUrl?.message}
-            inputProps={{
-              name: 'imageUrl',
-              placeholder: 'https://example.com/product-image.jpg',
-            }}
-          />
-          <div className="border-primary/10 bg-primary-invert flex min-h-36 items-center justify-center rounded-lg border border-dashed p-6 text-center">
-            <div>
-              <p className="text-primary text-sm font-semibold">Upload product images</p>
-              <p className="text-secondary mt-1 text-xs">Gallery uploader can be connected here.</p>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: 'Final review',
-      content: (
-        <div className="flex flex-col gap-4">
-          <div className="border-primary/10 bg-primary-invert rounded-lg border p-4">
-            <p className="text-primary text-sm font-semibold">Ready to publish</p>
-            <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
-              <p className="text-secondary">
-                Product: <span className="text-primary">{productValues.title || '-'}</span>
-              </p>
-              <p className="text-secondary">
-                Brand: <span className="text-primary">{productValues.brand || '-'}</span>
-              </p>
-              <p className="text-secondary">
-                Main category:{' '}
-                <span className="text-primary">
-                  {getCategoryName(level1Cats, productValues.mainCategory)}
-                </span>
-              </p>
-              <p className="text-secondary">
-                Sub-category:{' '}
-                <span className="text-primary">
-                  {getCategoryName(level2Cats, productValues.subCategory)}
-                </span>
-              </p>
-              <p className="text-secondary">
-                Product category:{' '}
-                <span className="text-primary">
-                  {getCategoryName(level3Cats, productValues.productCategory)}
-                </span>
-              </p>
-              <p className="text-secondary">
-                MRP: <span className="text-primary">{productValues.mrp || '-'}</span>
-              </p>
-              <p className="text-secondary">
-                Sale price: <span className="text-primary">{productValues.salePrice || '-'}</span>
-              </p>
-              <p className="text-secondary">
-                Stock: <span className="text-primary">{productValues.stock || '-'}</span>
-              </p>
-            </div>
-          </div>
-          <Checkbox
-            register={register('confirmDetails')}
-            error={errors.confirmDetails?.message}
-            content="I confirm the product details are correct"
-            checkboxProps={{ name: 'confirmDetails' }}
-          />
-        </div>
-      ),
-    },
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+      onSubmit={basicInfoForm.handleSubmit(onBasicInfoSubmit)}
+    >
+      <AddProductBasicInfoFields
+        form={basicInfoForm}
+        categories={{ L1: l1Cats, L2: l2Cats, L3: l3Cats }}
+      />
+    </form>,
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+      onSubmit={mediaAndGalleryForm.handleSubmit(onMediaAndGallerySubmit)}
+    >
+      <AddProductMediaAndGalleryFields form={mediaAndGalleryForm} />
+    </form>,
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+      onSubmit={descriptionAndContentForm.handleSubmit(onDescriptionAndContentSubmit)}
+    >
+      <AddProductDescriptionAndContentFields
+        form={descriptionAndContentForm}
+        imageRefs={imageRefs}
+        quillRefs={quillRefs}
+      />
+    </form>,
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+      onSubmit={stockAndVariantsForm.handleSubmit(onStockAndVariantsSubmit)}
+    >
+      <AddProductStockAndVariantsFields
+        form={stockAndVariantsForm}
+        defaultPrices={{
+          originalPrice: basicInfoForm.watch('originalPrice'),
+          sellingPrice: basicInfoForm.watch('sellingPrice'),
+        }}
+      />
+    </form>,
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+      onSubmit={tryOnConfigurationForm.handleSubmit(onTryOnConfigurationSubmit)}
+    >
+      <AddProductTryOnConfigurationFields form={tryOnConfigurationForm} />
+    </form>,
+    <form
+      id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+      onSubmit={reviewAndConfirmForm.handleSubmit(onReviewAndConfirmSubmit)}
+    >
+      <AddProductConfirmFieldAndReview
+        form={reviewAndConfirmForm}
+        onEdit={(step) => setActiveStep(step)}
+        values={{
+          basicInfo: basicInfoForm.getValues(),
+          mediaAndGallery: mediaAndGalleryForm.getValues(),
+          descriptionAndContent: descriptionAndContentForm.getValues(),
+          stockAndVariants: stockAndVariantsForm.getValues(),
+          tryOnConfiguration: tryOnConfigurationForm.getValues(),
+        }}
+      />
+    </form>,
   ];
 
+  useEffect(() => {
+    if (!draftProduct || isDraftProductLoading || isDraftProductError) return;
+
+    if (draftProduct.basicInfo) {
+      basicInfoForm.reset(draftProduct.basicInfo);
+    }
+    if (draftProduct.mediaAndGallery) {
+      mediaAndGalleryForm.reset(draftProduct.mediaAndGallery);
+    }
+
+    if (draftProduct.descriptionAndContent) {
+      descriptionAndContentForm.reset(draftProduct.descriptionAndContent);
+    }
+
+    if (draftProduct.stockAndVariants) {
+      stockAndVariantsForm.reset(draftProduct.stockAndVariants);
+    }
+
+    if (draftProduct.tryOnConfiguration) {
+      tryOnConfigurationForm.reset(draftProduct.tryOnConfiguration);
+    }
+  }, [draftProduct]);
+
   return (
-    <div>
-      <Navbar
-        buttons={[
-          {
-            content: 'Save Draft',
-            pattern: 'secondary',
-            className: 'whitespace-nowrap',
-            leftIcon: { icon: 'solar:diskette-linear', className: 'size-4 md:size-5' },
-            buttonProps: { onClick: handleSaveDraft },
-          },
-        ]}
-        className="[&>:nth-last-child(2)]:border-b-silver/30 [&>:nth-last-child(2)]:border-b [&>div]:py-2"
-      />
+    <PageWrapper>
+      <Stepper steps={ADD_PRODUCT_STEPS} activeStep={activeStep} className="mt-4 p-4!">
+        <div className="flex flex-col gap-5">
+          <div>
+            <p className="text-primary text-sm font-semibold">
+              {ADD_PRODUCT_STEPS[activeStep].title}
+            </p>
 
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 p-4 md:p-6">
-        <div>
-          <p className="text-secondary text-xs font-semibold tracking-wide uppercase">Products</p>
-          <h1 className="text-primary mt-1 text-2xl font-semibold">Add Product</h1>
+            <p className="text-secondary text-xs">{ADD_PRODUCT_STEPS[activeStep].description}</p>
+          </div>
+
+          {stepFields[activeStep]}
+
+          <div className="flex justify-between gap-3">
+            <Button pattern="secondary" content="Back" buttonProps={{ onClick: handleBack }} />
+            <Button
+              pattern="primary"
+              content={activeStep === ADD_PRODUCT_STEPS.length - 1 ? 'Submit' : 'Continue'}
+              buttonProps={{
+                type: 'submit',
+                form: ADD_PRODUCT_FORM_ID_MAP[activeStep],
+                disabled:
+                  isContentUploadPending ||
+                  saveDraftProductQuery.isPending ||
+                  publishDraftProductQuery.isPending ||
+                  basicInfoForm.formState.isSubmitting ||
+                  mediaAndGalleryForm.formState.isSubmitting ||
+                  descriptionAndContentForm.formState.isSubmitting ||
+                  stockAndVariantsForm.formState.isSubmitting ||
+                  tryOnConfigurationForm.formState.isSubmitting,
+              }}
+            />
+          </div>
         </div>
-
-        <Stepper steps={ADD_PRODUCT_STEPS} activeStep={activeStep} onStepClick={handleStepChange}>
-          <form onSubmit={handleSubmit(handlePublish)} className="flex flex-col gap-5">
-            <div>
-              <p className="text-primary text-base font-semibold">{stepFields[activeStep].title}</p>
-              <p className="text-secondary mt-1 text-xs">{activeStepData.description}</p>
-            </div>
-
-            {stepFields[activeStep].content}
-
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
-              <Button
-                pattern="outline"
-                content="Back"
-                leftIcon={{ icon: 'solar:arrow-left-linear', className: 'size-4' }}
-                buttonProps={{
-                  disabled: activeStep === 0,
-                  onClick: () => setActiveStep((step) => Math.max(step - 1, 0)),
-                }}
-                className="sm:max-w-36"
-              />
-              <Button
-                pattern="primary"
-                content={activeStep === ADD_PRODUCT_STEPS.length - 1 ? 'Publish' : 'Next'}
-                rightIcon={
-                  activeStep === ADD_PRODUCT_STEPS.length - 1
-                    ? { icon: 'solar:check-read-linear', className: 'size-4' }
-                    : { icon: 'solar:arrow-right-linear', className: 'size-4' }
-                }
-                buttonProps={{
-                  type: activeStep === ADD_PRODUCT_STEPS.length - 1 ? 'submit' : 'button',
-                  onClick: activeStep === ADD_PRODUCT_STEPS.length - 1 ? undefined : handleNext,
-                }}
-                className="sm:max-w-36"
-              />
-            </div>
-          </form>
-        </Stepper>
-      </div>
-    </div>
+      </Stepper>
+    </PageWrapper>
   );
 };
 

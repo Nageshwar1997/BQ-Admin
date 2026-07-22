@@ -1,14 +1,21 @@
 import type { IRadio } from '@/types/input.type';
 import { InputError } from './children';
 
-const Radio = ({ value, onChange, options, className = '', error }: IRadio) => {
+const Radio = ({
+  value,
+  onChange,
+  options,
+  className = '',
+  containerClassName = '',
+  error,
+}: IRadio) => {
   const index = options.findIndex((opt) => opt.value === value);
   const translatePercent = `${index * 100}%`;
 
   return (
-    <div className="flex max-w-full min-w-0 flex-col gap-1.5">
+    <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
       <div
-        className={`border-battleship-davys-gray mx-auto flex w-full items-center justify-center gap-4 rounded-full border ${className}`}
+        className={`border-battleship-davys-gray mx-auto flex w-full items-center justify-center gap-4 rounded-full border overflow-hidden ${className}`}
       >
         <div className="bg-smoke-eerie shadow-primary-btn hover:shadow-primary-btn-hover relative flex h-9 w-full items-center justify-between rounded-full transition-shadow duration-300">
           {/* Toggle Background */}
@@ -23,7 +30,7 @@ const Radio = ({ value, onChange, options, className = '', error }: IRadio) => {
           {options.map((option) => (
             <label
               key={option.value}
-              className={`relative z-10 inline-block flex-1 cursor-pointer text-center text-sm ${
+              className={`relative z-1 inline-block flex-1 cursor-pointer text-center text-sm ${
                 value === option.value
                   ? 'font-semibold text-white/90'
                   : 'text-primary/50 font-medium'

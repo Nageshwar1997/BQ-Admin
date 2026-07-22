@@ -3,7 +3,6 @@ import PageWrapper from '@/components/layout/containers/PageWrapper';
 import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
 import LoadingText from '@/components/layout/loaders/LoadingText';
 import ConfirmModal from '@/components/layout/modals/ConfirmModal';
-import Navbar from '@/components/layout/navbar';
 import {
   Table,
   TableBody,
@@ -13,19 +12,16 @@ import {
   TableRowCell,
 } from '@/components/layout/table';
 import Badge from '@/components/ui/Badge';
-import {
-  CATEGORY_LEVELS_MAP,
-  QUERY_PARAMS_KEY_MAP,
-  SORT_ORDER_MAP,
-} from '@/constants/common.constants';
+import { EMPTY_ARRAY, QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import {
   useDeleteCategory,
   useGetCategoriesByParentLevel,
 } from '@/services/product-service/category.service.query';
-import type { ICategory } from '@/types/api.type';
-import type { TCatModal, TCatTable, TSort } from '@/types/component.type';
+import type { TCategory } from '@/types/api.type';
+import type { TCatModal, TCatTable } from '@/types/component.type';
 import { getFilteredAndSortedCats } from '@/utils/api.util';
+import { CATEGORY_LEVELS_MAP, SORT_MAP, type TSort } from '@beautinique/shared-constants';
 import { Icon } from '@iconify/react';
 import {
   Fragment,
@@ -45,7 +41,7 @@ const TH_TITLES = ['Category', 'Level', 'Parent', 'Actions'] as const;
 const q_cat_keys = QUERY_PARAMS_KEY_MAP.category;
 
 const ApiStatusRow = (
-  props: Record<'haveLength' | 'isError' | 'isLoading', boolean> & Pick<ICategory, 'level'>,
+  props: Record<'haveLength' | 'isError' | 'isLoading', boolean> & Pick<TCategory, 'level'>,
 ) => {
   const { isError, isLoading, haveLength, level } = props;
 
@@ -79,18 +75,18 @@ const ApiStatusRow = (
   );
 };
 
-const CategoryHead = ({ level }: { level: ICategory['level'] }) => {
+const CategoryHead = ({ level }: { level: TCategory['level'] }) => {
   const { queryParams, removeParams, setParams } = useQueryParams();
   const sortKey =
     `sort_${level}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['sort'];
 
   const handleSort = () => {
-    if (queryParams[sortKey] === SORT_ORDER_MAP.asc) {
-      setParams({ ...queryParams, [sortKey]: SORT_ORDER_MAP.desc });
-    } else if (queryParams[sortKey] === SORT_ORDER_MAP.desc) {
+    if (queryParams[sortKey] === SORT_MAP.asc) {
+      setParams({ [sortKey]: SORT_MAP.desc });
+    } else if (queryParams[sortKey] === SORT_MAP.desc) {
       removeParams([sortKey]);
     } else {
-      setParams({ ...queryParams, [sortKey]: SORT_ORDER_MAP.asc });
+      setParams({ [sortKey]: SORT_MAP.asc });
     }
   };
   return (
@@ -107,9 +103,9 @@ const CategoryHead = ({ level }: { level: ICategory['level'] }) => {
                 {title}
                 <Icon
                   icon={
-                    queryParams[sortKey] === SORT_ORDER_MAP.asc
+                    queryParams[sortKey] === SORT_MAP.asc
                       ? 'solar:arrow-up-linear'
-                      : queryParams[sortKey] === SORT_ORDER_MAP.desc
+                      : queryParams[sortKey] === SORT_MAP.desc
                         ? 'solar:arrow-down-linear'
                         : 'solar:sort-linear'
                   }
@@ -141,7 +137,9 @@ const CategoryRow = (props: TCatTable & ComponentProps<'tr'>) => {
       <TableRowCell>
         <Badge content={`Level ${category.level}`} />
       </TableRowCell>
-      <TableRowCell className="text-primary/65 uppercase">{category.parent || 'N/A'}</TableRowCell>
+      <TableRowCell className="text-primary/65 uppercase">
+        {'parent' in category ? category.parent : 'N/A'}
+      </TableRowCell>
       <TableRowCell className="text-right">
         <CategoryActions
           category={category}
@@ -160,14 +158,13 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
   const sort = useDeferredValue(queryParams[q_cat_keys.level.l3.sort]) as TSort;
 
   const {
-    data = [],
+    data: categories = EMPTY_ARRAY,
     isLoading,
     isError,
   } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L3,
     parent: parentCat._id,
   });
-  const categories = data as ICategory[];
   const filteredCats = useMemo(
     () => getFilteredAndSortedCats(categories, search, sort),
     [categories, search, sort],
@@ -214,14 +211,13 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
   const sort = useDeferredValue(queryParams[q_cat_keys.level.l2.sort]) as TSort;
   const [selectedId, setSelectedId] = useState('');
   const {
-    data = [],
+    data: categories = EMPTY_ARRAY,
     isLoading,
     isError,
   } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L2,
     parent: parentCat._id,
   });
-  const categories = data as ICategory[];
   const filteredCats = useMemo(
     () => getFilteredAndSortedCats(categories, search, sort),
     [categories, search, sort],
@@ -295,13 +291,12 @@ const L1Table = () => {
   const [editData, setEditData] = useState<TCatModal | null>(null);
   const [deleteId, setDeleteId] = useState('');
   const {
-    data = [],
+    data: categories = EMPTY_ARRAY,
     isLoading,
     isError,
   } = useGetCategoriesByParentLevel({ level: CATEGORY_LEVELS_MAP.L1 });
 
-  const { mutateAsync: deleteCategoryAsync } = useDeleteCategory({ categoryId: deleteId });
-  const categories = data as ICategory[];
+  const deleteCategory = useDeleteCategory({ categoryId: deleteId });
 
   const handleEdit = (data: TCatModal) => {
     setEditData(data);
@@ -310,7 +305,7 @@ const L1Table = () => {
   };
 
   const handleDelete = async () => {
-    await deleteCategoryAsync(deleteId, {
+    await deleteCategory.mutateAsync(deleteId, {
       onSettled: () => {
         setDeleteId('');
 
@@ -426,9 +421,9 @@ const Categories = () => {
   return (
     <Fragment>
       {queryParams[q_cat_keys.mode] === q_cat_keys.add && <CategoryModal />}
-      <PageWrapper>
-        <Navbar
-          buttons={[
+      <PageWrapper
+        navbar={{
+          buttons: [
             {
               content: 'Clear',
               pattern: 'secondary',
@@ -442,12 +437,10 @@ const Categories = () => {
               leftIcon: { icon: 'solar:add-circle-linear', className: '*:stroke-[2.5]' },
               buttonProps: { onClick: () => setParams({ [q_cat_keys.mode]: q_cat_keys.add }) },
             },
-          ]}
-        />
-
-        <div>
-          <L1Table />
-        </div>
+          ],
+        }}
+      >
+        <L1Table />
       </PageWrapper>
     </Fragment>
   );

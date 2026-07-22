@@ -26,13 +26,13 @@ const Input = ({
 
   return (
     <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
-      <div className="relative h-10 lg:h-12">
+      <div className="relative">
         <InputLabel children={label} htmlFor={inputProps?.name} />
         <div
-          className={`border-primary/10 bg-smoke-eerie flex h-full w-full items-center gap-1 overflow-hidden rounded-lg border ${className}`}
+          className={`border-primary/10 bg-smoke-eerie flex items-center gap-3 overflow-hidden rounded-lg border px-3 ${className}`}
         >
           {/* Left Icon */}
-          <InputIcon {...icons} position="left" />
+          <InputIcon icon={icons?.left} />
           {/* Input */}
           <input
             aria-autocomplete="none"
@@ -42,10 +42,10 @@ const Input = ({
             id={inputProps.id || inputProps.name}
             onChange={handleChange}
             onWheel={(event) => (inputProps?.type === 'number' ? event.currentTarget.blur() : null)}
-            className={`text-primary placeholder:text-primary/30 autofill-effect line-clamp-1 h-full w-full flex-1 border-none bg-transparent p-3 text-sm font-normal outline-hidden placeholder:text-xs focus:border-none focus:outline-hidden disabled:cursor-not-allowed ${inputProps?.className || ''}`}
+            className={`text-primary placeholder:text-primary/30 autofill-effect min-w-0 flex-1 border-none bg-transparent py-2 text-[13px] outline-hidden placeholder:text-[13px] focus:border-none focus:outline-hidden disabled:cursor-not-allowed xl:py-3 ${inputProps?.className || ''}`}
           />
           {/* Right Icon */}
-          <InputIcon {...icons} position="right" />
+          <InputIcon icon={icons?.right} />
         </div>
       </div>
       <InputError error={error} />
