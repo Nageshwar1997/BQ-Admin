@@ -1,4 +1,4 @@
-import { CATEGORY_LEVELS_MAP } from '@beautinique/shared-constants';
+import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
 
 const passwords = { password: '', confirmPassword: '' };
 

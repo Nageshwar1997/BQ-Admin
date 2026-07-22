@@ -1,5 +1,5 @@
 import type { TCatTable } from '@/types/component.type';
-import { CATEGORY_LEVELS_MAP } from '@beautinique/shared-constants';
+import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
 import { Icon } from '@iconify/react';
 
 const CategoryInfo = ({ category }: Pick<TCatTable, 'category'>) => (

@@ -38,7 +38,7 @@ import type {
   TProductTryOnConfiguration,
 } from '@/types/schema.type';
 import { isDeepEqual } from '@/utils/common.util';
-import { CATEGORY_LEVELS_MAP } from '@beautinique/shared-constants';
+import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
 import { useEffect, useRef, useState } from 'react';

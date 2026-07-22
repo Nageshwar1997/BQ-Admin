@@ -6,7 +6,7 @@ import {
 } from '@/constants/input.constants';
 import type { TCategory } from '@/types/api.type';
 import type { TProductBasicInfo } from '@/types/schema.type';
-import type { TCategoryLevelsMap } from '@beautinique/shared-constants';
+import type { TCategoryLevelsMap } from '@beautinique/frontend-types';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
 type Props = {

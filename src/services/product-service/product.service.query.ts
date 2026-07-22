@@ -4,7 +4,7 @@ import type { IGetDashboardProductsQuery, TApiProductPopulated } from '@/types/a
 import type { TDraftProduct } from '@/types/schema.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
-import type { TProductStatus } from '@beautinique/shared-constants';
+import type { TProductStatus } from '@beautinique/frontend-types';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const { draft, get } = API_QUERY_KEYS.product_service.product;

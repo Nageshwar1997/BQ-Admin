@@ -1,5 +1,5 @@
 import { CATEGORY_STEPPER_STEP_COUNT } from '@/constants/common.constants';
-import { CATEGORY_LEVELS_MAP, REGEX } from '@beautinique/shared-constants';
+import { CATEGORY_LEVELS_MAP, REGEX } from '@beautinique/frontend-constants';
 import { literal, object, string, union } from 'zod';
 
 /* -------------------------------------------------------------------------- */

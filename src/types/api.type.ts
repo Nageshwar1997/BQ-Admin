@@ -1,12 +1,13 @@
-import {
-  type TApiMethod,
-  type TAuthProvider,
-  type TCategoryLevel,
-  type TCategoryLevelsMap,
-  type TProductStatus,
-  type TRole,
-  type TSort,
-} from '@beautinique/shared-constants';
+import type {
+  ICreateHeaders,
+  TApiMethod,
+  TAuthProvider,
+  TCategoryLevel,
+  TCategoryLevelsMap,
+  TProductStatus,
+  TSort,
+  TUserRole,
+} from '@beautinique/frontend-types';
 import type {
   TCategoryForm,
   TEmail,
@@ -32,7 +33,7 @@ export interface ITimeStamp {
 
 export interface IUser extends Pick<TLogin, 'password'>, TEmail, IId, ITimeStamp {
   providers: TAuthProvider[];
-  role: TRole;
+  role: TUserRole;
   avatar?: string;
   firstName: string;
   lastName: string;
@@ -67,12 +68,10 @@ export type TCategoryHierarchyNode<TLevel extends TCategoryLevel> = TLevel exten
 
 export type TCategoryHierarchy = TCategoryHierarchyNode<TLevel1>;
 
-export interface ICreateHeaders {
-  user?: Partial<Pick<IUser, '_id' | 'role'>>;
-  token?: string;
-  loginRole?: TRole;
-  contentType?: string;
-}
+export type TCreateHeaders = Omit<
+  ICreateHeaders<Partial<Pick<IUser, '_id' | 'role'>>>,
+  'serviceSecret'
+>;
 
 export type TRouteNode = Record<string, unknown> & { base?: string };
 

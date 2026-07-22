@@ -3,20 +3,29 @@ import { MediaModal } from '@/components/layout/modals/MediaModal';
 import type { TChildren, TMediaResource } from '@/types/component.type';
 import type { IFileInput } from '@/types/input.type';
 import { isIconProps } from '@/utils/common.util';
-import { FILE_FORMAT, FILE_MIME } from '@beautinique/shared-constants';
+import {
+  IMAGE_FORMATS,
+  IMAGE_MIMES,
+  VIDEO_FORMATS,
+  VIDEO_MIMES,
+} from '@beautinique/frontend-constants';
+import type {
+  TImageFormat,
+  TImageMime,
+  TVideoFormat,
+  TVideoMime,
+} from '@beautinique/frontend-types';
 import { Icon } from '@iconify/react';
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { InputError, InputIcon, InputLabel } from './children';
 
 const getMediaType = (value: File | string): TMediaResource => {
   if (value instanceof File) {
-    const imgMime: readonly string[] = FILE_MIME.image;
-    const vidMime: readonly string[] = FILE_MIME.video;
-    if (imgMime.includes(value.type)) {
+    if (IMAGE_MIMES.includes(value.type as TImageMime)) {
       return 'image';
     }
 
-    if (vidMime.includes(value.type)) {
+    if (VIDEO_MIMES.includes(value.type as TVideoMime)) {
       return 'video';
     }
 
@@ -31,14 +40,11 @@ const getMediaType = (value: File | string): TMediaResource => {
     return 'image';
   }
 
-  const imgExtensions: readonly string[] = FILE_FORMAT.image;
-  const vidExtensions: readonly string[] = FILE_FORMAT.video;
-
-  if (imgExtensions.includes(extension)) {
+  if (IMAGE_FORMATS.includes(extension as TImageFormat)) {
     return 'image';
   }
 
-  if (vidExtensions.includes(extension)) {
+  if (VIDEO_FORMATS.includes(extension as TVideoFormat)) {
     return 'video';
   }
 
@@ -133,7 +139,7 @@ const CenterContent = ({ fileInputProps }: Pick<IFileInput, 'fileInputProps'>) =
         aria-autocomplete="none"
         {...inputProps}
         id={fileInputProps.id || fileInputProps.name}
-        accept={fileInputProps?.accept ?? FILE_MIME.image.join(', ')}
+        accept={fileInputProps?.accept ?? IMAGE_MIMES.join(', ')}
         type="file"
         onChange={handleChange}
         className="sr-only"

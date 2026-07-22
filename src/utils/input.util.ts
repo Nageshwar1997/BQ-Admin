@@ -1,7 +1,8 @@
 import { DEFAULT_QUILL_LINK_ID } from '@/constants/input.constants';
 import type { TQuillImageRef } from '@/types/component.type';
 import type { IQuillToolbar, IToolBarOptions, TQuillToolbar } from '@/types/input.type';
-import { FILE_FORMAT, FILE_MIME, MAX_SIZE } from '@beautinique/shared-constants';
+import { IMAGE_FORMATS, IMAGE_MIMES, MAX_IMAGE_SIZE } from '@beautinique/frontend-constants';
+import type { TImageFormat, TImageMime } from '@beautinique/frontend-types';
 import { nanoid } from 'nanoid';
 import type Quill from 'quill';
 import type { Delta } from 'quill';
@@ -14,7 +15,7 @@ export const insertImageIntoQuill = (quill: Quill, imagesRef: RefObject<TQuillIm
   const input = document.createElement('input');
 
   input.type = 'file';
-  input.accept = FILE_MIME.image.join(', ');
+  input.accept = IMAGE_MIMES.join(', ');
   input.click();
 
   input.onchange = () => {
@@ -23,22 +24,24 @@ export const insertImageIntoQuill = (quill: Quill, imagesRef: RefObject<TQuillIm
     const file = input.files[0];
 
     // Validate file size
-    if (file.size > MAX_SIZE.IMAGE) {
+    if (file.size > MAX_IMAGE_SIZE) {
       return toaster.error({
         title: 'File size limit exceeded',
-        description: `Image size is ${formatFileSize(file.size)}. Max allowed size is ${formatFileSize(MAX_SIZE.IMAGE)}.`,
+        description: `Image size is ${formatFileSize(file.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_SIZE)}.`,
       });
     }
 
     // Validate extension and file type
-    const fileTypes: readonly string[] = FILE_MIME.image;
     const ext = file.name.split('.').pop()?.toLowerCase();
-    const extensions: readonly string[] = FILE_FORMAT.image;
 
-    if (!fileTypes.includes(file.type) || !ext || !extensions.includes(ext)) {
+    if (
+      !IMAGE_MIMES.includes(file.type as TImageMime) ||
+      !ext ||
+      !IMAGE_FORMATS.includes(ext as TImageFormat)
+    ) {
       return toaster.error({
         title: 'Invalid file type',
-        description: `File extension is .${ext ?? 'unknown'}. Allowed extensions are ${extensions.join(', ')}.`,
+        description: `File extension is .${ext ?? 'unknown'}. Allowed extensions are ${IMAGE_FORMATS.join(', ')}.`,
       });
     }
 

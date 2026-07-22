@@ -2,7 +2,7 @@ import FileInput from '@/components/ui/inputs/FileInput';
 import { PRODUCT_MEDIA_AND_GALLERY_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type { TProductMediaAndGallery } from '@/types/schema.type';
 import { toErrorMessageArray } from '@/utils/form.util';
-import { FILE_MIME } from '@beautinique/shared-constants';
+import { VIDEO_MIMES } from '@beautinique/frontend-constants';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
 type Props = {
@@ -37,7 +37,7 @@ const AddProductMediaAndGalleryFields = ({ form }: Props) => {
                   name,
                   placeholder,
                   multiple: isImages,
-                  accept: isVideo ? FILE_MIME.video.join(',') : undefined,
+                  accept: isVideo ? VIDEO_MIMES.join(',') : undefined,
                   disabled: isImages && images?.length >= 10,
                   value,
                   onChange: ({ target: { files } }) => {

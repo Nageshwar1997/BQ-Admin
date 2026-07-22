@@ -23,12 +23,8 @@ import { useGetDashboardProducts } from '@/services/product-service/product.serv
 import type { TCategoryHierarchyNode, TProductSortBy } from '@/types/api.type';
 import type { IHierarchySelectOption } from '@/types/input.type';
 import { formatDate, formatINRCurrency } from '@/utils/common.util';
-import {
-  SORT_MAP,
-  type TCategoryLevel,
-  type TProductStatus,
-  type TSort,
-} from '@beautinique/shared-constants';
+import { SORT_MAP } from '@beautinique/frontend-constants';
+import type { TCategoryLevel, TProductStatus, TSort } from '@beautinique/frontend-types';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -60,7 +56,9 @@ const SearchAndSort = () => {
         label: category.name,
         searchLabel: category.name,
         value: category._id,
-        children: category.subcategories?.length ? mapCategoryHierarchy(category.subcategories) : [],
+        children: category.subcategories?.length
+          ? mapCategoryHierarchy(category.subcategories)
+          : [],
       }));
     };
 

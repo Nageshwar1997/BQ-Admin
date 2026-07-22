@@ -8,7 +8,7 @@ import type {
   IProgressToast,
   TProgressToastOptions,
 } from '@/types/store.type';
-import { GB, KB, MB } from '@beautinique/shared-constants';
+import { GB, KB, MB } from '@beautinique/frontend-constants';
 import type { IconProps } from '@iconify/react';
 import type { CSSProperties } from 'react';
 

@@ -7,7 +7,8 @@ import type {
   TParams,
   TRouteNode,
 } from '@/types/api.type';
-import { SORT_MAP, type TSort } from '@beautinique/shared-constants';
+import { SORT_MAP } from '@beautinique/frontend-constants';
+import type { TSort } from '@beautinique/frontend-types';
 import { toaster } from './common.util';
 
 export const handleApiErrorToaster = ({ message, globalErrors }: ApiError, title = 'Error') => {

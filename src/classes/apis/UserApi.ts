@@ -1,6 +1,6 @@
-import { API_METHODS_AND_URLS, HEADERS_KEYS } from '@/constants/api.constants';
+import { API_METHODS_AND_URLS } from '@/constants/api.constants';
 import type { TChangePassword, TEmail, TLogin, TOtp, TPasswords } from '@/types/schema.type';
-import { ROLES_MAP } from '@beautinique/shared-constants';
+import { HEADERS_MAP, USER_ROLE_MAP } from '@beautinique/frontend-constants';
 import { ApiRequest } from '../ApiRequest';
 
 export class AuthApi extends ApiRequest {
@@ -12,7 +12,7 @@ export class AuthApi extends ApiRequest {
     return this.request({
       ...this.routes.login.manual,
       data,
-      headers: { [HEADERS_KEYS.loginRole]: ROLES_MAP.ADMIN },
+      headers: { [HEADERS_MAP.loginRole]: USER_ROLE_MAP.ADMIN },
     });
   };
 

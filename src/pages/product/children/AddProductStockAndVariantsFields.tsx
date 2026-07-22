@@ -14,7 +14,7 @@ import type {
 } from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
 import { toErrorMessageArray } from '@/utils/form.util';
-import { VARIANT_TYPES_MAP } from '@beautinique/shared-constants';
+import { VARIANT_TYPES_MAP } from '@beautinique/frontend-constants';
 import {
   Controller,
   useFieldArray,

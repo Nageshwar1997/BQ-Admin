@@ -21,7 +21,7 @@ import type { TCatModal } from '@/types/component.type';
 import type { TCategoryForm, TConfirmDetails } from '@/types/schema.type';
 import { isDeepEqual, toaster } from '@/utils/common.util';
 import { setErrorToForm } from '@/utils/form.util';
-import { CATEGORY_LEVELS_MAP } from '@beautinique/shared-constants';
+import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo } from 'react';

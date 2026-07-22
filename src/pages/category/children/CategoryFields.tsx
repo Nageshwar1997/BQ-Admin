@@ -4,7 +4,7 @@ import Tooltip from '@/components/ui/Tooltip';
 import { EMPTY_ARRAY } from '@/constants/common.constants';
 import type { TCategory } from '@/types/api.type';
 import type { TCategoryForm, TL2CategoryForm, TL3CategoryForm } from '@/types/schema.type';
-import { CATEGORY_LEVELS_MAP } from '@beautinique/shared-constants';
+import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
 import {
   Controller,
   type Control,

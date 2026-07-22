@@ -1,14 +1,17 @@
 import { formatFileSize } from '@/utils/common.util';
 import {
-  FILE_FORMAT,
-  FILE_MIME,
-  MAX_SIZE,
+  IMAGE_FORMATS,
+  IMAGE_MIMES,
+  MAX_IMAGE_SIZE,
+  MAX_VIDEO_SIZE,
   REGEX,
   TRY_ON_CATEGORY_MAP,
   TRY_ON_MAP,
   VARIANT_TYPES,
   VARIANT_TYPES_MAP,
-} from '@beautinique/shared-constants';
+  VIDEO_FORMATS,
+  VIDEO_MIMES,
+} from '@beautinique/frontend-constants';
 import {
   array,
   custom,
@@ -90,34 +93,31 @@ export const productBasicInfoSchema = object({
 
 const thumbnailFileSchema = file('Thumbnail is required')
   .mime(
-    [...FILE_MIME.image],
-    `Invalid thumbnail type. type must be one of: ${FILE_FORMAT.image.join(', ')}.`,
+    [...IMAGE_MIMES],
+    `Invalid thumbnail type. type must be one of: ${IMAGE_FORMATS.join(', ')}.`,
   )
   .max(
-    MAX_SIZE.IMAGE,
-    `Thumbnail size exceed. Max allowed thumbnail size is ${formatFileSize(MAX_SIZE.IMAGE)}.`,
+    MAX_IMAGE_SIZE,
+    `Thumbnail size exceed. Max allowed thumbnail size is ${formatFileSize(MAX_IMAGE_SIZE)}.`,
   );
 
 const thumbnailUrlSchema = url('Thumbnail is required').regex(REGEX.URL, 'Invalid thumbnail URL.');
 
 const videoFileSchema = file('Thumbnail is required')
-  .mime(
-    [...FILE_MIME.video],
-    `Invalid video type. type must be one of: ${FILE_FORMAT.video.join(', ')}.`,
-  )
+  .mime([...VIDEO_MIMES], `Invalid video type. type must be one of: ${VIDEO_FORMATS.join(', ')}.`)
   .max(
-    MAX_SIZE.VIDEO,
-    `Video size exceed. Max allowed video size is ${formatFileSize(MAX_SIZE.VIDEO)}.`,
+    MAX_VIDEO_SIZE,
+    `Video size exceed. Max allowed video size is ${formatFileSize(MAX_VIDEO_SIZE)}.`,
   );
 
 const videoUrlSchema = url('Video is required').regex(REGEX.URL, 'Invalid video URL.');
 
 const imageFileSchema = file('Thumbnail is required')
-  .mime(
-    [...FILE_MIME.image],
-    `Invalid image type. type must be one of: ${FILE_FORMAT.image.join(', ')}.`,
-  )
-  .max(MAX_SIZE.IMAGE, `Image size exceed. Max allowed image size is ${formatFileSize(MAX_SIZE.IMAGE)}.`);
+  .mime([...IMAGE_MIMES], `Invalid image type. type must be one of: ${IMAGE_MIMES.join(', ')}.`)
+  .max(
+    MAX_IMAGE_SIZE,
+    `Image size exceed. Max allowed image size is ${formatFileSize(MAX_IMAGE_SIZE)}.`,
+  );
 
 const imageUrlSchema = url('Image is required').regex(REGEX.URL, 'Invalid image URL.');
 
@@ -205,19 +205,19 @@ const variantSchema = object({
   thumbnail: custom<File | string>((value) => !!value, { error: 'Variant thumbnail is required.' })
     .superRefine((value, ctx) => {
       if (value instanceof File) {
-        if (value.size > MAX_SIZE.IMAGE) {
+        if (value.size > MAX_IMAGE_SIZE) {
           ctx.addIssue({
             code: 'custom',
-            message: `Variant thumbnail size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_SIZE.IMAGE)}.`,
+            message: `Variant thumbnail size is ${formatFileSize(value.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_SIZE)}.`,
           });
         }
 
-        const fileTypes: readonly string[] = FILE_MIME.image;
+        const fileTypes: readonly string[] = IMAGE_MIMES;
 
         if (!fileTypes.includes(value.type)) {
           ctx.addIssue({
             code: 'custom',
-            message: `Variant thumbnail type must be one of: ${FILE_FORMAT.image.join(', ')}.`,
+            message: `Variant thumbnail type must be one of: ${IMAGE_MIMES.join(', ')}.`,
           });
         }
       } else if (typeof value === 'string') {
@@ -257,21 +257,21 @@ const variantSchema = object({
             });
           }
         } else if (item instanceof File) {
-          if (item.size > MAX_SIZE.IMAGE) {
+          if (item.size > MAX_IMAGE_SIZE) {
             ctx.addIssue({
               code: 'custom',
               path: [index],
-              message: `${imageLabel} size is ${formatFileSize(item.size)}. Max allowed size is ${formatFileSize(MAX_SIZE.IMAGE)}.`,
+              message: `${imageLabel} size is ${formatFileSize(item.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_SIZE)}.`,
             });
           }
 
-          const fileTypes: readonly string[] = FILE_MIME.image;
+          const fileTypes: readonly string[] = IMAGE_MIMES;
 
           if (!fileTypes.includes(item.type)) {
             ctx.addIssue({
               code: 'custom',
               path: [index],
-              message: `${imageLabel} type must be one of: ${FILE_FORMAT.image.join(', ')}.`,
+              message: `${imageLabel} type must be one of: ${IMAGE_MIMES.join(', ')}.`,
             });
           }
         } else {

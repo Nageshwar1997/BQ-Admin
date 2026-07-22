@@ -21,7 +21,7 @@ import {
 import type { TCategory } from '@/types/api.type';
 import type { TCatModal, TCatTable } from '@/types/component.type';
 import { getFilteredAndSortedCats } from '@/utils/api.util';
-import { CATEGORY_LEVELS_MAP, SORT_MAP, type TSort } from '@beautinique/shared-constants';
+import { CATEGORY_LEVELS_MAP, SORT_MAP } from '@beautinique/frontend-constants';
 import { Icon } from '@iconify/react';
 import {
   Fragment,
