@@ -187,6 +187,10 @@ export const ADD_PRODUCT_STEPS: StepperStep[] = [
 
 export const CATEGORY_STEPPER_STEP_COUNT = [0, 1] as const;
 
+export const CATEGORY_STEPPER_STEP_COUNT_MAP = Object.fromEntries(
+  CATEGORY_STEPPER_STEP_COUNT.map((type) => [type, type]),
+) as { [K in (typeof CATEGORY_STEPPER_STEP_COUNT)[number]]: K };
+
 export const TOAST_TYPES = [
   'success',
   'error',

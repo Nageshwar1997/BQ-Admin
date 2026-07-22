@@ -1,4 +1,3 @@
-import { CATEGORY_STEPPER_STEP_COUNT } from '@/constants/common.constants';
 import { CATEGORY_LEVELS_MAP, REGEX } from '@beautinique/frontend-constants';
 import { literal, object, string, union } from 'zod';
 
@@ -7,13 +6,6 @@ import { literal, object, string, union } from 'zod';
 /* -------------------------------------------------------------------------- */
 
 const baseCategorySchema = object({
-  activeStep: union(
-    CATEGORY_STEPPER_STEP_COUNT.map((step) =>
-      literal(step, { message: `Active step must be ${CATEGORY_STEPPER_STEP_COUNT.join('/')}.` }),
-    ),
-    { error: 'Category level is required.' },
-  ),
-
   name: string({ error: 'Category name is required.' })
     .nonempty('Category name is required.')
     .min(2, 'Category name must be at least 2 characters.')
@@ -39,7 +31,7 @@ const baseCategorySchema = object({
 /*                               LEVEL 1 SCHEMA                               */
 /* -------------------------------------------------------------------------- */
 
-export const l1CategorySchema = baseCategorySchema.pick({ name: true, activeStep: true }).extend({
+export const l1CategorySchema = baseCategorySchema.pick({ name: true }).extend({
   level: literal(CATEGORY_LEVELS_MAP.L1),
 });
 
@@ -48,7 +40,7 @@ export const l1CategorySchema = baseCategorySchema.pick({ name: true, activeStep
 /* -------------------------------------------------------------------------- */
 
 export const l2CategorySchema = baseCategorySchema
-  .pick({ name: true, activeStep: true, mainCategory: true })
+  .pick({ name: true, mainCategory: true })
   .extend({ level: literal(CATEGORY_LEVELS_MAP.L2) });
 
 /* -------------------------------------------------------------------------- */
@@ -56,7 +48,7 @@ export const l2CategorySchema = baseCategorySchema
 /* -------------------------------------------------------------------------- */
 
 export const l3CategorySchema = baseCategorySchema
-  .pick({ name: true, activeStep: true, mainCategory: true, subCategory: true, description: true })
+  .pick({ name: true, mainCategory: true, subCategory: true, description: true })
   .extend({ level: literal(CATEGORY_LEVELS_MAP.L3) });
 
 /* -------------------------------------------------------------------------- */

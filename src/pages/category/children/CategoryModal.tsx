@@ -4,6 +4,7 @@ import Stepper, { type StepperStep } from '@/components/ui/Stepper';
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import {
   CATEGORY_MODAL_STEPS,
+  CATEGORY_STEPPER_STEP_COUNT_MAP,
   EMPTY_ARRAY,
   QUERY_PARAMS_KEY_MAP,
 } from '@/constants/common.constants';
@@ -18,13 +19,14 @@ import {
 } from '@/services/product-service/category.service.query';
 import type { TCategory } from '@/types/api.type';
 import type { TCatModal } from '@/types/component.type';
+import type { TCategory_Stepper_Step } from '@/types/form.types';
 import type { TCategoryForm, TConfirmDetails } from '@/types/schema.type';
 import { isDeepEqual, toaster } from '@/utils/common.util';
 import { setErrorToForm } from '@/utils/form.util';
 import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { Level1Fields, Level2Fields, Level3Fields } from './CategoryFields';
 
@@ -43,14 +45,13 @@ const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => 
   </div>
 );
 
-const geTCategoryFormName = (categories: TCategory[] | undefined, id?: string) =>
+const getCategoryFormName = (categories: TCategory[] | undefined, id?: string) =>
   categories?.find((cat) => cat._id === id)?.name || '-';
 
 const getInitialData = (cat: TCategory, mainCatId = ''): TCategoryForm => {
   switch (cat.level) {
     case CATEGORY_LEVELS_MAP.L2:
       return {
-        activeStep: 0,
         name: cat.name,
         level: CATEGORY_LEVELS_MAP.L2,
         mainCategory: cat.parent,
@@ -58,7 +59,6 @@ const getInitialData = (cat: TCategory, mainCatId = ''): TCategoryForm => {
 
     case CATEGORY_LEVELS_MAP.L3:
       return {
-        activeStep: 0,
         name: cat.name,
         level: cat.level,
         mainCategory: mainCatId,
@@ -68,7 +68,7 @@ const getInitialData = (cat: TCategory, mainCatId = ''): TCategoryForm => {
 
     case CATEGORY_LEVELS_MAP.L1:
     default:
-      return { activeStep: 0, name: cat.name, level: CATEGORY_LEVELS_MAP.L1 };
+      return { name: cat.name, level: CATEGORY_LEVELS_MAP.L1 };
   }
 };
 
@@ -89,6 +89,11 @@ const getPayload = (data: TCategoryForm) => {
 
 const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => {
   const { queryParams, removeParams } = useQueryParams();
+
+  const [activeStep, setActiveStep] = useState<TCategory_Stepper_Step>(
+    CATEGORY_STEPPER_STEP_COUNT_MAP[0],
+  );
+
   const category = props?.category;
   const mainCatId = props?.mainCatId;
 
@@ -106,16 +111,11 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   });
 
   const categoryValues = useWatch({ control: detailsForm.control });
-  const activeStep = useWatch({ control: detailsForm.control, name: 'activeStep' });
   const activeStepData = CATEGORY_MODAL_STEPS[activeStep];
   const level = useWatch({ control: detailsForm.control, name: 'level' });
   const mainCategory = useWatch({ control: detailsForm.control, name: 'mainCategory' });
   const subCategory = useWatch({ control: detailsForm.control, name: 'subCategory' });
   const name = useWatch({ control: detailsForm.control, name: 'name' });
-
-  const setActiveStep = (step: TCategoryForm['activeStep']) => {
-    detailsForm.setValue('activeStep', step, { shouldDirty: false, shouldTouch: false });
-  };
 
   const addCategory = useAddCategory();
 
@@ -149,10 +149,10 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
         return 'This will be created as a main category.';
 
       case CATEGORY_LEVELS_MAP.L2:
-        return `Under ${geTCategoryFormName(level1Cats, mainCategory)}.`;
+        return `Under ${getCategoryFormName(level1Cats, mainCategory)}.`;
 
       case CATEGORY_LEVELS_MAP.L3:
-        return `Under ${geTCategoryFormName(level1Cats, mainCategory)} / ${geTCategoryFormName(
+        return `Under ${getCategoryFormName(level1Cats, mainCategory)} / ${getCategoryFormName(
           level2Cats,
           subCategory,
         )}.`;
@@ -201,7 +201,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
       });
     } else if (!isDuplicateCategory()) {
       setActiveStep(
-        Math.min(activeStep + 1, CATEGORY_MODAL_STEPS.length - 1) as TCategoryForm['activeStep'],
+        Math.min(activeStep + 1, CATEGORY_MODAL_STEPS.length - 1) as TCategory_Stepper_Step,
       );
     }
   };
@@ -246,7 +246,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
           onSuccess: () => handleClose(),
           onError: ({ fieldErrors }) => {
             setErrorToForm(detailsForm.setError, fieldErrors);
-            detailsForm.setValue('activeStep', 0);
+            setActiveStep(CATEGORY_STEPPER_STEP_COUNT_MAP[0]);
           },
         },
       );
@@ -255,7 +255,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
         onSuccess: () => handleClose(),
         onError: ({ fieldErrors }) => {
           setErrorToForm(detailsForm.setError, fieldErrors);
-          detailsForm.setValue('activeStep', 0);
+          setActiveStep(CATEGORY_STEPPER_STEP_COUNT_MAP[0]);
         },
       });
     }
@@ -342,8 +342,8 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
                   {isL1(level)
                     ? 'Main category'
                     : isL2(level)
-                      ? geTCategoryFormName(level1Cats, mainCategory)
-                      : geTCategoryFormName(level2Cats, subCategory) || '-'}
+                      ? getCategoryFormName(level1Cats, mainCategory)
+                      : getCategoryFormName(level2Cats, subCategory) || '-'}
                 </span>
               </p>
               {isL3(level) && 'description' in categoryValues && (
@@ -402,29 +402,39 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
           <div className="flex justify-between gap-3">
             <Button
               pattern="secondary"
-              content={activeStep === 0 ? 'Reset' : 'Back'}
+              content={CATEGORY_STEPPER_STEP_COUNT_MAP[0] ? 'Reset' : 'Back'}
               leftIcon={{
-                icon: activeStep === 0 ? 'solar:restart-linear' : 'solar:arrow-left-linear',
+                icon: CATEGORY_STEPPER_STEP_COUNT_MAP[0]
+                  ? 'solar:restart-linear'
+                  : 'solar:arrow-left-linear',
               }}
               buttonProps={{
                 onClick: () =>
-                  activeStep === 0
+                  activeStep === CATEGORY_STEPPER_STEP_COUNT_MAP[0]
                     ? handleReset()
-                    : setActiveStep(Math.max(activeStep - 1, 0) as TCategoryForm['activeStep']),
+                    : setActiveStep(
+                        Math.max(
+                          activeStep - 1,
+                          CATEGORY_STEPPER_STEP_COUNT_MAP[0],
+                        ) as TCategory_Stepper_Step,
+                      ),
               }}
               className="sm:max-w-36"
             />
             <Button
               pattern="primary"
-              content={activeStep === CATEGORY_MODAL_STEPS.length - 1 ? 'Save' : 'Next'}
+              content={activeStep === CATEGORY_STEPPER_STEP_COUNT_MAP[1] ? 'Save' : 'Next'}
               rightIcon={
-                activeStep === CATEGORY_MODAL_STEPS.length - 1
+                activeStep === CATEGORY_STEPPER_STEP_COUNT_MAP[1]
                   ? { icon: 'solar:diskette-linear' }
                   : { icon: 'solar:arrow-right-linear' }
               }
               buttonProps={{
                 type: 'submit',
-                form: activeStep === 0 ? 'category-details-form' : 'confirm-details-form',
+                form:
+                  activeStep === CATEGORY_STEPPER_STEP_COUNT_MAP[0]
+                    ? 'category-details-form'
+                    : 'confirm-details-form',
               }}
               className="sm:max-w-36"
             />
