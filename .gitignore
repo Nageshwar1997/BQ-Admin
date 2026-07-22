@@ -14,8 +14,8 @@ dist
 dist-ssr
 *.local
 
-.claude2/*
-.agents2/*
+.claude/*
+.agents/*
 
 stats.html
 
