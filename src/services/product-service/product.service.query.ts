@@ -1,10 +1,9 @@
 import { productApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
 import type { IGetDashboardProductsQuery, TApiProductPopulated } from '@/types/api.type';
-import type { TDraftProduct } from '@/types/schema.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
-import type { TProductStatus } from '@beautinique/frontend-types';
+import type { TDraftProductDetailsZodSchema, TProductStatus } from '@beautinique/frontend-types';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const { draft, get } = API_QUERY_KEYS.product_service.product;
@@ -57,7 +56,7 @@ export const useGetDraftProduct = () => {
     queryKey: draft.get,
     queryFn: productApi.getDraftProduct,
     retry: false,
-    select: (data) => data?.draft as Partial<TDraftProduct> | undefined,
+    select: (data) => data?.draft as Partial<TDraftProductDetailsZodSchema> | undefined,
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     placeholderData: (prev) => prev,

@@ -4,20 +4,18 @@ import type {
   TAuthProvider,
   TCategoryLevel,
   TCategoryLevelsMap,
+  TCategoryZodSchema,
+  TProductBasicInfoZodSchema,
+  TProductDescriptionAndContentZodSchema,
+  TProductMediaAndGalleryZodSchema,
   TProductStatus,
+  TProductWithoutVariantsZodSchema,
+  TProductWithVariantsZodSchema,
   TRegisterZodSchema,
   TSort,
+  TTryOnSelection,
   TUserRole,
 } from '@beautinique/frontend-types';
-import type {
-  TCategoryForm,
-  TProductBasicInfo,
-  TProductDescriptionAndContent,
-  TProductMediaAndGallery,
-  TProductTryOnConfiguration,
-  TProductWithoutVariant,
-  TProductWithVariant,
-} from './schema.type';
 
 export type TFieldErrors = Record<string, string[]>;
 
@@ -46,7 +44,7 @@ export type TLevel2 = TCategoryLevelsMap['L2'];
 export type TLevel3 = TCategoryLevelsMap['L3'];
 
 type CategoryBase<TLevel extends TCategoryLevel> = IId &
-  Pick<TCategoryForm, 'name'> & { slug: string; level: TLevel };
+  Pick<TCategoryZodSchema, 'name'> & { slug: string; level: TLevel };
 
 export type TL1Category = CategoryBase<TLevel1>;
 export type TL2Category = CategoryBase<TLevel2> & { parent: string };
@@ -140,22 +138,20 @@ export type TGenerateQueryKeys<
       : never;
 };
 
-type TEnabledTryOn = Extract<TProductTryOnConfiguration, { enabled: true }>['tryOn'];
-
 type TApiTryOn =
   | { enabled: boolean; configured: false }
-  | ({ enabled: false; configured: true } & Partial<TEnabledTryOn>)
-  | ({ enabled: true; configured: true } & TEnabledTryOn);
+  | ({ enabled: false; configured: true } & Partial<TTryOnSelection>)
+  | ({ enabled: true; configured: true } & TTryOnSelection);
 
-type TRemoveFileType<T> = {
+export type TRemoveFileType<T> = {
   [K in keyof T]: T[K] extends (infer U)[] ? Exclude<U, File>[] : Exclude<T[K], File>;
 };
 
 export type TApiProductBase = IId &
   ITimeStamp &
-  Pick<TProductBasicInfo, 'title' | 'brand' | 'sellingPrice' | 'originalPrice'> &
-  TProductDescriptionAndContent &
-  TRemoveFileType<TProductMediaAndGallery> & {
+  Pick<TProductBasicInfoZodSchema, 'title' | 'brand' | 'sellingPrice' | 'originalPrice'> &
+  TProductDescriptionAndContentZodSchema &
+  TRemoveFileType<TProductMediaAndGalleryZodSchema> & {
     tryOn: TApiTryOn;
     seller: string;
     sku: string;
@@ -180,9 +176,9 @@ export type TApiProductBase = IId &
   };
 
 type TApiStockAndVariants =
-  | TProductWithoutVariant
-  | (Pick<TProductWithVariant, 'hasVariants'> & {
-      variants: (TRemoveFileType<TProductWithVariant['variants'][number]> & {
+  | Omit<TProductWithoutVariantsZodSchema, 'step'>
+  | (Pick<TProductWithVariantsZodSchema, 'hasVariants'> & {
+      variants: (TRemoveFileType<TProductWithVariantsZodSchema['variants'][number]> & {
         sku: string;
         discount: number;
         images: string[];

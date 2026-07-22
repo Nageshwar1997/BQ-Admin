@@ -3,8 +3,13 @@ import Select from '@/components/ui/inputs/Select';
 import Tooltip from '@/components/ui/Tooltip';
 import { EMPTY_ARRAY } from '@/constants/common.constants';
 import type { TCategory } from '@/types/api.type';
-import type { TCategoryForm, TL2CategoryForm, TL3CategoryForm } from '@/types/schema.type';
 import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
+import type {
+  TCategoryZodSchema,
+  TL1CategoryZodSchema,
+  TL2CategoryZodSchema,
+  TL3CategoryZodSchema,
+} from '@beautinique/frontend-types';
 import {
   Controller,
   type Control,
@@ -14,24 +19,26 @@ import {
 } from 'react-hook-form';
 
 type TCommonFields = {
-  register: UseFormRegister<TCategoryForm>;
-  errors: FieldErrors<TCategoryForm>;
-  control: Control<TCategoryForm>;
-  level: TCategoryForm['level'];
-  resetField: UseFormResetField<TCategoryForm>;
+  register: UseFormRegister<TCategoryZodSchema>;
+  errors: FieldErrors<TCategoryZodSchema>;
+  control: Control<TCategoryZodSchema>;
+  level: TCategoryZodSchema['level'];
+  resetField: UseFormResetField<TCategoryZodSchema>;
   isLevelDisabled: boolean;
 };
 
-type TLevel1Fields = TCommonFields;
-type TLevel2Fields = TCommonFields & {
-  level1Cats: TCategory[] | undefined;
-  mainCategory: TL2CategoryForm['mainCategory'];
-};
-type TLevel3Fields = Omit<TLevel2Fields, 'mainCategory'> & {
-  level2Cats: TCategory[] | undefined;
-  mainCategory: TL3CategoryForm['mainCategory'];
-  subCategory: TL3CategoryForm['subCategory'];
-};
+type TLevel1Fields = TCommonFields & Pick<TL1CategoryZodSchema, 'level'>;
+
+type TLevel2Fields = TCommonFields &
+  Pick<TL2CategoryZodSchema, 'mainCategory' | 'level'> & {
+    level1Cats: TCategory[] | undefined;
+  };
+
+type TLevel3Fields = TCommonFields &
+  Pick<TL3CategoryZodSchema, 'mainCategory' | 'subCategory' | 'level'> & {
+    level1Cats: TCategory[] | undefined;
+    level2Cats: TCategory[] | undefined;
+  };
 
 const CommonFields = ({
   register,

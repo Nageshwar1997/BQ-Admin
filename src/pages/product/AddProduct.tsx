@@ -6,14 +6,6 @@ import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import usePathParams from '@/hooks/usePathParams';
 import { useProcessQuillContent } from '@/hooks/useProcessQuillContent';
 import {
-  productBasicInfoSchema,
-  productDescriptionAndContentSchema,
-  productMediaAndGallerySchema,
-  productStockAndVariantsSchema,
-  productTryOnConfigurationSchema,
-} from '@/schemas/product.schema';
-import { confirmDetailsSchema } from '@/schemas/shared.schema';
-import {
   useUploadMultipleMedia,
   useUploadSingleMedia,
 } from '@/services/media-service/media.service.query';
@@ -29,16 +21,25 @@ import type {
   TProductQuillRefs,
 } from '@/types/common.type';
 import type { TQuillImageRef } from '@/types/component.type';
+import { isDeepEqual, toaster } from '@/utils/common.util';
+import { CATEGORY_LEVELS_MAP, DRAFT_PRODUCT_STEP_MAP } from '@beautinique/frontend-constants';
 import type {
-  TConfirmDetails,
-  TProductBasicInfo,
-  TProductDescriptionAndContent,
-  TProductMediaAndGallery,
-  TProductStockAndVariants,
-  TProductTryOnConfiguration,
-} from '@/types/schema.type';
-import { isDeepEqual } from '@/utils/common.util';
-import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
+  TConfirmDetailsZodSchema,
+  TDraftProductStepBodyZodSchema,
+  TProductBasicInfoZodSchema,
+  TProductDescriptionAndContentZodSchema,
+  TProductMediaAndGalleryZodSchema,
+  TProductStockAndVariantsZodSchema,
+  TProductTryOnConfigurationZodSchema,
+} from '@beautinique/frontend-types';
+import {
+  confirmDetailsZodSchema,
+  productBasicInfoZodSchema,
+  productDescriptionAndContentZodSchema,
+  productMediaAndGalleryZodSchema,
+  productStockAndVariantsZodSchema,
+  productTryOnConfigurationZodSchema,
+} from '@beautinique/frontend-zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
 import { useEffect, useRef, useState } from 'react';
@@ -53,7 +54,7 @@ import AddProductTryOnConfigurationFields from './children/AddProductTryOnConfig
 const AddProduct = () => {
   const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(0);
   const { processQuillContent, isPending: isContentUploadPending } =
-    useProcessQuillContent<TProductDescriptionAndContent>();
+    useProcessQuillContent<TProductDescriptionAndContentZodSchema>();
 
   const { navigate } = usePathParams();
 
@@ -81,28 +82,33 @@ const AddProduct = () => {
     additional: useRef<TQuillImageRef[]>([]),
   };
 
-  const basicInfoForm = useForm<TProductBasicInfo>({
-    resolver: zodResolver(productBasicInfoSchema),
+  const basicInfoForm = useForm<TProductBasicInfoZodSchema>({
+    resolver: zodResolver(productBasicInfoZodSchema),
+    defaultValues: { step: DRAFT_PRODUCT_STEP_MAP[0] },
   });
 
-  const mediaAndGalleryForm = useForm<TProductMediaAndGallery>({
-    resolver: zodResolver(productMediaAndGallerySchema),
+  const mediaAndGalleryForm = useForm<TProductMediaAndGalleryZodSchema>({
+    resolver: zodResolver(productMediaAndGalleryZodSchema),
+    defaultValues: { step: DRAFT_PRODUCT_STEP_MAP[1] },
   });
 
-  const descriptionAndContentForm = useForm<TProductDescriptionAndContent>({
-    resolver: zodResolver(productDescriptionAndContentSchema),
+  const descriptionAndContentForm = useForm<TProductDescriptionAndContentZodSchema>({
+    resolver: zodResolver(productDescriptionAndContentZodSchema),
+    defaultValues: { step: DRAFT_PRODUCT_STEP_MAP[2] },
   });
 
-  const stockAndVariantsForm = useForm<TProductStockAndVariants>({
-    resolver: zodResolver(productStockAndVariantsSchema),
+  const stockAndVariantsForm = useForm<TProductStockAndVariantsZodSchema>({
+    resolver: zodResolver(productStockAndVariantsZodSchema),
+    defaultValues: { step: DRAFT_PRODUCT_STEP_MAP[3] },
   });
 
-  const tryOnConfigurationForm = useForm<TProductTryOnConfiguration>({
-    resolver: zodResolver(productTryOnConfigurationSchema),
+  const tryOnConfigurationForm = useForm<TProductTryOnConfigurationZodSchema>({
+    resolver: zodResolver(productTryOnConfigurationZodSchema),
+    defaultValues: { step: DRAFT_PRODUCT_STEP_MAP[4] },
   });
 
-  const reviewAndConfirmForm = useForm<TConfirmDetails>({
-    resolver: zodResolver(confirmDetailsSchema),
+  const reviewAndConfirmForm = useForm<TConfirmDetailsZodSchema>({
+    resolver: zodResolver(confirmDetailsZodSchema),
   });
 
   const title = useWatch({ control: basicInfoForm.control, name: 'title' });
@@ -132,15 +138,14 @@ const AddProduct = () => {
     );
   };
 
-  const saveStepIfChanged = async <T extends Record<string, unknown>>(
-    currentData: T,
-    draftData: T | undefined,
-    saveData: T & { step: string },
+  const saveStepIfChanged = async (
+    saveData: TDraftProductStepBodyZodSchema,
+    draftData: TDraftProductStepBodyZodSchema | undefined,
     options?: { ignoreValues?: unknown[] },
   ) => {
     if (saveDraftProductQuery.isPending) return;
 
-    if (isDeepEqual(currentData, draftData, options ?? { ignoreValues: [undefined, null] })) {
+    if (isDeepEqual(saveData, draftData, options ?? { ignoreValues: [undefined, null] })) {
       handleNext();
       return;
     }
@@ -148,11 +153,11 @@ const AddProduct = () => {
     await saveDraftProductQuery.mutateAsync(saveData, { onSuccess: handleNext });
   };
 
-  const onBasicInfoSubmit = async (data: TProductBasicInfo) => {
-    await saveStepIfChanged(data, draftProduct?.basicInfo, { ...data, step: 'basicInfo' });
+  const onBasicInfoSubmit = async (data: TProductBasicInfoZodSchema) => {
+    await saveStepIfChanged(data, draftProduct?.basicInfo);
   };
 
-  const onMediaAndGallerySubmit = async (data: TProductMediaAndGallery) => {
+  const onMediaAndGallerySubmit = async (data: TProductMediaAndGalleryZodSchema) => {
     if (uploadSingleMediaQuery.isPending || uploadMultipleMediaQuery.isPending) return;
 
     const hasNewFiles =
@@ -161,10 +166,7 @@ const AddProduct = () => {
       data.images.some((image) => image instanceof File);
 
     if (!hasNewFiles) {
-      await saveStepIfChanged(data, draftProduct?.mediaAndGallery, {
-        ...data,
-        step: 'mediaAndGallery',
-      });
+      await saveStepIfChanged(data, draftProduct?.mediaAndGallery);
 
       return;
     }
@@ -284,7 +286,7 @@ const AddProduct = () => {
     );
   };
 
-  const onDescriptionAndContentSubmit = async (data: TProductDescriptionAndContent) => {
+  const onDescriptionAndContentSubmit = async (data: TProductDescriptionAndContentZodSchema) => {
     if (isContentUploadPending) return;
 
     const [descriptionResponse, additionalResponse, ingredientsResponse, instructionsResponse] =
@@ -335,7 +337,8 @@ const AddProduct = () => {
         }),
       ]);
 
-    const payload = {
+    const payload: TProductDescriptionAndContentZodSchema = {
+      step: 'descriptionAndContent',
       shortDescription: data.shortDescription,
       description: descriptionResponse as string,
       instructions: instructionsResponse,
@@ -343,13 +346,10 @@ const AddProduct = () => {
       additional: additionalResponse,
     };
 
-    await saveStepIfChanged(payload, draftProduct?.descriptionAndContent, {
-      ...payload,
-      step: 'descriptionAndContent',
-    });
+    await saveStepIfChanged(payload, draftProduct?.descriptionAndContent);
   };
 
-  const onStockAndVariantsSubmit = async (data: TProductStockAndVariants) => {
+  const onStockAndVariantsSubmit = async (data: TProductStockAndVariantsZodSchema) => {
     // No variants
     if (
       uploadSingleMediaQuery.isPending ||
@@ -360,10 +360,7 @@ const AddProduct = () => {
     }
 
     if (!data.hasVariants) {
-      await saveStepIfChanged(data, draftProduct?.stockAndVariants, {
-        ...data,
-        step: 'stockAndVariants',
-      });
+      await saveStepIfChanged(data, draftProduct?.stockAndVariants);
 
       return;
     } else {
@@ -437,19 +434,21 @@ const AddProduct = () => {
       await saveStepIfChanged(
         { hasVariants: true, variants: updatedVariants },
         draftProduct?.stockAndVariants,
-        { hasVariants: true, variants: updatedVariants, step: 'stockAndVariants' },
       );
     }
   };
 
-  const onTryOnConfigurationSubmit = async (data: TProductTryOnConfiguration) => {
-    await saveStepIfChanged(data, draftProduct?.tryOnConfiguration, {
-      ...data,
-      step: 'tryOnConfiguration',
-    });
+  const onTryOnConfigurationSubmit = async (data: TProductTryOnConfigurationZodSchema) => {
+    await saveStepIfChanged(data, draftProduct?.tryOnConfiguration);
   };
 
-  const onReviewAndConfirmSubmit = async (_data: TConfirmDetails) => {
+  const onReviewAndConfirmSubmit = async (data: TConfirmDetailsZodSchema) => {
+    if (data.confirm) {
+      toaster.error({
+        title: 'Please confirm details before submit.',
+        description: 'Review ',
+      });
+    }
     if (publishDraftProductQuery.isPending) return;
     await publishDraftProductQuery.mutateAsync();
   };

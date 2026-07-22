@@ -1,13 +1,13 @@
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Select from '@/components/ui/inputs/Select';
 import { PRODUCT_TRYON_INPUT_MAP_DATA } from '@/constants/input.constants';
-import type { TProductTryOnConfiguration } from '@/types/schema.type';
 import { TRY_ON_CATEGORIES, TRY_ON_MAP } from '@beautinique/frontend-constants';
+import type { TProductTryOnConfigurationZodSchema } from '@beautinique/frontend-types';
 import { useMemo } from 'react';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
 type Props = {
-  form: UseFormReturn<TProductTryOnConfiguration>;
+  form: UseFormReturn<TProductTryOnConfigurationZodSchema>;
 };
 
 const AddProductTryOnConfigurationFields = ({ form }: Props) => {

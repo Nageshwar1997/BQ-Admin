@@ -8,10 +8,7 @@ import {
   EMPTY_ARRAY,
   QUERY_PARAMS_KEY_MAP,
 } from '@/constants/common.constants';
-import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import useQueryParams from '@/hooks/useQueryParams';
-import { categorySchema } from '@/schemas/category.schema';
-import { confirmDetailsSchema } from '@/schemas/shared.schema';
 import {
   useAddCategory,
   useGetCategoriesByParentLevel,
@@ -20,10 +17,11 @@ import {
 import type { TCategory } from '@/types/api.type';
 import type { TCatModal } from '@/types/component.type';
 import type { TCategory_Stepper_Step } from '@/types/form.types';
-import type { TCategoryForm, TConfirmDetails } from '@/types/schema.type';
 import { isDeepEqual, toaster } from '@/utils/common.util';
 import { setErrorToForm } from '@/utils/form.util';
 import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
+import type { TCategoryZodSchema, TConfirmDetailsZodSchema } from '@beautinique/frontend-types';
+import { categoryZodSchema, confirmDetailsZodSchema } from '@beautinique/frontend-zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Icon } from '@iconify/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -32,11 +30,9 @@ import { Level1Fields, Level2Fields, Level3Fields } from './CategoryFields';
 
 type TMode = typeof QUERY_PARAMS_KEY_MAP.category.edit | typeof QUERY_PARAMS_KEY_MAP.category.add;
 
-const isL1 = (level: TCategoryForm['level']) => level === CATEGORY_LEVELS_MAP.L1;
-const isL2 = (level: TCategoryForm['level']) => level === CATEGORY_LEVELS_MAP.L2;
-const isL3 = (level: TCategoryForm['level']) => level === CATEGORY_LEVELS_MAP.L3;
-
-const DEFAULT_VALUES = FORM_DEFAULT_VALUES.category;
+const isL1 = (level: TCategoryZodSchema['level']) => level === CATEGORY_LEVELS_MAP.L1;
+const isL2 = (level: TCategoryZodSchema['level']) => level === CATEGORY_LEVELS_MAP.L2;
+const isL3 = (level: TCategoryZodSchema['level']) => level === CATEGORY_LEVELS_MAP.L3;
 
 const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => (
   <div className="text-left">
@@ -48,42 +44,42 @@ const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => 
 const getCategoryFormName = (categories: TCategory[] | undefined, id?: string) =>
   categories?.find((cat) => cat._id === id)?.name || '-';
 
-const getInitialData = (cat: TCategory, mainCatId = ''): TCategoryForm => {
+const getInitialData = (cat: TCategory, mainCatId = ''): TCategoryZodSchema => {
   switch (cat.level) {
-    case CATEGORY_LEVELS_MAP.L2:
-      return {
-        name: cat.name,
-        level: CATEGORY_LEVELS_MAP.L2,
-        mainCategory: cat.parent,
-      };
-
     case CATEGORY_LEVELS_MAP.L3:
       return {
-        name: cat.name,
         level: cat.level,
+        name: cat.name,
         mainCategory: mainCatId,
         subCategory: cat.parent,
         description: cat.description,
       };
 
+    case CATEGORY_LEVELS_MAP.L2:
+      return {
+        level: cat.level,
+        name: cat.name,
+        mainCategory: cat.parent,
+      };
+
     case CATEGORY_LEVELS_MAP.L1:
     default:
-      return { name: cat.name, level: CATEGORY_LEVELS_MAP.L1 };
+      return { name: cat.name, level: cat.level ?? CATEGORY_LEVELS_MAP.L1 };
   }
 };
 
-const getPayload = (data: TCategoryForm) => {
+const getPayload = (data: TCategoryZodSchema) => {
   const { level, name } = data;
   switch (level) {
-    case CATEGORY_LEVELS_MAP.L2:
-      return { name, level, parent: data.mainCategory, description: undefined };
-
     case CATEGORY_LEVELS_MAP.L3:
       return { name, level, parent: data.subCategory, description: data.description };
 
+    case CATEGORY_LEVELS_MAP.L2:
+      return { name, level, parent: data.mainCategory };
+
     case CATEGORY_LEVELS_MAP.L1:
     default:
-      return { name, level, parent: undefined, description: undefined };
+      return { name, level };
   }
 };
 
@@ -100,13 +96,12 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   const mode = queryParams[QUERY_PARAMS_KEY_MAP.category.mode] as TMode;
   const isEditMode = mode === QUERY_PARAMS_KEY_MAP.category.edit && !!category;
 
-  const detailsForm = useForm<TCategoryForm>({
-    resolver: zodResolver(categorySchema),
-    defaultValues: DEFAULT_VALUES,
+  const detailsForm = useForm<TCategoryZodSchema>({
+    resolver: zodResolver(categoryZodSchema),
   });
 
-  const confirmForm = useForm<TConfirmDetails>({
-    resolver: zodResolver(confirmDetailsSchema),
+  const confirmForm = useForm<TConfirmDetailsZodSchema>({
+    resolver: zodResolver(confirmDetailsZodSchema),
     defaultValues: { confirm: false },
   });
 
@@ -187,12 +182,12 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     return isDuplicate;
   };
 
-  const hasChanges = (data: TCategoryForm) => {
+  const hasChanges = (data: TCategoryZodSchema) => {
     if (!initialPayload) return true;
     return !isDeepEqual(getPayload(data), initialPayload);
   };
 
-  const handleNext = async (data: TCategoryForm) => {
+  const handleNext = async (data: TCategoryZodSchema) => {
     const payload = getPayload(data);
     if ((isEditMode && !hasChanges(detailsForm.getValues())) || !payload) {
       return toaster.error({
@@ -371,7 +366,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     if (isEditMode) {
       detailsForm.reset(getInitialData(category, mainCatId));
     } else {
-      detailsForm.reset(DEFAULT_VALUES);
+      detailsForm.reset({ level: CATEGORY_LEVELS_MAP.L1 });
     }
   };
 

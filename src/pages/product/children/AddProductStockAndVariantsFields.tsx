@@ -6,15 +6,15 @@ import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
 import { PRODUCT_VARIANT_ACTIONS } from '@/constants/common.constants';
 import { PRODUCT_VARIANT_INPUT_MAP_DATA, STOCKS_INPUT_MAP_DATA } from '@/constants/input.constants';
-import type {
-  TProductBasicInfo,
-  TProductStockAndVariants,
-  TProductWithoutVariant,
-  TProductWithVariant,
-} from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
 import { toErrorMessageArray } from '@/utils/form.util';
 import { VARIANT_TYPES_MAP } from '@beautinique/frontend-constants';
+import type {
+  TProductBasicInfoZodSchema,
+  TProductStockAndVariantsZodSchema,
+  TProductWithoutVariantsZodSchema,
+  TProductWithVariantsZodSchema,
+} from '@beautinique/frontend-types';
 import {
   Controller,
   useFieldArray,
@@ -24,12 +24,12 @@ import {
 } from 'react-hook-form';
 
 type Props = {
-  form: UseFormReturn<TProductStockAndVariants>;
-  defaultPrices: Pick<TProductBasicInfo, 'originalPrice' | 'sellingPrice'>;
+  form: UseFormReturn<TProductStockAndVariantsZodSchema>;
+  defaultPrices: Pick<TProductBasicInfoZodSchema, 'originalPrice' | 'sellingPrice'>;
 };
 
 const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
-  const EMPTY_VARIANT: TProductWithVariant['variants'][number] = {
+  const EMPTY_VARIANT: TProductWithVariantsZodSchema['variants'][number] = {
     type: VARIANT_TYPES_MAP.Color,
     label: '',
     value: '',
@@ -171,7 +171,9 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                               field.onChange(newValue);
                             },
                           }}
-                          errors={toErrorMessageArray<TProductStockAndVariants>(error?.[name])}
+                          errors={toErrorMessageArray<TProductStockAndVariantsZodSchema>(
+                            error?.[name],
+                          )}
                           handleRemove={(imgIdx) => {
                             const oldImages = currentVariant?.images;
 
@@ -254,7 +256,8 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
               label={input.label}
               register={form.register(input.name, { valueAsNumber: true })}
               error={
-                (form.formState.errors as FieldErrors<TProductWithoutVariant>)[input.name]?.message
+                (form.formState.errors as FieldErrors<TProductWithoutVariantsZodSchema>)[input.name]
+                  ?.message
               }
               inputProps={{ type: input.type, placeholder: input.placeholder }}
             />

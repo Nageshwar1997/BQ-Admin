@@ -1,12 +1,12 @@
 import FileInput from '@/components/ui/inputs/FileInput';
 import { PRODUCT_MEDIA_AND_GALLERY_INPUT_MAP_DATA } from '@/constants/input.constants';
-import type { TProductMediaAndGallery } from '@/types/schema.type';
 import { toErrorMessageArray } from '@/utils/form.util';
 import { VIDEO_MIMES } from '@beautinique/frontend-constants';
+import type { TProductMediaAndGalleryZodSchema } from '@beautinique/frontend-types';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
 type Props = {
-  form: UseFormReturn<TProductMediaAndGallery>;
+  form: UseFormReturn<TProductMediaAndGalleryZodSchema>;
 };
 
 const AddProductMediaAndGalleryFields = ({ form }: Props) => {
@@ -50,7 +50,9 @@ const AddProductMediaAndGalleryFields = ({ form }: Props) => {
                     }
                   },
                 }}
-                errors={toErrorMessageArray<TProductMediaAndGallery>(form.formState.errors[name])}
+                errors={toErrorMessageArray<TProductMediaAndGalleryZodSchema>(
+                  form.formState.errors[name],
+                )}
                 handleRemove={(index) => {
                   const nextValue = isImages
                     ? images.filter((_, currentIndex) => currentIndex !== index)

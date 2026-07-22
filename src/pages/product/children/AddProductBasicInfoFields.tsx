@@ -5,12 +5,11 @@ import {
   PRODUCT_CATEGORIES_SELECT_MAP_DATA,
 } from '@/constants/input.constants';
 import type { TCategory } from '@/types/api.type';
-import type { TProductBasicInfo } from '@/types/schema.type';
-import type { TCategoryLevelsMap } from '@beautinique/frontend-types';
+import type { TCategoryLevelsMap, TProductBasicInfoZodSchema } from '@beautinique/frontend-types';
 import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
 type Props = {
-  form: UseFormReturn<TProductBasicInfo>;
+  form: UseFormReturn<TProductBasicInfoZodSchema>;
   categories: Record<keyof TCategoryLevelsMap, TCategory[]>;
 };
 

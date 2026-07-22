@@ -4,28 +4,18 @@ import Checkbox from '@/components/ui/inputs/Checkbox';
 import { QuillContent } from '@/components/ui/QuillContent';
 import type { TAddProductStepNumber } from '@/types/common.type';
 import type { TClassName } from '@/types/component.type';
-import type {
-  TConfirmDetails,
-  TProductBasicInfo,
-  TProductDescriptionAndContent,
-  TProductMediaAndGallery,
-  TProductStockAndVariants,
-  TProductTryOnConfiguration,
-} from '@/types/schema.type';
 import { formatINRCurrency } from '@/utils/common.util';
+import type {
+  TConfirmDetailsZodSchema,
+  TDraftProductDetailsZodSchema,
+} from '@beautinique/frontend-types';
 import { Icon } from '@iconify/react';
 import type { ReactNode } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
 
 type Props = {
-  form: UseFormReturn<TConfirmDetails>;
-  values: {
-    basicInfo: TProductBasicInfo;
-    mediaAndGallery: TProductMediaAndGallery;
-    descriptionAndContent: TProductDescriptionAndContent;
-    stockAndVariants: TProductStockAndVariants;
-    tryOnConfiguration: TProductTryOnConfiguration;
-  };
+  form: UseFormReturn<TConfirmDetailsZodSchema>;
+  values: TDraftProductDetailsZodSchema;
   onEdit: (step: TAddProductStepNumber) => void;
 };
 

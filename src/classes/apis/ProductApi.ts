@@ -7,6 +7,7 @@ import type {
   TL2Category,
   TL3Category,
 } from '@/types/api.type';
+import type { TDraftProductStepBodyZodSchema } from '@beautinique/frontend-types';
 import { ApiRequest } from '../ApiRequest';
 
 export class CategoryApi extends ApiRequest {
@@ -53,7 +54,7 @@ export class ProductApi extends ApiRequest {
 
   /* ===================== POST API ===================== */
 
-  public saveDraftProduct = (data: any) => {
+  public saveDraftProduct = (data: TDraftProductStepBodyZodSchema) => {
     return this.request({ ...this.routes.draft.save, data });
   };
 
