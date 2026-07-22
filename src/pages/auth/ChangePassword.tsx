@@ -6,11 +6,11 @@ import Input from '@/components/ui/inputs/Input';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import { CHANGE_PASSWORD_INPUT_MAP_DATA } from '@/constants/input.constants';
 import usePathParams from '@/hooks/usePathParams';
-import { changePasswordSchema } from '@/schemas/user.schema';
 import { useChangePassword } from '@/services/user-service/auth.service.query';
 import useUserStore from '@/stores/user.store';
-import type { TChangePassword } from '@/types/schema.type';
 import { setErrorToForm } from '@/utils/form.util';
+import type { TChangePasswordZodSchema } from '@beautinique/frontend-types';
+import { changePasswordZodSchema } from '@beautinique/frontend-zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -33,13 +33,15 @@ const ChangePassword = () => {
     handleSubmit,
     register,
     setError,
-  } = useForm<TChangePassword>({
-    resolver: zodResolver(changePasswordSchema),
+  } = useForm<TChangePasswordZodSchema>({
+    resolver: zodResolver(changePasswordZodSchema),
     defaultValues: FORM_DEFAULT_VALUES.changePassword,
   });
 
   /* ================= 5. Local State ================= */
-  const [showPasswords, setShowPasswords] = useState<Record<keyof TChangePassword, boolean>>({
+  const [showPasswords, setShowPasswords] = useState<
+    Record<keyof TChangePasswordZodSchema, boolean>
+  >({
     password: false,
     confirmPassword: false,
     currentPassword: false,
@@ -47,7 +49,7 @@ const ChangePassword = () => {
 
   /* ================= 6. Handlers ================= */
 
-  const handleChangePassword = async (data: TChangePassword) => {
+  const handleChangePassword = async (data: TChangePasswordZodSchema) => {
     await changePassword.mutateAsync(
       { ...data },
       {
@@ -62,7 +64,7 @@ const ChangePassword = () => {
     );
   };
 
-  const togglePasswordVisibility = (field: keyof TChangePassword) => {
+  const togglePasswordVisibility = (field: keyof TChangePasswordZodSchema) => {
     setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 

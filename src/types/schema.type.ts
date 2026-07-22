@@ -14,27 +14,11 @@ import type {
   withoutVariantsSchema,
 } from '@/schemas/product.schema';
 import type { confirmDetailsSchema } from '@/schemas/shared.schema';
-import type {
-  changePasswordSchema,
-  emailSchema,
-  loginSchema,
-  otpSchema,
-  passwordsSchema,
-} from '@/schemas/user.schema';
 import type { infer as zodInfer } from 'zod';
 
 export type TConfirmDetails = zodInfer<typeof confirmDetailsSchema>;
 
 /* ================ USER SCHEMA TYPES ================ */
-export type TOtp = zodInfer<typeof otpSchema>;
-
-export type TEmail = zodInfer<typeof emailSchema>;
-
-export type TPasswords = zodInfer<typeof passwordsSchema>;
-
-export type TChangePassword = zodInfer<typeof changePasswordSchema>;
-
-export type TLogin = zodInfer<typeof loginSchema>;
 
 /* ================ CATEGORY SCHEMA TYPES ================ */
 export type TL1CategoryForm = zodInfer<typeof l1CategorySchema>;

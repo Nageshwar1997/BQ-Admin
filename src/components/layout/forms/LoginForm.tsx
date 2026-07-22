@@ -3,23 +3,20 @@ import Button from '@/components/ui/Button';
 import GradientText from '@/components/ui/GradientText';
 import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
-import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import { LOGIN_INPUT_MAP_DATA, PASSWORD_KEYS } from '@/constants/input.constants';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
-import { loginSchema } from '@/schemas/user.schema';
 import { useLogin } from '@/services/user-service/auth.service.query';
 import useActionsStore from '@/stores/action.store';
 import useUserStore from '@/stores/user.store';
-import type { TLogin } from '@/types/schema.type';
 import { setErrorToForm } from '@/utils/form.util';
+import type { TLoginZodSchema } from '@beautinique/frontend-types';
+import { loginZodSchema } from '@beautinique/frontend-zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import BorderGradient from '../containers/BorderGradient';
-
-const { login, email, phoneNumber } = FORM_DEFAULT_VALUES;
 
 const LoginForm = () => {
   /* ================= 1. External / Store Hooks ================= */
@@ -38,9 +35,12 @@ const LoginForm = () => {
     register,
     reset,
     setError,
-  } = useForm<TLogin>({ resolver: zodResolver(loginSchema), defaultValues: login });
+  } = useForm<TLoginZodSchema>({
+    resolver: zodResolver(loginZodSchema),
+    defaultValues: { loginMethod: 'email' },
+  });
 
-  const selectedMethod = useWatch({ control, name: 'loginMethod' });
+  const selectedMethod = useWatch({ control, name: 'loginMethod', defaultValue: 'email' });
 
   /* ================= 4. Local State ================= */
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -48,7 +48,7 @@ const LoginForm = () => {
   /* ================= 5. Handlers ================= */
 
   // -------- Handle Login Submit --------
-  const handleLogin = async (data: TLogin) => {
+  const handleLogin = async (data: TLoginZodSchema) => {
     await mutateAsync(data, {
       onSuccess: async ({ data: user }) => {
         setUser(user);
@@ -70,13 +70,12 @@ const LoginForm = () => {
   };
 
   // -------- Handle Login Method Change (Email / Phone) --------
-  const handleLoginMethodChange = (method: TLogin['loginMethod']) => {
-    reset({
-      loginMethod: method,
-      email: method === login.loginMethod ? email.email : login.email,
-      phoneNumber: method !== login.loginMethod ? phoneNumber.phoneNumber : login.phoneNumber,
-      password: '',
-    });
+  const handleLoginMethodChange = (method: TLoginZodSchema['loginMethod']) => {
+    if (method === 'phoneNumber') {
+      reset({ loginMethod: method, phoneNumber: undefined, password: undefined });
+    } else {
+      reset({ loginMethod: method, email: undefined, password: undefined });
+    }
   };
 
   /* ================= 6. JSX ================= */
@@ -101,7 +100,7 @@ const LoginForm = () => {
               <Radio
                 value={field.value}
                 onChange={(value) => {
-                  handleLoginMethodChange(value);
+                  handleLoginMethodChange(value as TLoginZodSchema['loginMethod']);
                   field.onChange(value);
                 }}
                 options={[
@@ -121,16 +120,18 @@ const LoginForm = () => {
             const isEmail = input.name === 'email';
             const isEmailSelected = selectedMethod === 'email';
 
+            const name = input.name as keyof Omit<TLoginZodSchema, 'loginMethod'>;
+
             // -------- Conditional Rendering --------
             if (isPhone && isEmailSelected) return null;
             if (isEmail && !isEmailSelected) return null;
 
             return (
               <Input
-                key={input.name}
+                key={name}
                 label={input.label}
                 inputProps={{
-                  name: input.name,
+                  name,
                   type: isPassword ? (showPassword ? 'text' : input.type) : input.type,
                   placeholder: input.placeholder,
                   autoComplete: input.autoComplete,
@@ -155,8 +156,8 @@ const LoginForm = () => {
                         }
                       : undefined
                 }
-                register={register(input.name)}
-                error={errors[input.name]?.message}
+                register={register(name)}
+                error={errors[name]?.message}
               />
             );
           })}

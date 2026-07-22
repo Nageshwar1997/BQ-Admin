@@ -11,7 +11,6 @@ import {
   PASSWORDS_INPUT_MAP_DATA,
 } from '@/constants/input.constants';
 import usePathParams from '@/hooks/usePathParams';
-import { emailSchema, otpSchema, passwordsSchema } from '@/schemas/user.schema';
 import {
   useForgotPasswordResendOtp,
   useForgotPasswordSave,
@@ -19,9 +18,14 @@ import {
   useForgotPasswordVerifyOtp,
 } from '@/services/user-service/auth.service.query';
 import useUserStore from '@/stores/user.store';
-import type { TEmail, TOtp, TPasswords } from '@/types/schema.type';
 import { toaster } from '@/utils/common.util';
 import { setErrorToForm } from '@/utils/form.util';
+import type {
+  TEmailZodSchema,
+  TOtpZodSchema,
+  TPasswordsZodSchema,
+} from '@beautinique/frontend-types';
+import { emailZodSchema, otpZodSchema, passwordsZodSchema } from '@beautinique/frontend-zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -52,30 +56,30 @@ const ForgotPassword = () => {
   }, [resendOtp.data]);
 
   /* ================= 4. Forms ================= */
-  const sendOtpForm = useForm<TEmail>({ resolver: zodResolver(emailSchema) });
+  const sendOtpForm = useForm<TEmailZodSchema>({ resolver: zodResolver(emailZodSchema) });
 
-  const verifyOtpForm = useForm<TOtp>({ resolver: zodResolver(otpSchema) });
+  const verifyOtpForm = useForm<TOtpZodSchema>({ resolver: zodResolver(otpZodSchema) });
 
-  const passwordForm = useForm<TPasswords>({ resolver: zodResolver(passwordsSchema) });
+  const passwordForm = useForm<TPasswordsZodSchema>({ resolver: zodResolver(passwordsZodSchema) });
 
   /* ================= 5. Local State ================= */
   const [currentStep, setCurrentStep] = useState<'send' | 'verify' | 'save'>('send');
 
-  const [showPasswords, setShowPasswords] = useState<Record<keyof TPasswords, boolean>>({
+  const [showPasswords, setShowPasswords] = useState<Record<keyof TPasswordsZodSchema, boolean>>({
     password: false,
     confirmPassword: false,
   });
 
   /* ================= 7. Handlers ================= */
 
-  const handleSendOtp = async (data: TEmail) => {
+  const handleSendOtp = async (data: TEmailZodSchema) => {
     await sendOtp.mutateAsync(data, {
       onSuccess: () => setCurrentStep('verify'),
       onError: ({ fieldErrors }) => setErrorToForm(sendOtpForm.setError, fieldErrors),
     });
   };
 
-  const handleVerifyOtp = async (data: TOtp) => {
+  const handleVerifyOtp = async (data: TOtpZodSchema) => {
     await verifyOtp.mutateAsync(
       { ...data, token },
       {
@@ -85,7 +89,7 @@ const ForgotPassword = () => {
     );
   };
 
-  const handleForgotPassword = async (data: TPasswords) => {
+  const handleForgotPassword = async (data: TPasswordsZodSchema) => {
     await savePassword.mutateAsync(
       { ...data, token },
       {
@@ -128,7 +132,7 @@ const ForgotPassword = () => {
     }
   };
 
-  const togglePasswordVisibility = (field: keyof TPasswords) => {
+  const togglePasswordVisibility = (field: keyof TPasswordsZodSchema) => {
     setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 

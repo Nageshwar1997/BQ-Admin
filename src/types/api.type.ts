@@ -5,13 +5,12 @@ import type {
   TCategoryLevel,
   TCategoryLevelsMap,
   TProductStatus,
+  TRegisterZodSchema,
   TSort,
   TUserRole,
 } from '@beautinique/frontend-types';
 import type {
   TCategoryForm,
-  TEmail,
-  TLogin,
   TProductBasicInfo,
   TProductDescriptionAndContent,
   TProductMediaAndGallery,
@@ -31,13 +30,11 @@ export interface ITimeStamp {
   updatedAt: string;
 }
 
-export interface IUser extends Pick<TLogin, 'password'>, TEmail, IId, ITimeStamp {
+export interface IUser
+  extends Omit<TRegisterZodSchema, 'confirmPassword' | 'password'>, IId, ITimeStamp {
   providers: TAuthProvider[];
   role: TUserRole;
   avatar?: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
 }
 
 /* -------------------------------------------------------------------------- */

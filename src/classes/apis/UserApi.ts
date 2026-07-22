@@ -1,6 +1,12 @@
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
-import type { TChangePassword, TEmail, TLogin, TOtp, TPasswords } from '@/types/schema.type';
 import { HEADERS_MAP, USER_ROLE_MAP } from '@beautinique/frontend-constants';
+import type {
+  TChangePasswordZodSchema,
+  TEmailZodSchema,
+  TLoginZodSchema,
+  TOtpZodSchema,
+  TPasswordsZodSchema,
+} from '@beautinique/frontend-types';
 import { ApiRequest } from '../ApiRequest';
 
 export class AuthApi extends ApiRequest {
@@ -8,7 +14,7 @@ export class AuthApi extends ApiRequest {
 
   /* ===================== LOGIN API ===================== */
 
-  public login = (data: TLogin) => {
+  public login = (data: TLoginZodSchema) => {
     return this.request({
       ...this.routes.login.manual,
       data,
@@ -18,7 +24,7 @@ export class AuthApi extends ApiRequest {
 
   /* ===================== PASSWORD API ===================== */
 
-  public forgotPasswordSendOtp = (data: TEmail) => {
+  public forgotPasswordSendOtp = (data: TEmailZodSchema) => {
     return this.request({ ...this.routes.password.forgot.sendOtp, data });
   };
 
@@ -29,7 +35,7 @@ export class AuthApi extends ApiRequest {
     });
   };
 
-  public forgotPasswordVerifyOtp = ({ token, ...data }: TOtp & { token: string }) => {
+  public forgotPasswordVerifyOtp = ({ token, ...data }: TOtpZodSchema & { token: string }) => {
     return this.request({
       ...this.routes.password.forgot.verifyOtp,
       data,
@@ -37,7 +43,7 @@ export class AuthApi extends ApiRequest {
     });
   };
 
-  public forgotPasswordSave = ({ token, ...data }: TPasswords & { token: string }) => {
+  public forgotPasswordSave = ({ token, ...data }: TPasswordsZodSchema & { token: string }) => {
     return this.request({
       ...this.routes.password.forgot.save,
       data,
@@ -45,7 +51,7 @@ export class AuthApi extends ApiRequest {
     });
   };
 
-  public changePassword = (data: TChangePassword) => {
+  public changePassword = (data: TChangePasswordZodSchema) => {
     return this.request({ ...this.routes.password.change, data });
   };
 }
