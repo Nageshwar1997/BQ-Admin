@@ -56,7 +56,7 @@ export const useGetDraftProduct = () => {
     queryKey: draft.get,
     queryFn: productApi.getDraftProduct,
     retry: false,
-    select: (data) => data?.draft as Partial<TDraftProductDetailsZodSchema> | undefined,
+    select: (data) => data?.data as Partial<TDraftProductDetailsZodSchema> | undefined,
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     placeholderData: (prev) => prev,

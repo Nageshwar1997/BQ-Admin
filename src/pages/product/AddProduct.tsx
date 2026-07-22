@@ -443,8 +443,8 @@ const AddProduct = () => {
   };
 
   const onReviewAndConfirmSubmit = async (data: TConfirmDetailsZodSchema) => {
-    if (data.confirm) {
-      toaster.error({
+    if (!data.confirm) {
+      return toaster.error({
         title: 'Please confirm details before submit.',
         description: 'Review ',
       });

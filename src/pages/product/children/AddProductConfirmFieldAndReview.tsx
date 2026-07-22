@@ -45,7 +45,7 @@ const KeyValue = ({
 };
 
 const BasicInfo = ({
-  data,
+  data: { step: _, ...data },
   onEdit,
 }: {
   data: Props['values']['basicInfo'];
@@ -73,7 +73,7 @@ const BasicInfo = ({
 };
 
 const DescriptionAndContent = ({
-  data,
+  data: { step: _, ...data },
   onEdit,
 }: {
   data: Props['values']['descriptionAndContent'];
@@ -83,7 +83,7 @@ const DescriptionAndContent = ({
   const { shortDescription, ...restData } = data;
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">
-      <Heading title="Basic Information" onEdit={onEdit} />
+      <Heading title="Description & Other Info" onEdit={onEdit} />
       <KeyValue label="Short description" value={shortDescription} />
       <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6">
         {Object.entries(restData).map(([key, content]) => {
@@ -102,7 +102,7 @@ const DescriptionAndContent = ({
 };
 
 const MediaAndGallery = ({
-  data,
+  data: { step: _, ...data },
   onEdit,
 }: {
   data: Props['values']['mediaAndGallery'];
@@ -148,7 +148,7 @@ const MediaAndGallery = ({
 };
 
 const StockAndVariants = ({
-  data,
+  data: { step: _, ...data },
   onEdit,
 }: {
   data: Props['values']['stockAndVariants'];
@@ -220,7 +220,7 @@ const StockAndVariants = ({
 };
 
 const TryOnConfiguration = ({
-  data,
+  data: { step: _, ...data },
   onEdit,
 }: {
   data: Props['values']['tryOnConfiguration'];
