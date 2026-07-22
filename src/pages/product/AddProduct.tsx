@@ -432,7 +432,7 @@ const AddProduct = () => {
       stockAndVariantsForm.setValue('variants', updatedVariants);
 
       await saveStepIfChanged(
-        { hasVariants: true, variants: updatedVariants },
+        { hasVariants: true, step: DRAFT_PRODUCT_STEP_MAP[3], variants: updatedVariants },
         draftProduct?.stockAndVariants,
       );
     }
