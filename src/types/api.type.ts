@@ -150,8 +150,8 @@ export type TRemoveFileType<T> = {
 export type TApiProductBase = IId &
   ITimeStamp &
   Pick<TProductBasicInfoZodSchema, 'title' | 'brand' | 'sellingPrice' | 'originalPrice'> &
-  TProductDescriptionAndContentZodSchema &
-  TRemoveFileType<TProductMediaAndGalleryZodSchema> & {
+  Omit<TProductDescriptionAndContentZodSchema, 'step'> &
+  TRemoveFileType<Omit<TProductMediaAndGalleryZodSchema, 'step'>> & {
     tryOn: TApiTryOn;
     seller: string;
     sku: string;
