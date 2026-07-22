@@ -55,10 +55,7 @@ export type TCategory = TL1Category | TL2Category | TL3Category;
 export type TCategoryHierarchyNode<TLevel extends TCategoryLevel> = TLevel extends TLevel1
   ? CategoryBase<TLevel1> & { subcategories: TCategoryHierarchyNode<TLevel2>[] }
   : TLevel extends TLevel2
-    ? CategoryBase<TLevel2> & {
-        parent: string;
-        subcategories: TCategoryHierarchyNode<TLevel3>[];
-      }
+    ? CategoryBase<TLevel2> & { parent: string; subcategories: TCategoryHierarchyNode<TLevel3>[] }
     : CategoryBase<TLevel3> & { parent: string; description: string; subcategories?: never };
 
 export type TCategoryHierarchy = TCategoryHierarchyNode<TLevel1>;
@@ -175,16 +172,16 @@ export type TApiProductBase = IId &
     };
   };
 
+type TVariant = TRemoveFileType<TProductWithVariantsZodSchema['variants'][number]> & {
+  sku: string;
+  discount: number;
+  images: string[];
+  thumbnail?: string;
+} & IId;
+
 type TApiStockAndVariants =
   | Omit<TProductWithoutVariantsZodSchema, 'step'>
-  | (Pick<TProductWithVariantsZodSchema, 'hasVariants'> & {
-      variants: (TRemoveFileType<TProductWithVariantsZodSchema['variants'][number]> & {
-        sku: string;
-        discount: number;
-        images: string[];
-        thumbnail?: string;
-      } & IId)[];
-    });
+  | (Pick<TProductWithVariantsZodSchema, 'hasVariants'> & { variants: TVariant[] });
 
 export type TApiProduct = TApiProductBase & TApiStockAndVariants & { category: string };
 
