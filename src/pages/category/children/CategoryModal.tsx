@@ -1,7 +1,15 @@
+import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
+import type { TCategoryZodSchema, TConfirmDetailsZodSchema } from '@beautinique/frontend-types';
+import { categoryZodSchema, confirmDetailsZodSchema } from '@beautinique/frontend-zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Icon } from '@iconify/react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+
 import { ModalWrapper } from '@/components/layout/modals/ModalWrapper';
 import Button from '@/components/ui/Button';
-import Stepper, { type StepperStep } from '@/components/ui/Stepper';
 import Checkbox from '@/components/ui/inputs/Checkbox';
+import Stepper, { type StepperStep } from '@/components/ui/Stepper';
 import {
   CATEGORY_MODAL_STEPS,
   CATEGORY_STEPPER_STEP_COUNT_MAP,
@@ -15,17 +23,11 @@ import {
   useUpdateCategory,
 } from '@/services/product-service/category.service.query';
 import type { TCategory } from '@/types/api.type';
-import type { TCatModal } from '@/types/component.type';
+import type { ICatModal } from '@/types/component.type';
 import type { TCategory_Stepper_Step } from '@/types/form.types';
 import { isDeepEqual, toaster } from '@/utils/common.util';
 import { setErrorToForm } from '@/utils/form.util';
-import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
-import type { TCategoryZodSchema, TConfirmDetailsZodSchema } from '@beautinique/frontend-types';
-import { categoryZodSchema, confirmDetailsZodSchema } from '@beautinique/frontend-zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Icon } from '@iconify/react';
-import { useEffect, useMemo, useState } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+
 import { Level1Fields, Level2Fields, Level3Fields } from './CategoryFields';
 
 type TMode = typeof QUERY_PARAMS_KEY_MAP.category.edit | typeof QUERY_PARAMS_KEY_MAP.category.add;
@@ -83,7 +85,7 @@ const getPayload = (data: TCategoryZodSchema) => {
   }
 };
 
-const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => {
+const CategoryModal = (props?: Partial<ICatModal> & { onClose?: () => void }) => {
   const { queryParams, removeParams } = useQueryParams();
 
   const [activeStep, setActiveStep] = useState<TCategory_Stepper_Step>(
@@ -93,7 +95,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   const category = props?.category;
   const mainCatId = props?.mainCatId;
 
-  const mode = queryParams[QUERY_PARAMS_KEY_MAP.category.mode] as TMode;
+  const mode = queryParams[QUERY_PARAMS_KEY_MAP.category.mode] as TMode | undefined;
   const isEditMode = mode === QUERY_PARAMS_KEY_MAP.category.edit && !!category;
 
   const detailsForm = useForm<TCategoryZodSchema>({
@@ -134,7 +136,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   });
 
   const initialPayload = useMemo(() => {
-    if (!isEditMode || !category) return null;
+    if (!isEditMode) return null;
     return getPayload(getInitialData(category, mainCatId));
   }, [category, mainCatId, isEditMode]);
 
@@ -155,7 +157,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
       default:
         return '-';
     }
-  }, [categoryValues, level, level1Cats, level2Cats]);
+  }, [level, level1Cats, level2Cats, mainCategory, subCategory]);
 
   const isDuplicateCategory = () => {
     const trimmedName = name.trim().toLowerCase();
@@ -173,7 +175,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     }
 
     const isDuplicate =
-      categories?.some((cat) => cat.name.trim().toLowerCase() === trimmedName) || false;
+      categories.some((cat) => cat.name.trim().toLowerCase() === trimmedName) || false;
 
     if (isDuplicate) {
       detailsForm.setError('name', { message: 'Category already exists.' });
@@ -187,13 +189,14 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     return !isDeepEqual(getPayload(data), initialPayload);
   };
 
-  const handleNext = async (data: TCategoryZodSchema) => {
-    const payload = getPayload(data);
-    if ((isEditMode && !hasChanges(detailsForm.getValues())) || !payload) {
-      return toaster.error({
+  const handleNext = () => {
+    if (isEditMode && !hasChanges(detailsForm.getValues())) {
+      toaster.error({
         title: 'No changes to save',
         description: 'Make changes and try again.',
       });
+
+      return;
     } else if (!isDuplicateCategory()) {
       setActiveStep(
         Math.min(activeStep + 1, CATEGORY_MODAL_STEPS.length - 1) as TCategory_Stepper_Step,
@@ -211,12 +214,6 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
   const handleSave = async () => {
     const values = detailsForm.getValues();
     const payload = getPayload(values);
-    if (!payload) {
-      return toaster.error({
-        title: 'No changes to save',
-        description: 'Make changes and try again.',
-      });
-    }
 
     if (isEditMode) {
       const updatedPayload: Partial<Omit<TCategory, 'slug' | '_id'>> = {};
@@ -229,16 +226,20 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
       });
 
       if (Object.keys(updatedPayload).length === 0) {
-        return toaster.error({
+        toaster.error({
           title: 'No changes to save',
           description: 'Make changes and try again.',
         });
+
+        return;
       }
 
       await updateCategory.mutateAsync(
         { ...updatedPayload, _id: category._id },
         {
-          onSuccess: () => handleClose(),
+          onSuccess: () => {
+            handleClose();
+          },
           onError: ({ fieldErrors }) => {
             setErrorToForm(detailsForm.setError, fieldErrors);
             setActiveStep(CATEGORY_STEPPER_STEP_COUNT_MAP[0]);
@@ -247,7 +248,9 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
       );
     } else {
       await addCategory.mutateAsync(payload, {
-        onSuccess: () => handleClose(),
+        onSuccess: () => {
+          handleClose();
+        },
         onError: ({ fieldErrors }) => {
           setErrorToForm(detailsForm.setError, fieldErrors);
           setActiveStep(CATEGORY_STEPPER_STEP_COUNT_MAP[0]);
@@ -326,10 +329,10 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
             <p className="text-primary text-sm font-semibold">Ready to save</p>
             <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
               <p className="text-tertiary">
-                Name: <span className="text-primary">{categoryValues.name || '-'}</span>
+                Name: <span className="text-primary">{categoryValues.name ?? '-'}</span>
               </p>
               <p className="text-tertiary">
-                Level: <span className="text-primary">Level {categoryValues.level || '-'}</span>
+                Level: <span className="text-primary">Level {categoryValues.level ?? '-'}</span>
               </p>
               <p className="text-tertiary">
                 Parent:{' '}
@@ -344,7 +347,7 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
               {isL3(level) && 'description' in categoryValues && (
                 <p className="text-tertiary sm:col-span-2">
                   Description:{' '}
-                  <span className="text-primary">{categoryValues.description || '-'}</span>
+                  <span className="text-primary">{categoryValues.description ?? '-'}</span>
                 </p>
               )}
             </div>
@@ -361,24 +364,22 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
     },
   ];
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     confirmForm.reset();
     if (isEditMode) {
       detailsForm.reset(getInitialData(category, mainCatId));
     } else {
       detailsForm.reset({ level: CATEGORY_LEVELS_MAP.L1 });
     }
-  };
+  }, [confirmForm, detailsForm, isEditMode, category, mainCatId]);
 
   useEffect(() => {
     handleReset();
-  }, [category, mainCatId]);
+  }, [handleReset]);
 
   return (
     <ModalWrapper
-      isOpen={
-        mode === QUERY_PARAMS_KEY_MAP.category.edit || mode === QUERY_PARAMS_KEY_MAP.category.add
-      }
+      isOpen={!!mode}
       onClose={handleClose}
       header={{ showCloseIcon: true, title: isEditMode ? 'Edit category' : 'Add new category' }}
       containerProps={{ className: 'p-4!' }}
@@ -388,31 +389,35 @@ const CategoryModal = (props: Partial<TCatModal> & { onClose?: () => void }) => 
       <Stepper steps={CATEGORY_MODAL_STEPS} activeStep={activeStep} className="bg-secondary-invert">
         <div className="flex flex-col gap-5">
           <TitleAndSubtitle
-            title={stepFields[activeStep].title}
-            description={activeStepData.description}
+            title={stepFields[activeStep]?.title ?? ''}
+            description={activeStepData?.description ?? ''}
           />
 
-          {stepFields[activeStep].content}
+          {stepFields[activeStep]?.content}
 
           <div className="flex justify-between gap-3">
             <Button
               pattern="secondary"
-              content={CATEGORY_STEPPER_STEP_COUNT_MAP[0] ? 'Reset' : 'Back'}
+              content={activeStep === CATEGORY_STEPPER_STEP_COUNT_MAP[0] ? 'Reset' : 'Back'}
               leftIcon={{
-                icon: CATEGORY_STEPPER_STEP_COUNT_MAP[0]
-                  ? 'solar:restart-linear'
-                  : 'solar:arrow-left-linear',
+                icon:
+                  activeStep === CATEGORY_STEPPER_STEP_COUNT_MAP[0]
+                    ? 'solar:restart-linear'
+                    : 'solar:arrow-left-linear',
               }}
               buttonProps={{
-                onClick: () =>
-                  activeStep === CATEGORY_STEPPER_STEP_COUNT_MAP[0]
-                    ? handleReset()
-                    : setActiveStep(
-                        Math.max(
-                          activeStep - 1,
-                          CATEGORY_STEPPER_STEP_COUNT_MAP[0],
-                        ) as TCategory_Stepper_Step,
-                      ),
+                onClick: () => {
+                  if (activeStep === CATEGORY_STEPPER_STEP_COUNT_MAP[0]) {
+                    handleReset();
+                  } else {
+                    setActiveStep(
+                      Math.max(
+                        activeStep - 1,
+                        CATEGORY_STEPPER_STEP_COUNT_MAP[0],
+                      ) as TCategory_Stepper_Step,
+                    );
+                  }
+                },
               }}
               className="sm:max-w-36"
             />

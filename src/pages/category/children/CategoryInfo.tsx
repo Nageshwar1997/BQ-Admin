@@ -1,6 +1,7 @@
-import type { TCatTable } from '@/types/component.type';
 import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
 import { Icon } from '@iconify/react';
+
+import type { TCatTable } from '@/types/component.type';
 
 const CategoryInfo = ({ category }: Pick<TCatTable, 'category'>) => (
   <div className="flex items-center gap-3">

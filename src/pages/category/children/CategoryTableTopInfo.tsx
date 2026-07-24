@@ -1,11 +1,12 @@
+import { useState } from 'react';
+
 import Badge from '@/components/ui/Badge';
 import Input from '@/components/ui/inputs/Input';
 import { QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
 import useQueryParams from '@/hooks/useQueryParams';
 import type { TCategory } from '@/types/api.type';
-import type { TClassName } from '@/types/component.type';
-import { useEffect, useState } from 'react';
+import type { IClassName } from '@/types/component.type';
 
 const q_cat_keys = QUERY_PARAMS_KEY_MAP.category;
 
@@ -19,8 +20,9 @@ const CategorySearchInput = ({ level }: Pick<TCategory, 'level'>) => {
   const { queryParams, setParams } = useQueryParams();
 
   const queryKey =
-    `search_${level}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['search'];
-  const [searchQuery, setSearchQuery] = useState(queryParams[queryKey] || '');
+    `search_${String(level)}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['search'];
+  const [searchQuery, setSearchQuery] = useState(queryParams[queryKey] ?? '');
+  const [prevQueryValue, setPrevQueryValue] = useState(queryParams[queryKey]);
 
   const handleSearch = useDebounce({
     callback: (value: string) => {
@@ -28,13 +30,11 @@ const CategorySearchInput = ({ level }: Pick<TCategory, 'level'>) => {
       const keysToClear = QUERY_CLEAR_MAP[queryKey];
 
       setParams((prevParams) => {
-        const updatedParams = { ...prevParams };
+        const keysToRemove = new Set<string>([queryKey, ...keysToClear]);
 
-        // current query remove
-        delete updatedParams[queryKey];
-
-        // dependent queries remove
-        keysToClear.forEach((key) => delete updatedParams[key]);
+        const updatedParams = Object.fromEntries(
+          Object.entries(prevParams).filter(([key]) => !keysToRemove.has(key)),
+        );
 
         // new value set
         if (trimmedValue) updatedParams[queryKey] = trimmedValue;
@@ -53,20 +53,24 @@ const CategorySearchInput = ({ level }: Pick<TCategory, 'level'>) => {
     handleSearch(trimmedValue);
   };
 
-  useEffect(() => {
+  if (queryParams[queryKey] !== prevQueryValue) {
+    setPrevQueryValue(queryParams[queryKey]);
+
     if (!queryParams[queryKey] && searchQuery) {
       setSearchQuery('');
     }
-  }, [queryParams[queryKey]]);
+  }
 
   return (
     <Input
       needRef
       inputProps={{
         name: queryKey,
-        placeholder: `Search level ${level} categories here...`,
+        placeholder: `Search level ${String(level)} categories here...`,
         value: searchQuery,
-        onChange: ({ target: { value } }) => handleChange(value),
+        onChange: ({ target: { value } }) => {
+          handleChange(value);
+        },
       }}
       containerClassName="max-w-sm"
       className="bg-silver/10!"
@@ -81,8 +85,8 @@ const CategoryTableTopInfo = ({
   name,
   badgeText,
   level,
-  className,
-}: TClassName & Pick<TCategory, 'level' | 'name'> & { badgeText: string }) => {
+  className = '',
+}: IClassName & Pick<TCategory, 'level' | 'name'> & { badgeText: string }) => {
   return (
     <div className={`space-y-3 p-4 ${className}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">

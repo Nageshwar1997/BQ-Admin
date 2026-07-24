@@ -1,3 +1,15 @@
+import { CATEGORY_LEVELS_MAP, SORT_MAP } from '@beautinique/frontend-constants';
+import type { TSort } from '@beautinique/frontend-types';
+import { Icon } from '@iconify/react';
+import {
+  type ComponentProps,
+  Fragment,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+
 import ApiStatus from '@/components/layout/ApiStatus';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
@@ -19,19 +31,9 @@ import {
   useGetCategoriesByParentLevel,
 } from '@/services/product-service/category.service.query';
 import type { TCategory } from '@/types/api.type';
-import type { TCatModal, TCatTable } from '@/types/component.type';
+import type { ICatModal, TCatTable } from '@/types/component.type';
 import { getFilteredAndSortedCats } from '@/utils/api.util';
-import { CATEGORY_LEVELS_MAP, SORT_MAP } from '@beautinique/frontend-constants';
-import type { TSort } from '@beautinique/frontend-types';
-import { Icon } from '@iconify/react';
-import {
-  Fragment,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useState,
-  type ComponentProps,
-} from 'react';
+
 import CategoryActions from './children/CategoryActions';
 import CategoryInfo from './children/CategoryInfo';
 import CategoryModal from './children/CategoryModal';
@@ -64,10 +66,10 @@ const ApiStatusRow = (
             }
             description={
               isError
-                ? `Something went wrong while fetching level ${level} categories. Please try again.`
+                ? `Something went wrong while fetching level ${String(level)} categories. Please try again.`
                 : haveLength
                   ? 'Try searching with a different keyword or clear the search.'
-                  : `No level ${level} categories have been added under this category yet.`
+                  : `No level ${String(level)} categories have been added under this category yet.`
             }
           />
         )}
@@ -79,7 +81,7 @@ const ApiStatusRow = (
 const CategoryHead = ({ level }: { level: TCategory['level'] }) => {
   const { queryParams, removeParams, setParams } = useQueryParams();
   const sortKey =
-    `sort_${level}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['sort'];
+    `sort_${String(level)}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['sort'];
 
   const handleSort = () => {
     if (queryParams[sortKey] === SORT_MAP.asc) {
@@ -136,7 +138,7 @@ const CategoryRow = (props: TCatTable & ComponentProps<'tr'>) => {
         <CategoryInfo category={category} />
       </TableRowCell>
       <TableRowCell>
-        <Badge content={`Level ${category.level}`} />
+        <Badge content={`Level ${String(category.level)}`} />
       </TableRowCell>
       <TableRowCell className="text-primary/65 uppercase">
         {'parent' in category ? category.parent : 'N/A'}
@@ -155,8 +157,8 @@ const CategoryRow = (props: TCatTable & ComponentProps<'tr'>) => {
 
 const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable) => {
   const { queryParams } = useQueryParams();
-  const search = useDeferredValue(queryParams[q_cat_keys.level.l3.search]);
-  const sort = useDeferredValue(queryParams[q_cat_keys.level.l3.sort]) as TSort;
+  const search = useDeferredValue(queryParams[q_cat_keys.level.l3.search] ?? '');
+  const sort = useDeferredValue(queryParams[q_cat_keys.level.l3.sort]) as TSort | undefined;
 
   const {
     data: categories = EMPTY_ARRAY,
@@ -174,7 +176,7 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
   return (
     <div className="border-primary/10 bg-primary/2 rounded-xl border">
       <CategoryTableTopInfo
-        badgeText={`${filteredCats.length}/${categories.length} items`}
+        badgeText={`${String(filteredCats.length)}/${String(categories.length)} items`}
         level={CATEGORY_LEVELS_MAP.L3}
         name={parentCat.name}
       />
@@ -208,9 +210,16 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
 
 const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
   const { queryParams } = useQueryParams();
-  const search = useDeferredValue(queryParams[q_cat_keys.level.l2.search]);
-  const sort = useDeferredValue(queryParams[q_cat_keys.level.l2.sort]) as TSort;
+  const search = useDeferredValue(queryParams[q_cat_keys.level.l2.search] ?? '');
+  const sort = useDeferredValue(queryParams[q_cat_keys.level.l2.sort]) as TSort | undefined;
   const [selectedId, setSelectedId] = useState('');
+  const [prevParentCatId, setPrevParentCatId] = useState(parentCat._id);
+
+  if (parentCat._id !== prevParentCatId) {
+    setPrevParentCatId(parentCat._id);
+    setSelectedId('');
+  }
+
   const {
     data: categories = EMPTY_ARRAY,
     isLoading,
@@ -224,14 +233,10 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
     [categories, search, sort],
   );
 
-  useEffect(() => {
-    setSelectedId('');
-  }, [parentCat._id]);
-
   return (
     <div className="border-primary/10 bg-primary/2 rounded-xl border">
       <CategoryTableTopInfo
-        badgeText={`${filteredCats.length}/${categories.length} items`}
+        badgeText={`${String(filteredCats.length)}/${String(categories.length)} items`}
         level={CATEGORY_LEVELS_MAP.L2}
         name={parentCat.name}
       />
@@ -243,9 +248,9 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
               <Fragment key={category._id}>
                 <CategoryRow
                   category={category}
-                  onClick={() =>
-                    setSelectedId((prevId) => (prevId === category._id ? '' : category._id))
-                  }
+                  onClick={() => {
+                    setSelectedId((prevId) => (prevId === category._id ? '' : category._id));
+                  }}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
@@ -286,10 +291,10 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
 
 const L1Table = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
-  const search = useDeferredValue(queryParams[q_cat_keys.level.l1.search]);
-  const sort = useDeferredValue(queryParams[q_cat_keys.level.l2.sort]) as TSort;
+  const search = useDeferredValue(queryParams[q_cat_keys.level.l1.search] ?? '');
+  const sort = useDeferredValue(queryParams[q_cat_keys.level.l2.sort]) as TSort | undefined;
   const [selectedId, setSelectedId] = useState('');
-  const [editData, setEditData] = useState<TCatModal | null>(null);
+  const [editData, setEditData] = useState<ICatModal | null>(null);
   const [deleteId, setDeleteId] = useState('');
   const {
     data: categories = EMPTY_ARRAY,
@@ -299,7 +304,7 @@ const L1Table = () => {
 
   const deleteCategory = useDeleteCategory({ categoryId: deleteId });
 
-  const handleEdit = (data: TCatModal) => {
+  const handleEdit = (data: ICatModal) => {
     setEditData(data);
 
     setParams({ [q_cat_keys.mode]: q_cat_keys.edit });
@@ -325,14 +330,20 @@ const L1Table = () => {
     [categories, search, sort],
   );
 
+  /**
+   * Intentionally runs once on mount only, to clear a stray leftover `?mode=` param left over from
+   * a previous session/reload - re-running this on every query-param change would close the
+   * add/edit modal the moment the user opens it.
+   */
   useEffect(() => {
     removeParams([q_cat_keys.mode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div className="border-primary/10 bg-secondary-invert rounded-xl border">
       <CategoryTableTopInfo
-        badgeText={`${filteredCats.length}/${categories.length} items`}
+        badgeText={`${String(filteredCats.length)}/${String(categories.length)} items`}
         level={CATEGORY_LEVELS_MAP.L1}
         name=""
         className="flex w-full flex-row-reverse items-center justify-between gap-3 space-y-0!"
@@ -349,9 +360,9 @@ const L1Table = () => {
                 <Fragment key={category._id}>
                   <CategoryRow
                     category={category}
-                    onClick={() =>
-                      setSelectedId((prevId) => (prevId === category._id ? '' : category._id))
-                    }
+                    onClick={() => {
+                      setSelectedId((prevId) => (prevId === category._id ? '' : category._id));
+                    }}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' || event.key === ' ') {
                         event.preventDefault();
@@ -359,14 +370,18 @@ const L1Table = () => {
                       }
                     }}
                     className={`cursor-pointer ${selectedId === category._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
-                    onDelete={(categoryId) => setDeleteId(categoryId)}
+                    onDelete={(categoryId) => {
+                      setDeleteId(categoryId);
+                    }}
                     onEdit={handleEdit}
                   />
                   {selectedId === category._id && (
                     <TableRow>
                       <TableRowCell colSpan={4} className="border-b-0 px-0!">
                         <L2Table
-                          onDelete={(categoryId) => setDeleteId(categoryId)}
+                          onDelete={(categoryId) => {
+                            setDeleteId(categoryId);
+                          }}
                           onEdit={handleEdit}
                           category={category}
                         />
@@ -391,12 +406,24 @@ const L1Table = () => {
       )}
       {!!deleteId && (
         <ConfirmModal
-          modalProps={{ isOpen: !!deleteId, onClose: () => setDeleteId('') }}
+          modalProps={{
+            isOpen: !!deleteId,
+            onClose: () => {
+              setDeleteId('');
+            },
+          }}
           type="warning"
           title="Are you sure?"
           description="Are you sure you want to delete this category? This action cannot be undone."
           buttons={{
-            left: { content: 'Cancel', buttonProps: { onClick: () => setDeleteId('') } },
+            left: {
+              content: 'Cancel',
+              buttonProps: {
+                onClick: () => {
+                  setDeleteId('');
+                },
+              },
+            },
             right: { content: 'Delete', buttonProps: { onClick: handleDelete } },
           }}
         />
@@ -436,7 +463,11 @@ const Categories = () => {
               content: 'Add',
               pattern: 'primary',
               leftIcon: { icon: 'solar:add-circle-linear', className: '*:stroke-[2.5]' },
-              buttonProps: { onClick: () => setParams({ [q_cat_keys.mode]: q_cat_keys.add }) },
+              buttonProps: {
+                onClick: () => {
+                  setParams({ [q_cat_keys.mode]: q_cat_keys.add });
+                },
+              },
             },
           ],
         }}

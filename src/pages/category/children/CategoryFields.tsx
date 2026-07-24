@@ -1,8 +1,3 @@
-import Input from '@/components/ui/inputs/Input';
-import Select from '@/components/ui/inputs/Select';
-import Tooltip from '@/components/ui/Tooltip';
-import { EMPTY_ARRAY } from '@/constants/common.constants';
-import type { TCategory } from '@/types/api.type';
 import { CATEGORY_LEVELS_MAP } from '@beautinique/frontend-constants';
 import type {
   TCategoryZodSchema,
@@ -11,21 +6,27 @@ import type {
   TL3CategoryZodSchema,
 } from '@beautinique/frontend-types';
 import {
-  Controller,
   type Control,
+  Controller,
   type FieldErrors,
   type UseFormRegister,
   type UseFormResetField,
 } from 'react-hook-form';
 
-type TCommonFields = {
+import Input from '@/components/ui/inputs/Input';
+import Select from '@/components/ui/inputs/Select';
+import Tooltip from '@/components/ui/Tooltip';
+import { EMPTY_ARRAY } from '@/constants/common.constants';
+import type { TCategory } from '@/types/api.type';
+
+interface TCommonFields {
   register: UseFormRegister<TCategoryZodSchema>;
   errors: FieldErrors<TCategoryZodSchema>;
   control: Control<TCategoryZodSchema>;
   level: TCategoryZodSchema['level'];
   resetField: UseFormResetField<TCategoryZodSchema>;
   isLevelDisabled: boolean;
-};
+}
 
 type TLevel1Fields = TCommonFields & Pick<TL1CategoryZodSchema, 'level'>;
 
@@ -65,7 +66,7 @@ const CommonFields = ({
             label="Category level"
             options={['Main', 'Sub', 'Product'].map((name, i) => ({
               value: i + CATEGORY_LEVELS_MAP.L1,
-              label: `L${i + CATEGORY_LEVELS_MAP.L1} - ${name} category`,
+              label: `L${String(i + CATEGORY_LEVELS_MAP.L1)} - ${name} category`,
               disabled: i + 1 === level,
             }))}
             error={errors.level?.message}
@@ -144,7 +145,7 @@ export const Level2Fields = ({
         render={({ field: { onChange } }) => (
           <Select
             label="Main category"
-            options={level1Cats?.map((cat: TCategory) => ({ label: cat.name, value: cat._id }))}
+            options={level1Cats.map((cat: TCategory) => ({ label: cat.name, value: cat._id }))}
             error={'mainCategory' in errors ? errors.mainCategory?.message : undefined}
             selectProps={{
               value: mainCategory,
@@ -191,7 +192,7 @@ export const Level3Fields = ({
         render={({ field: { onChange } }) => (
           <Select
             label="Main category"
-            options={level1Cats?.map((cat: TCategory) => ({ label: cat.name, value: cat._id }))}
+            options={level1Cats.map((cat: TCategory) => ({ label: cat.name, value: cat._id }))}
             error={'mainCategory' in errors ? errors.mainCategory?.message : undefined}
             selectProps={{
               value: mainCategory,
@@ -212,7 +213,7 @@ export const Level3Fields = ({
         render={({ field: { onChange } }) => (
           <Select
             label="Sub-category"
-            options={level2Cats?.map((cat) => ({ label: cat.name, value: cat._id }))}
+            options={level2Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
             error={'subCategory' in errors ? errors.subCategory?.message : undefined}
             selectProps={{
               value: subCategory,
