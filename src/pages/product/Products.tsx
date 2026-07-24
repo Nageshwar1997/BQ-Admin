@@ -57,7 +57,9 @@ const SearchAndSort = () => {
         label: category.name,
         searchLabel: category.name,
         value: category._id,
-        children: category.subcategories.length ? mapCategoryHierarchy(category.subcategories) : [],
+        children: category.subcategories?.length
+          ? mapCategoryHierarchy(category.subcategories)
+          : [],
       }));
     };
 
