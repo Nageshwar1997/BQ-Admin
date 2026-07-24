@@ -1,15 +1,16 @@
+import type { TProductDescriptionAndContentZodSchema } from '@beautinique/frontend-types';
+import { Controller, type UseFormReturn } from 'react-hook-form';
+
 import QuillInput from '@/components/ui/inputs/quillInput';
 import Textarea from '@/components/ui/inputs/Textarea';
 import { PRODUCT_DESCRIPTION_AND_CONTENT_INPUT_MAP_DATA } from '@/constants/input.constants';
 import type { TProductQuillImageRefs, TProductQuillRefs } from '@/types/common.type';
-import type { TProductDescriptionAndContentZodSchema } from '@beautinique/frontend-types';
-import { Controller, type UseFormReturn } from 'react-hook-form';
 
-type Props = {
+interface Props {
   form: UseFormReturn<TProductDescriptionAndContentZodSchema>;
   imageRefs: TProductQuillImageRefs;
   quillRefs: TProductQuillRefs;
-};
+}
 
 const AddProductDescriptionAndContentFields = ({ form, imageRefs, quillRefs }: Props) => {
   return (

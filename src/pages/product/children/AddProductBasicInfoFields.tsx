@@ -1,3 +1,6 @@
+import type { TProductBasicInfoZodSchema } from '@beautinique/frontend-types';
+import { Controller, type UseFormReturn,useWatch } from 'react-hook-form';
+
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import {
@@ -5,13 +8,11 @@ import {
   PRODUCT_CATEGORIES_SELECT_MAP_DATA,
 } from '@/constants/input.constants';
 import type { TCategory } from '@/types/api.type';
-import type { TCategoryLevelsMap, TProductBasicInfoZodSchema } from '@beautinique/frontend-types';
-import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
-type Props = {
+interface Props {
   form: UseFormReturn<TProductBasicInfoZodSchema>;
-  categories: Record<keyof TCategoryLevelsMap, TCategory[]>;
-};
+  categories: Record<'L1' | 'L2' | 'L3', TCategory[]>;
+}
 
 const AddProductBasicInfoFields = ({ form, categories }: Props) => {
   const l1Category = useWatch({ control: form.control, name: 'l1Category' });

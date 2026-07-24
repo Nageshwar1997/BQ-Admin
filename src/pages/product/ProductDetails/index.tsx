@@ -1,3 +1,6 @@
+import { Icon } from '@iconify/react';
+import { useMemo } from 'react';
+
 import ApiStatus from '@/components/layout/ApiStatus';
 import { MediaCarouselWithParentMedia } from '@/components/layout/carousels/MediaCarouselWithParentMedia';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
@@ -12,8 +15,6 @@ import useQueryParams from '@/hooks/useQueryParams';
 import { useGetDashboardProductBySlug } from '@/services/product-service/product.service.query';
 import type { TMediaOption } from '@/types/component.type';
 import { formatDate, formatINRCurrency, isNullOrUndefined } from '@/utils/common.util';
-import { Icon } from '@iconify/react';
-import { useMemo } from 'react';
 
 const ProductDetails = () => {
   const { pathParams } = usePathParams();
@@ -25,7 +26,7 @@ const ProductDetails = () => {
     return product.hasVariants
       ? product.variants.find((variant) => variant.sku === queryParams.v)
       : null;
-  }, [queryParams.v]);
+  }, [product, queryParams.v]);
 
   const media = useMemo(() => {
     if (!product) return [];
@@ -75,13 +76,14 @@ const ProductDetails = () => {
       originalPrice: variant?.originalPrice || product.originalPrice,
       stock: product?.hasVariants ? variant?.stock : 'stock' in product ? product.stock : null,
     };
-  }, [variant?.discount, product?.discount]);
+  }, [product, variant]);
 
   return (
     <PageWrapper
       navbar={{
         components: [
           <Select
+            key="status-select"
             options={
               product?.status
                 ? PRODUCT_STATUS_TRANSITIONS[product.status]?.map((status) => ({
@@ -256,10 +258,10 @@ const ProductDetails = () => {
               <div className="bg-tertiary-invert/50 rounded-lg px-4 py-3">
                 <div className="flex items-center gap-2 text-sm">
                   <div
-                    className={`shrink-0 rounded-full p-1 ${!!stock ? 'bg-jade-c/40' : 'bg-princeton-orange-c/40'}`}
+                    className={`shrink-0 rounded-full p-1 ${stock ? 'bg-jade-c/40' : 'bg-princeton-orange-c/40'}`}
                   >
                     <div
-                      className={`rounded-full p-1 ${!!stock ? 'bg-jade-c' : 'bg-princeton-orange-c'}`}
+                      className={`rounded-full p-1 ${stock ? 'bg-jade-c' : 'bg-princeton-orange-c'}`}
                     />
                   </div>
                   <span className="text-secondary/70 leading-normal font-medium">
@@ -318,7 +320,9 @@ const ProductDetails = () => {
                           key={`variant-${index}`}
                           role="button"
                           className={`cursor-pointer text-center text-[11px]/3.5 ${active ? 'text-tertiary' : 'text-tertiary/80'}`}
-                          onClick={() => setParams({ v: v.sku })}
+                          onClick={() => {
+                            setParams({ v: v.sku });
+                          }}
                         >
                           {isColor ? (
                             <div className={`flex flex-col items-center gap-1`}>
@@ -367,9 +371,10 @@ const ProductDetails = () => {
                     key={index}
                     title={title}
                     defaultOpen={index === 0}
-                    children={<QuillContent content={content} />}
                     className="[&>button]:border-y-primary/30 [&>button]:border-y"
-                  />
+                  >
+                    <QuillContent content={content} />
+                  </Dropdown>
                 );
               })}
             </div>

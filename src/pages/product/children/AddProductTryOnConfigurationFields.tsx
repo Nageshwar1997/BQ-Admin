@@ -1,14 +1,15 @@
-import Checkbox from '@/components/ui/inputs/Checkbox';
-import Select from '@/components/ui/inputs/Select';
-import { PRODUCT_TRYON_INPUT_MAP_DATA } from '@/constants/input.constants';
 import { TRY_ON_CATEGORIES, TRY_ON_MAP } from '@beautinique/frontend-constants';
 import type { TProductTryOnConfigurationZodSchema } from '@beautinique/frontend-types';
 import { useMemo } from 'react';
-import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
+import { Controller, type UseFormReturn,useWatch } from 'react-hook-form';
 
-type Props = {
+import Checkbox from '@/components/ui/inputs/Checkbox';
+import Select from '@/components/ui/inputs/Select';
+import { PRODUCT_TRYON_INPUT_MAP_DATA } from '@/constants/input.constants';
+
+interface Props {
   form: UseFormReturn<TProductTryOnConfigurationZodSchema>;
-};
+}
 
 const AddProductTryOnConfigurationFields = ({ form }: Props) => {
   const {
@@ -23,7 +24,7 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
 
   const subCategories = useMemo(() => {
     return tryOn?.category ? TRY_ON_MAP[tryOn.category] : [];
-  }, [tryOn?.category]);
+  }, [tryOn]);
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -64,7 +65,7 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
             register={register('enabled')}
             error={errors.enabled?.message}
             content="Enable TryOn"
-            checkboxProps={{ name: 'enabled', onChange: () => resetField('tryOn') }}
+            checkboxProps={{ name: 'enabled', onChange: () => { resetField('tryOn'); } }}
             containerClassName="col-span-2"
           />
         );

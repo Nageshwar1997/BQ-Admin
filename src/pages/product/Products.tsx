@@ -1,3 +1,10 @@
+import { SORT_MAP } from '@beautinique/frontend-constants';
+import type { TCategoryLevel, TProductStatus, TSort } from '@beautinique/frontend-types';
+import { Icon } from '@iconify/react';
+import { useEffect, useMemo, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+import { Link } from 'react-router-dom';
+
 import ApiStatus from '@/components/layout/ApiStatus';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
@@ -23,16 +30,10 @@ import { useGetDashboardProducts } from '@/services/product-service/product.serv
 import type { TCategoryHierarchyNode, TProductSortBy } from '@/types/api.type';
 import type { IHierarchySelectOption } from '@/types/input.type';
 import { formatDate, formatINRCurrency } from '@/utils/common.util';
-import { SORT_MAP } from '@beautinique/frontend-constants';
-import type { TCategoryLevel, TProductStatus, TSort } from '@beautinique/frontend-types';
-import { Icon } from '@iconify/react';
-import { useEffect, useMemo, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
-import { Link } from 'react-router-dom';
 
 const SearchAndSort = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
-  const [searchQuery, setSearchQuery] = useState(queryParams?.search || '');
+  const [searchQuery, setSearchQuery] = useState(queryParams.search ?? '');
 
   const { data: hierarchy, isLoading, isError } = useGetCategoriesHierarchy();
 
@@ -56,9 +57,7 @@ const SearchAndSort = () => {
         label: category.name,
         searchLabel: category.name,
         value: category._id,
-        children: category.subcategories?.length
-          ? mapCategoryHierarchy(category.subcategories)
-          : [],
+        children: category.subcategories.length ? mapCategoryHierarchy(category.subcategories) : [],
       }));
     };
 
@@ -86,11 +85,11 @@ const SearchAndSort = () => {
       />
       <HierarchySelect
         selectProps={{
-          value: queryParams.category || '',
+          value: queryParams.category ?? '',
           placeholder: 'Select Category',
           onChange: (value) => {
             if (value) {
-              setParams({ category: `${value}` });
+              setParams({ category: String(value) });
             } else {
               removeParams(['category']);
             }
@@ -102,7 +101,9 @@ const SearchAndSort = () => {
             right: {
               icon: 'lucide:x',
               className: 'cursor-pointer size-4',
-              onClick: () => removeParams(['category']),
+              onClick: () => {
+                removeParams(['category']);
+              },
             },
           }),
         }}
@@ -152,7 +153,7 @@ const Products = () => {
 
   useEffect(() => {
     if (inView && hasNextPage) {
-      fetchNextPage();
+      void fetchNextPage();
     }
   }, [inView, hasNextPage, fetchNextPage]);
 
@@ -171,12 +172,13 @@ const Products = () => {
         ...(data?.counts && {
           components: [
             <Select
-              options={Object.entries(data?.counts ?? {}).map(([key, value]) => ({
+              key="status-count-select"
+              options={Object.entries(data.counts).map(([key, value]) => ({
                 value: key.toLowerCase(),
-                label: `${key} (${value})`.toLowerCase(),
+                label: `${key} (${String(value)})`.toLowerCase(),
               }))}
               selectProps={{
-                value: queryParams.status || 'all',
+                value: queryParams.status ?? 'all',
                 onChange: (value) => {
                   if (!value || value === 'all') {
                     removeParams(['status', 'search']);
@@ -198,7 +200,7 @@ const Products = () => {
       }}
     >
       <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
-        {!!data?.products?.length && (
+        {!!data?.products.length && (
           <ScrollableGradientContainer
             direction="horizontal"
             gradientClassNames={{ left: 'from-secondary-invert', right: 'from-secondary-invert' }}
@@ -208,9 +210,11 @@ const Products = () => {
                 <TableRow>
                   {PRODUCTS_TABLE_TITLES.map(({ label, sortKey }, index) => (
                     <TableHeadCell
-                      key={`th-${index}`}
+                      key={`th-${String(index)}`}
                       className={`${sortKey ? 'hover:text-primary/90 cursor-pointer select-none' : ''} `}
-                      onClick={() => sortKey && handleSort(sortKey)}
+                      onClick={() => {
+                        if (sortKey) handleSort(sortKey);
+                      }}
                     >
                       <div className="flex items-center justify-center gap-1">
                         {label}
@@ -235,7 +239,7 @@ const Products = () => {
                 {data.products.map((product, index) => {
                   return (
                     <TableRow
-                      key={product._id + index}
+                      key={`${product._id}-${String(index)}`}
                       tabIndex={0}
                       className="border-y-primary/5 odd:bg-primary/5 even:bg-primary/2.5 border-y first:border-t-0 last:border-b-0 [&>td]:px-3 [&>td]:py-2 [&>td]:text-xs"
                       ref={index === data.products.length - 4 ? ref : undefined}

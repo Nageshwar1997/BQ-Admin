@@ -1,10 +1,3 @@
-import MediaCarouselWithModal from '@/components/layout/carousels/MediaCarouselWithModal';
-import Button from '@/components/ui/Button';
-import Checkbox from '@/components/ui/inputs/Checkbox';
-import { QuillContent } from '@/components/ui/QuillContent';
-import type { TAddProductStepNumber } from '@/types/common.type';
-import type { TClassName } from '@/types/component.type';
-import { formatINRCurrency } from '@/utils/common.util';
 import type {
   TConfirmDetailsZodSchema,
   TDraftProductDetailsZodSchema,
@@ -13,11 +6,19 @@ import { Icon } from '@iconify/react';
 import type { ReactNode } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
 
-type Props = {
+import MediaCarouselWithModal from '@/components/layout/carousels/MediaCarouselWithModal';
+import Button from '@/components/ui/Button';
+import Checkbox from '@/components/ui/inputs/Checkbox';
+import { QuillContent } from '@/components/ui/QuillContent';
+import type { TAddProductStepNumber } from '@/types/common.type';
+import type { IClassName } from '@/types/component.type';
+import { formatINRCurrency } from '@/utils/common.util';
+
+interface Props {
   form: UseFormReturn<TConfirmDetailsZodSchema>;
   values: TDraftProductDetailsZodSchema;
   onEdit: (step: TAddProductStepNumber) => void;
-};
+}
 
 const Heading = ({ title, onEdit }: { title: string; onEdit: () => void }) => (
   <div className="text-primary flex items-center gap-2">
@@ -35,7 +36,7 @@ const KeyValue = ({
   label,
   value,
   className = '',
-}: { label: string; value: string | ReactNode } & TClassName) => {
+}: { label: string; value: string | ReactNode } & IClassName) => {
   return (
     <div className={`space-y-1 ${className}`}>
       <p className="text-tertiary/70 text-xs font-medium tracking-tight uppercase">{label}</p>
@@ -168,53 +169,52 @@ const StockAndVariants = ({
           <KeyValue label="Stock Threshold" value={stocks.stockThreshold} />
         </div>
       )}
-      {variants &&
-        variants.map((variant, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6"
-          >
-            {variant.thumbnail && (
-              <KeyValue
-                label="Thumbnail"
-                value={
-                  <MediaCarouselWithModal
-                    media={[{ type: 'image', url: variant.thumbnail as string }]}
-                    gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
-                  />
-                }
-              />
-            )}
+      {variants?.map((variant, index) => (
+        <div
+          key={index}
+          className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6"
+        >
+          {variant.thumbnail && (
             <KeyValue
-              label={variant.images.length > 1 ? 'Images' : 'Image'}
+              label="Thumbnail"
               value={
                 <MediaCarouselWithModal
-                  media={variant.images.map((image) => ({ type: 'image', url: image as string }))}
+                  media={[{ type: 'image', url: variant.thumbnail as string }]}
                   gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
                 />
               }
             />
-            <KeyValue label="Label" value={variant.label} />
-            <KeyValue
-              label={variant.type === 'Color' ? 'Color' : 'Value'}
-              value={
-                variant.type === 'Color' ? (
-                  <div style={{ backgroundColor: variant.value }} className="w-fit px-5 py-2" />
-                ) : (
-                  variant.value
-                )
-              }
-            />
-            <KeyValue label="Stock" value={variant?.stock} />
-            <KeyValue label="Stock Threshold" value={variant.stockThreshold} />
-            <KeyValue
-              label="Selling Price"
-              value={formatINRCurrency(variant.sellingPrice)}
-              className="[&>div]:text-primary-green"
-            />
-            <KeyValue label="Original Price" value={formatINRCurrency(variant.originalPrice)} />
-          </div>
-        ))}
+          )}
+          <KeyValue
+            label={variant.images.length > 1 ? 'Images' : 'Image'}
+            value={
+              <MediaCarouselWithModal
+                media={variant.images.map((image) => ({ type: 'image', url: image as string }))}
+                gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
+              />
+            }
+          />
+          <KeyValue label="Label" value={variant.label} />
+          <KeyValue
+            label={variant.type === 'Color' ? 'Color' : 'Value'}
+            value={
+              variant.type === 'Color' ? (
+                <div style={{ backgroundColor: variant.value }} className="w-fit px-5 py-2" />
+              ) : (
+                variant.value
+              )
+            }
+          />
+          <KeyValue label="Stock" value={variant?.stock} />
+          <KeyValue label="Stock Threshold" value={variant.stockThreshold} />
+          <KeyValue
+            label="Selling Price"
+            value={formatINRCurrency(variant.sellingPrice)}
+            className="[&>div]:text-primary-green"
+          />
+          <KeyValue label="Original Price" value={formatINRCurrency(variant.originalPrice)} />
+        </div>
+      ))}
     </section>
   );
 };
@@ -252,11 +252,36 @@ const AddProductConfirmFieldAndReview = ({ values, form, onEdit }: Props) => {
   } = values;
   return (
     <div className="grid gap-4">
-      <BasicInfo data={basicInfo} onEdit={() => onEdit(0)} />
-      <MediaAndGallery data={mediaAndGallery} onEdit={() => onEdit(1)} />
-      <DescriptionAndContent data={descriptionAndContent} onEdit={() => onEdit(2)} />
-      <StockAndVariants data={stockAndVariants} onEdit={() => onEdit(3)} />
-      <TryOnConfiguration data={tryOnConfiguration} onEdit={() => onEdit(4)} />
+      <BasicInfo
+        data={basicInfo}
+        onEdit={() => {
+          onEdit(0);
+        }}
+      />
+      <MediaAndGallery
+        data={mediaAndGallery}
+        onEdit={() => {
+          onEdit(1);
+        }}
+      />
+      <DescriptionAndContent
+        data={descriptionAndContent}
+        onEdit={() => {
+          onEdit(2);
+        }}
+      />
+      <StockAndVariants
+        data={stockAndVariants}
+        onEdit={() => {
+          onEdit(3);
+        }}
+      />
+      <TryOnConfiguration
+        data={tryOnConfiguration}
+        onEdit={() => {
+          onEdit(4);
+        }}
+      />
       <Checkbox
         register={form.register('confirm')}
         error={form.formState.errors.confirm?.message}

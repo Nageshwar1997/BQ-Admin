@@ -1,27 +1,3 @@
-import PageWrapper from '@/components/layout/containers/PageWrapper';
-import Button from '@/components/ui/Button';
-import Stepper from '@/components/ui/Stepper';
-import { ADD_PRODUCT_STEPS, EMPTY_ARRAY, ROUTES } from '@/constants/common.constants';
-import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
-import usePathParams from '@/hooks/usePathParams';
-import { useProcessQuillContent } from '@/hooks/useProcessQuillContent';
-import {
-  useUploadMultipleMedia,
-  useUploadSingleMedia,
-} from '@/services/media-service/media.service.query';
-import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
-import {
-  useGetDraftProduct,
-  usePublishProduct,
-  useSaveDraftProduct,
-} from '@/services/product-service/product.service.query';
-import type {
-  TAddProductStepNumber,
-  TProductQuillImageRefs,
-  TProductQuillRefs,
-} from '@/types/common.type';
-import type { TQuillImageRef } from '@/types/component.type';
-import { isDeepEqual, toaster } from '@/utils/common.util';
 import { CATEGORY_LEVELS_MAP, DRAFT_PRODUCT_STEP_MAP } from '@beautinique/frontend-constants';
 import type {
   TConfirmDetailsZodSchema,
@@ -44,6 +20,32 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
 import { useEffect, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
+
+import PageWrapper from '@/components/layout/containers/PageWrapper';
+import Button from '@/components/ui/Button';
+import Stepper from '@/components/ui/Stepper';
+import { ADD_PRODUCT_STEPS, EMPTY_ARRAY, ROUTES } from '@/constants/common.constants';
+import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
+import usePathParams from '@/hooks/usePathParams';
+import { useProcessQuillContent } from '@/hooks/useProcessQuillContent';
+import {
+  useUploadMultipleMedia,
+  useUploadSingleMedia,
+} from '@/services/media-service/media.service.query';
+import { useGetCategoriesByParentLevel } from '@/services/product-service/category.service.query';
+import {
+  useGetDraftProduct,
+  usePublishProduct,
+  useSaveDraftProduct,
+} from '@/services/product-service/product.service.query';
+import type {
+  TAddProductStepNumber,
+  TProductQuillImageRefs,
+  TProductQuillRefs,
+} from '@/types/common.type';
+import type { IQuillImageRef } from '@/types/component.type';
+import { isDeepEqual, toaster } from '@/utils/common.util';
+
 import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
 import AddProductConfirmFieldAndReview from './children/AddProductConfirmFieldAndReview';
 import AddProductDescriptionAndContentFields from './children/AddProductDescriptionAndContentFields';
@@ -76,10 +78,10 @@ const AddProduct = () => {
   };
 
   const imageRefs: TProductQuillImageRefs = {
-    description: useRef<TQuillImageRef[]>([]),
-    ingredients: useRef<TQuillImageRef[]>([]),
-    instructions: useRef<TQuillImageRef[]>([]),
-    additional: useRef<TQuillImageRef[]>([]),
+    description: useRef<IQuillImageRef[]>([]),
+    ingredients: useRef<IQuillImageRef[]>([]),
+    instructions: useRef<IQuillImageRef[]>([]),
+    additional: useRef<IQuillImageRef[]>([]),
   };
 
   const basicInfoForm = useForm<TProductBasicInfoZodSchema>({
@@ -115,6 +117,8 @@ const AddProduct = () => {
 
   const l1Category = useWatch({ control: basicInfoForm.control, name: 'l1Category' });
   const l2Category = useWatch({ control: basicInfoForm.control, name: 'l2Category' });
+  const originalPrice = useWatch({ control: basicInfoForm.control, name: 'originalPrice' });
+  const sellingPrice = useWatch({ control: basicInfoForm.control, name: 'sellingPrice' });
 
   const { data: l1Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L1,
@@ -340,7 +344,7 @@ const AddProduct = () => {
     const payload: TProductDescriptionAndContentZodSchema = {
       step: 'descriptionAndContent',
       shortDescription: data.shortDescription,
-      description: descriptionResponse as string,
+      description: descriptionResponse ?? '',
       instructions: instructionsResponse,
       ingredients: ingredientsResponse,
       additional: additionalResponse,
@@ -444,10 +448,12 @@ const AddProduct = () => {
 
   const onReviewAndConfirmSubmit = async (data: TConfirmDetailsZodSchema) => {
     if (!data.confirm) {
-      return toaster.error({
+      toaster.error({
         title: 'Please confirm details before submit.',
         description: 'Review ',
       });
+
+      return;
     }
     if (publishDraftProductQuery.isPending) return;
     await publishDraftProductQuery.mutateAsync();
@@ -457,12 +463,13 @@ const AddProduct = () => {
     if (activeStep > 0) {
       setActiveStep((prev) => (prev > 0 ? prev - 1 : prev) as TAddProductStepNumber);
     } else {
-      navigate(`/${ROUTES.PRODUCTS.BASE}`);
+      void navigate(`/${ROUTES.PRODUCTS.BASE}`);
     }
   };
 
   const stepFields = [
     <form
+      key="basicInfo"
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
       onSubmit={basicInfoForm.handleSubmit(onBasicInfoSubmit)}
     >
@@ -472,13 +479,19 @@ const AddProduct = () => {
       />
     </form>,
     <form
+      key="mediaAndGallery"
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
       onSubmit={mediaAndGalleryForm.handleSubmit(onMediaAndGallerySubmit)}
     >
       <AddProductMediaAndGalleryFields form={mediaAndGalleryForm} />
     </form>,
     <form
+      key="descriptionAndContent"
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
+      // react-hook-form's handleSubmit() only returns a wrapper function here; it doesn't
+      // invoke onDescriptionAndContentSubmit (and therefore doesn't read imageRefs/quillRefs)
+      // until the form actually submits, which is safe - the compiler can't verify that though.
+      // eslint-disable-next-line react-hooks/refs
       onSubmit={descriptionAndContentForm.handleSubmit(onDescriptionAndContentSubmit)}
     >
       <AddProductDescriptionAndContentFields
@@ -488,30 +501,35 @@ const AddProduct = () => {
       />
     </form>,
     <form
+      key="stockAndVariants"
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
       onSubmit={stockAndVariantsForm.handleSubmit(onStockAndVariantsSubmit)}
     >
       <AddProductStockAndVariantsFields
         form={stockAndVariantsForm}
         defaultPrices={{
-          originalPrice: basicInfoForm.watch('originalPrice'),
-          sellingPrice: basicInfoForm.watch('sellingPrice'),
+          originalPrice,
+          sellingPrice,
         }}
       />
     </form>,
     <form
+      key="tryOnConfiguration"
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
       onSubmit={tryOnConfigurationForm.handleSubmit(onTryOnConfigurationSubmit)}
     >
       <AddProductTryOnConfigurationFields form={tryOnConfigurationForm} />
     </form>,
     <form
+      key="reviewAndConfirm"
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
       onSubmit={reviewAndConfirmForm.handleSubmit(onReviewAndConfirmSubmit)}
     >
       <AddProductConfirmFieldAndReview
         form={reviewAndConfirmForm}
-        onEdit={(step) => setActiveStep(step)}
+        onEdit={(step) => {
+          setActiveStep(step);
+        }}
         values={{
           basicInfo: basicInfoForm.getValues(),
           mediaAndGallery: mediaAndGalleryForm.getValues(),
@@ -544,7 +562,16 @@ const AddProduct = () => {
     if (draftProduct.tryOnConfiguration) {
       tryOnConfigurationForm.reset(draftProduct.tryOnConfiguration);
     }
-  }, [draftProduct]);
+  }, [
+    draftProduct,
+    isDraftProductLoading,
+    isDraftProductError,
+    basicInfoForm,
+    mediaAndGalleryForm,
+    descriptionAndContentForm,
+    stockAndVariantsForm,
+    tryOnConfigurationForm,
+  ]);
 
   return (
     <PageWrapper>
@@ -552,10 +579,10 @@ const AddProduct = () => {
         <div className="flex flex-col gap-5">
           <div>
             <p className="text-primary text-sm font-semibold">
-              {ADD_PRODUCT_STEPS[activeStep].title}
+              {ADD_PRODUCT_STEPS[activeStep]?.title}
             </p>
 
-            <p className="text-secondary text-xs">{ADD_PRODUCT_STEPS[activeStep].description}</p>
+            <p className="text-secondary text-xs">{ADD_PRODUCT_STEPS[activeStep]?.description}</p>
           </div>
 
           {stepFields[activeStep]}

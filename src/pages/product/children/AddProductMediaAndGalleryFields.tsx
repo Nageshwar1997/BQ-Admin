@@ -1,13 +1,14 @@
+import { VIDEO_MIMES } from '@beautinique/frontend-constants';
+import type { TProductMediaAndGalleryZodSchema } from '@beautinique/frontend-types';
+import { Controller, type UseFormReturn,useWatch } from 'react-hook-form';
+
 import FileInput from '@/components/ui/inputs/FileInput';
 import { PRODUCT_MEDIA_AND_GALLERY_INPUT_MAP_DATA } from '@/constants/input.constants';
 import { toErrorMessageArray } from '@/utils/form.util';
-import { VIDEO_MIMES } from '@beautinique/frontend-constants';
-import type { TProductMediaAndGalleryZodSchema } from '@beautinique/frontend-types';
-import { Controller, useWatch, type UseFormReturn } from 'react-hook-form';
 
-type Props = {
+interface Props {
   form: UseFormReturn<TProductMediaAndGalleryZodSchema>;
-};
+}
 
 const AddProductMediaAndGalleryFields = ({ form }: Props) => {
   const images = useWatch({ control: form.control, name: 'images' });

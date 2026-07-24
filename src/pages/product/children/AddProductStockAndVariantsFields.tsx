@@ -1,3 +1,18 @@
+import { VARIANT_TYPES_MAP } from '@beautinique/frontend-constants';
+import type {
+  TProductBasicInfoZodSchema,
+  TProductStockAndVariantsZodSchema,
+  TProductWithoutVariantsZodSchema,
+  TProductWithVariantsZodSchema,
+} from '@beautinique/frontend-types';
+import {
+  Controller,
+  type FieldErrors,
+  useFieldArray,
+  type UseFormReturn,
+  useWatch,
+} from 'react-hook-form';
+
 import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import ColorInput from '@/components/ui/inputs/colorInput';
@@ -8,25 +23,11 @@ import { PRODUCT_VARIANT_ACTIONS } from '@/constants/common.constants';
 import { PRODUCT_VARIANT_INPUT_MAP_DATA, STOCKS_INPUT_MAP_DATA } from '@/constants/input.constants';
 import { toaster } from '@/utils/common.util';
 import { toErrorMessageArray } from '@/utils/form.util';
-import { VARIANT_TYPES_MAP } from '@beautinique/frontend-constants';
-import type {
-  TProductBasicInfoZodSchema,
-  TProductStockAndVariantsZodSchema,
-  TProductWithoutVariantsZodSchema,
-  TProductWithVariantsZodSchema,
-} from '@beautinique/frontend-types';
-import {
-  Controller,
-  useFieldArray,
-  useWatch,
-  type FieldErrors,
-  type UseFormReturn,
-} from 'react-hook-form';
 
-type Props = {
+interface Props {
   form: UseFormReturn<TProductStockAndVariantsZodSchema>;
   defaultPrices: Pick<TProductBasicInfoZodSchema, 'originalPrice' | 'sellingPrice'>;
-};
+}
 
 const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
   const EMPTY_VARIANT: TProductWithVariantsZodSchema['variants'][number] = {
@@ -224,7 +225,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                           form.clearErrors(`variants.${index}`);
                         } else if (action.content === 'Add') {
                           const isInvalid =
-                            !currentVariant.type ||
+                            !currentVariant?.type ||
                             !currentVariant.label ||
                             !currentVariant.value ||
                             Number.isNaN(currentVariant.originalPrice) ||
@@ -234,10 +235,12 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                             !currentVariant.images?.length;
 
                           if (isInvalid) {
-                            return toaster.warning({
+                            toaster.warning({
                               title: 'Required',
                               description: 'Please fill all required fields.',
                             });
+
+                            return;
                           }
                         }
                       },
