@@ -1,18 +1,13 @@
+import { Icon } from '@iconify/react';
+import { Fragment } from 'react';
+
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import Button from '@/components/ui/Button';
 import Theme from '@/components/ui/Theme';
 import useUserStore from '@/stores/user.store';
-import type { IButton, TChildren, TClassName } from '@/types/component.type';
-import { Icon } from '@iconify/react';
-import { Fragment, type ReactNode } from 'react';
+import type { INavbar } from '@/types/component.type';
 
-const Navbar = ({
-  buttons,
-  children,
-  components,
-  className = '',
-}: { components?: ReactNode[]; buttons?: Partial<IButton & TChildren>[] } & Partial<TChildren> &
-  TClassName) => {
+const Navbar = ({ buttons, children, components, className = '' }: INavbar) => {
   const user = useUserStore((s) => s.user);
 
   return (
@@ -24,7 +19,7 @@ const Navbar = ({
           <div className="size-6 md:size-8">
             {user?.avatar ? (
               <img
-                src={user?.avatar}
+                src={user.avatar}
                 alt={`${user.firstName} ${user.lastName}`}
                 loading="lazy"
                 referrerPolicy="no-referrer"
@@ -36,28 +31,28 @@ const Navbar = ({
           </div>
           <Theme className="size-6 md:size-8" />
         </div>
-        {(components || buttons) && (
+        {(!!components || !!buttons) && (
           <div className="base:gap-3 flex flex-1 items-center justify-end gap-2 md:gap-4">
-            {components &&
-              components.map((component, index) => <Fragment key={index}>{component}</Fragment>)}
-            {buttons &&
-              buttons.map((props, idx) => {
-                const { children, ...rest } = props;
-                const isFirst = idx === 0;
-                const isSecond = idx === 1;
-                const pattern = isFirst ? 'tertiary' : isSecond ? 'secondary' : 'primary';
-                const content = isFirst ? 'Save' : isSecond ? 'Cancel' : 'Submit';
-                return (
-                  <div key={idx} className="relative">
-                    <Button
-                      {...rest}
-                      pattern={rest.pattern || pattern}
-                      content={rest.content || content}
-                    />
-                    {children}
-                  </div>
-                );
-              })}
+            {components?.map((component, index) => (
+              <Fragment key={index}>{component}</Fragment>
+            ))}
+            {buttons?.map((props, idx) => {
+              const { children, ...rest } = props;
+              const isFirst = idx === 0;
+              const isSecond = idx === 1;
+              const pattern = isFirst ? 'tertiary' : isSecond ? 'secondary' : 'primary';
+              const content = isFirst ? 'Save' : isSecond ? 'Cancel' : 'Submit';
+              return (
+                <div key={idx} className="relative">
+                  <Button
+                    {...rest}
+                    pattern={rest.pattern ?? pattern}
+                    content={rest.content ?? content}
+                  />
+                  {children}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

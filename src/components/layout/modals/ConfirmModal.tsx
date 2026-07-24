@@ -1,10 +1,12 @@
+import { Icon } from '@iconify/react';
+import { useMemo } from 'react';
+
 import Button from '@/components/ui/Button';
 import GradientText from '@/components/ui/GradientText';
 import { TOAST_TYPE } from '@/constants/common.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import type { TConfirmModal } from '@/types/component.type';
-import { Icon } from '@iconify/react';
-import { useMemo } from 'react';
+
 import { ModalWrapper } from './ModalWrapper';
 
 const cardConfig = (type: TConfirmModal['type']) => {
@@ -38,11 +40,14 @@ export const ConfirmModal = ({
     <ModalWrapper
       {...modalProps}
       isOpen={modalProps?.isOpen ?? !!queryParams.confirm}
-      onClose={() => (modalProps?.onClose, removeParams('confirm'))}
-      className={`max-w-sm border-2 ${modalProps?.className || ''}`}
+      onClose={() => {
+        modalProps?.onClose();
+        removeParams('confirm');
+      }}
+      className={`max-w-sm border-2 ${modalProps?.className ?? ''}`}
       containerProps={{
         ...modalProps?.containerProps,
-        className: `p-6! ${modalProps?.containerProps?.className || ''}`,
+        className: `p-6! ${modalProps?.containerProps?.className ?? ''}`,
         onClick: (e) => (e.stopPropagation(), modalProps?.containerProps?.onClick?.(e)),
       }}
       style={{
@@ -84,7 +89,7 @@ export const ConfirmModal = ({
               <Button
                 pattern="secondary"
                 {...buttons.left}
-                className={`max-h-10 rounded-md! ${buttons.left.className || ''}`}
+                className={`max-h-10 rounded-md! ${buttons.left.className ?? ''}`}
                 buttonProps={{
                   ...buttons.left.buttonProps,
                   onClick: (e) => {
@@ -99,7 +104,7 @@ export const ConfirmModal = ({
               <Button
                 pattern="primary"
                 {...buttons.right}
-                className={`max-h-10 rounded-md! ${buttons.right.className || ''}`}
+                className={`max-h-10 rounded-md! ${buttons.right.className ?? ''}`}
                 buttonProps={{
                   ...buttons.right.buttonProps,
                   onClick: (e) => {

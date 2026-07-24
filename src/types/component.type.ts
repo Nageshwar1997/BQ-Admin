@@ -124,13 +124,15 @@ interface TCustomConfirmModal extends IChildren {
   buttons?: Partial<Record<'left' | 'right', Omit<IButton, 'pattern'>>>;
 }
 
-interface IDefaultConfirmModal extends ITitleDescription {
+interface IDefaultConfirmModal {
   type:
     | typeof TOAST_TYPE.success
     | typeof TOAST_TYPE.error
     | typeof TOAST_TYPE.warning
     | typeof TOAST_TYPE.default;
   children?: never;
+  title: string;
+  description?: string;
   buttons: Partial<Record<'left' | 'right', Omit<IButton, 'pattern'>>>;
 }
 

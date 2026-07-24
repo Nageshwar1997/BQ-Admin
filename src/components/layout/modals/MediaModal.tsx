@@ -1,5 +1,7 @@
+import { useCallback, useEffect } from 'react';
+
 import type { IMediaCarouselWithParent } from '@/types/component.type';
-import { useEffect } from 'react';
+
 import { MediaCarouselWithParentMedia } from '../carousels/MediaCarouselWithParentMedia';
 import { ModalWrapper } from './ModalWrapper';
 
@@ -18,14 +20,14 @@ export const MediaModal = ({
   opened: boolean;
   onClose: (isOpen: boolean) => void;
 }) => {
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     onClose(false);
     setCurrentIndex(null);
-  };
+  }, [onClose, setCurrentIndex]);
 
   useEffect(() => {
     if (media.length === 0) handleClose();
-  }, [media.length]);
+  }, [media.length, handleClose]);
 
   if (media.length === 0) return null;
   return (
@@ -46,7 +48,7 @@ export const MediaModal = ({
           autoPlay: videoProps?.autoPlay ?? true,
           muted: videoProps?.muted ?? true,
           loop: videoProps?.loop ?? true,
-          className: `object-contain! bg-primary/10 backdrop-blur-xs rounded-lg ${videoProps?.className || ''}`,
+          className: `object-contain! bg-primary/10 backdrop-blur-xs rounded-lg ${videoProps?.className ?? ''}`,
         }}
       />
     </ModalWrapper>

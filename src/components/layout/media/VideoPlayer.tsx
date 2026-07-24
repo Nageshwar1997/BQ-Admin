@@ -1,22 +1,26 @@
-import { EMPTY_OBJECT, VIDEO_PLACEHOLDER } from '@/constants/common.constants';
-import type { IVideoPlayer } from '@/types/component.type';
-import { convertVideoToPoster } from '@/utils/common.util';
 import Hls from 'hls.js';
 import { useEffect, useRef, useState } from 'react';
 
+import { VIDEO_PLACEHOLDER } from '@/constants/common.constants';
+import type { IVideoPlayer } from '@/types/component.type';
+import { convertVideoToPoster } from '@/utils/common.util';
+
 const VideoPlayer = ({
   className = '',
-  videoProps = EMPTY_OBJECT,
+  videoProps,
   ref,
   showPosterOnly,
 }: IVideoPlayer) => {
-  const videoRef = useRef<HTMLVideoElement | null>(ref?.current ?? null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const [poster, setPoster] = useState<string | undefined>(videoProps.poster);
+  const setVideoRef = (node: HTMLVideoElement | null) => {
+    videoRef.current = node;
 
-  useEffect(() => {
-    setPoster(videoProps.poster);
-  }, [videoProps.poster]);
+    if (ref) ref.current = node;
+  };
+
+  const [generatedPoster, setGeneratedPoster] = useState<string | undefined>(undefined);
+  const poster = videoProps.poster ?? generatedPoster;
 
   useEffect(() => {
     let isMounted = true;
@@ -25,17 +29,17 @@ const VideoPlayer = ({
       if (!videoProps.src || videoProps.poster) return;
 
       try {
-        const generatedPoster = await convertVideoToPoster(videoProps.src);
+        const generated = await convertVideoToPoster(videoProps.src);
 
         if (isMounted) {
-          setPoster(generatedPoster);
+          setGeneratedPoster(generated);
         }
       } catch (error) {
         console.error('Poster generation failed:', error);
       }
     };
 
-    loadPoster();
+    void loadPoster();
 
     return () => {
       isMounted = false;
@@ -67,7 +71,7 @@ const VideoPlayer = ({
 
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           if (videoProps.autoPlay) {
-            video.play().catch((err) => {
+            video.play().catch((err: unknown) => {
               console.warn('Autoplay blocked:', err);
             });
           }
@@ -79,7 +83,7 @@ const VideoPlayer = ({
           'loadedmetadata',
           () => {
             if (videoProps.autoPlay) {
-              video.play().catch((err) => {
+              video.play().catch((err: unknown) => {
                 console.warn('Autoplay blocked:', err);
               });
             }
@@ -98,14 +102,14 @@ const VideoPlayer = ({
     <div className={`h-full w-full ${className}`}>
       {showPosterOnly ? (
         <img
-          src={poster || VIDEO_PLACEHOLDER}
+          src={poster ?? VIDEO_PLACEHOLDER}
           alt="video-thumbnail"
           className={`aspect-auto h-full w-full object-cover ${videoProps.className ?? ''}`}
         />
       ) : (
         <video
           key={videoProps.src}
-          ref={videoRef}
+          ref={setVideoRef}
           {...videoProps}
           playsInline={videoProps.playsInline ?? true}
           autoPlay={videoProps.autoPlay ?? true}
