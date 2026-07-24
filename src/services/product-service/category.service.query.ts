@@ -3,13 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { categoryApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
 import { EMPTY_ARRAY } from '@/constants/common.constants';
-import type {
-  TCategory,
-  TCategoryHierarchy,
-  TL1Category,
-  TL2Category,
-  TL3Category,
-} from '@/types/api.type';
+import type { TL1Category, TL2Category, TL3Category } from '@/types/api.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
 
@@ -112,7 +106,7 @@ export const useGetCategoriesByParentLevel = ({
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     refetchOnReconnect: true,
-    select: (data) => (data?.data || EMPTY_ARRAY) as TCategory[],
+    select: (data) => data.data ?? EMPTY_ARRAY,
   });
 };
 
@@ -134,6 +128,6 @@ export const useGetCategoriesHierarchy = () => {
 
     // UX
     placeholderData: (prev) => prev,
-    select: (data) => (data?.data || EMPTY_ARRAY) as TCategoryHierarchy[],
+    select: (data) => data.data ?? EMPTY_ARRAY,
   });
 };

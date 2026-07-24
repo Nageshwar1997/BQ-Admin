@@ -1,10 +1,16 @@
-import type { TDraftProductStepBodyZodSchema } from '@beautinique/frontend-types';
+import type {
+  TDraftProductDetailsZodSchema,
+  TDraftProductStepBodyZodSchema,
+} from '@beautinique/frontend-types';
 
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
 import type {
+  IDashboardProductsResponse,
   IGetDashboardProductsQuery,
   IId,
+  TApiProductPopulated,
   TCategory,
+  TCategoryHierarchy,
   TL1Category,
   TL2Category,
   TL3Category,
@@ -43,11 +49,11 @@ export class CategoryApi extends ApiRequest {
       | Pick<TL2Category, 'level' | 'parent'>
       | Pick<TL3Category, 'level' | 'parent'>,
   ) => {
-    return this.request({ ...this.routes.get.byParentLevel, params });
+    return this.request<TCategory[]>({ ...this.routes.get.byParentLevel, params });
   };
 
   public getCategoriesHierarchy = () => {
-    return this.request(this.routes.get.byHierarchy);
+    return this.request<TCategoryHierarchy[]>(this.routes.get.byHierarchy);
   };
 }
 
@@ -71,15 +77,18 @@ export class ProductApi extends ApiRequest {
   /* ===================== GET API ===================== */
 
   public getDraftProduct = () => {
-    return this.request(this.routes.draft.get);
+    return this.request<Partial<TDraftProductDetailsZodSchema>>(this.routes.draft.get);
   };
 
   public getDashboardProducts = (params: IGetDashboardProductsQuery) => {
-    return this.request({ ...this.routes.get.dashboard.products, params });
+    return this.request<IDashboardProductsResponse>({
+      ...this.routes.get.dashboard.products,
+      params,
+    });
   };
 
   public getDashboardProductBySlug = (slug: string) => {
     const { method, url } = this.routes.get.dashboard.bySlug;
-    return this.request({ method, url: url({ slug }) });
+    return this.request<TApiProductPopulated>({ method, url: url({ slug }) });
   };
 }

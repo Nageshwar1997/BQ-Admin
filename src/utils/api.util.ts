@@ -30,7 +30,7 @@ export const handleApiSuccessToaster = (message: string, title = 'Success') => {
 };
 
 export const getFilteredAndSortedCats = (categories: TCategory[], search: string, sort?: TSort) => {
-  const value = search?.toLowerCase().trim();
+  const value = search.toLowerCase().trim();
   const filtered = value
     ? categories.filter((category) =>
         [category.name, category.slug].join(' ').toLowerCase().includes(value),

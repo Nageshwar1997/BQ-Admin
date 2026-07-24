@@ -54,7 +54,7 @@ const ChangePassword = () => {
     await changePassword.mutateAsync(
       { ...data },
       {
-        onSuccess: ({ user }) => {
+        onSuccess: ({ data: user }) => {
           if (user) {
             setUser(user);
             void navigate(-1);

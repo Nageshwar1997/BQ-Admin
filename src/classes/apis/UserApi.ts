@@ -8,6 +8,7 @@ import type {
 } from '@beautinique/frontend-types';
 
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
+import type { IUser } from '@/types/api.type';
 
 import { ApiRequest } from '../ApiRequest';
 
@@ -17,7 +18,7 @@ export class AuthApi extends ApiRequest {
   /* ===================== LOGIN API ===================== */
 
   public login = (data: TLoginZodSchema) => {
-    return this.request({
+    return this.request<IUser>({
       ...this.routes.login.manual,
       data,
       headers: { [HEADERS_MAP.loginRole]: USER_ROLE_MAP.ADMIN },
@@ -27,11 +28,11 @@ export class AuthApi extends ApiRequest {
   /* ===================== PASSWORD API ===================== */
 
   public forgotPasswordSendOtp = (data: TEmailZodSchema) => {
-    return this.request({ ...this.routes.password.forgot.sendOtp, data });
+    return this.request<string>({ ...this.routes.password.forgot.sendOtp, data });
   };
 
   public forgotPasswordResendOtp = (token: string) => {
-    return this.request({
+    return this.request<number>({
       ...this.routes.password.forgot.resendOtp,
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -46,7 +47,7 @@ export class AuthApi extends ApiRequest {
   };
 
   public forgotPasswordSave = ({ token, ...data }: TPasswordsZodSchema & { token: string }) => {
-    return this.request({
+    return this.request<IUser>({
       ...this.routes.password.forgot.save,
       data,
       headers: { Authorization: `Bearer ${token}` },
@@ -54,7 +55,7 @@ export class AuthApi extends ApiRequest {
   };
 
   public changePassword = (data: TChangePasswordZodSchema) => {
-    return this.request({ ...this.routes.password.change, data });
+    return this.request<IUser>({ ...this.routes.password.change, data });
   };
 }
 export class UserApi extends ApiRequest {
@@ -63,6 +64,6 @@ export class UserApi extends ApiRequest {
   /* ===================== GET API ===================== */
 
   public getSessionUser = async () => {
-    return this.request(this.routes.session);
+    return this.request<IUser>(this.routes.session);
   };
 }

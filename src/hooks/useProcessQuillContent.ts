@@ -49,9 +49,9 @@ export const useProcessQuillContent = <T extends FieldValues>() => {
 
       formData.append('folder', folder);
 
-      const data = await mutateAsync({ data: formData, toasterInfo });
+      const { data } = await mutateAsync({ data: formData, toasterInfo });
 
-      const urls: string[] = data?.data?.filter(Boolean) || [];
+      const urls: string[] = data?.filter(Boolean) ?? [];
 
       if (urls.length !== files.length) {
         toaster.error({

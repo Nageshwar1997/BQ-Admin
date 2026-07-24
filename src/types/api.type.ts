@@ -19,6 +19,12 @@ import type {
 
 export type TFieldErrors = Record<string, string[]>;
 
+export interface IErrorResponse {
+  message?: string;
+  fieldErrors?: TFieldErrors;
+  globalErrors?: string[];
+}
+
 export interface IId {
   _id: string;
 }
@@ -201,4 +207,15 @@ export interface IGetDashboardProductsQuery {
   category?: string;
   sortBy?: TProductSortBy;
   sortOrder?: TSort;
+}
+
+export interface IPagination {
+  page: number;
+  totalPages: number;
+}
+
+export interface IDashboardProductsResponse {
+  products: TApiProductPopulated[];
+  pagination: IPagination;
+  counts: Record<TProductStatus | 'ALL', number>;
 }

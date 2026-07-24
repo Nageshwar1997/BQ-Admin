@@ -44,17 +44,9 @@ const ForgotPassword = () => {
   const verifyOtp = useForgotPasswordVerifyOtp();
   const savePassword = useForgotPasswordSave();
 
-  const token = useMemo(() => {
-    if (!sendOtp.data) return '';
+  const token = useMemo(() => sendOtp.data?.data ?? '', [sendOtp.data]);
 
-    return sendOtp.data?.data;
-  }, [sendOtp.data]);
-
-  const sendCount = useMemo(() => {
-    if (!resendOtp.data) return 1;
-
-    return resendOtp.data?.data;
-  }, [resendOtp.data]);
+  const sendCount = useMemo(() => resendOtp.data?.data ?? 1, [resendOtp.data]);
 
   /* ================= 4. Forms ================= */
   const sendOtpForm = useForm<TEmailZodSchema>({ resolver: zodResolver(emailZodSchema) });
@@ -75,8 +67,12 @@ const ForgotPassword = () => {
 
   const handleSendOtp = async (data: TEmailZodSchema) => {
     await sendOtp.mutateAsync(data, {
-      onSuccess: () => { setCurrentStep('verify'); },
-      onError: ({ fieldErrors }) => { setErrorToForm(sendOtpForm.setError, fieldErrors); },
+      onSuccess: () => {
+        setCurrentStep('verify');
+      },
+      onError: ({ fieldErrors }) => {
+        setErrorToForm(sendOtpForm.setError, fieldErrors);
+      },
     });
   };
 
@@ -84,8 +80,12 @@ const ForgotPassword = () => {
     await verifyOtp.mutateAsync(
       { ...data, token },
       {
-        onSuccess: () => { setCurrentStep('save'); },
-        onError: ({ fieldErrors }) => { setErrorToForm(verifyOtpForm.setError, fieldErrors); },
+        onSuccess: () => {
+          setCurrentStep('save');
+        },
+        onError: ({ fieldErrors }) => {
+          setErrorToForm(verifyOtpForm.setError, fieldErrors);
+        },
       },
     );
   };
@@ -94,8 +94,12 @@ const ForgotPassword = () => {
     await savePassword.mutateAsync(
       { ...data, token },
       {
-        onSuccess: ({ user }) => { setUser(user); },
-        onError: ({ fieldErrors }) => { setErrorToForm(passwordForm.setError, fieldErrors); },
+        onSuccess: ({ data: user }) => {
+          setUser(user ?? null);
+        },
+        onError: ({ fieldErrors }) => {
+          setErrorToForm(passwordForm.setError, fieldErrors);
+        },
       },
     );
   };
@@ -227,7 +231,9 @@ const ForgotPassword = () => {
                   icons={{
                     right: {
                       icon: showPasswords[input.name] ? 'lucide:eye-off' : 'lucide:eye',
-                      onClick: () => { togglePasswordVisibility(input.name); },
+                      onClick: () => {
+                        togglePasswordVisibility(input.name);
+                      },
                       className: 'cursor-pointer',
                     },
                   }}

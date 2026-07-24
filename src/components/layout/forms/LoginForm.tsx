@@ -53,7 +53,7 @@ const LoginForm = () => {
   const handleLogin = async (data: TLoginZodSchema) => {
     await mutateAsync(data, {
       onSuccess: async ({ data: user }) => {
-        setUser(user);
+        setUser(user ?? null);
 
         const { runAllActions } = useActionsStore.getState();
         await runAllActions();

@@ -1,9 +1,8 @@
-import type { TDraftProductDetailsZodSchema, TProductStatus } from '@beautinique/frontend-types';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { productApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
-import type { IGetDashboardProductsQuery, TApiProductPopulated } from '@/types/api.type';
+import type { IGetDashboardProductsQuery } from '@/types/api.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
 
@@ -63,7 +62,7 @@ export const useGetDraftProduct = () => {
     queryKey: draft.get,
     queryFn: productApi.getDraftProduct,
     retry: false,
-    select: (data) => data?.data as Partial<TDraftProductDetailsZodSchema> | undefined,
+    select: (data) => data.data,
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
     placeholderData: (prev) => prev,
@@ -81,7 +80,7 @@ export const useGetDashboardProducts = (
     queryFn: ({ pageParam }) =>
       productApi.getDashboardProducts({ ...params, page: pageParam.toString(), limit: '15' }),
     getNextPageParam: (lastPage) => {
-      const pagination = lastPage?.data?.pagination;
+      const pagination = lastPage.data?.pagination;
 
       if (!pagination) return undefined;
 
@@ -97,8 +96,8 @@ export const useGetDashboardProducts = (
     refetchOnMount: true,
     refetchOnReconnect: true,
     select: (data) => ({
-      products: data.pages.flatMap((page) => page.data.products) as TApiProductPopulated[],
-      counts: data.pages[0]?.data.counts as Record<TProductStatus | 'ALL', number>,
+      products: data.pages.flatMap((page) => page.data?.products ?? []),
+      counts: data.pages[0]?.data?.counts,
     }),
   });
 };
@@ -108,6 +107,6 @@ export const useGetDashboardProductBySlug = (slug: string) => {
     queryKey: [...get.dashboard.bySlug({ slug }), slug],
     queryFn: () => productApi.getDashboardProductBySlug(slug),
     enabled: !!slug,
-    select: (data) => data?.data as TApiProductPopulated | undefined,
+    select: (data) => data.data,
   });
 };

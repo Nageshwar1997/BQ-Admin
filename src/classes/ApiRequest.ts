@@ -1,9 +1,16 @@
-import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosError,
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+} from 'axios';
 
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
 import envs from '@/envs';
+import type { IErrorResponse } from '@/types/api.type';
 
 import ApiError from './ApiError';
+import type ApiSuccess from './ApiSuccess';
 
 interface AxiosRequestConfigWithRetry extends AxiosRequestConfig {
   _retry?: boolean;
@@ -98,17 +105,20 @@ export class ApiRequest {
     );
   }
 
-  protected request = async (config: AxiosRequestConfig) => {
+  protected request = async <TData = unknown>(
+    config: AxiosRequestConfig,
+  ): Promise<ApiSuccess<TData>> => {
     try {
-      const { data } = await this.instance.request(config);
+      const { data } = await this.instance.request<ApiSuccess<TData>>(config);
       return data;
     } catch (error) {
       if (error instanceof AxiosError) {
+        const errResp: AxiosResponse<IErrorResponse> | undefined = error.response;
+
         throw new ApiError({
-          message: error.response?.data?.message || 'API Error occurred',
-          globalErrors: error.response?.data?.globalErrors,
-          fieldErrors: error.response?.data?.fieldErrors,
-          statusCode: error.response?.status,
+          message: errResp?.data.message ?? 'API Error occurred',
+          globalErrors: errResp?.data.globalErrors,
+          fieldErrors: errResp?.data.fieldErrors,
         });
       }
 

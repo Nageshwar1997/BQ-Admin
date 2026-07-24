@@ -9,10 +9,10 @@ export class MediaApi extends ApiRequest {
   /* ===================== POST API ===================== */
 
   public uploadSingle = (props: TFormDataProgress) => {
-    return this.request({ ...this.routes.upload.single, ...props });
+    return this.request<string>({ ...this.routes.upload.single, ...props });
   };
 
   public uploadMultiple = (props: TFormDataProgress) => {
-    return this.request({ ...this.routes.upload.multiple, ...props });
+    return this.request<string[]>({ ...this.routes.upload.multiple, ...props });
   };
 }
