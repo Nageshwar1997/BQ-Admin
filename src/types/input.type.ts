@@ -15,19 +15,20 @@ import type {
   UseFormRegisterReturn,
   UseFormSetValue,
 } from 'react-hook-form';
+
 import type {
+  IClassName,
+  IContainerClassName,
+  IQuillImageRef,
+  ITitleDescription,
   ITooltip,
-  TClassName,
-  TContainerClassName,
-  TQuillImageRef,
-  TTitleDescription,
 } from './component.type';
 
 export type TInputIcon = IconProps | ReactElement;
 
 export type TInputIcons = Partial<Record<'left' | 'right', TInputIcon>>;
 
-export interface IBaseInput extends TClassName, TContainerClassName {
+export interface IBaseInput extends IClassName, IContainerClassName {
   needRef?: boolean;
   icons?: TInputIcons;
   register?: UseFormRegisterReturn;
@@ -46,16 +47,19 @@ export interface ICheckbox extends Omit<IBaseInput, 'needRef' | 'icons' | 'label
   tooltip?: Pick<ITooltip, 'required' | 'description' | 'title' | 'placement'>;
 }
 
-export type TOption = { label: string | ReactNode; value: string };
-
-export interface IRadio extends TClassName, TContainerClassName, Pick<IBaseInput, 'error'> {
+export interface IOption {
+  label: string | ReactNode;
   value: string;
-  onChange: (value: string) => void;
-  options: TOption[];
 }
 
-export interface ISelectOption extends Pick<TOption, 'label'> {
-  value: TOption['value'] | number;
+export interface IRadio extends IClassName, IContainerClassName, Pick<IBaseInput, 'error'> {
+  value: string;
+  onChange: (value: string) => void;
+  options: IOption[];
+}
+
+export interface ISelectOption extends Pick<IOption, 'label'> {
+  value: IOption['value'] | number;
   disabled?: boolean;
 }
 
@@ -111,6 +115,7 @@ export interface IFileInput extends Omit<IBaseInput, 'error' | 'register'> {
 export interface ITextArea extends Omit<IBaseInput, 'icons'> {
   textAreaProps: TextareaHTMLAttributes<HTMLTextAreaElement>;
 }
+
 export type TToolbarOption =
   | { header: (1 | 2 | 3 | 4 | 5 | 6 | false)[] }
   | 'bold'
@@ -148,13 +153,13 @@ export interface IToolBarOptions {
 
 export interface IQuillInput
   extends
-    TClassName,
+    IClassName,
     Pick<IBaseInput, 'error' | 'label'>,
     Pick<IInput['inputProps'], 'placeholder' | 'disabled'> {
   value?: string;
   needLinkButton?: boolean;
   onChange?: (value: string) => void;
-  imagesRef?: RefObject<TQuillImageRef[]>;
+  imagesRef?: RefObject<IQuillImageRef[]>;
   toolbarOptions?: IToolBarOptions;
 }
 
@@ -162,17 +167,17 @@ export interface IQuillToolbar extends ToolbarProps {
   handlers: Record<string, (...args: unknown[]) => void>;
 }
 
-export type TQuillImageBlot = {
+export interface IQuillImageBlot {
   new (): HTMLElement;
   create(value: unknown): HTMLElement;
   value(node: HTMLElement): unknown;
-};
+}
 
 export interface IProcessQuillContent<T extends FieldValues> {
   quillRef: RefObject<Quill | null>;
-  imagesRef: RefObject<TQuillImageRef[]>;
+  imagesRef: RefObject<IQuillImageRef[]>;
   setValue: UseFormSetValue<T>;
   field: FieldPath<T>;
   folder: string;
-  toasterInfo?: Partial<TTitleDescription>;
+  toasterInfo?: Partial<ITitleDescription>;
 }

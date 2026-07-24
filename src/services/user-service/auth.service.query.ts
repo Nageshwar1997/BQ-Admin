@@ -1,8 +1,9 @@
+import { useMutation } from '@tanstack/react-query';
+
 import { authApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
-import { useMutation } from '@tanstack/react-query';
 
 const { login, password } = API_QUERY_KEYS.user_service.auth;
 
@@ -16,8 +17,12 @@ export const useLogin = () => {
       const toastId = toaster.loading({ title: 'Please wait...', description: 'Logging in...' });
       return { toastId };
     },
-    onSuccess: async ({ message }) => handleApiSuccessToaster(message),
-    onError: (error) => handleApiErrorToaster(error),
+    onSuccess: ({ message }) => {
+      handleApiSuccessToaster(message);
+    },
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
     },
@@ -38,8 +43,12 @@ export const useForgotPasswordSendOtp = () => {
 
       return { toastId };
     },
-    onSuccess: ({ message }) => handleApiSuccessToaster(message),
-    onError: (error) => handleApiErrorToaster(error),
+    onSuccess: ({ message }) => {
+      handleApiSuccessToaster(message);
+    },
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
     },
@@ -57,8 +66,12 @@ export const useForgotPasswordResendOtp = () => {
       });
       return { toastId };
     },
-    onSuccess: ({ message }) => handleApiSuccessToaster(message),
-    onError: (error) => handleApiErrorToaster(error),
+    onSuccess: ({ message }) => {
+      handleApiSuccessToaster(message);
+    },
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
     },
@@ -76,8 +89,12 @@ export const useForgotPasswordVerifyOtp = () => {
       });
       return { toastId };
     },
-    onSuccess: ({ message }) => handleApiSuccessToaster(message),
-    onError: (error) => handleApiErrorToaster(error),
+    onSuccess: ({ message }) => {
+      handleApiSuccessToaster(message);
+    },
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
     },
@@ -95,8 +112,12 @@ export const useForgotPasswordSave = () => {
       });
       return { toastId };
     },
-    onSuccess: async ({ message }) => handleApiSuccessToaster(message),
-    onError: (error) => handleApiErrorToaster(error),
+    onSuccess: ({ message }) => {
+      handleApiSuccessToaster(message);
+    },
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
     },
@@ -114,8 +135,12 @@ export const useChangePassword = () => {
       });
       return { toastId };
     },
-    onSuccess: async ({ message }) => handleApiSuccessToaster(message),
-    onError: (error) => handleApiErrorToaster(error),
+    onSuccess: ({ message }) => {
+      handleApiSuccessToaster(message);
+    },
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
     },

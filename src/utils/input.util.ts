@@ -1,17 +1,20 @@
-import { DEFAULT_QUILL_LINK_ID } from '@/constants/input.constants';
-import type { TQuillImageRef } from '@/types/component.type';
-import type { IQuillToolbar, IToolBarOptions, TQuillToolbar } from '@/types/input.type';
 import { IMAGE_FORMATS, IMAGE_MIMES, MAX_IMAGE_SIZE } from '@beautinique/frontend-constants';
 import type { TImageFormat, TImageMime } from '@beautinique/frontend-types';
+import { formatFileSize } from '@beautinique/shared-utils';
 import { nanoid } from 'nanoid';
 import type Quill from 'quill';
 import type { Delta } from 'quill';
 import Inline from 'quill/blots/inline';
 import type { RefObject } from 'react';
-import { formatFileSize, toaster } from './common.util';
+
+import { DEFAULT_QUILL_LINK_ID } from '@/constants/input.constants';
+import type { IQuillImageRef } from '@/types/component.type';
+import type { IQuillToolbar, IToolBarOptions, TQuillToolbar } from '@/types/input.type';
+
+import { toaster } from './common.util';
 
 // Add Blob URL to Image
-export const insertImageIntoQuill = (quill: Quill, imagesRef: RefObject<TQuillImageRef[]>) => {
+export const insertImageIntoQuill = (quill: Quill, imagesRef: RefObject<IQuillImageRef[]>) => {
   const input = document.createElement('input');
 
   input.type = 'file';
@@ -23,12 +26,16 @@ export const insertImageIntoQuill = (quill: Quill, imagesRef: RefObject<TQuillIm
 
     const file = input.files[0];
 
+    if (!file) return;
+
     // Validate file size
     if (file.size > MAX_IMAGE_SIZE) {
-      return toaster.error({
+      toaster.error({
         title: 'File size limit exceeded',
         description: `Image size is ${formatFileSize(file.size)}. Max allowed size is ${formatFileSize(MAX_IMAGE_SIZE)}.`,
       });
+
+      return;
     }
 
     // Validate extension and file type
@@ -39,17 +46,19 @@ export const insertImageIntoQuill = (quill: Quill, imagesRef: RefObject<TQuillIm
       !ext ||
       !IMAGE_FORMATS.includes(ext as TImageFormat)
     ) {
-      return toaster.error({
+      toaster.error({
         title: 'Invalid file type',
         description: `File extension is .${ext ?? 'unknown'}. Allowed extensions are ${IMAGE_FORMATS.join(', ')}.`,
       });
+
+      return;
     }
 
     const range = quill.getSelection();
 
     if (!range) return;
 
-    const image: TQuillImageRef = { id: nanoid(), file, blobUrl: URL.createObjectURL(file) };
+    const image: IQuillImageRef = { id: nanoid(), file, blobUrl: URL.createObjectURL(file) };
 
     imagesRef.current.push(image);
 
@@ -67,7 +76,7 @@ export const insertImageIntoQuill = (quill: Quill, imagesRef: RefObject<TQuillIm
 };
 
 // Clean unused images
-export const removeImageFromQuill = (quill: Quill, imagesRef: RefObject<TQuillImageRef[]>) => {
+export const removeImageFromQuill = (quill: Quill, imagesRef: RefObject<IQuillImageRef[]>) => {
   const imgs = quill.root.querySelectorAll('img');
 
   const editorImageIds = Array.from(imgs)
@@ -119,7 +128,7 @@ export const removePastedStyles = (delta: Delta) => {
   delta.ops = delta.ops.map((op: (typeof delta.ops)[0]) => {
     if (op.attributes) {
       ['color', 'background-color', 'background-image', 'background'].forEach(
-        (attr) => delete op?.attributes?.[attr],
+        (attr) => delete op.attributes?.[attr],
       );
     }
     return op;
@@ -169,7 +178,7 @@ export const blockDraggedOrCopiedImage = (delta: Delta): boolean => {
 
     const image = op.insert.image as { src: string; alt?: string; id?: string };
 
-    const src = typeof image === 'string' ? image : image?.src;
+    const src = typeof image === 'string' ? image : image.src;
 
     if (!src) {
       return true;
@@ -231,7 +240,7 @@ export const addLinkIdButtonToToolbar = (quill: Quill) => {
   `;
 
   button.type = 'button';
-  button.onclick = () => toolbarModule.handlers.toggleLinkId();
+  button.onclick = () => toolbarModule.handlers.toggleLinkId?.();
 
   section.classList.add('ql-formats');
   section.appendChild(button);

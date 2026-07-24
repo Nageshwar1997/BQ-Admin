@@ -1,9 +1,11 @@
-import type { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import type { TProductDescriptionAndContentZodSchema } from '@beautinique/frontend-types';
 import type { AxiosProgressEvent } from 'axios';
 import type Quill from 'quill';
 import type { RefObject } from 'react';
-import type { TQuillImageRef } from './component.type';
+
+import type { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
+
+import type { IQuillImageRef } from './component.type';
 
 export type TAddProductStepNumber = keyof typeof ADD_PRODUCT_FORM_ID_MAP;
 
@@ -16,9 +18,9 @@ export type TProductContentFields = keyof Omit<
 
 export type TProductQuillRefs = Record<TProductContentFields, RefObject<Quill | null>>;
 
-export type TProductQuillImageRefs = Record<TProductContentFields, RefObject<TQuillImageRef[]>>;
+export type TProductQuillImageRefs = Record<TProductContentFields, RefObject<IQuillImageRef[]>>;
 
-export type TFormDataProgress = {
+export interface TFormDataProgress {
   data: FormData;
   onUploadProgress?: (event: AxiosProgressEvent) => void;
-};
+}

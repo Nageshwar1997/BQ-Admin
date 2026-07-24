@@ -1,21 +1,23 @@
-import type { TOAST_TYPE } from '@/constants/common.constants';
 import type { AxiosProgressEvent } from 'axios';
 import type { ReactNode } from 'react';
-import type { IUser } from './api.type';
-import type { IButton, TClassName, TTitleDescription } from './component.type';
 
-interface IBaseToast extends TClassName {
+import type { TOAST_TYPE } from '@/constants/common.constants';
+
+import type { IUser } from './api.type';
+import type { IButton, IClassName, ITitleDescription } from './component.type';
+
+interface IBaseToast extends IClassName {
   icon?: ReactNode;
   buttonProps?: Partial<IButton>;
 }
 
-type TToastClosable = {
+interface IToastClosable {
   isClosable?: boolean;
   autoClose?: boolean;
   closeTimer?: number;
-};
+}
 
-export interface IDefaultToast extends IBaseToast, TToastClosable, TTitleDescription {
+export interface IDefaultToast extends IBaseToast, IToastClosable, ITitleDescription {
   type:
     | typeof TOAST_TYPE.success
     | typeof TOAST_TYPE.error
@@ -23,14 +25,14 @@ export interface IDefaultToast extends IBaseToast, TToastClosable, TTitleDescrip
     | typeof TOAST_TYPE.default;
 }
 
-export interface ICustomToast extends IBaseToast, TToastClosable {
+export interface ICustomToast extends IBaseToast, IToastClosable {
   type: typeof TOAST_TYPE.custom;
   children: ReactNode;
   title?: never;
   description?: never;
 }
 
-export interface ILoadingToast extends IBaseToast, TTitleDescription {
+export interface ILoadingToast extends IBaseToast, ITitleDescription {
   type: typeof TOAST_TYPE.loading;
   isClosable?: never;
   autoClose?: never;
@@ -53,37 +55,37 @@ export interface IToastStore {
   remove: (id: string) => void;
 }
 
-export type TProgressToastOptions<T> = TTitleDescription & {
+export type TProgressToastOptions<T> = ITitleDescription & {
   request: (onProgress: (event: AxiosProgressEvent) => void) => Promise<T>;
 };
 
 export type TTheme = 'light' | 'dark';
 
-export type TThemeStore = { theme: TTheme; toggleTheme: () => void };
+export interface IThemeStore {
+  theme: TTheme;
+  toggleTheme: () => void;
+}
 
-export type TUserStore = {
+export interface IUserStore {
   user: IUser | null;
   authenticated: boolean;
   setUser: (user: IUser | null) => void;
-};
+}
 
-export type ActionFn = () => void | Promise<void>;
+type TActionFn = () => void | Promise<void>;
 
-export type ActionItem = {
+export interface IActionItem {
   id: string;
-  fn: ActionFn;
+  fn: TActionFn;
   retries: number;
   maxRetries: number;
-};
+}
 
-export type TActionsStore = {
-  actions: ActionItem[];
-
-  addAction: (fn: ActionFn, options?: { maxRetries?: number }) => string;
-
+export interface IActionsStore {
+  actions: IActionItem[];
+  addAction: (fn: TActionFn, options?: { maxRetries?: number }) => string;
   removeAction: (id: string) => void;
   clearActions: () => void;
-
   runNextAction: () => Promise<void>;
   runAllActions: () => Promise<void>;
-};
+}

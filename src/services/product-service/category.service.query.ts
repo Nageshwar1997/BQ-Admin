@@ -1,3 +1,5 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import { categoryApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
 import { EMPTY_ARRAY } from '@/constants/common.constants';
@@ -10,7 +12,6 @@ import type {
 } from '@/types/api.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const { get, add, update, delete: remove } = API_QUERY_KEYS.product_service.category;
 
@@ -32,7 +33,9 @@ export const useAddCategory = () => {
       await queryClient.invalidateQueries({ queryKey: get.byParentLevel });
     },
 
-    onError: (error) => handleApiErrorToaster(error),
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
     },
@@ -56,7 +59,9 @@ export const useUpdateCategory = ({ categoryId = '' }) => {
       handleApiSuccessToaster(message);
       await queryClient.invalidateQueries({ queryKey: get.byParentLevel });
     },
-    onError: (error) => handleApiErrorToaster(error),
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
     },
@@ -80,7 +85,9 @@ export const useDeleteCategory = ({ categoryId = '' }) => {
       handleApiSuccessToaster(message);
       await queryClient.invalidateQueries({ queryKey: get.byParentLevel });
     },
-    onError: (error) => handleApiErrorToaster(error),
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
     },

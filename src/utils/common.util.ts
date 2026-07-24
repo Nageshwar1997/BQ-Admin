@@ -1,3 +1,6 @@
+import type { IconProps } from '@iconify/react';
+import type { CSSProperties } from 'react';
+
 import { TOAST_TYPE, TOOLTIP_GAP, VIDEO_PLACEHOLDER } from '@/constants/common.constants';
 import useToastStore from '@/stores/toast.store';
 import type { IButton, ITooltip } from '@/types/component.type';
@@ -8,9 +11,6 @@ import type {
   IProgressToast,
   TProgressToastOptions,
 } from '@/types/store.type';
-import { GB, KB, MB } from '@beautinique/frontend-constants';
-import type { IconProps } from '@iconify/react';
-import type { CSSProperties } from 'react';
 
 export const getButtonCss = (pattern: IButton['pattern']) => {
   switch (pattern) {
@@ -34,26 +34,14 @@ export const getTooltipPosition = (
 ): CSSProperties => {
   switch (placement) {
     case 'bottom':
-      return {
-        top: rect.bottom,
-        left: rect.left + rect.width / 2,
-      };
+      return { top: rect.bottom, left: rect.left + rect.width / 2 };
     case 'right':
-      return {
-        top: rect.top + rect.height / 2,
-        left: rect.right,
-      };
+      return { top: rect.top + rect.height / 2, left: rect.right };
     case 'left':
-      return {
-        top: rect.top + rect.height / 2,
-        left: rect.left,
-      };
+      return { top: rect.top + rect.height / 2, left: rect.left };
     case 'top':
     default:
-      return {
-        top: rect.top,
-        left: rect.left + rect.width / 2,
-      };
+      return { top: rect.top, left: rect.left + rect.width / 2 };
   }
 };
 
@@ -61,16 +49,18 @@ export const getTooltipTransform = (
   placement: NonNullable<ITooltip['placement']>,
   isVisible: boolean,
 ) => {
+  const gap = String(isVisible ? TOOLTIP_GAP : 0);
+
   switch (placement) {
     case 'bottom':
-      return `translate(-50%, ${isVisible ? TOOLTIP_GAP : 0}px)`;
+      return `translate(-50%, ${gap}px)`;
     case 'right':
-      return `translate(${isVisible ? TOOLTIP_GAP : 0}px, -50%)`;
+      return `translate(${gap}px, -50%)`;
     case 'left':
-      return `translate(calc(-100% - ${isVisible ? TOOLTIP_GAP : 0}px), -50%)`;
+      return `translate(calc(-100% - ${gap}px), -50%)`;
     case 'top':
     default:
-      return `translate(-50%, calc(-100% - ${isVisible ? TOOLTIP_GAP : 0}px))`;
+      return `translate(-50%, calc(-100% - ${gap}px))`;
   }
 };
 
@@ -97,29 +87,16 @@ export const toaster = {
   custom: (data: ICustomToast) => add(data),
   progress: {
     start: (data: Omit<IProgressToast, 'type'>) => add({ ...data, type: TOAST_TYPE.progress }),
-    update: (toastId: string, progress: number) => update.progress(toastId, progress),
-    end: (toastId: string) => remove(toastId),
+    update: (toastId: string, progress: number) => {
+      update.progress(toastId, progress);
+    },
+    end: (toastId: string) => {
+      remove(toastId);
+    },
   },
-  remove: (toastId: string) => remove(toastId),
-};
-
-export const formatFileSize = (size: number) => {
-  if (size < KB) {
-    return `${size} Bytes`;
-  }
-
-  if (size < MB) {
-    const value = size / KB;
-    return `${Number.isInteger(value) ? value : value.toFixed(2)} KB`;
-  }
-
-  if (size < GB) {
-    const value = size / MB;
-    return `${Number.isInteger(value) ? value : value.toFixed(2)} MB`;
-  }
-
-  const value = size / GB;
-  return `${Number.isInteger(value) ? value : value.toFixed(2)} GB`;
+  remove: (toastId: string) => {
+    remove(toastId);
+  },
 };
 
 export const isDeepEqual = <T>(
@@ -268,9 +245,9 @@ export function convertVideoToPoster(videoUrl: string): Promise<string> {
     try {
       // Case 1: Cloudinary URL → instant
       if (videoUrl.includes('/upload/')) {
-        const [base, versionAndPath] = videoUrl.split('/upload/');
+        const [base = '', versionAndPath = ''] = videoUrl.split('/upload/');
         const cleanedPath = versionAndPath.replace(/^.*?(\/v\d+)/, '$1');
-        const posterPath = cleanedPath.replace(/\.(m3u8|mp4|webm|ogg|mov)$/, '.webp');
+        const posterPath = cleanedPath.replace(/\.(mp4|webm|mov|mkv|ogg|m3u8)$/, '.webp');
         resolve(`${base}/upload/so_0${posterPath}`);
         return;
       }
@@ -278,8 +255,12 @@ export function convertVideoToPoster(videoUrl: string): Promise<string> {
       // Case 2: Blob URL or direct video file → async extract
       if (videoUrl.startsWith('blob:') || /\.(mp4|webm|ogg|m3u8|mov)$/i.test(videoUrl)) {
         getPosterFromBlobVideo(videoUrl)
-          .then((poster) => resolve(poster || VIDEO_PLACEHOLDER))
-          .catch(() => resolve(VIDEO_PLACEHOLDER));
+          .then((poster) => {
+            resolve(poster || VIDEO_PLACEHOLDER);
+          })
+          .catch(() => {
+            resolve(VIDEO_PLACEHOLDER);
+          });
         return;
       }
 

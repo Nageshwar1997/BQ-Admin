@@ -1,5 +1,3 @@
-import type { TOAST_TYPE } from '@/constants/common.constants';
-import type { FOOTER_CATEGORIES } from '@/constants/footer.constants';
 import type { IconProps } from '@iconify/react';
 import type {
   ButtonHTMLAttributes,
@@ -10,17 +8,27 @@ import type {
   RefObject,
   VideoHTMLAttributes,
 } from 'react';
+
+import type { TOAST_TYPE } from '@/constants/common.constants';
+import type { FOOTER_CATEGORIES } from '@/constants/footer.constants';
+
 import type { TCategory } from './api.type';
 import type { TGradientPos, TScrollDirection } from './hook.type';
-import type { TInputIcons, TOption } from './input.type';
+import type { IOption, TInputIcons } from './input.type';
 
-export type TClassName = { className?: string };
+export interface IClassName {
+  className?: string;
+}
 
-export type TContainerClassName = { containerClassName?: string };
+export interface IContainerClassName {
+  containerClassName?: string;
+}
 
-export type TChildren = { children: ReactNode | ReactElement };
+export interface IChildren {
+  children: ReactNode | ReactElement;
+}
 
-export interface IButton extends TClassName {
+export interface IButton extends IClassName {
   buttonProps?: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'content'>;
   content: IconProps | string;
   pattern: 'primary' | 'secondary' | 'tertiary' | 'outline' | 'transparent';
@@ -28,54 +36,52 @@ export interface IButton extends TClassName {
   rightIcon?: IconProps;
 }
 
-export interface ILoading extends TClassName {
+export interface ILoading extends IClassName {
   text: string;
 }
 
-export interface IScrollableGradientContainer
-  extends TClassName, Partial<TChildren>, TContainerClassName {
+export interface IScrollableGradientContainer extends IClassName, IChildren, IContainerClassName {
   gradientClassNames?: Partial<Record<TGradientPos, string>>;
   direction: TScrollDirection;
 }
 
-export interface ILinerGradient extends TClassName {
+export interface ILinerGradient extends IClassName {
   position: TGradientPos;
 }
 
-export interface IGradientText extends TClassName, Partial<TChildren> {
+export interface IGradientText extends IClassName, Partial<IChildren> {
   text: string;
   type: 'accent' | 'silver';
   path?: string;
 }
 
-export interface IResend extends TClassName {
+export interface IResend extends IClassName {
   label: string;
   count: number;
   onResend?: () => void;
 }
 
-export type TTitleDescription = {
+export interface ITitleDescription {
   title: string | ReactNode;
   description?: string | ReactNode;
-};
+}
 
-export interface ITooltip extends TClassName, TChildren, TTitleDescription, TContainerClassName {
+export interface ITooltip extends IClassName, IChildren, ITitleDescription, IContainerClassName {
   placement?: 'top' | 'bottom' | 'left' | 'right';
   required?: boolean;
 }
 
-type TBaseStatus = TTitleDescription & TClassName & { divider?: boolean };
+type TBaseStatus = ITitleDescription & IClassName & { divider?: boolean };
 
 type TErrorStatus = TBaseStatus & { status: 'error' };
 type TEmptyStatus = TBaseStatus & { status: 'empty' };
-type TLoadingStatus = TClassName & { status: 'loading'; text?: string };
+type TLoadingStatus = IClassName & { status: 'loading'; text?: string };
 
 export type TApiStatus = TErrorStatus | TEmptyStatus | TLoadingStatus;
 
-export interface IModalWrapper extends TClassName {
+export interface IModalWrapper extends IClassName, IChildren {
   isOpen: boolean;
   onClose: () => void;
-  children: JSX.Element;
   containerProps?: JSX.IntrinsicElements['div'];
   header?: { title?: string; showCloseIcon?: boolean };
   closeOnOutsideClick?: boolean;
@@ -88,52 +94,56 @@ export interface IFooterOptionList {
   isFirst?: boolean;
 }
 
-export interface IVideoPlayer extends TClassName {
+export interface IVideoPlayer extends IClassName {
   videoProps: VideoHTMLAttributes<HTMLVideoElement>;
   ref?: RefObject<HTMLVideoElement | null>;
   showPosterOnly?: boolean;
 }
 
-export interface IBreadcrumb extends TClassName {
+export interface IBreadcrumb extends IClassName {
   customPath?: string;
   customPaths?: string[];
 }
 
-export type TCatModal = { category: TCategory; mainCatId?: string };
+export interface ICatModal {
+  category: TCategory;
+  mainCatId?: string;
+}
 
-export type TCatActionHandle = {
-  onEdit: (data: TCatModal) => void;
+export interface ICatActionHandle {
+  onEdit: (data: ICatModal) => void;
   onDelete: (categoryId: string) => void;
-};
+}
 
-export type TCatTable = TCatActionHandle & TCatModal;
+export type TCatTable = ICatActionHandle & ICatModal;
 
-type TCustomConfirmModal = TChildren & {
+interface TCustomConfirmModal extends IChildren {
   type: typeof TOAST_TYPE.custom;
   title?: never;
   description?: never;
   buttons?: Partial<Record<'left' | 'right', Omit<IButton, 'pattern'>>>;
-};
+}
 
-type TDefaultConfirmModal = {
+interface IDefaultConfirmModal extends ITitleDescription {
   type:
     | typeof TOAST_TYPE.success
     | typeof TOAST_TYPE.error
     | typeof TOAST_TYPE.warning
     | typeof TOAST_TYPE.default;
-  title: string;
   children?: never;
-  description?: string;
   buttons: Partial<Record<'left' | 'right', Omit<IButton, 'pattern'>>>;
-};
+}
 
-export type TConfirmModal = (TCustomConfirmModal | TDefaultConfirmModal) & {
+export type TConfirmModal = (TCustomConfirmModal | IDefaultConfirmModal) & {
   modalProps?: Omit<IModalWrapper, 'children' | 'closeOnOutsideClick'>;
 };
 
 export type TMediaResource = 'image' | 'video';
 
-export type TMediaOption = { type: TMediaResource; url: string };
+export interface TMediaOption {
+  type: TMediaResource;
+  url: string;
+}
 
 export interface IVideo {
   videoProps: VideoHTMLAttributes<HTMLVideoElement>;
@@ -141,7 +151,7 @@ export interface IVideo {
 }
 
 export interface IMediaCarousel
-  extends TClassName, Pick<IScrollableGradientContainer, 'gradientClassNames'> {
+  extends IClassName, Pick<IScrollableGradientContainer, 'gradientClassNames'> {
   media: TMediaOption[];
   selected?: number | null;
   onClick: (index: number) => void;
@@ -151,31 +161,33 @@ export interface IMediaCarousel
 
 export interface IMediaCarouselWithParent
   extends
-    TClassName,
+    IClassName,
     Partial<Pick<IVideo, 'videoProps'>>,
     Pick<IMediaCarousel, 'media' | 'selected' | 'handleRemove'> {
   needButtonControls?: boolean;
 }
 
-export type TQuillImageRef = { id: string; file: File; blobUrl: string };
+export interface IQuillImageRef {
+  id: string;
+  file: File;
+  blobUrl: string;
+}
 
-export type TPageWrapper = TChildren &
-  TContainerClassName &
-  TClassName & {
-    navbar?: {
-      components?: ReactElement[];
-      buttons?: Partial<IButton & TChildren>[];
-    } & Partial<TChildren>;
-  };
+export interface IPageWrapper extends IChildren, IContainerClassName, IClassName {
+  navbar?: {
+    components?: ReactElement[];
+    buttons?: Partial<IButton & IChildren>[];
+  } & Partial<IChildren>;
+}
 
-export interface IDropdownOptions extends TClassName {
-  options: TOption[];
+export interface IDropdownOptions extends IClassName {
+  options: IOption[];
   selected: string;
-  onChange: (opt: TOption) => void;
+  onChange: (opt: IOption) => void;
   onSelect?: () => void;
 }
 
-export interface IDropdown extends TClassName, Partial<Pick<IDropdownOptions, 'options'>> {
+export interface IDropdown extends IClassName, Partial<Pick<IDropdownOptions, 'options'>> {
   title: string | ReactElement;
   icons?: TInputIcons;
   children: ReactElement<{ onSelect?: () => void }>;

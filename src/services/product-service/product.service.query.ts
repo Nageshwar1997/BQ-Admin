@@ -1,10 +1,11 @@
+import type { TDraftProductDetailsZodSchema, TProductStatus } from '@beautinique/frontend-types';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import { productApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
 import type { IGetDashboardProductsQuery, TApiProductPopulated } from '@/types/api.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
-import type { TDraftProductDetailsZodSchema, TProductStatus } from '@beautinique/frontend-types';
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const { draft, get } = API_QUERY_KEYS.product_service.product;
 
@@ -25,7 +26,9 @@ export const useSaveDraftProduct = () => {
       await queryClient.invalidateQueries({ queryKey: [draft.get] });
       handleApiSuccessToaster(message);
     },
-    onError: (error) => handleApiErrorToaster(error),
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
     },
@@ -43,8 +46,12 @@ export const usePublishProduct = () => {
       });
       return { toastId };
     },
-    onSuccess: async ({ message }) => handleApiSuccessToaster(message),
-    onError: (error) => handleApiErrorToaster(error),
+    onSuccess: ({ message }) => {
+      handleApiSuccessToaster(message);
+    },
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
     onSettled: (_data, _error, _variables, context) => {
       if (context?.toastId) toaster.remove(context.toastId);
     },
@@ -71,7 +78,7 @@ export const useGetDashboardProducts = (
   return useInfiniteQuery({
     queryKey: [...get.dashboard.products, ...Object.values(params)],
     initialPageParam: 1,
-    queryFn: ({ pageParam = 1 }) =>
+    queryFn: ({ pageParam }) =>
       productApi.getDashboardProducts({ ...params, page: pageParam.toString(), limit: '15' }),
     getNextPageParam: (lastPage) => {
       const pagination = lastPage?.data?.pagination;

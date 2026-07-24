@@ -1,6 +1,7 @@
+import type { FieldErrors, FieldValues, Path, UseFormSetError } from 'react-hook-form';
+
 import type { TFieldErrors } from '@/types/api.type';
 import type { IFileInput } from '@/types/input.type';
-import type { FieldErrors, FieldValues, Path, UseFormSetError } from 'react-hook-form';
 
 export const setErrorToForm = <T extends FieldValues>(
   setError: UseFormSetError<T>,
