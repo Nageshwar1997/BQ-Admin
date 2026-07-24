@@ -1,3 +1,5 @@
+import { requireEnv } from '@beautinique/shared-utils';
+
 const {
   // A
   // B
@@ -54,7 +56,7 @@ const envs = {
   // C
   // D
   // E
-  encryption_secret_key: VITE_ENCRYPTION_SECRET_KEY,
+  encryption_secret_key: requireEnv(VITE_ENCRYPTION_SECRET_KEY, 'VITE_ENCRYPTION_SECRET_KEY'),
   // F
   // G
   // H
@@ -75,7 +77,7 @@ const envs = {
   // T
   // U
 
-  urls: { gateway: VITE_GATEWAY_BASE_URL },
+  urls: { gateway: requireEnv(VITE_GATEWAY_BASE_URL, 'VITE_GATEWAY_BASE_URL') },
 
   // V
   // W

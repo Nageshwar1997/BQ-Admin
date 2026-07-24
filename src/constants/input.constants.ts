@@ -1,5 +1,6 @@
-import type { TQuillToolbar } from '@/types/input.type';
 import { VARIANT_TYPES, VARIANT_TYPES_MAP } from '@beautinique/frontend-constants';
+
+import type { TQuillToolbar } from '@/types/input.type';
 
 export const PASSWORD_KEYS = ['password', 'confirmPassword'];
 

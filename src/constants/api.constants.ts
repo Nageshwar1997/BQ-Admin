@@ -1,6 +1,7 @@
+import { API_METHODS_MAP, PRODUCT_STATUSES_MAP } from '@beautinique/frontend-constants';
+
 import type { TProductSortBy } from '@/types/api.type';
 import { createQueryKeys, createRouteHelper } from '@/utils/api.util';
-import { API_METHODS_MAP, PRODUCT_STATUSES_MAP } from '@beautinique/frontend-constants';
 
 const { DELETE, GET, PATCH, POST } = API_METHODS_MAP;
 
@@ -107,7 +108,7 @@ export const API_METHODS_AND_URLS = createRouteHelper(METHODS_AND_PATHS);
 
 export const API_QUERY_KEYS = createQueryKeys(METHODS_AND_PATHS);
 
-export const PRODUCTS_TABLE_TITLES: { label: string; sortKey?: TProductSortBy | never }[] = [
+export const PRODUCTS_TABLE_TITLES: { label: string; sortKey?: TProductSortBy }[] = [
   { label: 'S. No' },
   { label: 'View' },
   { label: 'Thumbnail' },
