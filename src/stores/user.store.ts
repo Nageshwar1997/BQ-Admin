@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 
+import { resetAuthLogoutState } from '@/classes/ApiRequest';
 import { USER_KEY } from '@/constants/common.constants';
 import type { IUser } from '@/types/api.type';
 import type { IUserStore } from '@/types/store.type';
@@ -19,8 +20,12 @@ const useUserStore = create<IUserStore>((set) => {
     authenticated: !!user,
 
     setUser: (user) => {
-      if (user) sessionStorage.setItem(USER_KEY, encryptData(user));
-      else sessionStorage.removeItem(USER_KEY);
+      if (user) {
+        sessionStorage.setItem(USER_KEY, encryptData(user));
+        resetAuthLogoutState();
+      } else {
+        sessionStorage.removeItem(USER_KEY);
+      }
 
       set({ user, authenticated: !!user });
     },

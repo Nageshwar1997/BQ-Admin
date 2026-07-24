@@ -24,6 +24,12 @@ interface IFailedQueueItem {
 let isRefreshing = false;
 let failedQueue: IFailedQueueItem[] = [];
 let hasRedirected = false;
+let refreshIntervalId: ReturnType<typeof setInterval> | null = null;
+
+// Dedicated client used only for the refresh call itself. Every ApiRequest subclass instance
+// creates its own axios instance with identical config, so this avoids depending on any one of
+// them and keeps the periodic refresh (below) independent of which API classes exist.
+const refreshClient = axios.create({ baseURL: envs.urls.gateway, withCredentials: true });
 
 const processQueue = (error?: unknown) => {
   failedQueue.forEach((p) => {
@@ -43,6 +49,62 @@ const triggerLogout = () => {
       detail: { reason: 'login' },
     }),
   );
+};
+
+/**
+ * Re-arms triggerLogout() after a successful login, so a logout can fire again if this new
+ * session later expires too. Without this, triggerLogout() would silently no-op on the second
+ * and subsequent sessions within the same tab, since hasRedirected only ever gets set once.
+ */
+export const resetAuthLogoutState = () => {
+  hasRedirected = false;
+};
+
+/**
+ * Refreshes the access token. Safe to call concurrently - if a refresh is already in flight
+ * (e.g. triggered by a 401 while the periodic timer is also refreshing), callers just wait for
+ * that one instead of firing a duplicate request.
+ */
+const refreshAccessToken = async (): Promise<void> => {
+  if (isRefreshing) {
+    return new Promise<void>((resolve, reject) => {
+      failedQueue.push({ resolve, reject });
+    });
+  }
+
+  isRefreshing = true;
+
+  try {
+    try {
+      await refreshClient.request(API_METHODS_AND_URLS.gateway.refreshAccessToken);
+      processQueue();
+    } catch (err) {
+      processQueue(err);
+      triggerLogout();
+      throw err;
+    }
+  } finally {
+    isRefreshing = false;
+  }
+};
+
+/** Starts proactively refreshing the access token on a fixed interval. Call once per login session. */
+export const startAutoRefreshAccessToken = (intervalMs: number) => {
+  stopAutoRefreshAccessToken();
+
+  refreshIntervalId = setInterval(() => {
+    refreshAccessToken().catch(() => {
+      // A failed refresh already triggers logout inside refreshAccessToken; nothing else to do.
+    });
+  }, intervalMs);
+};
+
+/** Stops the periodic refresh started by startAutoRefreshAccessToken. Call on logout/unmount. */
+export const stopAutoRefreshAccessToken = () => {
+  if (refreshIntervalId) {
+    clearInterval(refreshIntervalId);
+    refreshIntervalId = null;
+  }
 };
 
 export class ApiRequest {
@@ -76,27 +138,13 @@ export class ApiRequest {
 
         // 🔁 401 handling
         if (error.response?.status === 401 && !originalRequest._retry) {
-          if (isRefreshing) {
-            return new Promise<void>((resolve, reject) => {
-              failedQueue.push({ resolve, reject });
-            }).then(() => this.instance.request(originalRequest));
-          }
-
           originalRequest._retry = true;
-          isRefreshing = true;
 
           try {
-            await this.instance.request(API_METHODS_AND_URLS.gateway.refreshAccessToken);
-
-            processQueue();
-
+            await refreshAccessToken();
             return await this.instance.request(originalRequest);
           } catch (err) {
-            processQueue(err);
-            triggerLogout();
             return await Promise.reject(err instanceof Error ? err : new Error(String(err)));
-          } finally {
-            isRefreshing = false;
           }
         }
 
