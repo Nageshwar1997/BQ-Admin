@@ -1,10 +1,17 @@
-import type { TQuillImageBlot } from '@/types/input.type';
+import { isUndefined } from '@beautinique/shared-utils';
 import Quill from 'quill';
 
-type TQuillImageValue = { src: string; alt?: string; id?: string };
+import type { IQuillImageBlot } from '@/types/input.type';
+import { isNull } from '@/utils/common.util';
+
+interface TQuillImageValue {
+  src: string;
+  alt?: string;
+  id?: string;
+}
 
 // Extended Image Blot
-const BaseImage = Quill.import('formats/image') as TQuillImageBlot;
+const BaseImage = Quill.import('formats/image') as IQuillImageBlot;
 
 class QuillImgBlot extends BaseImage {
   static create(value: string | TQuillImageValue) {
@@ -17,7 +24,7 @@ class QuillImgBlot extends BaseImage {
 
       node.setAttribute('alt', value.alt ?? 'Image');
 
-      if (value.id != null) {
+      if (!isNull(value.id) && !isUndefined(value.id)) {
         node.setAttribute('data-image-id', value.id);
       }
     }
@@ -38,7 +45,7 @@ class QuillImgBlot extends BaseImage {
       return url;
     }
 
-    const Link = Quill.import('formats/link') as { sanitize?: (url: string) => string };
+    const Link = Quill.import('formats/link') as { sanitize?: (url: string) => string } | undefined;
 
     return Link?.sanitize ? Link.sanitize(url) : url;
   }

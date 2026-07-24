@@ -1,5 +1,6 @@
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
 import type { TFormDataProgress } from '@/types/common.type';
+
 import { ApiRequest } from '../ApiRequest';
 
 export class MediaApi extends ApiRequest {

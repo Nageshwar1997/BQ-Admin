@@ -1,3 +1,5 @@
+import type { TDraftProductStepBodyZodSchema } from '@beautinique/frontend-types';
+
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
 import type {
   IGetDashboardProductsQuery,
@@ -7,7 +9,7 @@ import type {
   TL2Category,
   TL3Category,
 } from '@/types/api.type';
-import type { TDraftProductStepBodyZodSchema } from '@beautinique/frontend-types';
+
 import { ApiRequest } from '../ApiRequest';
 
 export class CategoryApi extends ApiRequest {

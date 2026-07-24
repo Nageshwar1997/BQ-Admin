@@ -1,4 +1,3 @@
-import { API_METHODS_AND_URLS } from '@/constants/api.constants';
 import { HEADERS_MAP, USER_ROLE_MAP } from '@beautinique/frontend-constants';
 import type {
   TChangePasswordZodSchema,
@@ -7,6 +6,9 @@ import type {
   TOtpZodSchema,
   TPasswordsZodSchema,
 } from '@beautinique/frontend-types';
+
+import { API_METHODS_AND_URLS } from '@/constants/api.constants';
+
 import { ApiRequest } from '../ApiRequest';
 
 export class AuthApi extends ApiRequest {

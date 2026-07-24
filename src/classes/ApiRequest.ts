@@ -1,19 +1,21 @@
+import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig } from 'axios';
+
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
 import envs from '@/envs';
-import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig } from 'axios';
+
 import ApiError from './ApiError';
 
 interface AxiosRequestConfigWithRetry extends AxiosRequestConfig {
   _retry?: boolean;
 }
 
-type FailedQueueItem = {
+interface IFailedQueueItem {
   resolve: () => void;
   reject: (error: unknown) => void;
-};
+}
 
 let isRefreshing = false;
-let failedQueue: FailedQueueItem[] = [];
+let failedQueue: IFailedQueueItem[] = [];
 let hasRedirected = false;
 
 const processQueue = (error?: unknown) => {
@@ -49,7 +51,7 @@ export class ApiRequest {
       (res) => res,
       async (error: unknown) => {
         if (!axios.isAxiosError(error)) {
-          return Promise.reject(error);
+          return Promise.reject(error instanceof Error ? error : new Error(String(error)));
         }
 
         if (!error.config) {
@@ -81,11 +83,11 @@ export class ApiRequest {
 
             processQueue();
 
-            return this.instance.request(originalRequest);
+            return await this.instance.request(originalRequest);
           } catch (err) {
             processQueue(err);
             triggerLogout();
-            return Promise.reject(err);
+            return await Promise.reject(err instanceof Error ? err : new Error(String(err)));
           } finally {
             isRefreshing = false;
           }
