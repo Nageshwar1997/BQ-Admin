@@ -1,8 +1,3 @@
-import MediaCarousel from '@/components/layout/carousels/MediaCarousel';
-import { MediaModal } from '@/components/layout/modals/MediaModal';
-import type { TChildren, TMediaResource } from '@/types/component.type';
-import type { IFileInput } from '@/types/input.type';
-import { isIconProps } from '@/utils/common.util';
 import {
   IMAGE_FORMATS,
   IMAGE_MIMES,
@@ -16,7 +11,14 @@ import type {
   TVideoMime,
 } from '@beautinique/frontend-types';
 import { Icon } from '@iconify/react';
-import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { type ChangeEvent, useEffect, useRef, useState } from 'react';
+
+import MediaCarousel from '@/components/layout/carousels/MediaCarousel';
+import { MediaModal } from '@/components/layout/modals/MediaModal';
+import type { IChildren, TMediaResource } from '@/types/component.type';
+import type { IFileInput } from '@/types/input.type';
+import { isIconProps } from '@/utils/common.util';
+
 import { InputError, InputIcon, InputLabel } from './children';
 
 const getMediaType = (value: File | string): TMediaResource => {
@@ -32,7 +34,7 @@ const getMediaType = (value: File | string): TMediaResource => {
     return 'image';
   }
 
-  const cleanUrl = value.split('?')[0].split('#')[0];
+  const cleanUrl = (value.split('?')[0] ?? '').split('#')[0] ?? '';
 
   const extension = cleanUrl.split('.').pop()?.toLowerCase();
 
@@ -52,7 +54,7 @@ const getMediaType = (value: File | string): TMediaResource => {
 };
 
 const MediaErrorStyle = ({ errors }: Pick<IFileInput, 'errors'>) => {
-  if (!errors || !errors.length) return null;
+  if (!errors?.length) return null;
 
   return (
     <style>
@@ -60,14 +62,14 @@ const MediaErrorStyle = ({ errors }: Pick<IFileInput, 'errors'>) => {
         .map((error, index) => {
           if (!error) return '';
 
-          return `.media-carousel > div:nth-child(${index + 1}) { border-color: var(--color-red-c) !important; }`;
+          return `.media-carousel > div:nth-child(${String(index + 1)}) { border-color: var(--color-red-c) !important; }`;
         })
         .join('\n')}
     </style>
   );
 };
 
-const InputWrapper = ({ children, icons }: TChildren & Pick<IFileInput, 'icons'>) => (
+const InputWrapper = ({ children, icons }: IChildren & Pick<IFileInput, 'icons'>) => (
   <div className="flex items-center justify-between gap-3">
     {/* Left Icon */}
     <InputIcon icon={icons?.left} />
@@ -78,12 +80,9 @@ const InputWrapper = ({ children, icons }: TChildren & Pick<IFileInput, 'icons'>
   </div>
 );
 
-const InputWithoutIconClick = ({
-  fileInputProps,
-  className,
-  children,
-  icons,
-}: Pick<IFileInput, 'fileInputProps' | 'className' | 'icons'> & TChildren) => (
+type Props = Pick<IFileInput, 'fileInputProps' | 'className' | 'icons'> & IChildren;
+
+const InputWithoutIconClick = ({ fileInputProps, className = '', children, icons }: Props) => (
   <label
     htmlFor={fileInputProps.name}
     className={`border-primary/10 bg-smoke-eerie group block rounded-lg border px-3 ${className}`}
@@ -94,10 +93,10 @@ const InputWithoutIconClick = ({
 
 const InputWithIconClick = ({
   fileInputProps,
-  className,
+  className = '',
   children,
   icons,
-}: Pick<IFileInput, 'fileInputProps' | 'className' | 'icons'> & TChildren) => (
+}: Pick<IFileInput, 'fileInputProps' | 'className' | 'icons'> & IChildren) => (
   <div className={`border-primary/10 bg-smoke-eerie group rounded-lg border px-3 ${className}`}>
     <InputWrapper icons={icons}>
       <label htmlFor={fileInputProps.name} className="block">
@@ -112,7 +111,7 @@ const CenterContent = ({ fileInputProps }: Pick<IFileInput, 'fileInputProps'>) =
   const { value: _, ...inputProps } = fileInputProps;
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (fileInputProps?.disabled) return;
+    if (fileInputProps.disabled) return;
 
     if (fileInputProps.onChange) {
       fileInputProps.onChange(event);
@@ -124,22 +123,18 @@ const CenterContent = ({ fileInputProps }: Pick<IFileInput, 'fileInputProps'>) =
   return (
     <div
       role="button"
-      className={`flex-1 truncate border-none bg-transparent text-[13px] outline-hidden focus:border-none focus:outline-hidden ${fileInputProps?.disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${fileInputProps?.className || ''}`}
+      className={`flex-1 truncate border-none bg-transparent text-[13px] outline-hidden focus:border-none focus:outline-hidden ${fileInputProps.disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${fileInputProps.className ?? ''}`}
     >
       <p className="text-primary/30 w-max truncate py-2 xl:py-3">
-        {fileInputProps?.placeholder
-          ? fileInputProps.placeholder
-          : fileInputProps.multiple
-            ? 'Choose files'
-            : 'Choose file'}
+        {(fileInputProps.placeholder ?? fileInputProps.multiple) ? 'Choose files' : 'Choose file'}
       </p>
       {/* Input */}
       <input
         ref={inputRef}
         aria-autocomplete="none"
         {...inputProps}
-        id={fileInputProps.id || fileInputProps.name}
-        accept={fileInputProps?.accept ?? IMAGE_MIMES.join(', ')}
+        id={fileInputProps.id ?? fileInputProps.name}
+        accept={fileInputProps.accept ?? IMAGE_MIMES.join(', ')}
         type="file"
         onChange={handleChange}
         className="sr-only"
@@ -152,8 +147,8 @@ const MainSection = ({
   icons,
   ...props
 }: Pick<IFileInput, 'fileInputProps' | 'className' | 'icons'>) => {
-  return (isIconProps(icons?.left) && icons?.left?.onClick) ||
-    (isIconProps(icons?.right) && icons?.right?.onClick) ? (
+  return (isIconProps(icons?.left) && icons.left.onClick) ||
+    (isIconProps(icons?.right) && icons.right.onClick) ? (
     <InputWithIconClick {...props} icons={icons}>
       <CenterContent {...props} />
     </InputWithIconClick>
@@ -171,7 +166,7 @@ const FileInput = ({
   mediaCarouselClassName = '',
   errors = [],
   handleRemove,
-  fileInputProps = {},
+  fileInputProps,
   ...props
 }: IFileInput) => {
   const [showImageModal, setShowImageModal] = useState(false);
@@ -197,6 +192,11 @@ const FileInput = ({
     const value = fileInputProps.value;
 
     if (!value) {
+      /**
+       * previews are derived from getPreviewUrl(), which allocates blob URLs (an external-system
+       * side effect unsafe to run during render), so this can't be computed with a plain useMemo.
+       */
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPreviews([]);
       return;
     }
@@ -223,36 +223,38 @@ const FileInput = ({
   }, [fileInputProps.value]);
 
   useEffect(() => {
+    const urlMap = previewUrlsRef.current;
+
     return () => {
-      previewUrlsRef.current.forEach((url) => {
+      urlMap.forEach((url) => {
         URL.revokeObjectURL(url);
       });
 
-      previewUrlsRef.current.clear();
+      urlMap.clear();
     };
   }, []);
   return (
     <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
       <div className="relative">
-        <InputLabel children={label} htmlFor={fileInputProps.name} />
+        <InputLabel htmlFor={fileInputProps.name}>{label}</InputLabel>
         <MainSection fileInputProps={fileInputProps} {...props} />
       </div>
-      {errors?.length > 0 && (
+      {errors.length > 0 && (
         <div className="space-y-1">
           {errors.map((error, index) => {
             if (!error) return null;
-            const message = errors.length > 1 ? `${index + 1}. ${error}` : error;
+            const message = errors.length > 1 ? `${String(index + 1)}. ${error}` : error;
             return <InputError key={index} error={message} />;
           })}
         </div>
       )}
-      {previews?.length > 0 && (
+      {previews.length > 0 && (
         <div className="border-primary/10 bg-smoke-eerie relative flex rounded-lg border">
-          {fileInputProps?.multiple && (
+          {fileInputProps.multiple && (
             <div className="sticky left-0 mr-1 ml-2 flex items-center justify-start gap-3">
               <label
                 htmlFor={fileInputProps.name}
-                className={`border-primary/50 bg-tertiary-invert hover:border-tertiary flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-md border shadow-xs transition-colors duration-300 md:size-16 lg:size-20 ${fileInputProps?.disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                className={`border-primary/50 bg-tertiary-invert hover:border-tertiary flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-md border shadow-xs transition-colors duration-300 md:size-16 lg:size-20 ${fileInputProps.disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
               >
                 <Icon icon="solar:gallery-add-linear" className="text-primary size-[40%]" />
               </label>
@@ -261,7 +263,7 @@ const FileInput = ({
           )}
           <MediaErrorStyle errors={errors} />
           <MediaCarousel
-            className={`${mediaCarouselClassName}`}
+            className={mediaCarouselClassName}
             gradientClassNames={{
               left: 'from-smoke-eerie rounded-l-[7px] z-2',
               right: 'from-smoke-eerie rounded-r-[7px] z-2',

@@ -1,3 +1,8 @@
+import './quillInput.css';
+
+import Quill, { Delta } from 'quill';
+import { forwardRef, useEffect, useRef } from 'react';
+
 import QuillImgBlot from '@/classes/QuillImgBlot';
 import { defaultQuillToolbar } from '@/constants/input.constants';
 import type { IQuillInput } from '@/types/input.type';
@@ -11,10 +16,8 @@ import {
   removePastedStyles,
   toggleLinkId,
 } from '@/utils/input.util';
-import Quill, { Delta } from 'quill';
-import { forwardRef, useEffect, useRef } from 'react';
+
 import { InputError, InputLabel } from '../children';
-import './quillInput.css';
 
 Quill.register('formats/image', QuillImgBlot, true);
 Quill.register('modules/headingIds', enableQuillHeadingIds);
@@ -25,7 +28,7 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
       label,
       disabled,
       error,
-      className,
+      className = '',
       value,
       onChange,
       placeholder = 'Write your content here...',
@@ -55,9 +58,15 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
             container: toolbarOptions ? buildToolbar(toolbarOptions) : defaultQuillToolbar,
             handlers: {
               ...(imagesRef && {
-                image: () => insertImageIntoQuill(quill, imagesRef),
+                image: () => {
+                  insertImageIntoQuill(quill, imagesRef);
+                },
               }),
-              ...(needLinkButton && { toggleLinkId: () => toggleLinkId(quill) }),
+              ...(needLinkButton && {
+                toggleLinkId: () => {
+                  toggleLinkId(quill);
+                },
+              }),
             },
           },
           clipboard: {
@@ -117,6 +126,8 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
         }
       }
 
+      const images = imagesRef?.current;
+
       return () => {
         quill.root.removeEventListener('scroll', handleScroll);
 
@@ -124,20 +135,24 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
           ref.current = null;
         }
 
-        imagesRef?.current.forEach((image) => {
+        images?.forEach((image) => {
           URL.revokeObjectURL(image.blobUrl);
         });
 
-        imagesRef?.current.splice(0);
+        images?.splice(0);
 
         container.innerHTML = '';
       };
+      // Quill instance is intentionally created once on mount only - recreating it whenever
+      // placeholder/onChange/toolbarOptions/etc change would destroy the editor's cursor
+      // position, undo history and DOM, which these props aren't meant to trigger.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Set value when it changes from outside
     useEffect(() => {
       if (editorRef.current && value !== editorRef.current.root.innerHTML) {
-        editorRef.current.root.innerHTML = value || '';
+        editorRef.current.root.innerHTML = value ?? '';
       }
     }, [value]);
 
@@ -148,7 +163,7 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
     return (
       <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${className}`}>
         <div className="relative">
-          <InputLabel children={label} />
+          <InputLabel>{label}</InputLabel>
 
           <div
             ref={containerRef}
@@ -161,5 +176,7 @@ const QuillInput = forwardRef<Quill | null, IQuillInput>(
     );
   },
 );
+
+QuillInput.displayName = 'QuillInput';
 
 export default QuillInput;

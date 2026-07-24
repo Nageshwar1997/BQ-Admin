@@ -1,5 +1,7 @@
+import { type ChangeEvent, useEffect, useRef } from 'react';
+
 import type { ITextArea } from '@/types/input.type';
-import { useEffect, useRef, type ChangeEvent } from 'react';
+
 import { InputError, InputLabel } from './children';
 
 const Textarea = ({
@@ -16,7 +18,7 @@ const Textarea = ({
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     if (textAreaProps.disabled) return;
     textAreaProps.onChange?.(event);
-    register?.onChange?.(event);
+    void register?.onChange(event);
   };
 
   useEffect(() => {
@@ -28,7 +30,7 @@ const Textarea = ({
   return (
     <div className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}>
       <div className="relative">
-        <InputLabel children={label} htmlFor={textAreaProps?.name} />
+        <InputLabel htmlFor={textAreaProps.name}>{label}</InputLabel>
         <div
           className={`border-primary/10 bg-smoke-eerie overflow-hidden rounded-lg border ${className}`}
         >
@@ -38,10 +40,10 @@ const Textarea = ({
             {...register}
             {...textAreaProps}
             {...(needRef && { ref: inputRef })}
-            id={textAreaProps.id || textAreaProps.name}
+            id={textAreaProps.id ?? textAreaProps.name}
             onChange={handleChange}
-            rows={textAreaProps.rows || 5}
-            className={`text-primary placeholder:text-primary/30 autofill-effect block w-full resize-y border-none bg-transparent px-3 py-2 text-[13px] outline-hidden placeholder:text-[13px] focus:border-none focus:outline-hidden disabled:cursor-not-allowed xl:py-3 ${textAreaProps?.className || ''}`}
+            rows={textAreaProps.rows ?? 5}
+            className={`text-primary placeholder:text-primary/30 autofill-effect block w-full resize-y border-none bg-transparent px-3 py-2 text-[13px] outline-hidden placeholder:text-[13px] focus:border-none focus:outline-hidden disabled:cursor-not-allowed xl:py-3 ${textAreaProps.className ?? ''}`}
           />
         </div>
       </div>

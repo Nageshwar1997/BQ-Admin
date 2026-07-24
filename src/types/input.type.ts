@@ -98,8 +98,8 @@ export interface IColorInput
     Pick<IBaseInput, 'className' | 'containerClassName' | 'error' | 'label'>,
     Pick<IInput['inputProps'], 'disabled' | 'placeholder'>,
     Pick<ISelect, 'position'> {
-  value: string;
-  onChange: (value: string) => void;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
 export interface IFileInput extends Omit<IBaseInput, 'error' | 'register'> {

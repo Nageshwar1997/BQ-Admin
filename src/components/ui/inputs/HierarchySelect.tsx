@@ -1,19 +1,44 @@
+import { Icon } from '@iconify/react';
+import { type ChangeEvent, useMemo, useState } from 'react';
+
 import ApiStatus from '@/components/layout/ApiStatus';
 import { useOutsideClick } from '@/hooks/useOutsideClick';
-import type { TChildren } from '@/types/component.type';
+import type { IChildren } from '@/types/component.type';
 import type {
   IHierarchySelect,
   IHierarchySelectOption,
   IHierarchySelectTreeNode,
 } from '@/types/input.type';
-import { Icon } from '@iconify/react';
-import { useMemo, useState, type ChangeEvent } from 'react';
+
 import { InputError, InputIcon, InputLabel } from './children';
 import Input from './Input';
 
-const IconContainer = ({ children }: TChildren) => (
+const IconContainer = ({ children }: IChildren) => (
   <div className="flex size-5 shrink-0 items-center justify-center">{children}</div>
 );
+
+const filterTree = (nodes: IHierarchySelectOption[], keyword: string): IHierarchySelectOption[] => {
+  if (!keyword.trim()) return nodes;
+
+  const lower = keyword.toLowerCase();
+
+  return nodes.reduce<IHierarchySelectOption[]>((acc, node) => {
+    const searchableText = node.searchLabel ?? (typeof node.label === 'string' ? node.label : '');
+
+    const matched = searchableText.toLowerCase().includes(lower);
+
+    const children = node.children ? filterTree(node.children, keyword) : [];
+
+    if (matched || children.length) {
+      acc.push({
+        ...node,
+        children,
+      });
+    }
+
+    return acc;
+  }, []);
+};
 
 const TreeNode = ({
   node,
@@ -33,7 +58,7 @@ const TreeNode = ({
         className={`hover:bg-primary/5 text-tertiary flex items-center gap-2 rounded-sm px-2 py-1.5 text-[13px] ${
           isSelected ? 'bg-primary/8' : ''
         } ${node.disabled ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
-        style={{ paddingLeft: `${level * 10}px` }}
+        style={{ paddingLeft: `${String(level * 10)}px` }}
         onClick={() => {
           if (node.disabled) return;
 
@@ -107,12 +132,12 @@ const TreeNode = ({
 const HierarchySelect = ({
   options,
   selectProps,
-  className,
-  containerClassName,
+  className = '',
+  containerClassName = '',
   error,
   icons,
   label,
-  optionsClassName,
+  optionsClassName = '',
   position,
   inputProps,
 }: IHierarchySelect) => {
@@ -120,12 +145,17 @@ const HierarchySelect = ({
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState<Record<string | number, boolean>>({});
 
-  const containerRef = useOutsideClick<HTMLDivElement>(() => setIsOpen(false), { enabled: isOpen });
+  const containerRef = useOutsideClick<HTMLDivElement>(
+    () => {
+      setIsOpen(false);
+    },
+    { enabled: isOpen },
+  );
 
-  const searchValue = inputProps?.value || search;
+  const searchValue = inputProps?.value ?? search;
 
   const handleToggle = () => {
-    if (selectProps?.disabled || !options.length) return;
+    if (selectProps.disabled || !options.length) return;
     setIsOpen((prev) => !prev);
   };
 
@@ -144,34 +174,11 @@ const HierarchySelect = ({
     inputProps?.onChange?.(e);
   };
 
-  const filterTree = (
-    nodes: IHierarchySelectOption[],
-    keyword: string,
-  ): IHierarchySelectOption[] => {
-    if (!keyword.trim()) return nodes;
+  const searchKeyword = searchValue.toString();
 
-    const lower = keyword.toLowerCase();
-
-    return nodes.reduce<IHierarchySelectOption[]>((acc, node) => {
-      const searchableText = node.searchLabel ?? (typeof node.label === 'string' ? node.label : '');
-
-      const matched = searchableText.toLowerCase().includes(lower);
-
-      const children = node.children ? filterTree(node.children, keyword) : [];
-
-      if (matched || children.length) {
-        acc.push({
-          ...node,
-          children,
-        });
-      }
-
-      return acc;
-    }, []);
-  };
   const filteredOptions = useMemo(
-    () => filterTree(options, searchValue.toString()),
-    [options, searchValue.toString()],
+    () => filterTree(options, searchKeyword),
+    [options, searchKeyword],
   );
 
   const selectedOption = useMemo(() => {
@@ -203,7 +210,9 @@ const HierarchySelect = ({
       className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}
     >
       <div className="relative">
-        <InputLabel children={label} onClick={handleToggle} className="z-2 cursor-pointer" />
+        <InputLabel onClick={handleToggle} className="z-2 cursor-pointer">
+          {label}
+        </InputLabel>
 
         <div
           className={`border-primary/10 bg-smoke-eerie flex items-center gap-3 overflow-hidden rounded-lg border px-3 ${className}`}
@@ -218,7 +227,7 @@ const HierarchySelect = ({
             <span
               className={`flex-1 truncate py-2 xl:py-3 ${!selectedOption?.value ? 'text-primary/30' : ''}`}
             >
-              {selectedOption?.label || selectProps.placeholder || 'Select'}
+              {selectedOption?.label ?? selectProps.placeholder ?? 'Select'}
             </span>
 
             <Icon
@@ -232,7 +241,9 @@ const HierarchySelect = ({
                 className={`border-primary/10 bg-smoke-eerie absolute left-0 z-3 w-full overflow-hidden rounded-lg border shadow-md ${
                   position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
                 } ${optionsClassName}`}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
               >
                 <Input
                   needRef={true}
@@ -240,8 +251,8 @@ const HierarchySelect = ({
                     ...inputProps,
                     value: searchValue,
                     onChange: handleSearch,
-                    placeholder: inputProps?.placeholder || 'Search here...',
-                    className: `py-2! ${inputProps?.className || ''}`,
+                    placeholder: inputProps?.placeholder ?? 'Search here...',
+                    className: `py-2! ${inputProps?.className ?? ''}`,
                   }}
                   icons={{
                     right: {

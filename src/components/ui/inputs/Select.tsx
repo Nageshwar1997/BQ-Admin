@@ -1,8 +1,9 @@
-import { EMPTY_ARRAY } from '@/constants/common.constants';
-import { useOutsideClick } from '@/hooks/useOutsideClick';
-import type { ISelect } from '@/types/input.type';
 import { Icon } from '@iconify/react';
 import { useEffect, useRef, useState } from 'react';
+
+import { useOutsideClick } from '@/hooks/useOutsideClick';
+import type { ISelect } from '@/types/input.type';
+
 import { InputError, InputIcon, InputLabel } from './children';
 
 const Select = ({
@@ -13,18 +14,23 @@ const Select = ({
   optionsClassName = '',
   icons,
   selectProps,
-  options = EMPTY_ARRAY,
+  options,
   position = 'bottom',
 }: ISelect) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const containerRef = useOutsideClick<HTMLDivElement>(() => setIsOpen(false), { enabled: isOpen });
+  const containerRef = useOutsideClick<HTMLDivElement>(
+    () => {
+      setIsOpen(false);
+    },
+    { enabled: isOpen },
+  );
   const selectedOptionRef = useRef<HTMLLIElement | null>(null);
 
   const selected = options.find((opt) => opt.value === selectProps.value);
 
   const handleToggle = () => {
-    if (selectProps?.disabled || !options.length) return;
+    if (selectProps.disabled || !options.length) return;
     setIsOpen((prev) => !prev);
   };
 
@@ -44,7 +50,9 @@ const Select = ({
       className={`flex max-w-full min-w-0 flex-col gap-1.5 ${containerClassName}`}
     >
       <div className="relative">
-        <InputLabel children={label} onClick={handleToggle} className="z-2 cursor-pointer" />
+        <InputLabel onClick={handleToggle} className="z-2 cursor-pointer">
+          {label}
+        </InputLabel>
         <div
           className={`border-primary/10 bg-smoke-eerie flex items-center gap-3 overflow-hidden rounded-lg border px-3 ${className}`}
         >
@@ -57,7 +65,7 @@ const Select = ({
             <span
               className={`flex-1 truncate py-2 xl:py-3 ${!selected?.value ? 'text-primary/30' : ''}`}
             >
-              {selected?.label || selectProps?.placeholder}
+              {selected?.label ?? selectProps.placeholder}
             </span>
             <Icon
               icon="solar:alt-arrow-down-linear"
@@ -84,8 +92,8 @@ const Select = ({
                         onClick={(e) => {
                           e.stopPropagation();
 
-                          if (option.disabled || selectProps?.disabled) return;
-                          selectProps.onChange?.(active ? '' : option.value || '');
+                          if (option.disabled || selectProps.disabled) return;
+                          selectProps.onChange(active ? '' : option.value || '');
                           setIsOpen(false);
                         }}
                       >

@@ -200,3 +200,8 @@ export interface IDropdown extends IClassName, Partial<Pick<IDropdownOptions, 'o
   isRounded?: boolean;
   defaultOpen?: boolean;
 }
+
+export interface INavbar extends IClassName, Partial<IChildren> {
+  components?: ReactNode[];
+  buttons?: Partial<IButton & IChildren>[];
+}
