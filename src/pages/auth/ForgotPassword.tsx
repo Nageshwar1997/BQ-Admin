@@ -1,3 +1,13 @@
+import type {
+  TEmailZodSchema,
+  TOtpZodSchema,
+  TPasswordsZodSchema,
+} from '@beautinique/frontend-types';
+import { emailZodSchema, otpZodSchema, passwordsZodSchema } from '@beautinique/frontend-zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+
 import BorderGradient from '@/components/layout/containers/BorderGradient';
 import AuthBottomInstructions from '@/components/ui/AuthBottomInstructions';
 import Button from '@/components/ui/Button';
@@ -20,15 +30,6 @@ import {
 import useUserStore from '@/stores/user.store';
 import { toaster } from '@/utils/common.util';
 import { setErrorToForm } from '@/utils/form.util';
-import type {
-  TEmailZodSchema,
-  TOtpZodSchema,
-  TPasswordsZodSchema,
-} from '@beautinique/frontend-types';
-import { emailZodSchema, otpZodSchema, passwordsZodSchema } from '@beautinique/frontend-zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
 
 const ForgotPassword = () => {
   /* ================= 1. Store Hooks ================= */
@@ -74,8 +75,8 @@ const ForgotPassword = () => {
 
   const handleSendOtp = async (data: TEmailZodSchema) => {
     await sendOtp.mutateAsync(data, {
-      onSuccess: () => setCurrentStep('verify'),
-      onError: ({ fieldErrors }) => setErrorToForm(sendOtpForm.setError, fieldErrors),
+      onSuccess: () => { setCurrentStep('verify'); },
+      onError: ({ fieldErrors }) => { setErrorToForm(sendOtpForm.setError, fieldErrors); },
     });
   };
 
@@ -83,8 +84,8 @@ const ForgotPassword = () => {
     await verifyOtp.mutateAsync(
       { ...data, token },
       {
-        onSuccess: () => setCurrentStep('save'),
-        onError: ({ fieldErrors }) => setErrorToForm(verifyOtpForm.setError, fieldErrors),
+        onSuccess: () => { setCurrentStep('save'); },
+        onError: ({ fieldErrors }) => { setErrorToForm(verifyOtpForm.setError, fieldErrors); },
       },
     );
   };
@@ -93,18 +94,20 @@ const ForgotPassword = () => {
     await savePassword.mutateAsync(
       { ...data, token },
       {
-        onSuccess: ({ user }) => setUser(user),
-        onError: ({ fieldErrors }) => setErrorToForm(passwordForm.setError, fieldErrors),
+        onSuccess: ({ user }) => { setUser(user); },
+        onError: ({ fieldErrors }) => { setErrorToForm(passwordForm.setError, fieldErrors); },
       },
     );
   };
 
   const handleResendOtp = async () => {
     if (sendCount >= 3) {
-      return toaster.error({
+      toaster.error({
         title: 'Resend Failed',
         description: 'You have reached the maximum number of attempts.',
       });
+
+      return;
     }
 
     if (sendOtp.isPending || verifyOtp.isPending || resendOtp.isPending) return;
@@ -127,7 +130,7 @@ const ForgotPassword = () => {
       case 'send':
       default:
         sendOtpForm.reset(FORM_DEFAULT_VALUES.email);
-        navigate(-1);
+        void navigate(-1);
         break;
     }
   };
@@ -224,7 +227,7 @@ const ForgotPassword = () => {
                   icons={{
                     right: {
                       icon: showPasswords[input.name] ? 'lucide:eye-off' : 'lucide:eye',
-                      onClick: () => togglePasswordVisibility(input.name),
+                      onClick: () => { togglePasswordVisibility(input.name); },
                       className: 'cursor-pointer',
                     },
                   }}

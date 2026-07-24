@@ -1,3 +1,9 @@
+import type { TChangePasswordZodSchema } from '@beautinique/frontend-types';
+import { changePasswordZodSchema } from '@beautinique/frontend-zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+
 import BorderGradient from '@/components/layout/containers/BorderGradient';
 import AuthBottomInstructions from '@/components/ui/AuthBottomInstructions';
 import Button from '@/components/ui/Button';
@@ -9,11 +15,6 @@ import usePathParams from '@/hooks/usePathParams';
 import { useChangePassword } from '@/services/user-service/auth.service.query';
 import useUserStore from '@/stores/user.store';
 import { setErrorToForm } from '@/utils/form.util';
-import type { TChangePasswordZodSchema } from '@beautinique/frontend-types';
-import { changePasswordZodSchema } from '@beautinique/frontend-zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 
 const ChangePassword = () => {
   /* ================= 1. Store Hooks ================= */
@@ -56,10 +57,12 @@ const ChangePassword = () => {
         onSuccess: ({ user }) => {
           if (user) {
             setUser(user);
-            navigate(-1);
+            void navigate(-1);
           }
         },
-        onError: ({ fieldErrors }) => setErrorToForm(setError, fieldErrors),
+        onError: ({ fieldErrors }) => {
+          setErrorToForm(setError, fieldErrors);
+        },
       },
     );
   };
@@ -99,7 +102,9 @@ const ChangePassword = () => {
                 icons={{
                   right: {
                     icon: showPasswords[input.name] ? 'lucide:eye-off' : 'lucide:eye',
-                    onClick: () => togglePasswordVisibility(input.name),
+                    onClick: () => {
+                      togglePasswordVisibility(input.name);
+                    },
                     className: 'cursor-pointer',
                   },
                 }}

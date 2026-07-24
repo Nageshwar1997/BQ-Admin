@@ -1,5 +1,6 @@
-import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
 import { Outlet } from 'react-router-dom';
+
+import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
 
 const Auth = () => {
   return (
@@ -12,11 +13,9 @@ const Auth = () => {
           loading="eager"
         />
       </div>
-      <ScrollableGradientContainer
-        direction="vertical"
-        className="mx-auto max-w-md"
-        children={<Outlet />}
-      />
+      <ScrollableGradientContainer direction="vertical" className="mx-auto max-w-md">
+        <Outlet />
+      </ScrollableGradientContainer>
     </div>
   );
 };
