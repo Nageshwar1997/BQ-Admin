@@ -65,7 +65,7 @@ const ColorInput = ({
             />
           </div>
           <span className={`flex-1 truncate py-2 xl:py-3 ${!value ? 'text-primary/30' : ''}`}>
-            {value?.toUpperCase() ?? placeholder}
+            {value ? value.toUpperCase() : placeholder}
           </span>
           <InputIcon
             icon={{
