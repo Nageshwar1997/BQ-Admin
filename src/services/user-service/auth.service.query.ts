@@ -1,11 +1,11 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { authApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
 
-const { login, password } = API_QUERY_KEYS.user_service.auth;
+const { login, logout, password } = API_QUERY_KEYS.user_service.auth;
 
 /* ===================== LOGIN QUERIES ===================== */
 
@@ -137,6 +137,32 @@ export const useChangePassword = () => {
     },
     onSuccess: ({ message }) => {
       handleApiSuccessToaster(message);
+    },
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
+    onSettled: (_data, _error, _variables, context) => {
+      if (context?.toastId) toaster.remove(context.toastId);
+    },
+  });
+};
+
+/* ===================== LOGOUT QUERIES ===================== */
+
+export const useLogout = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: logout,
+    mutationFn: authApi.logout,
+    onMutate: () => {
+      const toastId = toaster.loading({ title: 'Please wait...', description: 'Logging out...' });
+      return { toastId };
+    },
+    onSuccess: ({ message }) => {
+      handleApiSuccessToaster(message);
+      // Drop all cached data so nothing from this session leaks into the next login.
+      queryClient.clear();
     },
     onError: (error) => {
       handleApiErrorToaster(error);

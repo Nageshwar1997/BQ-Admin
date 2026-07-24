@@ -57,6 +57,12 @@ export class AuthApi extends ApiRequest {
   public changePassword = (data: TChangePasswordZodSchema) => {
     return this.request<IUser>({ ...this.routes.password.change, data });
   };
+
+  /* ===================== LOGOUT API ===================== */
+
+  public logout = () => {
+    return this.request(this.routes.logout);
+  };
 }
 export class UserApi extends ApiRequest {
   private routes = API_METHODS_AND_URLS.user_service.user;

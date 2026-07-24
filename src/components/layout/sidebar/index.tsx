@@ -4,9 +4,11 @@ import { Link } from 'react-router-dom';
 
 import Divider from '@/components/ui/Divider';
 import Tooltip from '@/components/ui/Tooltip';
-import { SIDEBAR_DATA } from '@/constants/common.constants';
+import { ROUTES, SIDEBAR_DATA } from '@/constants/common.constants';
 import useIsSmallScreen from '@/hooks/useIsSmallScreen';
 import usePathParams from '@/hooks/usePathParams';
+import { useLogout } from '@/services/user-service/auth.service.query';
+import useUserStore from '@/stores/user.store';
 
 import ScrollableGradientContainer from '../containers/ScrollableGradientContainer';
 
@@ -22,14 +24,14 @@ const SidebarItem = ({
 }) => {
   const icon = isSameIndex || isSameRoute ? item.icon.replace('-linear', '-bold') : item.icon;
   return (
-    <div className="flex flex-col items-center gap-1" onClick={() => onClick?.(item.handler)}>
+    <div
+      className="flex cursor-pointer flex-col items-center gap-1"
+      onClick={() => onClick?.(item.handler)}
+    >
       <span
-        className={`border-primary/50 w-fit rounded-lg border p-1 md:p-1.5 ${isSameRoute ? 'bg-accent-duo shadow-secondary-btn' : 'hover:bg-secondary-invert/40 hover:shadow-tertiary-btn bg-secondary-invert/30'}`}
+        className={`border-primary/50 size-6 w-fit shrink-0 rounded-lg border p-1 md:size-9 md:p-1.5 ${isSameRoute ? 'bg-accent-duo shadow-secondary-btn' : 'hover:bg-secondary-invert/40 hover:shadow-tertiary-btn bg-secondary-invert/30'}`}
       >
-        <Icon
-          icon={icon}
-          className={`size-5 md:size-6 ${isSameRoute ? 'text-white' : 'text-tertiary'}`}
-        />
+        <Icon icon={icon} className={`size-full ${isSameRoute ? 'text-white' : 'text-tertiary'}`} />
       </span>
       <span className="text-[8px] md:hidden">{item.title}</span>
     </div>
@@ -37,14 +39,21 @@ const SidebarItem = ({
 };
 
 const Sidebar = () => {
-  const { pathname, paths } = usePathParams();
+  const { pathname, paths, navigate } = usePathParams();
   const isMobile = useIsSmallScreen(767);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const setUser = useUserStore((s) => s.setUser);
+  const logout = useLogout();
 
-  const handleEvents = (event: (typeof SIDEBAR_DATA)[number]['handler']) => {
+  const handleEvents = async (event: (typeof SIDEBAR_DATA)[number]['handler']) => {
     switch (event) {
       case 'logout':
-        console.warn('Logout');
+        await logout.mutateAsync(undefined, {
+          onSettled: () => {
+            setUser(null);
+            void navigate(`/${ROUTES.AUTH.BASE}`);
+          },
+        });
         break;
       default:
         break;
@@ -74,26 +83,19 @@ const Sidebar = () => {
             const isSameIndex = hoveredIdx === index;
 
             return (
-              <Tooltip
-                key={index}
-                title={item.title}
-                placement={isMobile ? 'top' : 'right'}
-                required={!isMobile}
-              >
+              <Tooltip key={index} title={item.title} placement={'right'} required={!isMobile}>
                 {path ? (
-                  <>
-                    <Link
-                      to={path}
-                      onMouseEnter={() => {
-                        setHoveredIdx(index);
-                      }}
-                      onMouseLeave={() => {
-                        setHoveredIdx(null);
-                      }}
-                    >
-                      <SidebarItem {...item} isSameRoute={isSameRoute} isSameIndex={isSameIndex} />
-                    </Link>
-                  </>
+                  <Link
+                    to={path}
+                    onMouseEnter={() => {
+                      setHoveredIdx(index);
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredIdx(null);
+                    }}
+                  >
+                    <SidebarItem {...item} isSameRoute={isSameRoute} isSameIndex={isSameIndex} />
+                  </Link>
                 ) : (
                   <SidebarItem
                     {...item}
