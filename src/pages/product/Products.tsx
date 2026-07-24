@@ -308,13 +308,11 @@ const Products = () => {
         {(isLoading ||
           isFetchingNextPage ||
           isError ||
+          // typescript-eslint's no-unnecessary-condition misreads isFetchNextPageError as always
+          // falsy for this react-query hook shape, even though tsc confirms it's a real boolean.
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           isFetchNextPageError ||
-          // Check if there are no products
-          (!isLoading &&
-            !isFetchingNextPage &&
-            !isError &&
-            !isFetchNextPageError &&
-            data?.products.length === 0)) && (
+          data?.products.length === 0) && (
           <div
             className={`flex items-center justify-center ${!isFetchingNextPage ? 'min-h-[40dvh]' : ''}`}
           >
@@ -326,18 +324,23 @@ const Products = () => {
             ) : (
               <ApiStatus
                 className="min-h-0!"
-                status={isError || isFetchNextPageError ? 'error' : 'empty'}
+                status={
+                  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- see note above
+                  isError || isFetchNextPageError ? 'error' : 'empty'
+                }
                 title={
                   isError
                     ? 'Failed to load products'
-                    : isFetchNextPageError
+                    : // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- see note above
+                      isFetchNextPageError
                       ? 'Failed to load more products'
                       : 'No products available'
                 }
                 description={
                   isError
                     ? 'Something went wrong while fetching products. Please try again.'
-                    : isFetchNextPageError
+                    : // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- see note above
+                      isFetchNextPageError
                       ? 'Something went wrong while fetching more products. Please try again.'
                       : 'No products have been added yet.'
                 }

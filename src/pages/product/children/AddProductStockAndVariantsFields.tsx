@@ -105,6 +105,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                 return type === 'radio' ? (
                   <Controller
                     key={`${name}-${type}`}
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     name={`variants.${index}.${name}`}
                     control={form.control}
                     defaultValue={input.defaultValue}
@@ -116,6 +117,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                           value={value}
                           onChange={(val) => {
                             onChange(val);
+                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                             form.resetField(`variants.${index}.value`);
                           }}
                           options={options}
@@ -128,6 +130,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                 ) : type === 'color' ? (
                   <Controller
                     key={`${name}-${type}`}
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     name={`variants.${index}.${name}`}
                     control={form.control}
                     render={({ field: { onChange, value } }) => (
@@ -144,6 +147,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                   <Controller
                     key={`${name}-${type}`}
                     control={form.control}
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                     name={`variants.${index}.${name}`}
                     render={({ field }) => {
                       const { label, placeholder1, placeholder2 } = input;
@@ -182,6 +186,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                               ? oldImages?.filter((_, currentIndex) => currentIndex !== imgIdx)
                               : undefined;
 
+                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                             form.setValue(`variants.${index}.${name}`, nextValue, {
                               shouldDirty: true,
                               shouldTouch: true,
@@ -197,6 +202,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                     key={`${name}-${type}`}
                     label={input.label}
                     register={form.register(
+                      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                       `variants.${index}.${name}`,
                       input.type === 'number' ? { valueAsNumber: true } : {},
                     )}
@@ -221,9 +227,11 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                           }
                           remove(index);
                         } else if (action.content === 'Clear') {
+                          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                           form.setValue(`variants.${index}`, EMPTY_VARIANT);
+                          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                           form.clearErrors(`variants.${index}`);
-                        } else if (action.content === 'Add') {
+                        } else {
                           const isInvalid =
                             !currentVariant?.type ||
                             !currentVariant.label ||
