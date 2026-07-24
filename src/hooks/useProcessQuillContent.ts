@@ -1,8 +1,9 @@
+import { useCallback } from 'react';
+import type { FieldPathValue, FieldValues } from 'react-hook-form';
+
 import { useUploadMultipleMedia } from '@/services/media-service/media.service.query';
 import type { IProcessQuillContent } from '@/types/input.type';
 import { toaster } from '@/utils/common.util';
-import { useCallback } from 'react';
-import type { FieldPathValue, FieldValues } from 'react-hook-form';
 
 const getQuillContent = (value: string) => {
   if (!value || value === '<p><br></p>') return undefined;
