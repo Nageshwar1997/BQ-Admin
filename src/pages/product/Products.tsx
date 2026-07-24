@@ -23,6 +23,7 @@ import Select from '@/components/ui/inputs/Select';
 import { PRODUCTS_TABLE_TITLES } from '@/constants/api.constants';
 import { ROUTES } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
+import useIsSmallScreen from '@/hooks/useIsSmallScreen';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesHierarchy } from '@/services/product-service/category.service.query';
@@ -33,6 +34,7 @@ import { formatDate, formatINRCurrency } from '@/utils/common.util';
 
 const SearchAndSort = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
+  const isSmallScreen = useIsSmallScreen(1024);
   const [searchQuery, setSearchQuery] = useState(queryParams.search ?? '');
 
   const { data: hierarchy, isLoading, isError } = useGetCategoriesHierarchy();
@@ -69,7 +71,7 @@ const SearchAndSort = () => {
   return (
     <div className="base:flex-row flex flex-col items-center justify-between gap-3 md:gap-4">
       <Input
-        needRef
+        needRef={!isSmallScreen}
         inputProps={{
           name: 'search',
           placeholder: 'Search products here...',

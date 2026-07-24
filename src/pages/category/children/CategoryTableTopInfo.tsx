@@ -4,6 +4,7 @@ import Badge from '@/components/ui/Badge';
 import Input from '@/components/ui/inputs/Input';
 import { QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
+import useIsSmallScreen from '@/hooks/useIsSmallScreen';
 import useQueryParams from '@/hooks/useQueryParams';
 import type { TCategory } from '@/types/api.type';
 import type { IClassName } from '@/types/component.type';
@@ -18,6 +19,7 @@ const QUERY_CLEAR_MAP = {
 
 const CategorySearchInput = ({ level }: Pick<TCategory, 'level'>) => {
   const { queryParams, setParams } = useQueryParams();
+  const isSmallScreen = useIsSmallScreen(1024);
 
   const queryKey =
     `search_${String(level)}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['search'];
@@ -63,7 +65,7 @@ const CategorySearchInput = ({ level }: Pick<TCategory, 'level'>) => {
 
   return (
     <Input
-      needRef
+      needRef={!isSmallScreen}
       inputProps={{
         name: queryKey,
         placeholder: `Search level ${String(level)} categories here...`,
