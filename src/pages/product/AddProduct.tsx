@@ -86,7 +86,12 @@ const AddProduct = () => {
 
   const basicInfoForm = useForm<TProductBasicInfoZodSchema>({
     resolver: zodResolver(productBasicInfoZodSchema),
-    defaultValues: { step: DRAFT_PRODUCT_STEP_MAP[0] },
+    defaultValues: {
+      step: DRAFT_PRODUCT_STEP_MAP[0],
+      l1Category: {},
+      l2Category: {},
+      l3Category: {},
+    },
   });
 
   const mediaAndGalleryForm = useForm<TProductMediaAndGalleryZodSchema>({

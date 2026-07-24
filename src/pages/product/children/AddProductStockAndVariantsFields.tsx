@@ -46,7 +46,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
 
   const hasVariants = useWatch({ control: form.control, name: 'hasVariants' });
 
-  const variants = useWatch({ control: form.control, name: 'variants' });
+  const variants = useWatch({ control: form.control, name: 'variants', defaultValue: [] });
 
   return (
     <div className="grid gap-6">
@@ -80,7 +80,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
         }}
       />
 
-      {hasVariants ? (
+      {hasVariants && fields.length > 0 ? (
         fields.map((field, index) => {
           const currentVariant = variants[index];
           const error =

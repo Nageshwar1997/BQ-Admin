@@ -1,4 +1,4 @@
-import { VIDEO_MIMES } from '@beautinique/frontend-constants';
+import { EMPTY_ARRAY, VIDEO_MIMES } from '@beautinique/frontend-constants';
 import type { TProductMediaAndGalleryZodSchema } from '@beautinique/frontend-types';
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form';
 
@@ -11,7 +11,7 @@ interface Props {
 }
 
 const AddProductMediaAndGalleryFields = ({ form }: Props) => {
-  const images = useWatch({ control: form.control, name: 'images' });
+  const images = useWatch({ control: form.control, name: 'images', defaultValue: EMPTY_ARRAY });
   const values = useWatch({ control: form.control });
 
   return (
