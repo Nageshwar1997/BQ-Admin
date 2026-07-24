@@ -1,9 +1,11 @@
-import useThemeStore from '@/stores/theme.store';
-import type { TClassName } from '@/types/component.type';
 import { Icon } from '@iconify/react';
+
+import useThemeStore from '@/stores/theme.store';
+import type { IClassName } from '@/types/component.type';
+
 import Tooltip from './Tooltip';
 
-const Theme = ({ className = '' }: TClassName) => {
+const Theme = ({ className = '' }: IClassName) => {
   const theme = useThemeStore((s) => s.theme);
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
 

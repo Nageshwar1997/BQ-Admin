@@ -1,7 +1,8 @@
-import type { TClassName } from '@/types/component.type';
 import { useEffect, useRef } from 'react';
 
-export const QuillContent = ({ content, className = '' }: TClassName & { content: string }) => {
+import type { IClassName } from '@/types/component.type';
+
+export const QuillContent = ({ content, className = '' }: IClassName & { content: string }) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

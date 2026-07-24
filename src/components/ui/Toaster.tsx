@@ -1,9 +1,11 @@
+import { Icon } from '@iconify/react';
+import { type ComponentProps, useCallback, useEffect, useRef, useState } from 'react';
+
 import { TOAST_TYPE } from '@/constants/common.constants';
 import useToastStore from '@/stores/toast.store';
-import type { TClassName } from '@/types/component.type';
+import type { IClassName } from '@/types/component.type';
 import type { TToast, TToastItem } from '@/types/store.type';
-import { Icon } from '@iconify/react';
-import { useEffect, useRef, useState, type ComponentProps } from 'react';
+
 import Button from './Button';
 
 const CircularProgress = ({ progress, ...props }: { progress: number } & ComponentProps<'svg'>) => {
@@ -69,7 +71,7 @@ const cardConfig = (type: TToast['type']) => {
   }
 };
 
-export const Toaster = (props: TToastItem & TClassName) => {
+export const Toaster = (props: TToastItem & IClassName) => {
   const {
     className = '',
     type,
@@ -93,17 +95,19 @@ export const Toaster = (props: TToastItem & TClassName) => {
 
   const config = cardConfig(type);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setVisible(false);
 
     timeoutRef.current = setTimeout(() => {
       setMounted(false);
       remove(props.id);
     }, 300);
-  };
+  }, [remove, props.id]);
 
   useEffect(() => {
-    const enterTimer = setTimeout(() => setVisible(true), 50);
+    const enterTimer = setTimeout(() => {
+      setVisible(true);
+    }, 50);
 
     let autoTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -118,7 +122,7 @@ export const Toaster = (props: TToastItem & TClassName) => {
       if (autoTimer) clearTimeout(autoTimer);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [resolvedAutoClose, closeTimer]);
+  }, [resolvedAutoClose, closeTimer, handleClose]);
 
   if (!mounted) return null;
 
@@ -144,7 +148,7 @@ export const Toaster = (props: TToastItem & TClassName) => {
           ) : (
             <Icon
               icon={config.iconName}
-              className={`${type === TOAST_TYPE.loading ? 'animate-spin' : ''}`}
+              className={type === TOAST_TYPE.loading ? 'animate-spin' : ''}
               style={{ color: `rgb(${config.rgb})` }}
             />
           ))}

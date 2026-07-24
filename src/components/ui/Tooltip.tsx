@@ -1,15 +1,16 @@
-import { TOOLTIP_ANIMATION_DURATION } from '@/constants/common.constants';
-import type { ITooltip } from '@/types/component.type';
-import { getTooltipArrowCss, getTooltipPosition, getTooltipTransform } from '@/utils/common.util';
 import {
+  type CSSProperties,
   useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
-  type CSSProperties,
 } from 'react';
 import { createPortal } from 'react-dom';
+
+import { TOOLTIP_ANIMATION_DURATION } from '@/constants/common.constants';
+import type { ITooltip } from '@/types/component.type';
+import { getTooltipArrowCss, getTooltipPosition, getTooltipTransform } from '@/utils/common.util';
 
 const OriginalTooltip = ({
   title,
@@ -35,7 +36,9 @@ const OriginalTooltip = ({
 
   const showTooltip = () => {
     animationFrameRef.current = window.requestAnimationFrame(() => {
-      animationFrameRef.current = window.requestAnimationFrame(() => setIsVisible(true));
+      animationFrameRef.current = window.requestAnimationFrame(() => {
+        setIsVisible(true);
+      });
     });
   };
 

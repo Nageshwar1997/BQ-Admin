@@ -1,6 +1,8 @@
+import { Icon } from '@iconify/react';
+
 import usePathParams from '@/hooks/usePathParams';
 import type { IBreadcrumb } from '@/types/component.type';
-import { Icon } from '@iconify/react';
+
 import ScrollableGradientContainer from '../layout/containers/ScrollableGradientContainer';
 
 const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) => {
@@ -13,7 +15,7 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
       targetIndex === -1 ? '/' : '/' + activePaths.slice(0, targetIndex + 1).join('/');
 
     if (targetPath !== finalPathName) {
-      navigate(targetPath);
+      void navigate(targetPath);
     }
   };
 
@@ -25,7 +27,9 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
             className={`truncate capitalize ${
               finalPathName !== '/' ? 'cursor-pointer' : 'opacity-80'
             }`}
-            onClick={() => handleNavigate(-1)}
+            onClick={() => {
+              handleNavigate(-1);
+            }}
           >
             Dashboard
           </span>
@@ -42,7 +46,13 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
                 className={`truncate capitalize ${
                   !isLast && finalPathName !== targetPath ? 'cursor-pointer' : 'opacity-80'
                 }`}
-                onClick={!isLast ? () => handleNavigate(index) : undefined}
+                onClick={
+                  !isLast
+                    ? () => {
+                        handleNavigate(index);
+                      }
+                    : undefined
+                }
               >
                 {path.replace('-', ' ')}
               </span>

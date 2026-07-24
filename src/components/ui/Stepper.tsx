@@ -1,11 +1,11 @@
 import { Icon } from '@iconify/react';
 import type { CSSProperties, ReactNode } from 'react';
 
-export type StepperStep = {
+export interface StepperStep {
   title: string;
   description?: string;
   icon?: string;
-};
+}
 
 interface StepperProps {
   steps: StepperStep[];
@@ -16,7 +16,7 @@ interface StepperProps {
 }
 
 const Stepper = ({ steps, activeStep, onStepClick, className = '', children }: StepperProps) => {
-  const currentStep = Math.min(Math.max(activeStep, 0), Math.max(steps?.length - 1, 0));
+  const currentStep = Math.min(Math.max(activeStep, 0), Math.max(steps.length - 1, 0));
 
   return (
     <section className={`flex w-full flex-col gap-6 p-4 shadow-sm sm:p-5 lg:p-6 ${className}`}>

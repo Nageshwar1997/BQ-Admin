@@ -1,7 +1,8 @@
-import type { IButton } from '@/types/component.type';
-import { getButtonCss } from '@/utils/common.util';
 import { Icon } from '@iconify/react';
 import { type MouseEvent } from 'react';
+
+import type { IButton } from '@/types/component.type';
+import { getButtonCss } from '@/utils/common.util';
 
 const Button = ({
   pattern,
@@ -24,7 +25,7 @@ const Button = ({
       className={`group flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg px-4 py-3 text-sm leading-4 outline-hidden transition-all duration-300 focus-within:outline-hidden disabled:cursor-not-allowed disabled:opacity-85 lg:px-5 lg:py-4 xl:text-base ${btnCSS} ${className} ${
         buttonProps?.className ?? ''
       }`}
-      type={buttonProps?.type || 'button'}
+      type={buttonProps?.type ?? 'button'}
       onClick={handleClick}
     >
       {leftIcon && <Icon {...leftIcon} />}

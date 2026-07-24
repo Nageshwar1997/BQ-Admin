@@ -1,5 +1,6 @@
-import type { ILinerGradient } from '@/types/component.type';
 import { useMemo } from 'react';
+
+import type { ILinerGradient } from '@/types/component.type';
 
 const LinearGradient = ({ className = '', position }: ILinerGradient) => {
   const positionClass = useMemo(() => {
