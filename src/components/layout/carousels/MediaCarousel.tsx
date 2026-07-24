@@ -1,5 +1,7 @@
-import type { IMediaCarousel } from '@/types/component.type';
 import { Icon } from '@iconify/react';
+
+import type { IMediaCarousel } from '@/types/component.type';
+
 import ScrollableGradientContainer from '../containers/ScrollableGradientContainer';
 import VideoPlayer from '../media/VideoPlayer';
 
@@ -12,7 +14,7 @@ const MediaCarousel = ({
   handleRemove,
   gradientClassNames,
 }: IMediaCarousel) => {
-  if (!media || media.length === 0) return null;
+  if (media.length === 0) return null;
 
   return (
     <ScrollableGradientContainer
@@ -29,7 +31,9 @@ const MediaCarousel = ({
                 thumbnailRefs.current[i] = el;
               }
             }}
-            onClick={() => onClick(i)}
+            onClick={() => {
+              onClick(i);
+            }}
             className={`group relative size-14 shrink-0 overflow-hidden rounded-md border shadow-xs transition-colors duration-300 hover:opacity-100 md:size-16 lg:size-20 ${
               i === selected ? 'border-tertiary opacity-100' : 'border-primary/30 opacity-90'
             } ${item.type === 'video' ? 'relative' : ''}`}
@@ -54,7 +58,7 @@ const MediaCarousel = ({
             ) : (
               <img
                 src={item.url}
-                alt={`image-${i}`}
+                alt={`image-${String(i)}`}
                 draggable={false}
                 className="aspect-square h-full w-full cursor-pointer object-cover"
               />

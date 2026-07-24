@@ -1,5 +1,7 @@
-import type { IMediaCarousel, IMediaCarouselWithParent } from '@/types/component.type';
 import { useState } from 'react';
+
+import type { IMediaCarousel, IMediaCarouselWithParent } from '@/types/component.type';
+
 import { MediaModal } from '../modals/MediaModal';
 import MediaCarousel from './MediaCarousel';
 
@@ -21,7 +23,9 @@ const MediaCarouselWithModal = ({
       <MediaCarousel
         media={media}
         selected={currentIndex}
-        onClick={(index) => setCurrentIndex(index)}
+        onClick={(index) => {
+          setCurrentIndex(index);
+        }}
         gradientClassNames={gradientClassNames}
       />
 
@@ -30,7 +34,9 @@ const MediaCarouselWithModal = ({
         currentIndex={currentIndex}
         setCurrentIndex={setCurrentIndex}
         opened={currentIndex !== null}
-        onClose={() => setCurrentIndex(null)}
+        onClose={() => {
+          setCurrentIndex(null);
+        }}
         videoProps={videoProps}
       />
     </div>

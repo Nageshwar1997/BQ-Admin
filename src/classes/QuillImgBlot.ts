@@ -1,8 +1,7 @@
-import { isUndefined } from '@beautinique/shared-utils';
+import { isNullOrUndefined } from '@beautinique/shared-utils';
 import Quill from 'quill';
 
 import type { IQuillImageBlot } from '@/types/input.type';
-import { isNull } from '@/utils/common.util';
 
 interface TQuillImageValue {
   src: string;
@@ -24,7 +23,7 @@ class QuillImgBlot extends BaseImage {
 
       node.setAttribute('alt', value.alt ?? 'Image');
 
-      if (!isNull(value.id) && !isUndefined(value.id)) {
+      if (!isNullOrUndefined(value.id)) {
         node.setAttribute('data-image-id', value.id);
       }
     }
