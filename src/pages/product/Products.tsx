@@ -132,14 +132,14 @@ const Products = () => {
   } = useGetDashboardProducts({
     search: queryParams.search,
     status: queryParams.status?.toUpperCase() as TProductStatus,
-    sortBy: (queryParams.sortBy || 'updatedAt') as TProductSortBy,
-    sortOrder: (queryParams.sortOrder || SORT_MAP.desc) as TSort,
+    sortBy: (queryParams.sortBy ?? 'updatedAt') as TProductSortBy,
+    sortOrder: (queryParams.sortOrder ?? SORT_MAP.desc) as TSort,
     category: queryParams.category,
   });
 
   const handleSort = (sortBy: TProductSortBy) => {
     const currentSortBy = queryParams.sortBy;
-    const currentSortOrder = queryParams.sortOrder || SORT_MAP.desc;
+    const currentSortOrder = queryParams.sortOrder ?? SORT_MAP.desc;
 
     const nextOrder =
       currentSortBy === sortBy
@@ -274,7 +274,7 @@ const Products = () => {
                       <TableRowCell>
                         {!product.hasVariants
                           ? product.stock
-                          : product.variants?.reduce((acc, variant) => acc + variant.stock, 0)}
+                          : product.variants.reduce((acc, variant) => acc + variant.stock, 0)}
                       </TableRowCell>
                       <TableRowCell>
                         {formatDate(product.createdAt, { month: '2-digit' })}
@@ -283,7 +283,7 @@ const Products = () => {
                         {formatDate(product.updatedAt, { month: '2-digit' })}
                       </TableRowCell>
                       <TableRowCell>
-                        {product.tryOn.configured
+                        {product.tryOn.configured && product.tryOn.enabled
                           ? `${product.tryOn.category} - ${product.tryOn.subCategory}`
                           : 'N/A'}
                       </TableRowCell>
@@ -312,7 +312,7 @@ const Products = () => {
             !isFetchingNextPage &&
             !isError &&
             !isFetchNextPageError &&
-            data?.products?.length === 0)) && (
+            data?.products.length === 0)) && (
           <div
             className={`flex items-center justify-center ${!isFetchingNextPage ? 'min-h-[40dvh]' : ''}`}
           >

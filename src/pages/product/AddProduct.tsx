@@ -126,14 +126,14 @@ const AddProduct = () => {
 
   const { data: l2Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L2,
-    parent: l1Category?._id,
-    enabled: !!l1Category?._id,
+    parent: l1Category._id,
+    enabled: !!l1Category._id,
   });
 
   const { data: l3Cats = EMPTY_ARRAY } = useGetCategoriesByParentLevel({
     level: CATEGORY_LEVELS_MAP.L3,
-    parent: l2Category?._id,
-    enabled: !!l2Category?._id,
+    parent: l2Category._id,
+    enabled: !!l2Category._id,
   });
 
   const handleNext = () => {
@@ -267,7 +267,7 @@ const AddProduct = () => {
 
     const uploadedImageUrls =
       imagesResponse && typeof imagesResponse === 'object' && 'data' in imagesResponse
-        ? ((imagesResponse.data as string[]) ?? [])
+        ? ((imagesResponse.data as string[] | undefined) ?? [])
         : [];
 
     const finalImages = [...existingImageUrls, ...uploadedImageUrls];

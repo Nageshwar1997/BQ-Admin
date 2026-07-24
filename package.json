@@ -36,7 +36,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
-    "@beautinique/frontend-types": "^1.0.6",
+    "@beautinique/frontend-types": "^1.0.7",
     "@eslint/js": "^10.0.1",
     "@hookform/devtools": "^4.4.0",
     "@hookform/resolvers": "^5.4.0",
