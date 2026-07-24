@@ -34,7 +34,7 @@ const ScrollableGradientContainer = ({
       } ${isHorizontal ? 'h-fit w-full flex-row' : ''} ${containerClassName}`}
     >
       {gradientKeys.map((key) => (
-        <LinearGradient key={key} position={key} className={gradientClassNames[key] ?? ''} />
+        <LinearGradient key={key} position={key} className={gradientClassNames[key]} />
       ))}
       <div
         ref={containerRef}
