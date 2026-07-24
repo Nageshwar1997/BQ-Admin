@@ -1,6 +1,6 @@
 import { VIDEO_MIMES } from '@beautinique/frontend-constants';
 import type { TProductMediaAndGalleryZodSchema } from '@beautinique/frontend-types';
-import { Controller, type UseFormReturn,useWatch } from 'react-hook-form';
+import { Controller, type UseFormReturn, useWatch } from 'react-hook-form';
 
 import FileInput from '@/components/ui/inputs/FileInput';
 import { PRODUCT_MEDIA_AND_GALLERY_INPUT_MAP_DATA } from '@/constants/input.constants';
@@ -39,12 +39,12 @@ const AddProductMediaAndGalleryFields = ({ form }: Props) => {
                   placeholder,
                   multiple: isImages,
                   accept: isVideo ? VIDEO_MIMES.join(',') : undefined,
-                  disabled: isImages && images?.length >= 10,
+                  disabled: isImages && images.length >= 10,
                   value,
                   onChange: ({ target: { files } }) => {
                     if (!files?.length) return;
                     if (isImages) {
-                      const oldFiles = images || [];
+                      const oldFiles = images;
                       field.onChange([...oldFiles, ...Array.from(files)]);
                     } else {
                       field.onChange(files[0]);

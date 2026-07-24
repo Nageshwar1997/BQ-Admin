@@ -1,5 +1,5 @@
 import type { TProductBasicInfoZodSchema } from '@beautinique/frontend-types';
-import { Controller, type UseFormReturn,useWatch } from 'react-hook-form';
+import { Controller, type UseFormReturn, useWatch } from 'react-hook-form';
 
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
@@ -39,9 +39,7 @@ const AddProductBasicInfoFields = ({ form, categories }: Props) => {
           const isL3 = name === 'l3Category';
           const cats = isL1 ? categories.L1 : isL2 ? categories.L2 : isL3 ? categories.L3 : [];
 
-          const options = cats
-            .map((cat) => !!cat && { label: cat.name, value: cat._id })
-            .filter(Boolean);
+          const options = cats.map((cat) => ({ label: cat.name, value: cat._id }));
           return (
             <Controller
               key={name}
@@ -51,14 +49,14 @@ const AddProductBasicInfoFields = ({ form, categories }: Props) => {
                 <Select
                   label={label}
                   error={
-                    form.formState.errors[name]?.message ||
-                    form.formState.errors[name]?.name?.message ||
+                    form.formState.errors[name]?.message ??
+                    form.formState.errors[name]?.name?.message ??
                     form.formState.errors[name]?._id?.message
                   }
                   options={options}
                   position="top"
                   selectProps={{
-                    value: value?._id,
+                    value: value._id,
                     placeholder,
                     disabled: isL2 ? !l1Category : isL3 ? !l2Category : !options.length,
                     onChange: (value) => {

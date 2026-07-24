@@ -18,7 +18,7 @@ import { formatDate, formatINRCurrency, isNullOrUndefined } from '@/utils/common
 
 const ProductDetails = () => {
   const { pathParams } = usePathParams();
-  const { data: product, isLoading, isError } = useGetDashboardProductBySlug(pathParams.slug || '');
+  const { data: product, isLoading, isError } = useGetDashboardProductBySlug(pathParams.slug ?? '');
   const { queryParams, setParams, removeParams } = useQueryParams();
 
   const variant = useMemo(() => {
@@ -57,7 +57,7 @@ const ProductDetails = () => {
       return 0;
     }
 
-    const mediaUrl = variant.thumbnail || variant.images?.[0];
+    const mediaUrl = variant.thumbnail ?? variant.images[0];
 
     if (!mediaUrl) {
       return 0;
@@ -71,10 +71,10 @@ const ProductDetails = () => {
   const { discount, originalPrice, sellingPrice, stock } = useMemo(() => {
     if (!product) return { discount: 0, sellingPrice: 0, originalPrice: 0, stock: null };
     return {
-      discount: variant?.discount || product.discount,
-      sellingPrice: variant?.sellingPrice || product.sellingPrice,
-      originalPrice: variant?.originalPrice || product.originalPrice,
-      stock: product?.hasVariants ? variant?.stock : 'stock' in product ? product.stock : null,
+      discount: variant?.discount ?? product.discount,
+      sellingPrice: variant?.sellingPrice ?? product.sellingPrice,
+      originalPrice: variant?.originalPrice ?? product.originalPrice,
+      stock: product.hasVariants ? variant?.stock : 'stock' in product ? product.stock : null,
     };
   }, [product, variant]);
 
@@ -86,14 +86,14 @@ const ProductDetails = () => {
             key="status-select"
             options={
               product?.status
-                ? PRODUCT_STATUS_TRANSITIONS[product.status]?.map((status) => ({
+                ? PRODUCT_STATUS_TRANSITIONS[product.status].map((status) => ({
                     label: status.toLowerCase(),
                     value: status,
                   }))
                 : []
             }
             selectProps={{
-              value: product?.status || '',
+              value: product?.status ?? 'all',
               onChange: (value) => {
                 if (!value || value === 'all') {
                   removeParams(['status', 'search']);
@@ -142,7 +142,7 @@ const ProductDetails = () => {
             {/* Rating */}
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-0.5">
-                {[...Array(5)].map((_, index) => {
+                {Array(5).map((_, index) => {
                   const fillPercentage = Math.max(
                     0,
                     Math.min(100, (product.averageRating - index) * 100),
@@ -157,7 +157,7 @@ const ProductDetails = () => {
 
                       <div
                         className="absolute inset-0 overflow-hidden"
-                        style={{ width: `${fillPercentage}%` }}
+                        style={{ width: `${String(fillPercentage)}%` }}
                       >
                         <Icon icon="solar:star-bold" className="text-primary-yellow size-5" />
                       </div>
@@ -265,7 +265,7 @@ const ProductDetails = () => {
                     />
                   </div>
                   <span className="text-secondary/70 leading-normal font-medium">
-                    {stock ? `${stock} in stock` : 'Out of stock'}
+                    {stock ? `${String(stock)} in stock` : 'Out of stock'}
                   </span>
                 </div>
               </div>
@@ -317,7 +317,7 @@ const ProductDetails = () => {
                       const active = variant?.sku === v.sku;
                       return (
                         <div
-                          key={`variant-${index}`}
+                          key={`variant-${String(index)}`}
                           role="button"
                           className={`cursor-pointer text-center text-[11px]/3.5 ${active ? 'text-tertiary' : 'text-tertiary/80'}`}
                           onClick={() => {

@@ -132,12 +132,12 @@ const MediaAndGallery = ({
             />
           }
         />
-        {data?.video && (
+        {data.video && (
           <KeyValue
             label="Video"
             value={
               <MediaCarouselWithModal
-                media={[{ type: 'video', url: data?.video as string }]}
+                media={[{ type: 'video', url: data.video as string }]}
                 gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
               />
             }
@@ -165,7 +165,7 @@ const StockAndVariants = ({
       <Heading title={hasVariants ? 'Variants' : 'Stock'} onEdit={onEdit} />
       {stocks && (
         <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,max-content))] gap-6">
-          <KeyValue label="Stock" value={stocks?.stock} />
+          <KeyValue label="Stock" value={stocks.stock} />
           <KeyValue label="Stock Threshold" value={stocks.stockThreshold} />
         </div>
       )}
@@ -205,7 +205,7 @@ const StockAndVariants = ({
               )
             }
           />
-          <KeyValue label="Stock" value={variant?.stock} />
+          <KeyValue label="Stock" value={variant.stock} />
           <KeyValue label="Stock Threshold" value={variant.stockThreshold} />
           <KeyValue
             label="Selling Price"
@@ -226,7 +226,7 @@ const TryOnConfiguration = ({
   data: Props['values']['tryOnConfiguration'];
   onEdit: () => void;
 }) => {
-  if (!Object.keys(data).length || !data.enabled || !data.tryOn) return null;
+  if (!Object.keys(data).length || !data.tryOn?.category) return null;
 
   return (
     <section className="border-platinum-jet bg-smoke-eerie shadow-light-dark-soft flex flex-col gap-6 rounded-xl border p-6">

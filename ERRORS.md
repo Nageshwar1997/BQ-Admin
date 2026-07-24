@@ -1,28 +1,4 @@
-C:\Users\nages\Desktop\BQ\BQ-Admin\src\components\layout\loaders\LoadingText.tsx
-  6:58  error  Invalid type "number" of template literal expression  @typescript-eslint/restrict-template-expressions
 
-C:\Users\nages\Desktop\BQ\BQ-Admin\src\hooks\useIsSmallScreen.ts
-   8:57  error  Invalid type "number" of template literal expression  @typescript-eslint/restrict-template-expressions
-  13:57  error  Invalid type "number" of template literal expression  @typescript-eslint/restrict-template-expressions
-
-C:\Users\nages\Desktop\BQ\BQ-Admin\src\pages\category\children\CategoryModal.tsx
-  47:51  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
-  69:39  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined         @typescript-eslint/no-unnecessary-condition
-
-C:\Users\nages\Desktop\BQ\BQ-Admin\src\pages\product\ProductDetails\index.tsx
-   21:94  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
-   60:40  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
-   60:57  error  Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
-   74:35  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
-   75:43  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
-   76:45  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
-   77:21  error  Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
-   89:61  error  Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
-   96:38  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
-  145:19  error  Unsafe spread of an `any` value in an array                                                                @typescript-eslint/no-unsafe-assignment
-  160:44  error  Invalid type "number" of template literal expression                                                       @typescript-eslint/restrict-template-expressions
-  268:33  error  Invalid type "number" of template literal expression                                                       @typescript-eslint/restrict-template-expressions
-  320:43  error  Invalid type "number" of template literal expression                                                       @typescript-eslint/restrict-template-expressions
 
 C:\Users\nages\Desktop\BQ\BQ-Admin\src\pages\product\Products.tsx
   311:11  error  Unnecessary conditional, value is always falsy   @typescript-eslint/no-unnecessary-condition
@@ -34,22 +10,8 @@ C:\Users\nages\Desktop\BQ\BQ-Admin\src\pages\product\Products.tsx
   333:23  error  Unnecessary conditional, value is always falsy   @typescript-eslint/no-unnecessary-condition
   340:23  error  Unnecessary conditional, value is always falsy   @typescript-eslint/no-unnecessary-condition
 
-C:\Users\nages\Desktop\BQ\BQ-Admin\src\pages\product\children\AddProductBasicInfoFields.tsx
-  43:27  error  Unnecessary conditional, value is always truthy                                                            @typescript-eslint/no-unnecessary-condition
-  54:58  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
-  55:64  error  Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator  @typescript-eslint/prefer-nullish-coalescing
-  61:33  error  Unnecessary optional chain on a non-nullish value                                                          @typescript-eslint/no-unnecessary-condition
 
-C:\Users\nages\Desktop\BQ\BQ-Admin\src\pages\product\children\AddProductConfirmFieldAndReview.tsx
-  135:14  error  Unnecessary optional chain on a non-nullish value  @typescript-eslint/no-unnecessary-condition
-  140:51  error  Unnecessary optional chain on a non-nullish value  @typescript-eslint/no-unnecessary-condition
-  168:48  error  Unnecessary optional chain on a non-nullish value  @typescript-eslint/no-unnecessary-condition
-  208:49  error  Unnecessary optional chain on a non-nullish value  @typescript-eslint/no-unnecessary-condition
-  229:53  error  Unnecessary conditional, value is always falsy     @typescript-eslint/no-unnecessary-condition
 
-C:\Users\nages\Desktop\BQ\BQ-Admin\src\pages\product\children\AddProductMediaAndGalleryFields.tsx
-  42:47  error  Unnecessary optional chain on a non-nullish value  @typescript-eslint/no-unnecessary-condition
-  47:40  error  Unnecessary conditional, value is always truthy    @typescript-eslint/no-unnecessary-condition
 
 C:\Users\nages\Desktop\BQ\BQ-Admin\src\pages\product\children\AddProductStockAndVariantsFields.tsx
    37:20  error  Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined         @typescript-eslint/no-unnecessary-condition

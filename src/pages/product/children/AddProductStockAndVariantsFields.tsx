@@ -34,8 +34,8 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
     type: VARIANT_TYPES_MAP.Color,
     label: '',
     value: '',
-    originalPrice: defaultPrices.originalPrice ?? NaN,
-    sellingPrice: defaultPrices.sellingPrice ?? NaN,
+    originalPrice: defaultPrices.originalPrice,
+    sellingPrice: defaultPrices.sellingPrice,
     stock: NaN,
     stockThreshold: NaN,
     thumbnail: undefined,
@@ -82,7 +82,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
 
       {hasVariants ? (
         fields.map((field, index) => {
-          const currentVariant = variants?.[index];
+          const currentVariant = variants[index];
           const error =
             'variants' in form.formState.errors
               ? form.formState.errors.variants?.[index]
@@ -109,11 +109,11 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                     control={form.control}
                     defaultValue={input.defaultValue}
                     render={({ field: { onChange, value } }) => {
-                      const { defaultValue, options } = input;
+                      const { options } = input;
 
                       return (
                         <Radio
-                          value={value ?? defaultValue}
+                          value={value}
                           onChange={(val) => {
                             onChange(val);
                             form.resetField(`variants.${index}.value`);
@@ -166,7 +166,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                             onChange: ({ target: { files } }) => {
                               if (!files?.length) return;
                               const newValue = isImages
-                                ? [...(currentVariant?.images || []), ...(Array.from(files) || [])]
+                                ? [...(currentVariant?.images ?? []), ...Array.from(files)]
                                 : files[0];
 
                               field.onChange(newValue);
@@ -216,7 +216,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                       type: 'button',
                       onClick: () => {
                         if (action.content === 'Remove') {
-                          if (fields?.length === 1) {
+                          if (fields.length === 1) {
                             form.setValue('hasVariants', false);
                           }
                           remove(index);
@@ -232,7 +232,7 @@ const AddProductStockAndVariantsFields = ({ form, defaultPrices }: Props) => {
                             Number.isNaN(currentVariant.sellingPrice) ||
                             Number.isNaN(currentVariant.stock) ||
                             Number.isNaN(currentVariant.stockThreshold) ||
-                            !currentVariant.images?.length;
+                            !currentVariant.images.length;
 
                           if (isInvalid) {
                             toaster.warning({

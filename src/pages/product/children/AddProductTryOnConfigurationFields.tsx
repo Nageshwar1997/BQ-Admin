@@ -1,7 +1,7 @@
 import { TRY_ON_CATEGORIES, TRY_ON_MAP } from '@beautinique/frontend-constants';
 import type { TProductTryOnConfigurationZodSchema } from '@beautinique/frontend-types';
 import { useMemo } from 'react';
-import { Controller, type UseFormReturn,useWatch } from 'react-hook-form';
+import { Controller, type UseFormReturn, useWatch } from 'react-hook-form';
 
 import Checkbox from '@/components/ui/inputs/Checkbox';
 import Select from '@/components/ui/inputs/Select';
@@ -43,7 +43,7 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
                   error={'tryOn' in errors ? errors.tryOn?.[input.name]?.message : undefined}
                   options={options.map((category) => ({ label: category, value: category }))}
                   selectProps={{
-                    value: value || '',
+                    value: value ?? '',
                     placeholder: input.placeholder,
                     disabled: input.name === 'subCategory' && !tryOn?.category,
                     onChange: (value) => {
@@ -65,7 +65,12 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
             register={register('enabled')}
             error={errors.enabled?.message}
             content="Enable TryOn"
-            checkboxProps={{ name: 'enabled', onChange: () => { resetField('tryOn'); } }}
+            checkboxProps={{
+              name: 'enabled',
+              onChange: () => {
+                resetField('tryOn');
+              },
+            }}
             containerClassName="col-span-2"
           />
         );

@@ -5,12 +5,12 @@ const useIsSmallScreen = (width = 1023) => {
 
   useEffect(() => {
     const checkIsMobile = () => {
-      setIsSmallScreen(window.matchMedia(`(max-width: ${width}px)`).matches);
+      setIsSmallScreen(window.matchMedia(`(max-width: ${String(width)}px)`).matches);
     };
 
     checkIsMobile(); // Initial check
 
-    const mediaQuery = window.matchMedia(`(max-width: ${width}px)`);
+    const mediaQuery = window.matchMedia(`(max-width: ${String(width)}px)`);
 
     const handleMediaQueryChange = (event: MediaQueryListEvent) => {
       setIsSmallScreen(event.matches);

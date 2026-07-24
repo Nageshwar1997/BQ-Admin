@@ -44,7 +44,7 @@ const TitleAndSubtitle = ({ title, description }: Omit<StepperStep, 'icon'>) => 
 );
 
 const getCategoryFormName = (categories: TCategory[] | undefined, id?: string) =>
-  categories?.find((cat) => cat._id === id)?.name || '-';
+  categories?.find((cat) => cat._id === id)?.name ?? '-';
 
 const getInitialData = (cat: TCategory, mainCatId = ''): TCategoryZodSchema => {
   switch (cat.level) {
@@ -66,7 +66,7 @@ const getInitialData = (cat: TCategory, mainCatId = ''): TCategoryZodSchema => {
 
     case CATEGORY_LEVELS_MAP.L1:
     default:
-      return { name: cat.name, level: cat.level ?? CATEGORY_LEVELS_MAP.L1 };
+      return { name: cat.name, level: cat.level };
   }
 };
 
