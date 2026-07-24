@@ -1,4 +1,5 @@
-import type { TPageWrapper } from '@/types/component.type';
+import type { IPageWrapper } from '@/types/component.type';
+
 import Navbar from '../navbar';
 
 const PageWrapper = ({
@@ -6,7 +7,7 @@ const PageWrapper = ({
   className = '',
   containerClassName = '',
   navbar,
-}: TPageWrapper) => {
+}: IPageWrapper) => {
   return (
     <div className={`[&>*:not(:first-child)]:p-4 ${containerClassName}`}>
       <Navbar {...navbar} />

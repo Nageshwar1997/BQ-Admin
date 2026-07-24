@@ -18,11 +18,11 @@ const ScrollableGradientContainer = ({
 
   const gradients = { ...showH_Gradient, ...showV_Gradient };
   const isScrollable = isVertical
-    ? !!(gradients.top || gradients.bottom)
-    : !!(gradients.left || gradients.right);
+    ? !!(gradients.top ?? gradients.bottom)
+    : !!(gradients.left ?? gradients.right);
 
   const gradientKeys = Object.entries(gradients)
-    .filter(([, value]) => value === true)
+    .filter(([, value]) => value)
     .map(([key]) => key as TGradientPos);
 
   return (
@@ -32,7 +32,7 @@ const ScrollableGradientContainer = ({
       } ${isHorizontal ? 'h-fit w-full flex-row' : ''} ${containerClassName}`}
     >
       {gradientKeys.map((key) => (
-        <LinearGradient key={key} position={key} className={gradientClassNames[key] || ''} />
+        <LinearGradient key={key} position={key} className={gradientClassNames[key] ?? ''} />
       ))}
       <div
         ref={containerRef}

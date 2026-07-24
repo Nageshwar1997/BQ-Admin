@@ -1,8 +1,9 @@
+import { Icon } from '@iconify/react';
+import { cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
+
 import { InputIcon } from '@/components/ui/inputs/children';
 import { useOutsideClick } from '@/hooks/useOutsideClick';
 import type { IDropdown } from '@/types/component.type';
-import { Icon } from '@iconify/react';
-import { cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
 
 const Dropdown = ({
   title,
@@ -19,9 +20,12 @@ const Dropdown = ({
 }: IDropdown) => {
   const [isOpen, setIsOpen] = useState<boolean>(defaultOpen);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const ref = useOutsideClick<HTMLDivElement>(() => (isOpen ? setIsOpen(false) : null), {
-    enabled: closeOnOutsideClick,
-  });
+  const ref = useOutsideClick<HTMLDivElement>(
+    () => {
+      if (isOpen) setIsOpen(false);
+    },
+    { enabled: closeOnOutsideClick },
+  );
 
   useEffect(() => {
     const el = containerRef.current;
@@ -29,7 +33,7 @@ const Dropdown = ({
 
     const updateHeight = () => {
       if (isOpen) {
-        el.style.maxHeight = `${el.scrollHeight}px`;
+        el.style.maxHeight = `${String(el.scrollHeight)}px`;
         el.style.opacity = '1';
       } else {
         el.style.maxHeight = '0px';
@@ -43,7 +47,9 @@ const Dropdown = ({
 
     observer.observe(el);
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, [isOpen, options]);
   return (
     <div
@@ -53,8 +59,10 @@ const Dropdown = ({
       ref={ref}
     >
       <button
-        className="bg-primary-invert group cursor-pointer flex w-full items-center justify-between gap-2 px-3 py-2 text-left transition-colors duration-300 xl:py-3"
-        onClick={() => setIsOpen((prev) => !prev)}
+        className="bg-primary-invert group flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left transition-colors duration-300 xl:py-3"
+        onClick={() => {
+          setIsOpen((prev) => !prev);
+        }}
         aria-expanded={isOpen}
         role="button"
       >

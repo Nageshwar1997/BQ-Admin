@@ -1,3 +1,10 @@
+import type { TLoginZodSchema } from '@beautinique/frontend-types';
+import { loginZodSchema } from '@beautinique/frontend-zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { Link } from 'react-router-dom';
+
 import AuthBottomInstructions from '@/components/ui/AuthBottomInstructions';
 import Button from '@/components/ui/Button';
 import GradientText from '@/components/ui/GradientText';
@@ -10,12 +17,7 @@ import { useLogin } from '@/services/user-service/auth.service.query';
 import useActionsStore from '@/stores/action.store';
 import useUserStore from '@/stores/user.store';
 import { setErrorToForm } from '@/utils/form.util';
-import type { TLoginZodSchema } from '@beautinique/frontend-types';
-import { loginZodSchema } from '@beautinique/frontend-zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
-import { Controller, useForm, useWatch } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+
 import BorderGradient from '../containers/BorderGradient';
 
 const LoginForm = () => {
@@ -56,11 +58,13 @@ const LoginForm = () => {
         const { runAllActions } = useActionsStore.getState();
         await runAllActions();
 
-        if (paths.includes('auth')) navigate('/');
+        if (paths.includes('auth')) void navigate('/');
         if (queryParams.login) removeParams(['login']);
       },
 
-      onError: ({ fieldErrors }) => setErrorToForm(setError, fieldErrors),
+      onError: ({ fieldErrors }) => {
+        setErrorToForm(setError, fieldErrors);
+      },
     });
   };
 

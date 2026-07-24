@@ -1,3 +1,7 @@
+import { Icon } from '@iconify/react';
+import { Fragment } from 'react';
+import { Link } from 'react-router-dom';
+
 import Divider from '@/components/ui/Divider';
 import GradientText from '@/components/ui/GradientText';
 import { FOOTER_AWARDS, FOOTER_CATEGORIES, SOCIAL_MEDIA_LINKS } from '@/constants/footer.constants';
@@ -5,9 +9,6 @@ import useAuthAction from '@/hooks/useAuthAction';
 import usePathParams from '@/hooks/usePathParams';
 import useThemeStore from '@/stores/theme.store';
 import { type IFooterOptionList } from '@/types/component.type';
-import { Icon } from '@iconify/react';
-import { Link } from 'react-router-dom';
-import { Fragment } from 'react/jsx-runtime';
 
 const FooterOptionList = ({ isFirst = false, title, options }: IFooterOptionList) => {
   const { runAction } = useAuthAction();
@@ -21,7 +22,7 @@ const FooterOptionList = ({ isFirst = false, title, options }: IFooterOptionList
       return;
     }
 
-    action();
+    void action();
   };
 
   return (
@@ -37,7 +38,9 @@ const FooterOptionList = ({ isFirst = false, title, options }: IFooterOptionList
         {options.map((link, i) => (
           <button
             key={i}
-            onClick={() => handleNavigate(link.path, link.private)}
+            onClick={() => {
+              handleNavigate(link.path, link.private);
+            }}
             className="hover:text-tertiary mx-auto w-fit cursor-pointer text-nowrap hover:font-medium hover:underline"
           >
             {link.title}

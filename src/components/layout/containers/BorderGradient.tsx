@@ -1,10 +1,10 @@
-import type { TChildren, TClassName, TContainerClassName } from '@/types/component.type';
+import type { IChildren, IClassName, IContainerClassName } from '@/types/component.type';
 
 const BorderGradient = ({
   children,
   className = '',
   containerClassName = '',
-}: TChildren & TClassName & TContainerClassName) => {
+}: IChildren & IClassName & IContainerClassName) => {
   return (
     <div className={`bg-border-gradient mx-auto w-full rounded-3xl p-px ${containerClassName}`}>
       <div
