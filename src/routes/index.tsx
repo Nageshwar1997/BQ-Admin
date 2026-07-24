@@ -1,8 +1,9 @@
+import { Outlet, type RouteObject } from 'react-router-dom';
+
 import LoadingScreen from '@/components/layout/loaders/LoadingScreen';
 import { ROUTES } from '@/constants/common.constants';
 // import { authenticate } from '@/middlewares';
 import ErrorBoundary from '@/pages/error/ErrorBoundary';
-import { Outlet, type RouteObject } from 'react-router-dom';
 
 const { AUTH, CATEGORIES, DASHBOARD, PRODUCTS } = ROUTES;
 
