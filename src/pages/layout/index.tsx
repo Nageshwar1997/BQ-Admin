@@ -1,9 +1,10 @@
+import { Outlet } from 'react-router-dom';
+
 import Footer from '@/components/layout/footer';
 import AuthModal from '@/components/layout/modals/AuthModal';
 import Sidebar from '@/components/layout/sidebar';
 import ScrollToTop from '@/components/ScrollToTop';
 import useAutoRetry from '@/hooks/useAutoRetry';
-import { Outlet } from 'react-router-dom';
 
 const Layout = () => {
   useAutoRetry(); // It will call api to refresh token when user is online again
@@ -14,7 +15,7 @@ const Layout = () => {
       <AuthModal />
       <div className="flex w-full grow flex-col-reverse md:flex-row">
         <Sidebar />
-        <div className="h-full min-w-0 max-w-full flex-1 grow">
+        <div className="h-full max-w-full min-w-0 flex-1 grow">
           <Outlet />
           <Footer />
         </div>
