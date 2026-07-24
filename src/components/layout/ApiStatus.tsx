@@ -1,5 +1,7 @@
-import type { TApiStatus } from '@/types/component.type';
 import { Icon } from '@iconify/react';
+
+import type { TApiStatus } from '@/types/component.type';
+
 import Divider from '../ui/Divider';
 import GradientText from '../ui/GradientText';
 import LoadingRings from './loaders/LoadingRings';
@@ -10,7 +12,7 @@ const ApiDescription = ({ status, ...props }: TApiStatus) => {
 
   return (
     <div className="flex flex-col items-center justify-center gap-2">
-      <div className="bg-primary/5 grid size-8 place-items-center rounded-full md:size-10 p-2">
+      <div className="bg-primary/5 grid size-8 place-items-center rounded-full p-2 md:size-10">
         <Icon
           icon={status === 'error' ? 'solar:danger-triangle-linear' : 'solar:folder-error-linear'}
           className="text-silver-jet size-full shrink-0"
@@ -21,8 +23,9 @@ const ApiDescription = ({ status, ...props }: TApiStatus) => {
         type="silver"
         className="text-sm text-shadow-sm sm:text-base md:text-lg"
         text={typeof title === 'string' ? title : ''}
-        children={title && typeof title !== 'string' ? title : undefined}
-      />
+      >
+        {title && typeof title !== 'string' ? title : undefined}
+      </GradientText>
       {description && (
         <div className="text-silver-jet text-center text-xs leading-6 font-normal sm:text-sm">
           {description}

@@ -1,11 +1,13 @@
+import { Icon } from '@iconify/react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+
 import Divider from '@/components/ui/Divider';
 import Tooltip from '@/components/ui/Tooltip';
 import { SIDEBAR_DATA } from '@/constants/common.constants';
 import useIsSmallScreen from '@/hooks/useIsSmallScreen';
 import usePathParams from '@/hooks/usePathParams';
-import { Icon } from '@iconify/react';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+
 import ScrollableGradientContainer from '../containers/ScrollableGradientContainer';
 
 const SidebarItem = ({
@@ -42,7 +44,7 @@ const Sidebar = () => {
   const handleEvents = (event: (typeof SIDEBAR_DATA)[number]['handler']) => {
     switch (event) {
       case 'logout':
-        console.log('Logout');
+        console.warn('Logout');
         break;
       default:
         break;
@@ -82,8 +84,12 @@ const Sidebar = () => {
                   <>
                     <Link
                       to={path}
-                      onMouseEnter={() => setHoveredIdx(index)}
-                      onMouseLeave={() => setHoveredIdx(null)}
+                      onMouseEnter={() => {
+                        setHoveredIdx(index);
+                      }}
+                      onMouseLeave={() => {
+                        setHoveredIdx(null);
+                      }}
                     >
                       <SidebarItem {...item} isSameRoute={isSameRoute} isSameIndex={isSameIndex} />
                     </Link>
