@@ -18,8 +18,10 @@ const ScrollableGradientContainer = ({
 
   const gradients = { ...showH_Gradient, ...showV_Gradient };
   const isScrollable = isVertical
-    ? !!(gradients.top ?? gradients.bottom)
-    : !!(gradients.left ?? gradients.right);
+    ? // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+      !!(gradients.top || gradients.bottom)
+    : // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+      !!(gradients.left || gradients.right);
 
   const gradientKeys = Object.entries(gradients)
     .filter(([, value]) => value)
