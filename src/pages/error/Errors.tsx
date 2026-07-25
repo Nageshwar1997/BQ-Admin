@@ -23,7 +23,7 @@ const ErrorWrapper = ({ imgText, title, message }: IError) => {
 
   return (
     <div className="flex h-dvh w-dvw flex-col items-center justify-center space-y-4 p-6 text-center">
-      <PageMeta title={title} />
+      <PageMeta title={title} description={message} />
       <h1
         className={`w-full max-w-lg bg-[url('/images/Oops.webp')] bg-cover bg-clip-text bg-center bg-no-repeat text-center text-7xl font-extrabold text-transparent italic md:text-8xl lg:text-9xl`}
       >

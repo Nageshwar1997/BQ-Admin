@@ -473,7 +473,7 @@ const Categories = () => {
           ],
         }}
       >
-        <PageMeta title="Categories" />
+        <PageMeta title="Categories" description="Manage product categories and their hierarchy." />
         <L1Table />
       </PageWrapper>
     </Fragment>

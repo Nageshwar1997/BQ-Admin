@@ -5,7 +5,7 @@ import PageMeta from '@/components/ui/PageMeta';
 
 const Login = () => (
   <Fragment>
-    <PageMeta title="Login" />
+    <PageMeta title="Login" description="Login to your account." />
     <LoginForm />
   </Fragment>
 );

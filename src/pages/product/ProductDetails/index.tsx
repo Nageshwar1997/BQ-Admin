@@ -116,7 +116,11 @@ const ProductDetails = () => {
       }}
       className="flex flex-col gap-8"
     >
-      <PageMeta title={product?.title ?? 'Product Details'} />
+      <PageMeta
+        title={product?.title ?? 'Product Details'}
+        description={product?.shortDescription}
+        image={product?.thumbnail}
+      />
       {!!product && !!Object.keys(product).length ? (
         <div className="grid flex-col items-start gap-6 lg:grid-cols-2">
           <div className="w-full lg:sticky lg:top-37">

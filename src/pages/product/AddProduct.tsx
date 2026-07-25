@@ -581,7 +581,10 @@ const AddProduct = () => {
 
   return (
     <PageWrapper>
-      <PageMeta title="Add Product" />
+      <PageMeta
+        title="Add Product"
+        description="Create a new product with details, media and pricing."
+      />
       <Stepper steps={ADD_PRODUCT_STEPS} activeStep={activeStep} className="mt-4 p-4!">
         <div className="flex flex-col gap-5">
           <div>

@@ -76,7 +76,7 @@ const ChangePassword = () => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4">
-      <PageMeta title="Change Password" />
+      <PageMeta title="Change Password" description="Change your account password." />
       {/* ================= HEADER ================= */}
       <GradientText
         type="accent"

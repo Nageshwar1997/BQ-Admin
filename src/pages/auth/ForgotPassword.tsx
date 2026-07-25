@@ -148,7 +148,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4">
-      <PageMeta title="Forgot Password" />
+      <PageMeta title="Forgot Password" description="Reset your account password." />
       {/* ================= HEADER ================= */}
       <GradientText
         type="accent"

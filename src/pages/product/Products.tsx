@@ -204,7 +204,7 @@ const Products = () => {
         children: <SearchAndSort />,
       }}
     >
-      <PageMeta title="Products" />
+      <PageMeta title="Products" description="Manage and browse all products." />
       <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
         {!!data?.products.length && (
           <ScrollableGradientContainer
