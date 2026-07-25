@@ -20,7 +20,9 @@ const Layout = () => {
       <div className="flex w-full grow flex-col-reverse md:flex-row">
         <Sidebar />
         <div className="h-full max-w-full min-w-0 flex-1 grow">
-          <Outlet />
+          <main>
+            <Outlet />
+          </main>
           <Footer />
         </div>
       </div>

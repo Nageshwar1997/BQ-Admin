@@ -11,10 +11,13 @@ const Auth = () => {
           className="aspect-square h-full w-full object-contain"
           alt="Auth-Image"
           loading="eager"
+          fetchPriority="high"
         />
       </div>
       <ScrollableGradientContainer direction="vertical" className="mx-auto max-w-md">
-        <Outlet />
+        <main>
+          <Outlet />
+        </main>
       </ScrollableGradientContainer>
     </div>
   );
