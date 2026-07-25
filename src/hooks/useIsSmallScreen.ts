@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
 
 const useIsSmallScreen = (width = 1023) => {
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  // Lazy initializer: reads matchMedia synchronously for the first render, instead of hardcoding
+  // `false` and correcting it a render later inside the effect below (which caused needRef/etc.
+  // consumers to briefly see the wrong value on mount, on small screens).
+  const [isSmallScreen, setIsSmallScreen] = useState(
+    () => window.matchMedia(`(max-width: ${String(width)}px)`).matches,
+  );
 
   useEffect(() => {
-    const checkIsMobile = () => {
-      setIsSmallScreen(window.matchMedia(`(max-width: ${String(width)}px)`).matches);
-    };
-
-    checkIsMobile(); // Initial check
-
     const mediaQuery = window.matchMedia(`(max-width: ${String(width)}px)`);
 
     const handleMediaQueryChange = (event: MediaQueryListEvent) => {
