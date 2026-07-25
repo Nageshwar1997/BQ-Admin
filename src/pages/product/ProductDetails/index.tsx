@@ -8,7 +8,6 @@ import ScrollableGradientContainer from '@/components/layout/containers/Scrollab
 import Dropdown from '@/components/layout/dropdown';
 import Button from '@/components/ui/Button';
 import Select from '@/components/ui/inputs/Select';
-import PageMeta from '@/components/ui/PageMeta';
 import { QuillContent } from '@/components/ui/QuillContent';
 import { PRODUCT_STATUS_TRANSITIONS } from '@/constants/api.constants';
 import usePathParams from '@/hooks/usePathParams';
@@ -116,11 +115,6 @@ const ProductDetails = () => {
       }}
       className="flex flex-col gap-8"
     >
-      <PageMeta
-        title={product?.title ?? 'Product Details'}
-        description={product?.shortDescription}
-        image={product?.thumbnail}
-      />
       {!!product && !!Object.keys(product).length ? (
         <div className="grid flex-col items-start gap-6 lg:grid-cols-2">
           <div className="w-full lg:sticky lg:top-37">
