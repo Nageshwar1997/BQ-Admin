@@ -24,6 +24,7 @@ import {
   TableRowCell,
 } from '@/components/layout/table';
 import Badge from '@/components/ui/Badge';
+import PageMeta from '@/components/ui/PageMeta';
 import { EMPTY_ARRAY, QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import {
@@ -472,6 +473,7 @@ const Categories = () => {
           ],
         }}
       >
+        <PageMeta title="Categories" description="Manage product categories and their hierarchy." />
         <L1Table />
       </PageWrapper>
     </Fragment>

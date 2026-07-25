@@ -23,6 +23,7 @@ import { useForm, useWatch } from 'react-hook-form';
 
 import PageWrapper from '@/components/layout/containers/PageWrapper';
 import Button from '@/components/ui/Button';
+import PageMeta from '@/components/ui/PageMeta';
 import Stepper from '@/components/ui/Stepper';
 import { ADD_PRODUCT_STEPS, EMPTY_ARRAY, ROUTES } from '@/constants/common.constants';
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
@@ -580,6 +581,10 @@ const AddProduct = () => {
 
   return (
     <PageWrapper>
+      <PageMeta
+        title="Add Product"
+        description="Create a new product with details, media and pricing."
+      />
       <Stepper steps={ADD_PRODUCT_STEPS} activeStep={activeStep} className="mt-4 p-4!">
         <div className="flex flex-col gap-5">
           <div>

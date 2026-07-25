@@ -9,6 +9,7 @@ import AuthBottomInstructions from '@/components/ui/AuthBottomInstructions';
 import Button from '@/components/ui/Button';
 import GradientText from '@/components/ui/GradientText';
 import Input from '@/components/ui/inputs/Input';
+import PageMeta from '@/components/ui/PageMeta';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import { CHANGE_PASSWORD_INPUT_MAP_DATA } from '@/constants/input.constants';
 import usePathParams from '@/hooks/usePathParams';
@@ -75,6 +76,7 @@ const ChangePassword = () => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4">
+      <PageMeta title="Change Password" description="Change your account password." />
       {/* ================= HEADER ================= */}
       <GradientText
         type="accent"

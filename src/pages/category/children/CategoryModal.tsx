@@ -9,6 +9,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import { ModalWrapper } from '@/components/layout/modals/ModalWrapper';
 import Button from '@/components/ui/Button';
 import Checkbox from '@/components/ui/inputs/Checkbox';
+import PageMeta from '@/components/ui/PageMeta';
 import Stepper, { type StepperStep } from '@/components/ui/Stepper';
 import {
   CATEGORY_MODAL_STEPS,
@@ -381,11 +382,12 @@ const CategoryModal = (props?: Partial<ICatModal> & { onClose?: () => void }) =>
     <ModalWrapper
       isOpen={!!mode}
       onClose={handleClose}
-      header={{ showCloseIcon: true, title: isEditMode ? 'Edit category' : 'Add new category' }}
+      header={{ showCloseIcon: true, title: isEditMode ? 'Edit category' : 'Add category' }}
       containerProps={{ className: 'p-4!' }}
       closeOnOutsideClick={false}
       className="bg-secondary-invert [&>div]:first:bg-secondary-invert max-w-lg! [&>div>div]:px-0"
     >
+      <PageMeta title={isEditMode ? 'Edit Category' : 'Add Category'} />
       <Stepper steps={CATEGORY_MODAL_STEPS} activeStep={activeStep} className="bg-secondary-invert">
         <div className="flex flex-col gap-5">
           <TitleAndSubtitle

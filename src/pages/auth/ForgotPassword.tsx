@@ -13,6 +13,7 @@ import AuthBottomInstructions from '@/components/ui/AuthBottomInstructions';
 import Button from '@/components/ui/Button';
 import GradientText from '@/components/ui/GradientText';
 import Input from '@/components/ui/inputs/Input';
+import PageMeta from '@/components/ui/PageMeta';
 import Resend from '@/components/ui/Resend';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import {
@@ -147,6 +148,7 @@ const ForgotPassword = () => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4">
+      <PageMeta title="Forgot Password" description="Reset your account password." />
       {/* ================= HEADER ================= */}
       <GradientText
         type="accent"
