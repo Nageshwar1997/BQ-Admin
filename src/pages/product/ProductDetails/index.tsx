@@ -319,9 +319,17 @@ const ProductDetails = () => {
                         <div
                           key={`variant-${String(index)}`}
                           role="button"
+                          tabIndex={0}
+                          aria-pressed={active}
                           className={`cursor-pointer text-center text-[11px]/3.5 ${active ? 'text-tertiary' : 'text-tertiary/80'}`}
                           onClick={() => {
                             setParams({ v: v.sku });
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault();
+                              setParams({ v: v.sku });
+                            }
                           }}
                         >
                           {isColor ? (

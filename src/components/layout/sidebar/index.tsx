@@ -15,19 +15,14 @@ import ScrollableGradientContainer from '../containers/ScrollableGradientContain
 const SidebarItem = ({
   isSameRoute,
   isSameIndex,
-  onClick,
   ...item
 }: (typeof SIDEBAR_DATA)[number] & {
   isSameRoute: boolean;
-  onClick?: (handleEvents: (typeof SIDEBAR_DATA)[number]['handler']) => void;
   isSameIndex?: boolean;
 }) => {
   const icon = isSameIndex || isSameRoute ? item.icon.replace('-linear', '-bold') : item.icon;
   return (
-    <div
-      className="flex cursor-pointer flex-col items-center gap-1"
-      onClick={() => onClick?.(item.handler)}
-    >
+    <div className="flex cursor-pointer flex-col items-center gap-1">
       <span
         className={`border-primary/50 size-6 w-fit shrink-0 rounded-lg border p-1 md:size-9 md:p-1.5 ${isSameRoute ? 'bg-accent-duo shadow-secondary-btn' : 'hover:bg-secondary-invert/40 hover:shadow-tertiary-btn bg-secondary-invert/30'}`}
       >
@@ -97,12 +92,20 @@ const Sidebar = () => {
                     <SidebarItem {...item} isSameRoute={isSameRoute} isSameIndex={isSameIndex} />
                   </Link>
                 ) : (
-                  <SidebarItem
-                    {...item}
-                    isSameRoute={isSameRoute}
-                    isSameIndex={isSameIndex}
-                    onClick={handleEvents}
-                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void handleEvents(item.handler);
+                    }}
+                    onMouseEnter={() => {
+                      setHoveredIdx(index);
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredIdx(null);
+                    }}
+                  >
+                    <SidebarItem {...item} isSameRoute={isSameRoute} isSameIndex={isSameIndex} />
+                  </button>
                 )}
               </Tooltip>
             );

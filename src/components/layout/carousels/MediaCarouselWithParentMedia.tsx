@@ -1,12 +1,15 @@
 import { isNullOrUndefined } from '@beautinique/shared-utils';
 import { Icon } from '@iconify/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import Divider from '@/components/ui/Divider';
 import type { IClassName, IMediaCarouselWithParent } from '@/types/component.type';
 
-import VideoPlayer from '../media/VideoPlayer';
 import MediaCarousel from './MediaCarousel';
+
+// hls.js (used for real video playback) is only needed when a video is actually present in the
+// media list - lazy-loading keeps it out of every page's initial bundle, including image-only ones.
+const VideoPlayer = lazy(() => import('../media/VideoPlayer'));
 
 const ChevronButton = ({ onClick, className = '' }: { onClick: () => void } & IClassName) => {
   return (
@@ -74,11 +77,13 @@ export const MediaCarouselWithParentMedia = ({
       <div className="relative flex h-100 items-center justify-center lg:h-105 xl:h-125">
         <div className="flex h-full w-full transform items-center justify-center rounded-lg transition-opacity duration-500">
           {mediaType === 'video' ? (
-            <VideoPlayer
-              key={src}
-              videoProps={{ ...videoProps, src }}
-              className="mx-auto flex max-h-full items-center justify-center"
-            />
+            <Suspense fallback={null}>
+              <VideoPlayer
+                key={src}
+                videoProps={{ ...videoProps, src }}
+                className="mx-auto flex max-h-full items-center justify-center"
+              />
+            </Suspense>
           ) : (
             <img
               src={src}

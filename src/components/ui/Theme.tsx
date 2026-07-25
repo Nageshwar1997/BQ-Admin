@@ -14,6 +14,7 @@ const Theme = ({ className = '' }: IClassName) => {
       <button
         type="button"
         onClick={toggleTheme}
+        aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
         className={`size-5 cursor-pointer md:size-6 ${className}`}
       >
         <Icon

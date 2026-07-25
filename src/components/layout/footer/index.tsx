@@ -66,6 +66,7 @@ const Footer = () => {
                 <img
                   src={`/images/logo/BQ_${theme === 'dark' ? 'white' : 'black'}_logo.webp`}
                   alt="Logo"
+                  loading="lazy"
                   className="h-10 w-full max-w-20 object-contain sm:h-12 lg:h-16 lg:max-w-24"
                 />
               </Link>
@@ -86,6 +87,7 @@ const Footer = () => {
                 <img
                   src={`/images/footer/${award.key}-${theme}.webp`}
                   alt={award.name}
+                  loading="lazy"
                   className="h-10 w-fit object-contain md:h-12 lg:h-14"
                 />
               </Link>

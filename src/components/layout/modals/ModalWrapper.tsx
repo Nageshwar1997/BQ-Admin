@@ -55,12 +55,17 @@ export const ModalWrapper = ({
               </h2>
             )}
             {header.showCloseIcon && (
-              <div className="group cursor-pointer p-3" onClick={onClose}>
+              <button
+                type="button"
+                aria-label="Close"
+                className="group cursor-pointer p-3"
+                onClick={onClose}
+              >
                 <Icon
                   icon="lucide:x"
                   className="text-tertiary group-hover:text-primary size-4 transition-all duration-300 group-hover:scale-110 sm:size-5"
                 />
-              </div>
+              </button>
             )}
           </div>
         )}

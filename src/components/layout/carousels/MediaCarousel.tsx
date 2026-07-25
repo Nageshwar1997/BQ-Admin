@@ -1,9 +1,13 @@
 import { Icon } from '@iconify/react';
+import { lazy, Suspense } from 'react';
 
 import type { IMediaCarousel } from '@/types/component.type';
 
 import ScrollableGradientContainer from '../containers/ScrollableGradientContainer';
-import VideoPlayer from '../media/VideoPlayer';
+
+// hls.js (used for real video playback) is only needed when a video is actually present in the
+// media list - lazy-loading keeps it out of every page's initial bundle, including image-only ones.
+const VideoPlayer = lazy(() => import('../media/VideoPlayer'));
 
 const MediaCarousel = ({
   className = '',
@@ -48,18 +52,21 @@ const MediaCarousel = ({
                     />
                   </div>
                 )}
-                <VideoPlayer
-                  key={item.url}
-                  showPosterOnly={true}
-                  videoProps={{ src: item.url, autoPlay: false }}
-                  className="aspect-square h-full w-full cursor-pointer object-cover"
-                />
+                <Suspense fallback={null}>
+                  <VideoPlayer
+                    key={item.url}
+                    showPosterOnly={true}
+                    videoProps={{ src: item.url, autoPlay: false }}
+                    className="aspect-square h-full w-full cursor-pointer object-cover"
+                  />
+                </Suspense>
               </>
             ) : (
               <img
                 src={item.url}
                 alt={`image-${String(i)}`}
                 draggable={false}
+                loading="lazy"
                 className="aspect-square h-full w-full cursor-pointer object-cover"
               />
             )}
@@ -67,6 +74,7 @@ const MediaCarousel = ({
             {handleRemove && (
               <button
                 type="button"
+                aria-label="Remove"
                 className="bg-tertiary/80 absolute top-0.5 right-0.5 z-1 flex size-4 cursor-pointer items-center justify-center rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();

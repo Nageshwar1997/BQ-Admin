@@ -260,7 +260,8 @@ const Products = () => {
                       <TableRowCell className="grid place-items-center">
                         <img
                           src={product.thumbnail}
-                          alt="Thumbnail"
+                          alt={product.title}
+                          loading="lazy"
                           className="border-tertiary/20 aspect-square size-10 rounded-lg border object-cover"
                         />
                       </TableRowCell>
