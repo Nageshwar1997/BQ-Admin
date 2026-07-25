@@ -20,6 +20,7 @@ import {
 import HierarchySelect from '@/components/ui/inputs/HierarchySelect';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
+import PageMeta from '@/components/ui/PageMeta';
 import { PRODUCTS_TABLE_TITLES } from '@/constants/api.constants';
 import { ROUTES } from '@/constants/common.constants';
 import useDebounce from '@/hooks/useDebounce';
@@ -203,6 +204,7 @@ const Products = () => {
         children: <SearchAndSort />,
       }}
     >
+      <PageMeta title="Products" />
       <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
         {!!data?.products.length && (
           <ScrollableGradientContainer
