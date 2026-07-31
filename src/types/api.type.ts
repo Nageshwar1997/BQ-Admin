@@ -5,6 +5,8 @@ import type {
   TCategoryLevel,
   TCategoryLevelsMap,
   TCategoryZodSchema,
+  TContactQueryStatus,
+  TCreateContactQueryZodSchema,
   TProductBasicInfoZodSchema,
   TProductDescriptionAndContentZodSchema,
   TProductMediaAndGalleryZodSchema,
@@ -209,13 +211,23 @@ export interface IGetDashboardProductsQuery {
   sortOrder?: TSort;
 }
 
-export interface IPagination {
+export interface IApiPagination {
   page: number;
   totalPages: number;
 }
 
 export interface IDashboardProductsResponse {
   products: TApiProductPopulated[];
-  pagination: IPagination;
+  pagination: IApiPagination;
   counts: Record<TProductStatus | 'ALL', number>;
+}
+
+export interface IContactQuery
+  extends IId, Pick<ITimeStamp, 'createdAt'>, TCreateContactQueryZodSchema {
+  status: TContactQueryStatus;
+}
+
+export interface IContactQueriesListResponse {
+  queries: IContactQuery[];
+  pagination: IApiPagination;
 }
