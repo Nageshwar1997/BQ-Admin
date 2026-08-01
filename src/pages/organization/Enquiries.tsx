@@ -24,7 +24,10 @@ import {
   TableRowCell,
 } from '@/components/layout/table';
 import Select from '@/components/ui/inputs/Select';
-import { CONTACT_QUERY_STATUS_TRANSITIONS, ENQUIRIES_TABLE_TITLES } from '@/constants/api.constants';
+import {
+  CONTACT_QUERY_STATUS_TRANSITIONS,
+  ENQUIRIES_TABLE_TITLES,
+} from '@/constants/api.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import {
   useGetContactQueries,
@@ -173,25 +176,25 @@ const Enquiries = () => {
                             {query.email}
                           </Link>
                         </TableRowCell>
-                        <TableRowCell className="text-primary flex items-center gap-1">
+                        <TableRowCell className="text-primary space-x-2 text-start">
                           {!!query.phoneNumber && (
                             <Fragment>
-                              <Link target="_blank" to={`https://wa.me/+91${query.phoneNumber}`}>
-                                <span className="block size-3.5 shrink-0">
-                                  <Icon icon="logos:whatsapp-icon" />
-                                </span>
+                              <Link
+                                target="_blank"
+                                className="size-3.5"
+                                to={`https://wa.me/+91${query.phoneNumber}`}
+                              >
+                                <Icon icon="logos:whatsapp-icon" className="inline size-3.5" />
                               </Link>
                               <Link target="_blank" to={`tel:${query.phoneNumber}`}>
-                                <span className="block size-3.5 shrink-0">
-                                  <Icon
-                                    icon="solar:phone-calling-bold-duotone"
-                                    className="[&>*:first-child]:text-blue-crayola-c stroke-primary size-full [&>*:first-child]:opacity-100"
-                                  />
-                                </span>
+                                <Icon
+                                  icon="solar:phone-calling-bold-duotone"
+                                  className="[&>*:first-child]:text-blue-crayola-c stroke-primary inline [&>*:first-child]:opacity-100"
+                                />
                               </Link>
                             </Fragment>
                           )}
-                          {query.phoneNumber}
+                          <span>{query.phoneNumber}</span>
                         </TableRowCell>
                         <TableRowCell>{query.queryType}</TableRowCell>
                         <TableRowCell>
@@ -220,11 +223,9 @@ const Enquiries = () => {
                                 isUpdatingStatus ||
                                 !CONTACT_QUERY_STATUS_TRANSITIONS[query.status].length,
                             }}
+                            className="[&>div>span]:py-2 [&>div>span]:text-xs"
                             containerClassName="min-w-32"
-                            optionsClassName="[&>ul>li]:first-letter:capitalize"
-                            // Opens upward for the last few rows so the options list doesn't get
-                            // clipped by the table wrapper's overflow-hidden.
-                            position={index >= enquiries.length - 3 ? 'top' : 'bottom'}
+                            optionsClassName="[&>ul>li>span]:first-letter:uppercase [&>ul>li>span]:text-xs"
                           />
                         </TableRowCell>
                         <TableRowCell className="uppercase">
