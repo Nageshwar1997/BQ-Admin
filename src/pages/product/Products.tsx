@@ -196,7 +196,7 @@ const Products = () => {
               }}
               containerClassName="max-w-32! w-full"
               className="[&>div]:first:capitalize"
-              optionsClassName="[&>ul>li]:text-xs"
+              optionsClassName="capitalize"
             />,
           ],
         }),
