@@ -120,7 +120,7 @@ export const SIDEBAR_DATA = [
   },
   {
     title: 'Enquiries',
-    icon: 'solar:box-minimalistic-linear',
+    icon: 'solar:mailbox-linear',
     path: `/${ROUTES.ENQUIRIES}`,
     handler: null,
   },

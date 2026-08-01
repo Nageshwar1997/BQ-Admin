@@ -225,6 +225,7 @@ export interface IDashboardProductsResponse {
 export interface IContactQuery
   extends IId, Pick<ITimeStamp, 'createdAt'>, TCreateContactQueryZodSchema {
   status: TContactQueryStatus;
+  expiresAt?: string | null;
 }
 
 export interface IContactQueriesListResponse {

@@ -1,3 +1,4 @@
+import { EMPTY_ARRAY } from '@beautinique/frontend-constants';
 import type { IListContactQueriesQuery } from '@beautinique/frontend-types';
 import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
 
@@ -55,6 +56,6 @@ export const useGetContactQueries = (
     refetchOnWindowFocus: false,
     refetchOnMount: true,
     refetchOnReconnect: true,
-    select: (data) => data.pages.flatMap((page) => page.data?.queries ?? []),
+    select: (data) => data.pages.flatMap((page) => page.data?.queries ?? EMPTY_ARRAY),
   });
 };
