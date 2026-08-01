@@ -1,7 +1,7 @@
-import type { IListContactQueriesQuery, TContactQueryStatus } from '@beautinique/frontend-types';
+import type { IListContactQueriesQuery } from '@beautinique/frontend-types';
 
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
-import type { IContactQueriesListResponse } from '@/types/api.type';
+import type { IContactQueriesListResponse, IUpdateContactQueryStatus } from '@/types/api.type';
 
 import { ApiRequest } from '../ApiRequest';
 
@@ -14,13 +14,7 @@ export class ContactApi extends ApiRequest {
   };
 
   /* ================== UPDATE CONTACT QUERY STATUS ================== */
-  public updateContactQueryStatus = ({
-    status,
-    ticketId,
-  }: {
-    ticketId: string;
-    status: TContactQueryStatus;
-  }) => {
+  public updateContactQueryStatus = ({ status, ticketId }: IUpdateContactQueryStatus) => {
     const { method, url } = this.routes.updateStatus;
     return this.request({
       method,

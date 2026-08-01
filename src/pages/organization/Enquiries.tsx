@@ -30,6 +30,7 @@ import {
   useGetContactQueries,
   useUpdateContactQueryStatus,
 } from '@/services/organization-service/contact.service.query';
+import type { IUpdateContactQueryStatus } from '@/types/api.type';
 import { formatDate } from '@/utils/common.util';
 
 const STATUS_ICONS: Record<TContactQueryStatus, string> = {
@@ -61,7 +62,11 @@ const Enquiries = () => {
     queryType: queryParams.queryType as IListContactQueriesQuery['queryType'] | undefined,
     status: queryParams.status?.toUpperCase() as IListContactQueriesQuery['status'] | undefined,
   });
-  const { mutate: updateStatus, isPending: isUpdatingStatus } = useUpdateContactQueryStatus();
+  const { mutateAsync, isPending: isUpdatingStatus } = useUpdateContactQueryStatus();
+
+  const handleUpdateStatus = async (data: IUpdateContactQueryStatus) => {
+    await mutateAsync(data);
+  };
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -208,15 +213,15 @@ const Enquiries = () => {
                               value: status,
                             }))}
                             selectProps={{
-                              value: '',
-                              onChange: (value) => {
+                              value: query.status,
+                              onChange: async (value) => {
                                 if (!value) return;
-                                updateStatus({
+                                await handleUpdateStatus({
                                   ticketId: query._id,
                                   status: value as TContactQueryStatus,
                                 });
                               },
-                              placeholder: `${query.status.charAt(0)}${query.status.slice(1).toLowerCase()}`,
+                              placeholder: 'Status',
                               disabled: isUpdatingStatus,
                             }}
                             className="gap-2! text-left [&>div>span]:py-2! [&>div>span]:text-xs"

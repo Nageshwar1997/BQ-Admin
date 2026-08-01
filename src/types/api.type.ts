@@ -232,3 +232,8 @@ export interface IContactQueriesListResponse {
   queries: IContactQuery[];
   pagination: IApiPagination;
 }
+
+export interface IUpdateContactQueryStatus {
+  ticketId: string;
+  status: TContactQueryStatus;
+}
