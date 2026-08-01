@@ -4,7 +4,7 @@ import {
   CONTACT_QUERY_TYPES,
   SORT_MAP,
 } from '@beautinique/frontend-constants';
-import type { IListContactQueriesQuery } from '@beautinique/frontend-types';
+import type { IListContactQueriesQuery, TContactQueryStatus } from '@beautinique/frontend-types';
 import { isNullOrUndefined } from '@beautinique/shared-utils';
 import { Icon } from '@iconify/react';
 import { Fragment, useEffect } from 'react';
@@ -24,10 +24,27 @@ import {
   TableRowCell,
 } from '@/components/layout/table';
 import Select from '@/components/ui/inputs/Select';
-import { ENQUIRIES_TABLE_TITLES } from '@/constants/api.constants';
+import { CONTACT_QUERY_STATUS_TRANSITIONS, ENQUIRIES_TABLE_TITLES } from '@/constants/api.constants';
 import useQueryParams from '@/hooks/useQueryParams';
-import { useGetContactQueries } from '@/services/organization-service/contact.service.query';
+import {
+  useGetContactQueries,
+  useUpdateContactQueryStatus,
+} from '@/services/organization-service/contact.service.query';
 import { formatDate } from '@/utils/common.util';
+
+const STATUS_ICONS: Record<TContactQueryStatus, string> = {
+  OPENED: 'solar:bell-linear',
+  ANSWERED: 'solar:chat-round-check-linear',
+  CLOSED: 'solar:check-circle-linear',
+  REJECTED: 'solar:close-circle-linear',
+};
+
+const STATUS_ICON_COLORS: Record<TContactQueryStatus, string> = {
+  OPENED: 'text-primary-yellow',
+  ANSWERED: 'text-picton-blue-c',
+  CLOSED: 'text-primary-green',
+  REJECTED: 'text-primary-red',
+};
 
 const Enquiries = () => {
   const { ref, inView } = useInView();
@@ -44,6 +61,7 @@ const Enquiries = () => {
     queryType: queryParams.queryType as IListContactQueriesQuery['queryType'] | undefined,
     status: queryParams.status?.toUpperCase() as IListContactQueriesQuery['status'] | undefined,
   });
+  const { mutate: updateStatus, isPending: isUpdatingStatus } = useUpdateContactQueryStatus();
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -148,7 +166,7 @@ const Enquiries = () => {
                           >
                             <span className="size-4 shrink-0">
                               <Icon
-                                icon="solar:reply-linear"
+                                icon="solar:letter-linear"
                                 className="group-hover:text-blue-crayola-c size-full"
                               />
                             </span>
@@ -176,8 +194,38 @@ const Enquiries = () => {
                           {query.phoneNumber}
                         </TableRowCell>
                         <TableRowCell>{query.queryType}</TableRowCell>
-                        <TableRowCell className="first-letter:capitalize">
-                          {query.status.toLowerCase()}
+                        <TableRowCell>
+                          <Select
+                            key={`status-${query._id}`}
+                            icons={{
+                              left: {
+                                icon: STATUS_ICONS[query.status],
+                                className: STATUS_ICON_COLORS[query.status],
+                              },
+                            }}
+                            options={CONTACT_QUERY_STATUS_TRANSITIONS[query.status].map(
+                              (status) => ({ label: status.toLowerCase(), value: status }),
+                            )}
+                            selectProps={{
+                              value: '',
+                              onChange: (value) => {
+                                if (!value) return;
+                                updateStatus({
+                                  ticketId: query._id,
+                                  status: value as TContactQueryStatus,
+                                });
+                              },
+                              placeholder: `${query.status.charAt(0)}${query.status.slice(1).toLowerCase()}`,
+                              disabled:
+                                isUpdatingStatus ||
+                                !CONTACT_QUERY_STATUS_TRANSITIONS[query.status].length,
+                            }}
+                            containerClassName="min-w-32"
+                            optionsClassName="[&>ul>li]:first-letter:capitalize"
+                            // Opens upward for the last few rows so the options list doesn't get
+                            // clipped by the table wrapper's overflow-hidden.
+                            position={index >= enquiries.length - 3 ? 'top' : 'bottom'}
+                          />
                         </TableRowCell>
                         <TableRowCell className="uppercase">
                           {formatDate(query.createdAt, {

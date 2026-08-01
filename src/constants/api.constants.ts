@@ -1,4 +1,8 @@
-import { API_METHODS_MAP, PRODUCT_STATUSES_MAP } from '@beautinique/frontend-constants';
+import {
+  API_METHODS_MAP,
+  CONTACT_QUERY_STATUS_MAP,
+  PRODUCT_STATUSES_MAP,
+} from '@beautinique/frontend-constants';
 
 import type { TProductSortBy } from '@/types/api.type';
 import { createQueryKeys, createRouteHelper } from '@/utils/api.util';
@@ -173,4 +177,21 @@ export const PRODUCT_STATUS_TRANSITIONS = {
     PRODUCT_STATUSES_MAP.PUBLISHED,
     PRODUCT_STATUSES_MAP.BLOCKED,
   ],
+} as const;
+
+export const CONTACT_QUERY_STATUS_TRANSITIONS = {
+  [CONTACT_QUERY_STATUS_MAP.OPENED]: [
+    CONTACT_QUERY_STATUS_MAP.ANSWERED,
+    CONTACT_QUERY_STATUS_MAP.CLOSED,
+    CONTACT_QUERY_STATUS_MAP.REJECTED,
+  ],
+
+  [CONTACT_QUERY_STATUS_MAP.ANSWERED]: [
+    CONTACT_QUERY_STATUS_MAP.CLOSED,
+    CONTACT_QUERY_STATUS_MAP.REJECTED,
+  ],
+
+  // Terminal states: a closed or rejected ticket can't transition further.
+  [CONTACT_QUERY_STATUS_MAP.CLOSED]: [],
+  [CONTACT_QUERY_STATUS_MAP.REJECTED]: [],
 } as const;

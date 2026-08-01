@@ -1,6 +1,6 @@
 import { EMPTY_ARRAY } from '@beautinique/frontend-constants';
 import type { IListContactQueriesQuery } from '@beautinique/frontend-types';
-import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { contactApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
@@ -10,6 +10,8 @@ import { toaster } from '@/utils/common.util';
 const { list, updateStatus } = API_QUERY_KEYS.organization_service.contact;
 
 export const useUpdateContactQueryStatus = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: updateStatus({ ticketId: '' }),
     mutationFn: contactApi.updateContactQueryStatus,
@@ -20,7 +22,8 @@ export const useUpdateContactQueryStatus = () => {
       });
       return { toastId };
     },
-    onSuccess: ({ message }) => {
+    onSuccess: async ({ message }) => {
+      await queryClient.invalidateQueries({ queryKey: list });
       handleApiSuccessToaster(message);
     },
     onError: (error) => {
