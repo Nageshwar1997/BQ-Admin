@@ -87,6 +87,7 @@ export const ROUTES = {
   PROFILE: {
     BASE: 'profile',
   },
+  ENQUIRIES: 'enquiries',
 } as const;
 
 export const TOOLTIP_GAP = 15 as const;
@@ -115,6 +116,12 @@ export const SIDEBAR_DATA = [
     title: 'Products',
     icon: 'solar:box-minimalistic-linear',
     path: `/${ROUTES.PRODUCTS.BASE}`,
+    handler: null,
+  },
+  {
+    title: 'Enquiries',
+    icon: 'solar:box-minimalistic-linear',
+    path: `/${ROUTES.ENQUIRIES}`,
     handler: null,
   },
   {

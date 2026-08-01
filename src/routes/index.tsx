@@ -5,7 +5,7 @@ import { ROUTES } from '@/constants/common.constants';
 import { authenticate } from '@/middlewares';
 import ErrorBoundary from '@/pages/error/ErrorBoundary';
 
-const { AUTH, CATEGORIES, DASHBOARD, PRODUCTS } = ROUTES;
+const { AUTH, CATEGORIES, DASHBOARD, PRODUCTS, ENQUIRIES } = ROUTES;
 
 const routes: RouteObject[] = [
   {
@@ -43,35 +43,38 @@ const routes: RouteObject[] = [
               return { Component: AddProduct };
             },
           },
+          {
+            path: PRODUCTS.PRODUCT_ID,
+            lazy: async () => {
+              const { default: ProductDetails } = await import('@/pages/product/ProductDetails');
+              return { Component: ProductDetails };
+            },
+          },
+          {
+            path: PRODUCTS.CATEGORY_L1,
+            lazy: async () => {
+              const { default: CategoryProducts } =
+                await import('@/pages/product/CategoryProducts');
+              return { Component: CategoryProducts };
+            },
+          },
+          {
+            path: `${PRODUCTS.CATEGORY_L1}/${PRODUCTS.CATEGORY_L2}`,
+            lazy: async () => {
+              const { default: CategoryProducts } =
+                await import('@/pages/product/CategoryProducts');
+              return { Component: CategoryProducts };
+            },
+          },
+          {
+            path: `${PRODUCTS.CATEGORY_L1}/${PRODUCTS.CATEGORY_L2}/${PRODUCTS.CATEGORY_L3}`,
+            lazy: async () => {
+              const { default: CategoryProducts } =
+                await import('@/pages/product/CategoryProducts');
+              return { Component: CategoryProducts };
+            },
+          },
         ],
-      },
-      {
-        path: `${PRODUCTS.BASE}/${PRODUCTS.PRODUCT_ID}`,
-        lazy: async () => {
-          const { default: ProductDetails } = await import('@/pages/product/ProductDetails');
-          return { Component: ProductDetails };
-        },
-      },
-      {
-        path: `${PRODUCTS.BASE}/${PRODUCTS.CATEGORY_L1}`,
-        lazy: async () => {
-          const { default: CategoryProducts } = await import('@/pages/product/CategoryProducts');
-          return { Component: CategoryProducts };
-        },
-      },
-      {
-        path: `${PRODUCTS.BASE}/${PRODUCTS.CATEGORY_L1}/${PRODUCTS.CATEGORY_L2}`,
-        lazy: async () => {
-          const { default: CategoryProducts } = await import('@/pages/product/CategoryProducts');
-          return { Component: CategoryProducts };
-        },
-      },
-      {
-        path: `${PRODUCTS.BASE}/${PRODUCTS.CATEGORY_L1}/${PRODUCTS.CATEGORY_L2}/${PRODUCTS.CATEGORY_L3}`,
-        lazy: async () => {
-          const { default: CategoryProducts } = await import('@/pages/product/CategoryProducts');
-          return { Component: CategoryProducts };
-        },
       },
       /* ========== CATEGORIES ========== */
       {
@@ -79,6 +82,14 @@ const routes: RouteObject[] = [
         lazy: async () => {
           const { default: Categories } = await import('@/pages/category/Categories');
           return { Component: Categories };
+        },
+      },
+      /* ========== ENQUIRIES ========== */
+      {
+        path: ENQUIRIES,
+        lazy: async () => {
+          const { default: Enquiries } = await import('@/pages/organization/Enquiries');
+          return { Component: Enquiries };
         },
       },
     ],

@@ -38,7 +38,7 @@ export const useGetContactQueries = (
     queryKey: [...list, ...Object.values(params)],
     initialPageParam: 1,
     queryFn: ({ pageParam }) =>
-      contactApi.getContactQueries({ page: pageParam.toString(), limit: '15' }),
+      contactApi.getContactQueries({ page: pageParam.toString(), limit: '15', ...params }),
     getNextPageParam: (lastPage) => {
       const pagination = lastPage.data?.pagination;
 
