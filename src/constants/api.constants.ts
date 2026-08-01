@@ -138,17 +138,17 @@ export const PRODUCTS_TABLE_TITLES: { label: string; sortKey?: TProductSortBy }[
   { label: 'Avg. Rating' },
 ] as const;
 
-export const ENQUIRIES_TABLE_TITLES: { label: string; sortKey?: TProductSortBy }[] = [
-  { label: 'S. No' },
-  { label: 'Name' },
-  { label: 'Ticket Id' },
-  { label: 'Message' },
-  { label: 'Email' },
-  { label: 'Phone Number' },
-  { label: 'Query Type' },
-  { label: 'Status' },
-  { label: 'Raised At' },
-  { label: 'Expires At' },
+export const ENQUIRIES_TABLE_TITLES = [
+  'S. No',
+  'Name',
+  'Ticket Id',
+  'Message',
+  'Email',
+  'Phone Number',
+  'Query Type',
+  'Status',
+  'Raised At',
+  'Expires At',
 ] as const;
 
 export const PRODUCT_STATUS_TRANSITIONS = {

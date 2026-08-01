@@ -126,7 +126,7 @@ const Select = ({
         createPortal(
           <div
             ref={dropdownRef}
-            className={`border-primary/10 bg-smoke-eerie fixed z-100 overflow-hidden rounded-lg border shadow-md ${optionsClassName}`}
+            className={`border-primary/10 bg-smoke-eerie fixed z-3 overflow-hidden rounded-lg border shadow-md ${optionsClassName}`}
             style={{
               left: dropdownPosition.left,
               width: dropdownPosition.width,
