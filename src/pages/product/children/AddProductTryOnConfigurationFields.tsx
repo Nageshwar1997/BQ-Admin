@@ -53,8 +53,8 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
                       onChange(value);
                     },
                   }}
-                  optionsClassName="[&>ul>li>span]:lowercase [&>ul>li>span]:first-letter:capitalize"
-                  className="[&>div>span]:lowercase [&>div>span]:first-letter:capitalize"
+                  className="lowercase"
+                  optionsClassName="lowercase"
                 />
               );
             }}

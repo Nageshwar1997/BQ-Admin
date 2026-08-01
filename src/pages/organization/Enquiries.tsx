@@ -24,10 +24,7 @@ import {
   TableRowCell,
 } from '@/components/layout/table';
 import Select from '@/components/ui/inputs/Select';
-import {
-  CONTACT_QUERY_STATUS_TRANSITIONS,
-  ENQUIRIES_TABLE_TITLES,
-} from '@/constants/api.constants';
+import { ENQUIRIES_TABLE_TITLES } from '@/constants/api.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import {
   useGetContactQueries,
@@ -206,9 +203,10 @@ const Enquiries = () => {
                                 className: STATUS_ICON_COLORS[query.status],
                               },
                             }}
-                            options={CONTACT_QUERY_STATUS_TRANSITIONS[query.status].map(
-                              (status) => ({ label: status.toLowerCase(), value: status }),
-                            )}
+                            options={CONTACT_QUERY_STATUS.map((status) => ({
+                              label: status.toLowerCase(),
+                              value: status,
+                            }))}
                             selectProps={{
                               value: '',
                               onChange: (value) => {
@@ -219,13 +217,11 @@ const Enquiries = () => {
                                 });
                               },
                               placeholder: `${query.status.charAt(0)}${query.status.slice(1).toLowerCase()}`,
-                              disabled:
-                                isUpdatingStatus ||
-                                !CONTACT_QUERY_STATUS_TRANSITIONS[query.status].length,
+                              disabled: isUpdatingStatus,
                             }}
-                            className="[&>div>span]:py-2 [&>div>span]:text-xs"
+                            className="gap-2! text-left [&>div>span]:py-2! [&>div>span]:text-xs"
                             containerClassName="min-w-32"
-                            optionsClassName="[&>ul>li>span]:first-letter:uppercase [&>ul>li>span]:text-xs"
+                            optionsClassName="[&>ul>li>span]:text-xs"
                           />
                         </TableRowCell>
                         <TableRowCell className="uppercase">

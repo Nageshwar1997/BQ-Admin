@@ -108,8 +108,6 @@ const ProductDetails = () => {
               disabled: !product?.status || isLoading || isError,
             }}
             containerClassName="max-w-40! w-full"
-            className="[&>div]:first:capitalize"
-            optionsClassName="[&>ul>li]:text-xs"
           />,
         ],
       }}

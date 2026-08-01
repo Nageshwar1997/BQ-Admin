@@ -195,8 +195,6 @@ const Products = () => {
                 },
               }}
               containerClassName="max-w-32! w-full"
-              className="[&>div]:first:capitalize"
-              optionsClassName="capitalize"
             />,
           ],
         }),
