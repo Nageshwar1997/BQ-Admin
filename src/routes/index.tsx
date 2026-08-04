@@ -84,6 +84,16 @@ const routes: RouteObject[] = [
           return { Component: Categories };
         },
       },
+      {
+        path: PROFILE.UPDATE_PASSWORD,
+        middleware: [authenticate],
+        lazy: async () => {
+          const { default: UpdatePassword } = await import('@/pages/auth/UpdatePassword');
+
+          return { Component: UpdatePassword };
+        },
+      },
+
       /* ========== ENQUIRIES ========== */
       {
         path: ENQUIRIES,
@@ -121,16 +131,8 @@ const routes: RouteObject[] = [
     ],
   },
   {
-    path: PROFILE.UPDATE_PASSWORD,
-    middleware: [authenticate],
-    lazy: async () => {
-      const { default: UpdatePassword } = await import('@/pages/auth/UpdatePassword');
-
-      return { Component: UpdatePassword };
-    },
-  },
-  {
     path: '*',
+
     lazy: async () => {
       const { default: NotFound } = await import('@/pages/error/NotFound');
       return { Component: NotFound };
