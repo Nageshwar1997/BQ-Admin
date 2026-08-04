@@ -73,7 +73,6 @@ export const ROUTES = {
   AUTH: {
     BASE: 'auth',
     FORGOT_PASSWORD: 'forgot-password',
-    CHANGE_PASSWORD: 'change-password',
   },
   CATEGORIES: { BASE: 'categories' },
   PRODUCTS: {
@@ -86,6 +85,7 @@ export const ROUTES = {
   },
   PROFILE: {
     BASE: 'profile',
+    UPDATE_PASSWORD: 'update-password',
   },
   ENQUIRIES: 'enquiries',
 } as const;
@@ -122,6 +122,12 @@ export const SIDEBAR_DATA = [
     title: 'Enquiries',
     icon: 'solar:mailbox-linear',
     path: `/${ROUTES.ENQUIRIES}`,
+    handler: null,
+  },
+  {
+    title: 'Update Password',
+    icon: 'solar:lock-password-linear',
+    path: `/${ROUTES.PROFILE.UPDATE_PASSWORD}`,
     handler: null,
   },
   {

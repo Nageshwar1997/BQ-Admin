@@ -5,7 +5,7 @@ import { ROUTES } from '@/constants/common.constants';
 import { authenticate } from '@/middlewares';
 import ErrorBoundary from '@/pages/error/ErrorBoundary';
 
-const { AUTH, CATEGORIES, DASHBOARD, PRODUCTS, ENQUIRIES } = ROUTES;
+const { AUTH, CATEGORIES, DASHBOARD, PRODUCTS, PROFILE, ENQUIRIES } = ROUTES;
 
 const routes: RouteObject[] = [
   {
@@ -118,16 +118,16 @@ const routes: RouteObject[] = [
           return { Component: ForgotPassword };
         },
       },
-      {
-        path: AUTH.CHANGE_PASSWORD,
-        middleware: [authenticate],
-        lazy: async () => {
-          const { default: ChangePassword } = await import('@/pages/auth/ChangePassword');
-
-          return { Component: ChangePassword };
-        },
-      },
     ],
+  },
+  {
+    path: PROFILE.UPDATE_PASSWORD,
+    middleware: [authenticate],
+    lazy: async () => {
+      const { default: UpdatePassword } = await import('@/pages/auth/UpdatePassword');
+
+      return { Component: UpdatePassword };
+    },
   },
   {
     path: '*',

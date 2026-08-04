@@ -54,10 +54,6 @@ export class AuthApi extends ApiRequest {
     });
   };
 
-  public changePassword = (data: TChangePasswordZodSchema) => {
-    return this.request<IUser>({ ...this.routes.password.change, data });
-  };
-
   /* ===================== LOGOUT API ===================== */
 
   public logout = () => {
@@ -71,5 +67,9 @@ export class UserApi extends ApiRequest {
 
   public getSessionUser = async () => {
     return this.request<IUser>(this.routes.session);
+  };
+
+  public changePassword = (data: TChangePasswordZodSchema) => {
+    return this.request<IUser>({ ...this.routes.password.change, data });
   };
 }
