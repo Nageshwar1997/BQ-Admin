@@ -19,7 +19,7 @@ export class ContactApi extends ApiRequest {
     return this.request({
       method,
       url: url({ ticketId }),
-      data: { status },
+      params: { status },
     });
   };
 }
