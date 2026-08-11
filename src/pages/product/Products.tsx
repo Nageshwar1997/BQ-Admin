@@ -114,7 +114,7 @@ const SearchAndSort = () => {
         options={categories}
         error={isError ? 'Failed to load categories' : undefined}
         containerClassName="min-w-40 max-w-xs! w-full"
-        optionsClassName="base:w-max base:right-0 base:left-auto sm:w-full sm:left-0 sm:right-auto"
+        optionsClassName="base:w-max base:right-0 base:left-auto sm:w-full sm:left-0 sm:right-auto z-50"
       />
     </div>
   );
