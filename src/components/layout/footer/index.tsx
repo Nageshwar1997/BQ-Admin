@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import Divider from '@/components/ui/Divider';
 import GradientText from '@/components/ui/GradientText';
+import { ROUTES } from '@/constants/common.constants';
 import { APP_VERSION, FOOTER_LINKS } from '@/constants/footer.constants';
 import envs from '@/envs';
 import useThemeStore from '@/stores/theme.store';
@@ -15,7 +16,7 @@ const Footer = () => {
     <footer className="w-full">
       <div className="flex flex-col gap-6 px-4 py-8 md:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-10">
         {/* Brand */}
-        <Link to="/" className="flex items-center gap-3">
+        <Link to={ROUTES.DASHBOARD} className="flex items-center gap-3">
           <img
             src={`/images/logo/BQ_${theme === 'dark' ? 'white' : 'black'}_logo.webp`}
             alt="Logo"

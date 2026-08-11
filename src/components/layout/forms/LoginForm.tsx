@@ -10,6 +10,7 @@ import Button from '@/components/ui/Button';
 import GradientText from '@/components/ui/GradientText';
 import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
+import { ROUTES } from '@/constants/common.constants';
 import { LOGIN_INPUT_MAP_DATA, PASSWORD_KEYS } from '@/constants/input.constants';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
@@ -58,7 +59,7 @@ const LoginForm = () => {
         const { runAllActions } = useActionsStore.getState();
         await runAllActions();
 
-        if (paths.includes('auth')) void navigate('/');
+        if (paths.includes(ROUTES.AUTH.BASE)) void navigate(ROUTES.DASHBOARD);
         if (queryParams.login) removeParams(['login']);
       },
 
@@ -170,7 +171,7 @@ const LoginForm = () => {
             <GradientText
               text="Forgot Password?"
               type="accent"
-              path="/auth/forgot-password"
+              path={`/${ROUTES.AUTH.BASE}/${ROUTES.AUTH.FORGOT_PASSWORD}`}
               className="text-xs font-semibold whitespace-nowrap hover:underline"
             />
           </p>
@@ -178,7 +179,7 @@ const LoginForm = () => {
           {/* ================= ACTION BUTTONS ================= */}
           <div className="flex gap-4 sm:col-span-2">
             {/* -------- Back Button -------- */}
-            <Link to="/" className="w-full">
+            <Link to={ROUTES.DASHBOARD} className="w-full">
               <Button pattern="secondary" content="Back" />
             </Link>
 
