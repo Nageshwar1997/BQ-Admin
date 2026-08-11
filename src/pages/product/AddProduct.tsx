@@ -54,7 +54,7 @@ import AddProductStockAndVariantsFields from './children/AddProductStockAndVaria
 import AddProductTryOnConfigurationFields from './children/AddProductTryOnConfigurationFields';
 
 const AddProduct = () => {
-  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(4);
+  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(0);
   const { processQuillContent, isPending: isContentUploadPending } =
     useProcessQuillContent<TProductDescriptionAndContentZodSchema>();
 
