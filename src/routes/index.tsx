@@ -1,11 +1,20 @@
+import { type ComponentType } from 'react';
 import { Outlet, type RouteObject } from 'react-router-dom';
 
 import LoadingScreen from '@/components/layout/loaders/LoadingScreen';
 import { ROUTES } from '@/constants/common.constants';
-import { authenticate } from '@/middlewares';
+import { authenticate, guestOnly } from '@/middlewares';
 import ErrorBoundary from '@/pages/error/ErrorBoundary';
 
 const { AUTH, CATEGORIES, DASHBOARD, PRODUCTS, PROFILE, ENQUIRIES } = ROUTES;
+
+// Wraps a page's dynamic import into the function react-router's `lazy` route property expects.
+// The import itself must stay a literal `() => import('@/path')` callback (not a variable path)
+// so Vite can statically split each page into its own chunk.
+const loadPage = (loader: () => Promise<{ default: ComponentType }>) => async () => {
+  const { default: Component } = await loader();
+  return { Component };
+};
 
 const routes: RouteObject[] = [
   {
@@ -13,17 +22,11 @@ const routes: RouteObject[] = [
     HydrateFallback: LoadingScreen,
     ErrorBoundary,
     middleware: [authenticate],
-    lazy: async () => {
-      const { default: Layout } = await import('@/pages/layout');
-      return { Component: Layout };
-    },
+    lazy: loadPage(() => import('@/pages/layout')),
     children: [
       {
         index: true,
-        lazy: async () => {
-          const { default: Home } = await import('@/pages/home');
-          return { Component: Home };
-        },
+        lazy: loadPage(() => import('@/pages/home')),
       },
       {
         path: PRODUCTS.BASE,
@@ -31,76 +34,45 @@ const routes: RouteObject[] = [
         children: [
           {
             index: true,
-            lazy: async () => {
-              const { default: Products } = await import('@/pages/product/Products');
-              return { Component: Products };
-            },
+            lazy: loadPage(() => import('@/pages/product/Products')),
           },
           {
             path: PRODUCTS.ADD,
-            lazy: async () => {
-              const { default: AddProduct } = await import('@/pages/product/AddProduct');
-              return { Component: AddProduct };
-            },
+            lazy: loadPage(() => import('@/pages/product/AddProduct')),
           },
           {
             path: PRODUCTS.PRODUCT_ID,
-            lazy: async () => {
-              const { default: ProductDetails } = await import('@/pages/product/ProductDetails');
-              return { Component: ProductDetails };
-            },
+            lazy: loadPage(() => import('@/pages/product/ProductDetails')),
           },
           {
             path: PRODUCTS.CATEGORY_L1,
-            lazy: async () => {
-              const { default: CategoryProducts } =
-                await import('@/pages/product/CategoryProducts');
-              return { Component: CategoryProducts };
-            },
+            lazy: loadPage(() => import('@/pages/product/CategoryProducts')),
           },
           {
             path: `${PRODUCTS.CATEGORY_L1}/${PRODUCTS.CATEGORY_L2}`,
-            lazy: async () => {
-              const { default: CategoryProducts } =
-                await import('@/pages/product/CategoryProducts');
-              return { Component: CategoryProducts };
-            },
+            lazy: loadPage(() => import('@/pages/product/CategoryProducts')),
           },
           {
             path: `${PRODUCTS.CATEGORY_L1}/${PRODUCTS.CATEGORY_L2}/${PRODUCTS.CATEGORY_L3}`,
-            lazy: async () => {
-              const { default: CategoryProducts } =
-                await import('@/pages/product/CategoryProducts');
-              return { Component: CategoryProducts };
-            },
+            lazy: loadPage(() => import('@/pages/product/CategoryProducts')),
           },
         ],
       },
       /* ========== CATEGORIES ========== */
       {
         path: CATEGORIES.BASE,
-        lazy: async () => {
-          const { default: Categories } = await import('@/pages/category/Categories');
-          return { Component: Categories };
-        },
+        lazy: loadPage(() => import('@/pages/category/Categories')),
       },
       {
         path: PROFILE.UPDATE_PASSWORD,
         middleware: [authenticate],
-        lazy: async () => {
-          const { default: UpdatePassword } = await import('@/pages/auth/UpdatePassword');
-
-          return { Component: UpdatePassword };
-        },
+        lazy: loadPage(() => import('@/pages/auth/UpdatePassword')),
       },
 
       /* ========== ENQUIRIES ========== */
       {
         path: ENQUIRIES,
-        lazy: async () => {
-          const { default: Enquiries } = await import('@/pages/organization/Enquiries');
-          return { Component: Enquiries };
-        },
+        lazy: loadPage(() => import('@/pages/organization/Enquiries')),
       },
     ],
   },
@@ -108,35 +80,23 @@ const routes: RouteObject[] = [
     path: AUTH.BASE,
     HydrateFallback: LoadingScreen,
     ErrorBoundary: ErrorBoundary,
-    lazy: async () => {
-      const { default: Auth } = await import('@/pages/auth');
-      return { Component: Auth };
-    },
+    middleware: [guestOnly],
+    lazy: loadPage(() => import('@/pages/auth')),
     children: [
       {
         index: true,
-        lazy: async () => {
-          const { default: Login } = await import('@/pages/auth/Login');
-          return { Component: Login };
-        },
+        lazy: loadPage(() => import('@/pages/auth/Login')),
       },
 
       {
         path: AUTH.FORGOT_PASSWORD,
-        lazy: async () => {
-          const { default: ForgotPassword } = await import('@/pages/auth/ForgotPassword');
-          return { Component: ForgotPassword };
-        },
+        lazy: loadPage(() => import('@/pages/auth/ForgotPassword')),
       },
     ],
   },
   {
     path: '*',
-
-    lazy: async () => {
-      const { default: NotFound } = await import('@/pages/error/NotFound');
-      return { Component: NotFound };
-    },
+    lazy: loadPage(() => import('@/pages/error/NotFound')),
   },
 ];
 

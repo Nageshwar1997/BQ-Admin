@@ -59,8 +59,18 @@ const LoginForm = () => {
         const { runAllActions } = useActionsStore.getState();
         await runAllActions();
 
-        if (paths.includes(ROUTES.AUTH.BASE)) void navigate(ROUTES.DASHBOARD);
-        if (queryParams.login) removeParams(['login']);
+        // The `authenticate` middleware bounces the user here from a private route
+        // (?redirect=...) — send them straight back to it instead of Dashboard.
+        if (queryParams.redirect?.charAt(0)) {
+          void navigate(queryParams.redirect);
+          return;
+        }
+
+        if (paths.includes(ROUTES.AUTH.BASE)) {
+          void navigate(ROUTES.DASHBOARD);
+        } else if (queryParams.login) {
+          removeParams(['login']);
+        }
       },
 
       onError: ({ fieldErrors }) => {
