@@ -1,5 +1,6 @@
 import { Icon } from '@iconify/react';
 
+import { ROUTES } from '@/constants/common.constants';
 import usePathParams from '@/hooks/usePathParams';
 import type { IBreadcrumb } from '@/types/component.type';
 
@@ -12,7 +13,9 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
 
   const handleNavigate = (targetIndex: number) => {
     const targetPath =
-      targetIndex === -1 ? '/' : '/' + activePaths.slice(0, targetIndex + 1).join('/');
+      targetIndex === -1
+        ? ROUTES.DASHBOARD
+        : `/${activePaths.slice(0, targetIndex + 1).join('/')}`;
 
     if (targetPath !== finalPathName) {
       void navigate(targetPath);
@@ -26,7 +29,7 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
         className={`text-secondary flex items-center gap-2 ${className}`}
       >
         <div className="flex items-center gap-2 truncate">
-          {finalPathName !== '/' ? (
+          {finalPathName !== ROUTES.DASHBOARD ? (
             <button
               type="button"
               className="cursor-pointer truncate capitalize"
@@ -45,7 +48,7 @@ const Breadcrumb = ({ className = '', customPath, customPaths }: IBreadcrumb) =>
         </div>
 
         {activePaths.map((path, index) => {
-          const targetPath = '/' + activePaths.slice(0, index + 1).join('/');
+          const targetPath = `/${activePaths.slice(0, index + 1).join('/')}`;
           const isLast = index === activePaths.length - 1;
           const isClickable = !isLast && finalPathName !== targetPath;
 
