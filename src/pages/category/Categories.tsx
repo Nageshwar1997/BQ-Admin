@@ -1,7 +1,7 @@
 import { CATEGORY_LEVELS_MAP, SORT_MAP } from '@beautinique/frontend-constants';
 import type { TSort } from '@beautinique/frontend-types';
 import { Icon } from '@iconify/react';
-import { createColumnHelper, useTable } from '@tanstack/react-table';
+import { useTable } from '@tanstack/react-table';
 import { Fragment, useDeferredValue, useEffect, useMemo, useState } from 'react';
 
 import ApiStatus from '@/components/layout/ApiStatus';
@@ -19,7 +19,7 @@ import {
 } from '@/components/layout/table';
 import Badge from '@/components/ui/Badge';
 import { EMPTY_ARRAY, QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
-import { APP_TABLE_FEATURES, type TAppTableFeatures, toColumn } from '@/constants/table.constants';
+import { APP_TABLE_FEATURES, createAppColumnHelper, toColumn } from '@/constants/table.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import {
   useDeleteCategory,
@@ -36,7 +36,7 @@ import CategoryTableTopInfo from './children/CategoryTableTopInfo';
 
 const q_cat_keys = QUERY_PARAMS_KEY_MAP.category;
 
-const columnHelper = createColumnHelper<TAppTableFeatures, TCategory>();
+const columnHelper = createAppColumnHelper<TCategory>();
 
 const ApiStatusRow = (
   props: Record<'haveLength' | 'isError' | 'isLoading', boolean> & Pick<TCategory, 'level'>,

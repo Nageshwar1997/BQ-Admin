@@ -1,5 +1,5 @@
 import type { ColumnDef, RowData } from '@tanstack/react-table';
-import { coreFeatures, tableFeatures } from '@tanstack/react-table';
+import { coreFeatures, createColumnHelper, tableFeatures } from '@tanstack/react-table';
 
 // Only the core feature set (table/column/row/header/cell + the core row
 // model) is registered - no optional features (sorting, filtering, expanding,
@@ -23,3 +23,12 @@ export const toColumn = <TData extends RowData, TValue>(
   def: ColumnDef<TAppTableFeatures, TData, TValue>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- see doc comment above
 ): ColumnDef<TAppTableFeatures, TData, any> => def;
+
+/**
+ * Same `createColumnHelper` every table page would otherwise call directly,
+ * with `TAppTableFeatures` baked in so call sites only ever need to name
+ * their row type: `const columnHelper = createAppColumnHelper<TProduct>();`
+ * instead of repeating `createColumnHelper<TAppTableFeatures, TProduct>()`.
+ */
+export const createAppColumnHelper = <TData extends RowData>() =>
+  createColumnHelper<TAppTableFeatures, TData>();

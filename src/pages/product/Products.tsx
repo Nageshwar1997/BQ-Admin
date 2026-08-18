@@ -1,7 +1,7 @@
 import { EMPTY_ARRAY, SORT_MAP } from '@beautinique/frontend-constants';
 import type { TCategoryLevel, TProductStatus, TSort } from '@beautinique/frontend-types';
 import { Icon } from '@iconify/react';
-import { createColumnHelper, useTable } from '@tanstack/react-table';
+import { useTable } from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
@@ -22,7 +22,7 @@ import HierarchySelect from '@/components/ui/inputs/HierarchySelect';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import { ROUTES } from '@/constants/common.constants';
-import { APP_TABLE_FEATURES, type TAppTableFeatures, toColumn } from '@/constants/table.constants';
+import { APP_TABLE_FEATURES, createAppColumnHelper, toColumn } from '@/constants/table.constants';
 import useDebounce from '@/hooks/useDebounce';
 import useIsSmallScreen from '@/hooks/useIsSmallScreen';
 import usePathParams from '@/hooks/usePathParams';
@@ -159,7 +159,7 @@ const SortableHeaderLabel = ({
   </button>
 );
 
-const columnHelper = createColumnHelper<TAppTableFeatures, TApiProductPopulated>();
+const columnHelper = createAppColumnHelper<TApiProductPopulated>();
 
 const Products = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();

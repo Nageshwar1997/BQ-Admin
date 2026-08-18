@@ -3,7 +3,7 @@ import { CONTACT_QUERY_STATUS, CONTACT_QUERY_TYPES } from '@beautinique/frontend
 import type { IListContactQueriesQuery, TContactQueryStatus } from '@beautinique/frontend-types';
 import { isNullOrUndefined } from '@beautinique/shared-utils';
 import { Icon } from '@iconify/react';
-import { createColumnHelper, useTable } from '@tanstack/react-table';
+import { useTable } from '@tanstack/react-table';
 import { Fragment, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
@@ -21,7 +21,7 @@ import {
   TableRowCell,
 } from '@/components/layout/table';
 import Select from '@/components/ui/inputs/Select';
-import { APP_TABLE_FEATURES, type TAppTableFeatures, toColumn } from '@/constants/table.constants';
+import { APP_TABLE_FEATURES, createAppColumnHelper, toColumn } from '@/constants/table.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import {
   useGetContactQueries,
@@ -44,7 +44,7 @@ const STATUS_ICON_COLORS: Record<TContactQueryStatus, string> = {
   REJECTED: 'text-primary-red',
 };
 
-const columnHelper = createColumnHelper<TAppTableFeatures, IContactQuery>();
+const columnHelper = createAppColumnHelper<IContactQuery>();
 
 const Enquiries = () => {
   const { ref, inView } = useInView();
