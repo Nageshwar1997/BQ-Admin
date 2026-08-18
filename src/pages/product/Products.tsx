@@ -146,16 +146,18 @@ const SortableHeaderLabel = ({
     className="hover:text-primary/90 flex w-full cursor-pointer items-center justify-center gap-1 select-none"
   >
     {label}
-    <Icon
-      icon={
-        activeSortKey === sortKey
-          ? sortOrder === SORT_MAP.asc
-            ? 'solar:alt-arrow-up-linear'
-            : 'solar:alt-arrow-down-linear'
-          : 'solar:sort-linear'
-      }
-      className="size-3.5 shrink-0"
-    />
+    <span className="size-3.5 shrink-0">
+      <Icon
+        icon={
+          activeSortKey === sortKey
+            ? sortOrder === SORT_MAP.asc
+              ? 'solar:alt-arrow-up-linear'
+              : 'solar:alt-arrow-down-linear'
+            : 'solar:sort-linear'
+        }
+        className="size-full"
+      />
+    </span>
   </button>
 );
 
