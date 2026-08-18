@@ -24,7 +24,10 @@ export const useAddCategory = () => {
     },
     onSuccess: async ({ message }) => {
       handleApiSuccessToaster(message);
-      await queryClient.invalidateQueries({ queryKey: get.byParentLevel });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: get.byParentLevel }),
+        queryClient.invalidateQueries({ queryKey: get.byHierarchy }),
+      ]);
     },
 
     onError: (error) => {
@@ -51,7 +54,10 @@ export const useUpdateCategory = ({ categoryId = '' }) => {
     },
     onSuccess: async ({ message }) => {
       handleApiSuccessToaster(message);
-      await queryClient.invalidateQueries({ queryKey: get.byParentLevel });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: get.byParentLevel }),
+        queryClient.invalidateQueries({ queryKey: get.byHierarchy }),
+      ]);
     },
     onError: (error) => {
       handleApiErrorToaster(error);
@@ -77,7 +83,10 @@ export const useDeleteCategory = ({ categoryId = '' }) => {
     },
     onSuccess: async ({ message }) => {
       handleApiSuccessToaster(message);
-      await queryClient.invalidateQueries({ queryKey: get.byParentLevel });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: get.byParentLevel }),
+        queryClient.invalidateQueries({ queryKey: get.byHierarchy }),
+      ]);
     },
     onError: (error) => {
       handleApiErrorToaster(error);

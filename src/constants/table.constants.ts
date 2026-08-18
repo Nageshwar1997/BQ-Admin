@@ -2,6 +2,7 @@ import type { ColumnDef, RowData, TableFeatures } from '@tanstack/react-table';
 import {
   coreFeatures,
   createColumnHelper,
+  createExpandedRowModel,
   createSortedRowModel,
   rowExpandingFeature,
   rowSortingFeature,
@@ -18,17 +19,19 @@ import {
 export const APP_TABLE_FEATURES = tableFeatures({ ...coreFeatures, rowSortingFeature });
 export type TAppTableFeatures = typeof APP_TABLE_FEATURES;
 
-// Category tables load all rows for a level up front (no pagination), so
-// sorting them is genuinely client-side work - this set adds a real
-// `sortedRowModel` on top of sorting, so tanstack actually reorders rows. It
-// also registers `rowExpandingFeature` (state.expanded/getIsExpanded/
-// toggleExpanded only, no `expandedRowModel`) so the accordion-style
-// expand/collapse row is tanstack-owned state instead of a local `useState`.
+// The categories table loads the whole L1/L2/L3 tree up front (one hierarchy
+// fetch, see Categories.tsx) rather than lazily fetching each level, so it
+// gets real tanstack features throughout: `sortedRowModel` actually reorders
+// rows (sorting is genuinely client-side), and `rowExpandingFeature` +
+// `expandedRowModel` build the flattened, indented row list straight from
+// each node's `subcategories` (via `getSubRows` on the table) instead of
+// hand-rolled expand/collapse state per level.
 export const CATEGORY_TABLE_FEATURES = tableFeatures({
   ...coreFeatures,
   rowSortingFeature,
   rowExpandingFeature,
   sortedRowModel: createSortedRowModel(),
+  expandedRowModel: createExpandedRowModel(),
 });
 export type TCategoryTableFeatures = typeof CATEGORY_TABLE_FEATURES;
 

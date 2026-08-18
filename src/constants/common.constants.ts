@@ -145,11 +145,10 @@ export const QUERY_PARAMS_KEY_MAP = {
     mode: 'mode', // To Set Mode (Edit or Add)
     add: 'add', // To Open Add Category Modal
     edit: 'edit', // To Open Edit Category Modal
-    level: {
-      l1: { search: 'search_1', sort: 'sort_1' }, // To Set Filter Query for Level 1 Category
-      l2: { search: 'search_2', sort: 'sort_2' }, // To Set Filter Query for Level 2 Category
-      l3: { search: 'search_3', sort: 'sort_3' }, // To Set Filter Query for Level 3 Category
-    },
+    // The category tree is a single table now (see Categories.tsx) - one
+    // search/sort pair applies across every level instead of one per level.
+    search: 'search',
+    sort: 'sort',
   },
   confirm: 'confirm', // To Open Confirm Modal
   sort: 'sort', // To Set Sort Order

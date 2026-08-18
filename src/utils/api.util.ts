@@ -1,7 +1,7 @@
 import type ApiError from '@/classes/ApiError';
 import type {
   IEndpoint,
-  TCategory,
+  TCategoryNode,
   TGenerateQueryKeys,
   TGenerateRoutes,
   TParams,
@@ -29,14 +29,31 @@ export const handleApiSuccessToaster = (message: string, title = 'Success') => {
 // Sorting is handled by tanstack/react-table's own sortedRowModel (see
 // CATEGORY_TABLE_FEATURES in table.constants.ts) - this only does the search
 // filtering, which happens before the data reaches the table.
-export const getFilteredCats = (categories: TCategory[], search: string) => {
+//
+// The category tree is filtered before it reaches the table (rather than via
+// a tanstack column filter) so collapsed branches never need to be expanded
+// for a match somewhere inside them to be findable: a node is kept if it
+// matches directly (keeping its whole subtree as-is) or if any descendant
+// matches (recursively pruning the rest of that subtree away). Categories.tsx
+// auto-expands every row while a search is active so matches stay visible.
+export const filterCategoryTree = (nodes: TCategoryNode[], search: string): TCategoryNode[] => {
   const value = search.toLowerCase().trim();
+  if (!value) return nodes;
 
-  return value
-    ? categories.filter((category) =>
-        [category.name, category.slug].join(' ').toLowerCase().includes(value),
-      )
-    : categories;
+  const matches = (node: TCategoryNode) =>
+    [node.name, node.slug].join(' ').toLowerCase().includes(value);
+
+  const filterNode = (node: TCategoryNode): TCategoryNode | null => {
+    if (matches(node)) return node;
+
+    const filteredChildren = (node.subcategories ?? [])
+      .map(filterNode)
+      .filter((child): child is TCategoryNode => child !== null);
+
+    return filteredChildren.length ? { ...node, subcategories: filteredChildren } : null;
+  };
+
+  return nodes.map(filterNode).filter((node): node is TCategoryNode => node !== null);
 };
 
 const joinPaths = (...paths: (string | undefined)[]) =>

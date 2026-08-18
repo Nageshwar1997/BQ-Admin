@@ -68,6 +68,31 @@ export type TCategoryHierarchyNode<TLevel extends TCategoryLevel> = TLevel exten
 
 export type TCategoryHierarchy = TCategoryHierarchyNode<TLevel1>;
 
+/**
+ * Depth-agnostic version of `TCategoryHierarchyNode` - a single flat type
+ * that can represent an L1, L2, *or* L3 node, used as the row type for the
+ * categories table.
+ *
+ * `TCategoryHierarchy` (= `TCategoryHierarchyNode<TLevel1>`) can't be reused
+ * for this: it's locked to `level: 1` specifically (an L1 node whose
+ * `subcategories` are typed as L2 nodes, whose `subcategories` are typed as
+ * L3 nodes - each depth gets its own distinct type via the conditional in
+ * `TCategoryHierarchyNode`). tanstack/react-table needs one consistent
+ * `TData` for every row regardless of depth (`getSubRows`, `columns`,
+ * `row.original` are all typed against a single `TData`) - handing it an L2
+ * node (`level: 2`) where `TData = TCategoryHierarchy` demands `level: 1` is
+ * a real type error (`Type '2' is not assignable to type '1'`), not just a
+ * style preference.
+ *
+ * `TCategoryNode` fixes that by using `TCategory` (already the
+ * `TL1Category | TL2Category | TL3Category` union) with `subcategories`
+ * recursing into itself instead of a level-specific type, so a node at any
+ * depth satisfies it. `TCategoryHierarchy[]` is structurally assignable to
+ * `TCategoryNode[]` as-is, so the hierarchy API's response can be passed to
+ * the table without a cast.
+ */
+export type TCategoryNode = TCategory & { subcategories?: TCategoryNode[] };
+
 export type TCreateHeaders = Omit<
   ICreateHeaders<Partial<Pick<IUser, '_id' | 'role'>>>,
   'serviceSecret'
