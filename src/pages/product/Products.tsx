@@ -1,6 +1,7 @@
 import { EMPTY_ARRAY, SORT_MAP } from '@beautinique/frontend-constants';
 import type { TCategoryLevel, TProductStatus, TSort } from '@beautinique/frontend-types';
 import { Icon } from '@iconify/react';
+import type { HeaderContext, SortingState } from '@tanstack/react-table';
 import { useTable } from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -22,7 +23,12 @@ import HierarchySelect from '@/components/ui/inputs/HierarchySelect';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
 import { ROUTES } from '@/constants/common.constants';
-import { APP_TABLE_FEATURES, createAppColumnHelper, toColumn } from '@/constants/table.constants';
+import {
+  APP_TABLE_FEATURES,
+  createAppColumnHelper,
+  type TAppTableFeatures,
+  toColumn,
+} from '@/constants/table.constants';
 import useDebounce from '@/hooks/useDebounce';
 import useIsSmallScreen from '@/hooks/useIsSmallScreen';
 import usePathParams from '@/hooks/usePathParams';
@@ -125,43 +131,202 @@ const SearchAndSort = () => {
   );
 };
 
-const SortableHeaderLabel = ({
-  label,
-  sortKey,
-  activeSortKey,
-  sortOrder,
-  onSort,
-}: {
-  label: string;
-  sortKey: TProductSortBy;
-  activeSortKey?: string;
-  sortOrder?: string;
-  onSort: (key: TProductSortBy) => void;
-}) => (
-  <button
-    type="button"
-    onClick={() => {
-      onSort(sortKey);
-    }}
-    className="hover:text-primary/90 flex w-full cursor-pointer items-center justify-center gap-1 select-none"
-  >
-    {label}
-    <span className="size-3.5 shrink-0">
-      <Icon
-        icon={
-          activeSortKey === sortKey
-            ? sortOrder === SORT_MAP.asc
-              ? 'solar:alt-arrow-up-linear'
-              : 'solar:alt-arrow-down-linear'
-            : 'solar:sort-linear'
-        }
-        className="size-full"
-      />
-    </span>
-  </button>
-);
+// Renders a header cell that's driven entirely by tanstack/react-table's own
+// row-sorting feature - `column.getToggleSortingHandler()` for the click
+// handler and `column.getIsSorted()` for the current direction - instead of
+// hand-rolled click/state logic.
+const renderSortableHeader = (label: string) => {
+  function SortableHeader<TValue>({
+    column,
+  }: HeaderContext<TAppTableFeatures, TApiProductPopulated, TValue>) {
+    const sorted = column.getIsSorted();
+    return (
+      <button
+        type="button"
+        onClick={column.getToggleSortingHandler()}
+        className="hover:text-primary/90 flex w-full cursor-pointer items-center justify-center gap-1 select-none"
+      >
+        {label}
+        <span className="size-3.5 shrink-0">
+          <Icon
+            icon={
+              sorted === 'asc'
+                ? 'solar:alt-arrow-up-linear'
+                : sorted === 'desc'
+                  ? 'solar:alt-arrow-down-linear'
+                  : 'solar:sort-linear'
+            }
+            className="size-full"
+          />
+        </span>
+      </button>
+    );
+  }
+
+  return SortableHeader;
+};
 
 const columnHelper = createAppColumnHelper<TApiProductPopulated>();
+
+const columns = [
+  toColumn(
+    columnHelper.display({
+      id: 'serial',
+      header: () => 'S. No',
+      cell: (info) => info.row.index + 1,
+    }),
+  ),
+  toColumn(
+    columnHelper.display({
+      id: 'view',
+      header: () => 'View',
+      cell: (info) => (
+        <Link className="mx-auto block size-4.5 shrink-0" to={info.row.original.slug}>
+          <Icon
+            icon="material-symbols:eye-tracking-outline"
+            className="text-primary hover:text-blue-crayola-c mx-auto size-full"
+          />
+        </Link>
+      ),
+    }),
+  ),
+  toColumn(
+    columnHelper.display({
+      id: 'thumbnail',
+      header: () => 'Thumbnail',
+      cell: (info) => (
+        <img
+          src={info.row.original.thumbnail}
+          alt={info.row.original.title}
+          loading="lazy"
+          className="border-tertiary/20 mx-auto aspect-square size-10 rounded-lg border object-cover"
+        />
+      ),
+    }),
+  ),
+  toColumn(
+    columnHelper.accessor('title', {
+      header: renderSortableHeader('Title'),
+      enableSorting: true,
+      cell: (info) => <p className="max-w-sm truncate text-left">{info.getValue()}</p>,
+    }),
+  ),
+  toColumn(
+    columnHelper.accessor('brand', {
+      header: () => 'Brand',
+      enableSorting: false,
+      cell: (info) => info.getValue(),
+    }),
+  ),
+  toColumn(
+    columnHelper.accessor('sellingPrice', {
+      header: renderSortableHeader('SP'),
+      enableSorting: true,
+      cell: (info) => (
+        <span className="text-primary-green font-medium">{formatINRCurrency(info.getValue())}</span>
+      ),
+    }),
+  ),
+  toColumn(
+    columnHelper.accessor('originalPrice', {
+      header: renderSortableHeader('MRP'),
+      enableSorting: true,
+      cell: (info) => (
+        <span className="text-primary-red font-medium">{formatINRCurrency(info.getValue())}</span>
+      ),
+    }),
+  ),
+  toColumn(
+    columnHelper.accessor('status', {
+      header: () => 'Status',
+      enableSorting: false,
+      cell: (info) => info.getValue(),
+    }),
+  ),
+  toColumn(
+    columnHelper.display({
+      id: 'stock',
+      header: () => 'Stock',
+      cell: (info) => {
+        const product = info.row.original;
+        return !product.hasVariants
+          ? product.stock
+          : product.variants.reduce((acc, variant) => acc + variant.stock, 0);
+      },
+    }),
+  ),
+  toColumn(
+    columnHelper.accessor('createdAt', {
+      header: renderSortableHeader('Created At'),
+      enableSorting: true,
+      cell: (info) => formatDate(info.getValue(), { month: '2-digit' }),
+    }),
+  ),
+  toColumn(
+    columnHelper.accessor('updatedAt', {
+      header: renderSortableHeader('Updated At'),
+      enableSorting: true,
+      cell: (info) => formatDate(info.getValue(), { month: '2-digit' }),
+    }),
+  ),
+  toColumn(
+    columnHelper.display({
+      id: 'tryOn',
+      header: () => 'Try-On',
+      cell: (info) => {
+        const product = info.row.original;
+        return product.tryOn.configured && product.tryOn.enabled
+          ? `${product.tryOn.category} - ${product.tryOn.subCategory}`
+          : 'N/A';
+      },
+    }),
+  ),
+  toColumn(
+    columnHelper.display({
+      id: 'variants',
+      header: () => 'Variants',
+      cell: (info) => {
+        const product = info.row.original;
+        return product.hasVariants ? product.variants.length : 'N/A';
+      },
+    }),
+  ),
+  toColumn(
+    columnHelper.accessor('sku', {
+      header: () => 'Sku',
+      enableSorting: false,
+      cell: (info) => info.getValue(),
+    }),
+  ),
+  toColumn(
+    columnHelper.accessor('slug', {
+      header: () => 'Slug',
+      enableSorting: false,
+      cell: (info) => info.getValue(),
+    }),
+  ),
+  toColumn(
+    columnHelper.accessor('soldCount', {
+      header: renderSortableHeader('Sold'),
+      enableSorting: true,
+      cell: (info) => info.getValue(),
+    }),
+  ),
+  toColumn(
+    columnHelper.accessor('returnCount', {
+      header: () => 'Returned',
+      enableSorting: false,
+      cell: (info) => info.getValue(),
+    }),
+  ),
+  toColumn(
+    columnHelper.accessor('averageRating', {
+      header: () => 'Avg. Rating',
+      enableSorting: false,
+      cell: (info) => info.getValue(),
+    }),
+  ),
+];
 
 const Products = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
@@ -184,223 +349,43 @@ const Products = () => {
     category: queryParams.category,
   });
 
-  const handleSort = (sortBy: TProductSortBy) => {
-    const currentSortBy = queryParams.sortBy;
-    const currentSortOrder = queryParams.sortOrder ?? SORT_MAP.desc;
-
-    const nextOrder =
-      currentSortBy === sortBy
-        ? currentSortOrder === SORT_MAP.asc
-          ? SORT_MAP.desc
-          : SORT_MAP.asc
-        : SORT_MAP.desc;
-
-    setParams({ sortBy, sortOrder: nextOrder });
-  };
-
-  // Sorting stays server-driven (via the `sortBy`/`sortOrder` query params, same
-  // as before) — tanstack/react-table here is only responsible for the
-  // column/header/row model, not for sorting the data itself.
-  const columns = useMemo(
-    () => [
-      toColumn(
-        columnHelper.display({
-          id: 'serial',
-          header: () => 'S. No',
-          cell: (info) => info.row.index + 1,
-        }),
-      ),
-      toColumn(
-        columnHelper.display({
-          id: 'view',
-          header: () => 'View',
-          cell: (info) => (
-            <Link className="mx-auto block size-4.5 shrink-0" to={info.row.original.slug}>
-              <Icon
-                icon="material-symbols:eye-tracking-outline"
-                className="text-primary hover:text-blue-crayola-c mx-auto size-full"
-              />
-            </Link>
-          ),
-        }),
-      ),
-      toColumn(
-        columnHelper.display({
-          id: 'thumbnail',
-          header: () => 'Thumbnail',
-          cell: (info) => (
-            <img
-              src={info.row.original.thumbnail}
-              alt={info.row.original.title}
-              loading="lazy"
-              className="border-tertiary/20 mx-auto aspect-square size-10 rounded-lg border object-cover"
-            />
-          ),
-        }),
-      ),
-      toColumn(
-        columnHelper.accessor('title', {
-          header: () => (
-            <SortableHeaderLabel
-              label="Title"
-              sortKey="title"
-              activeSortKey={queryParams.sortBy}
-              sortOrder={queryParams.sortOrder}
-              onSort={handleSort}
-            />
-          ),
-          cell: (info) => <p className="max-w-sm truncate text-left">{info.getValue()}</p>,
-        }),
-      ),
-      toColumn(
-        columnHelper.accessor('brand', { header: () => 'Brand', cell: (info) => info.getValue() }),
-      ),
-      toColumn(
-        columnHelper.accessor('sellingPrice', {
-          header: () => (
-            <SortableHeaderLabel
-              label="SP"
-              sortKey="sellingPrice"
-              activeSortKey={queryParams.sortBy}
-              sortOrder={queryParams.sortOrder}
-              onSort={handleSort}
-            />
-          ),
-          cell: (info) => (
-            <span className="text-primary-green font-medium">
-              {formatINRCurrency(info.getValue())}
-            </span>
-          ),
-        }),
-      ),
-      toColumn(
-        columnHelper.accessor('originalPrice', {
-          header: () => (
-            <SortableHeaderLabel
-              label="MRP"
-              sortKey="originalPrice"
-              activeSortKey={queryParams.sortBy}
-              sortOrder={queryParams.sortOrder}
-              onSort={handleSort}
-            />
-          ),
-          cell: (info) => (
-            <span className="text-primary-red font-medium">
-              {formatINRCurrency(info.getValue())}
-            </span>
-          ),
-        }),
-      ),
-      toColumn(
-        columnHelper.accessor('status', {
-          header: () => 'Status',
-          cell: (info) => info.getValue(),
-        }),
-      ),
-      toColumn(
-        columnHelper.display({
-          id: 'stock',
-          header: () => 'Stock',
-          cell: (info) => {
-            const product = info.row.original;
-            return !product.hasVariants
-              ? product.stock
-              : product.variants.reduce((acc, variant) => acc + variant.stock, 0);
-          },
-        }),
-      ),
-      toColumn(
-        columnHelper.accessor('createdAt', {
-          header: () => (
-            <SortableHeaderLabel
-              label="Created At"
-              sortKey="createdAt"
-              activeSortKey={queryParams.sortBy}
-              sortOrder={queryParams.sortOrder}
-              onSort={handleSort}
-            />
-          ),
-          cell: (info) => formatDate(info.getValue(), { month: '2-digit' }),
-        }),
-      ),
-      toColumn(
-        columnHelper.accessor('updatedAt', {
-          header: () => (
-            <SortableHeaderLabel
-              label="Updated At"
-              sortKey="updatedAt"
-              activeSortKey={queryParams.sortBy}
-              sortOrder={queryParams.sortOrder}
-              onSort={handleSort}
-            />
-          ),
-          cell: (info) => formatDate(info.getValue(), { month: '2-digit' }),
-        }),
-      ),
-      toColumn(
-        columnHelper.display({
-          id: 'tryOn',
-          header: () => 'Try-On',
-          cell: (info) => {
-            const product = info.row.original;
-            return product.tryOn.configured && product.tryOn.enabled
-              ? `${product.tryOn.category} - ${product.tryOn.subCategory}`
-              : 'N/A';
-          },
-        }),
-      ),
-      toColumn(
-        columnHelper.display({
-          id: 'variants',
-          header: () => 'Variants',
-          cell: (info) => {
-            const product = info.row.original;
-            return product.hasVariants ? product.variants.length : 'N/A';
-          },
-        }),
-      ),
-      toColumn(
-        columnHelper.accessor('sku', { header: () => 'Sku', cell: (info) => info.getValue() }),
-      ),
-      toColumn(
-        columnHelper.accessor('slug', { header: () => 'Slug', cell: (info) => info.getValue() }),
-      ),
-      toColumn(
-        columnHelper.accessor('soldCount', {
-          header: () => (
-            <SortableHeaderLabel
-              label="Sold"
-              sortKey="soldCount"
-              activeSortKey={queryParams.sortBy}
-              sortOrder={queryParams.sortOrder}
-              onSort={handleSort}
-            />
-          ),
-          cell: (info) => info.getValue(),
-        }),
-      ),
-      toColumn(
-        columnHelper.accessor('returnCount', {
-          header: () => 'Returned',
-          cell: (info) => info.getValue(),
-        }),
-      ),
-      toColumn(
-        columnHelper.accessor('averageRating', {
-          header: () => 'Avg. Rating',
-          cell: (info) => info.getValue(),
-        }),
-      ),
-    ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleSort closes over queryParams/setParams, re-created each render anyway
-    [queryParams.sortBy, queryParams.sortOrder],
-  );
+  // Sorting state mirrors the `sortBy`/`sortOrder` query params - tanstack owns
+  // the sort-toggle UI (via `enableSorting`/`renderSortableHeader` on the
+  // columns above) but never reorders rows itself (`manualSorting: true`,
+  // no `sortedRowModel` registered): the server already returns products
+  // sorted, so `onSortingChange` below just re-derives the query params from
+  // whatever column tanstack says was toggled.
+  const sorting: SortingState = queryParams.sortBy
+    ? [
+        {
+          id: queryParams.sortBy,
+          desc: (queryParams.sortOrder ?? SORT_MAP.desc) === SORT_MAP.desc,
+        },
+      ]
+    : [];
 
   const table = useTable({
     features: APP_TABLE_FEATURES,
     data: data?.products ?? EMPTY_ARRAY,
     columns,
     getRowId: (row) => row._id,
+    state: { sorting },
+    manualSorting: true,
+    enableMultiSort: false,
+    enableSortingRemoval: false,
+    sortDescFirst: true,
+    onSortingChange: (updater) => {
+      const next = typeof updater === 'function' ? updater(sorting) : updater;
+      const first = next[0];
+      if (!first) {
+        removeParams(['sortBy', 'sortOrder']);
+        return;
+      }
+      setParams({
+        sortBy: first.id,
+        sortOrder: first.desc ? SORT_MAP.desc : SORT_MAP.asc,
+      });
+    },
   });
 
   const rows = table.getRowModel().rows;

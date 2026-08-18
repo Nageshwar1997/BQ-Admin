@@ -82,6 +82,7 @@ const CommonFields = ({
                 resetField('description');
               },
             }}
+            containerClassName="w-full"
           />
         )}
       />
@@ -151,6 +152,7 @@ export const Level2Fields = ({
               value: mainCategory,
               placeholder: 'Select main category',
               onChange: onChange,
+              disabled: isLevelDisabled,
             }}
           />
         )}
@@ -202,6 +204,7 @@ export const Level3Fields = ({
 
                 resetField('subCategory');
               },
+              disabled: isLevelDisabled,
             }}
           />
         )}
@@ -218,7 +221,7 @@ export const Level3Fields = ({
             selectProps={{
               value: subCategory,
               placeholder: 'Select sub-category',
-              disabled: !mainCategory,
+              disabled: !mainCategory || isLevelDisabled,
               onChange,
             }}
           />

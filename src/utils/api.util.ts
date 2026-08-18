@@ -1,6 +1,3 @@
-import { SORT_MAP } from '@beautinique/frontend-constants';
-import type { TSort } from '@beautinique/frontend-types';
-
 import type ApiError from '@/classes/ApiError';
 import type {
   IEndpoint,
@@ -29,20 +26,17 @@ export const handleApiSuccessToaster = (message: string, title = 'Success') => {
   toaster.success({ title, description: message });
 };
 
-export const getFilteredAndSortedCats = (categories: TCategory[], search: string, sort?: TSort) => {
+// Sorting is handled by tanstack/react-table's own sortedRowModel (see
+// CATEGORY_TABLE_FEATURES in table.constants.ts) - this only does the search
+// filtering, which happens before the data reaches the table.
+export const getFilteredCats = (categories: TCategory[], search: string) => {
   const value = search.toLowerCase().trim();
-  const filtered = value
+
+  return value
     ? categories.filter((category) =>
         [category.name, category.slug].join(' ').toLowerCase().includes(value),
       )
     : categories;
-
-  if (!sort) return filtered;
-
-  return [...filtered].sort((a, b) => {
-    const direction = sort === SORT_MAP.desc ? -1 : 1;
-    return a.name.localeCompare(b.name) * direction;
-  });
 };
 
 const joinPaths = (...paths: (string | undefined)[]) =>

@@ -1,6 +1,6 @@
 import { CATEGORY_LEVELS_MAP, SORT_MAP } from '@beautinique/frontend-constants';
-import type { TSort } from '@beautinique/frontend-types';
 import { Icon } from '@iconify/react';
+import type { ExpandedState, HeaderContext, SortingState, Updater } from '@tanstack/react-table';
 import { useTable } from '@tanstack/react-table';
 import { Fragment, useDeferredValue, useEffect, useMemo, useState } from 'react';
 
@@ -19,7 +19,12 @@ import {
 } from '@/components/layout/table';
 import Badge from '@/components/ui/Badge';
 import { EMPTY_ARRAY, QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
-import { APP_TABLE_FEATURES, createAppColumnHelper, toColumn } from '@/constants/table.constants';
+import {
+  CATEGORY_TABLE_FEATURES,
+  createCategoryColumnHelper,
+  type TCategoryTableFeatures,
+  toColumn,
+} from '@/constants/table.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import {
   useDeleteCategory,
@@ -27,7 +32,7 @@ import {
 } from '@/services/product-service/category.service.query';
 import type { TCategory } from '@/types/api.type';
 import type { ICatModal, TCatTable } from '@/types/component.type';
-import { getFilteredAndSortedCats } from '@/utils/api.util';
+import { getFilteredCats } from '@/utils/api.util';
 
 import CategoryActions from './children/CategoryActions';
 import CategoryInfo from './children/CategoryInfo';
@@ -36,7 +41,19 @@ import CategoryTableTopInfo from './children/CategoryTableTopInfo';
 
 const q_cat_keys = QUERY_PARAMS_KEY_MAP.category;
 
-const columnHelper = createAppColumnHelper<TCategory>();
+const columnHelper = createCategoryColumnHelper<TCategory>();
+
+// Toggling one row's expanded state should collapse whichever other row was
+// open (accordion behavior) - tanstack's own `expanded` state is a map that
+// supports many rows open at once, so this diffs old vs. new to find the row
+// that was just switched on and keeps only that one.
+const toSingleExpanded = (prev: ExpandedState, updater: Updater<ExpandedState>): ExpandedState => {
+  const prevMap = prev === true ? {} : prev;
+  const nextRaw = typeof updater === 'function' ? updater(prev) : updater;
+  const nextMap = nextRaw === true ? {} : nextRaw;
+  const toggledOnId = Object.keys(nextMap).find((id) => nextMap[id] && !prevMap[id]);
+  return toggledOnId ? { [toggledOnId]: true } : {};
+};
 
 const ApiStatusRow = (
   props: Record<'haveLength' | 'isError' | 'isLoading', boolean> & Pick<TCategory, 'level'>,
@@ -73,14 +90,47 @@ const ApiStatusRow = (
   );
 };
 
+// Renders a header cell driven entirely by tanstack/react-table's own
+// row-sorting feature - `column.getToggleSortingHandler()` for the click
+// handler and `column.getIsSorted()` for the current direction.
+const renderSortableHeader = (label: string) => {
+  function SortableHeader<TValue>({
+    column,
+  }: HeaderContext<TCategoryTableFeatures, TCategory, TValue>) {
+    const sorted = column.getIsSorted();
+    return (
+      <button
+        type="button"
+        onClick={column.getToggleSortingHandler()}
+        className="hover:text-primary/80 group flex cursor-pointer items-center gap-2"
+      >
+        {label}
+        <Icon
+          icon={
+            sorted === 'asc'
+              ? 'solar:arrow-up-linear'
+              : sorted === 'desc'
+                ? 'solar:arrow-down-linear'
+                : 'solar:sort-linear'
+          }
+          className="group-hover:text-primary/80 size-4"
+        />
+      </button>
+    );
+  }
+
+  return SortableHeader;
+};
+
 /**
  * Column defs shared by the L1/L2/L3 category tables - each level renders its
  * own <Table> (see L1Table/L2Table/L3Table below) since expanding a row
  * inlines a nested table for the next level, rather than nesting rows within
- * one table. Sorting itself stays exactly as before: it's applied to the raw
- * `categories` array per level (via `getFilteredAndSortedCats`, keyed by
- * `sort_<level>` query params) before the data ever reaches the table -
- * tanstack/react-table here is only responsible for the column/header/row model.
+ * one table. Sorting/searching are per-level, keyed by `sort_<level>`/
+ * `search_<level>` query params: search is applied to the raw `categories`
+ * array before it reaches the table (`getFilteredCats`), sorting is real
+ * tanstack/react-table state - `CATEGORY_TABLE_FEATURES` registers a
+ * `sortedRowModel`, so tanstack actually reorders the rows client-side.
  */
 const useCategoryColumns = ({
   level,
@@ -98,40 +148,28 @@ const useCategoryColumns = ({
     `sort_${String(level)}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['sort'];
   const sortValue = queryParams[sortKey];
 
-  const handleSort = () => {
-    if (sortValue === SORT_MAP.asc) {
-      setParams({ [sortKey]: SORT_MAP.desc });
-    } else if (sortValue === SORT_MAP.desc) {
+  const sorting: SortingState = sortValue
+    ? [{ id: 'category', desc: sortValue === SORT_MAP.desc }]
+    : [];
+
+  const onSortingChange = (updater: Updater<SortingState>) => {
+    const next = typeof updater === 'function' ? updater(sorting) : updater;
+    const first = next[0];
+    if (!first) {
       removeParams([sortKey]);
-    } else {
-      setParams({ [sortKey]: SORT_MAP.asc });
+      return;
     }
+    setParams({ [sortKey]: first.desc ? SORT_MAP.desc : SORT_MAP.asc });
   };
 
-  return useMemo(
+  const columns = useMemo(
     () => [
       toColumn(
-        columnHelper.display({
+        columnHelper.accessor('name', {
           id: 'category',
-          header: () => (
-            <button
-              type="button"
-              onClick={handleSort}
-              className="hover:text-primary/80 group flex cursor-pointer items-center gap-2"
-            >
-              Category
-              <Icon
-                icon={
-                  sortValue === SORT_MAP.asc
-                    ? 'solar:arrow-up-linear'
-                    : sortValue === SORT_MAP.desc
-                      ? 'solar:arrow-down-linear'
-                      : 'solar:sort-linear'
-                }
-                className="group-hover:text-primary/80 size-4"
-              />
-            </button>
-          ),
+          header: renderSortableHeader('Category'),
+          enableSorting: true,
+          sortFn: (rowA, rowB) => rowA.original.name.localeCompare(rowB.original.name),
           cell: (info) => <CategoryInfo category={info.row.original} />,
         }),
       ),
@@ -171,15 +209,15 @@ const useCategoryColumns = ({
         }),
       ),
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleSort closes over stable setParams/removeParams; sortValue is the real trigger
-    [sortValue, mainCatId, onDelete, onEdit],
+    [mainCatId, onDelete, onEdit],
   );
+
+  return { columns, sorting, onSortingChange };
 };
 
 const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable) => {
   const { queryParams } = useQueryParams();
   const search = useDeferredValue(queryParams[q_cat_keys.level.l3.search] ?? '');
-  const sort = useDeferredValue(queryParams[q_cat_keys.level.l3.sort]) as TSort | undefined;
 
   const {
     data: categories = EMPTY_ARRAY,
@@ -189,22 +227,22 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
     level: CATEGORY_LEVELS_MAP.L3,
     parent: parentCat._id,
   });
-  const filteredCats = useMemo(
-    () => getFilteredAndSortedCats(categories, search, sort),
-    [categories, search, sort],
-  );
+  const filteredCats = useMemo(() => getFilteredCats(categories, search), [categories, search]);
 
-  const columns = useCategoryColumns({
+  const { columns, sorting, onSortingChange } = useCategoryColumns({
     level: CATEGORY_LEVELS_MAP.L3,
     mainCatId,
     onDelete,
     onEdit,
   });
   const table = useTable({
-    features: APP_TABLE_FEATURES,
+    features: CATEGORY_TABLE_FEATURES,
     data: filteredCats,
     columns,
     getRowId: (row) => row._id,
+    state: { sorting },
+    onSortingChange,
+    enableMultiSort: false,
   });
   const rows = table.getRowModel().rows;
 
@@ -259,13 +297,12 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
 const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
   const { queryParams } = useQueryParams();
   const search = useDeferredValue(queryParams[q_cat_keys.level.l2.search] ?? '');
-  const sort = useDeferredValue(queryParams[q_cat_keys.level.l2.sort]) as TSort | undefined;
-  const [selectedId, setSelectedId] = useState('');
+  const [expanded, setExpanded] = useState<ExpandedState>({});
   const [prevParentCatId, setPrevParentCatId] = useState(parentCat._id);
 
   if (parentCat._id !== prevParentCatId) {
     setPrevParentCatId(parentCat._id);
-    setSelectedId('');
+    setExpanded({});
   }
 
   const {
@@ -276,17 +313,25 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
     level: CATEGORY_LEVELS_MAP.L2,
     parent: parentCat._id,
   });
-  const filteredCats = useMemo(
-    () => getFilteredAndSortedCats(categories, search, sort),
-    [categories, search, sort],
-  );
+  const filteredCats = useMemo(() => getFilteredCats(categories, search), [categories, search]);
 
-  const columns = useCategoryColumns({ level: CATEGORY_LEVELS_MAP.L2, onDelete, onEdit });
+  const { columns, sorting, onSortingChange } = useCategoryColumns({
+    level: CATEGORY_LEVELS_MAP.L2,
+    onDelete,
+    onEdit,
+  });
   const table = useTable({
-    features: APP_TABLE_FEATURES,
+    features: CATEGORY_TABLE_FEATURES,
     data: filteredCats,
     columns,
     getRowId: (row) => row._id,
+    state: { sorting, expanded },
+    onSortingChange,
+    enableMultiSort: false,
+    getRowCanExpand: () => true,
+    onExpandedChange: (updater) => {
+      setExpanded((prev) => toSingleExpanded(prev, updater));
+    },
   });
   const rows = table.getRowModel().rows;
 
@@ -315,20 +360,14 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
               <Fragment key={row.id}>
                 <TableRow
                   tabIndex={0}
-                  onClick={() => {
-                    setSelectedId((prevId) =>
-                      prevId === row.original._id ? '' : row.original._id,
-                    );
-                  }}
+                  onClick={row.getToggleExpandedHandler()}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
-                      setSelectedId((prevId) =>
-                        prevId === row.original._id ? '' : row.original._id,
-                      );
+                      row.toggleExpanded();
                     }
                   }}
-                  className={`border-y-primary/5 cursor-pointer border-y first:border-t-0 last:border-b-0 ${selectedId === row.original._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
+                  className={`border-y-primary/5 cursor-pointer border-y first:border-t-0 last:border-b-0 ${row.getIsExpanded() ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
                 >
                   {row.getAllCells().map((cell) => (
                     <TableRowCell className="first:text-left last:text-right" key={cell.id}>
@@ -336,7 +375,7 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
                     </TableRowCell>
                   ))}
                 </TableRow>
-                {selectedId === row.original._id && (
+                {row.getIsExpanded() && (
                   <TableRow>
                     <TableRowCell colSpan={4} className="border-b-0 px-0!">
                       <L3Table
@@ -367,8 +406,7 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
 const L1Table = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const search = useDeferredValue(queryParams[q_cat_keys.level.l1.search] ?? '');
-  const sort = useDeferredValue(queryParams[q_cat_keys.level.l2.sort]) as TSort | undefined;
-  const [selectedId, setSelectedId] = useState('');
+  const [expanded, setExpanded] = useState<ExpandedState>({});
   const [editData, setEditData] = useState<ICatModal | null>(null);
   const [deleteId, setDeleteId] = useState('');
   const {
@@ -390,7 +428,12 @@ const L1Table = () => {
       onSettled: () => {
         setDeleteId('');
 
-        setSelectedId((prev) => (prev === deleteId ? '' : prev));
+        setExpanded((prev) => {
+          const map = prev === true ? {} : prev;
+          if (!map[deleteId]) return prev;
+          const { [deleteId]: _removed, ...rest } = map;
+          return rest;
+        });
       },
     });
   };
@@ -400,12 +443,9 @@ const L1Table = () => {
     removeParams([q_cat_keys.mode]);
   };
 
-  const filteredCats = useMemo(
-    () => getFilteredAndSortedCats(categories, search, sort),
-    [categories, search, sort],
-  );
+  const filteredCats = useMemo(() => getFilteredCats(categories, search), [categories, search]);
 
-  const columns = useCategoryColumns({
+  const { columns, sorting, onSortingChange } = useCategoryColumns({
     level: CATEGORY_LEVELS_MAP.L1,
     onDelete: (categoryId) => {
       setDeleteId(categoryId);
@@ -413,10 +453,17 @@ const L1Table = () => {
     onEdit: handleEdit,
   });
   const table = useTable({
-    features: APP_TABLE_FEATURES,
+    features: CATEGORY_TABLE_FEATURES,
     data: filteredCats,
     columns,
     getRowId: (row) => row._id,
+    state: { sorting, expanded },
+    onSortingChange,
+    enableMultiSort: false,
+    getRowCanExpand: () => true,
+    onExpandedChange: (updater) => {
+      setExpanded((prev) => toSingleExpanded(prev, updater));
+    },
   });
   const rows = table.getRowModel().rows;
 
@@ -460,20 +507,14 @@ const L1Table = () => {
                 <Fragment key={row.id}>
                   <TableRow
                     tabIndex={0}
-                    onClick={() => {
-                      setSelectedId((prevId) =>
-                        prevId === row.original._id ? '' : row.original._id,
-                      );
-                    }}
+                    onClick={row.getToggleExpandedHandler()}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' || event.key === ' ') {
                         event.preventDefault();
-                        setSelectedId((prevId) =>
-                          prevId === row.original._id ? '' : row.original._id,
-                        );
+                        row.toggleExpanded();
                       }
                     }}
-                    className={`border-y-primary/5 cursor-pointer border-y first:border-t-0 last:border-b-0 ${selectedId === row.original._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
+                    className={`border-y-primary/5 cursor-pointer border-y first:border-t-0 last:border-b-0 ${row.getIsExpanded() ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
                   >
                     {row.getAllCells().map((cell) => (
                       <TableRowCell className="first:text-left last:text-right" key={cell.id}>
@@ -481,7 +522,7 @@ const L1Table = () => {
                       </TableRowCell>
                     ))}
                   </TableRow>
-                  {selectedId === row.original._id && (
+                  {row.getIsExpanded() && (
                     <TableRow>
                       <TableRowCell colSpan={4} className="border-b-0 px-0!">
                         <L2Table
