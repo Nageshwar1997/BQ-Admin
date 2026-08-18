@@ -1,6 +1,7 @@
-import { SORT_MAP } from '@beautinique/frontend-constants';
+import { EMPTY_ARRAY, SORT_MAP } from '@beautinique/frontend-constants';
 import type { TCategoryLevel, TProductStatus, TSort } from '@beautinique/frontend-types';
 import { Icon } from '@iconify/react';
+import { createColumnHelper, useTable } from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
@@ -20,15 +21,19 @@ import {
 import HierarchySelect from '@/components/ui/inputs/HierarchySelect';
 import Input from '@/components/ui/inputs/Input';
 import Select from '@/components/ui/inputs/Select';
-import { PRODUCTS_TABLE_TITLES } from '@/constants/api.constants';
 import { ROUTES } from '@/constants/common.constants';
+import { APP_TABLE_FEATURES, type TAppTableFeatures, toColumn } from '@/constants/table.constants';
 import useDebounce from '@/hooks/useDebounce';
 import useIsSmallScreen from '@/hooks/useIsSmallScreen';
 import usePathParams from '@/hooks/usePathParams';
 import useQueryParams from '@/hooks/useQueryParams';
 import { useGetCategoriesHierarchy } from '@/services/product-service/category.service.query';
 import { useGetDashboardProducts } from '@/services/product-service/product.service.query';
-import type { TCategoryHierarchyNode, TProductSortBy } from '@/types/api.type';
+import type {
+  TApiProductPopulated,
+  TCategoryHierarchyNode,
+  TProductSortBy,
+} from '@/types/api.type';
 import type { IHierarchySelectOption } from '@/types/input.type';
 import { formatDate, formatINRCurrency } from '@/utils/common.util';
 
@@ -120,6 +125,42 @@ const SearchAndSort = () => {
   );
 };
 
+const SortableHeaderLabel = ({
+  label,
+  sortKey,
+  activeSortKey,
+  sortOrder,
+  onSort,
+}: {
+  label: string;
+  sortKey: TProductSortBy;
+  activeSortKey?: string;
+  sortOrder?: string;
+  onSort: (key: TProductSortBy) => void;
+}) => (
+  <button
+    type="button"
+    onClick={() => {
+      onSort(sortKey);
+    }}
+    className="hover:text-primary/90 flex w-full cursor-pointer items-center justify-center gap-1 select-none"
+  >
+    {label}
+    <Icon
+      icon={
+        activeSortKey === sortKey
+          ? sortOrder === SORT_MAP.asc
+            ? 'solar:alt-arrow-up-linear'
+            : 'solar:alt-arrow-down-linear'
+          : 'solar:sort-linear'
+      }
+      className="size-3.5 shrink-0"
+    />
+  </button>
+);
+
+const columnHelper = createColumnHelper<TAppTableFeatures, TApiProductPopulated>();
+
 const Products = () => {
   const { queryParams, setParams, removeParams } = useQueryParams();
   const { navigate } = usePathParams();
@@ -154,6 +195,213 @@ const Products = () => {
 
     setParams({ sortBy, sortOrder: nextOrder });
   };
+
+  // Sorting stays server-driven (via the `sortBy`/`sortOrder` query params, same
+  // as before) — tanstack/react-table here is only responsible for the
+  // column/header/row model, not for sorting the data itself.
+  const columns = useMemo(
+    () => [
+      toColumn(
+        columnHelper.display({
+          id: 'serial',
+          header: () => 'S. No',
+          cell: (info) => info.row.index + 1,
+        }),
+      ),
+      toColumn(
+        columnHelper.display({
+          id: 'view',
+          header: () => 'View',
+          cell: (info) => (
+            <Link className="mx-auto block size-4.5 shrink-0" to={info.row.original.slug}>
+              <Icon
+                icon="material-symbols:eye-tracking-outline"
+                className="text-primary hover:text-blue-crayola-c mx-auto size-full"
+              />
+            </Link>
+          ),
+        }),
+      ),
+      toColumn(
+        columnHelper.display({
+          id: 'thumbnail',
+          header: () => 'Thumbnail',
+          cell: (info) => (
+            <img
+              src={info.row.original.thumbnail}
+              alt={info.row.original.title}
+              loading="lazy"
+              className="border-tertiary/20 mx-auto aspect-square size-10 rounded-lg border object-cover"
+            />
+          ),
+        }),
+      ),
+      toColumn(
+        columnHelper.accessor('title', {
+          header: () => (
+            <SortableHeaderLabel
+              label="Title"
+              sortKey="title"
+              activeSortKey={queryParams.sortBy}
+              sortOrder={queryParams.sortOrder}
+              onSort={handleSort}
+            />
+          ),
+          cell: (info) => <p className="max-w-sm truncate text-left">{info.getValue()}</p>,
+        }),
+      ),
+      toColumn(
+        columnHelper.accessor('brand', { header: () => 'Brand', cell: (info) => info.getValue() }),
+      ),
+      toColumn(
+        columnHelper.accessor('sellingPrice', {
+          header: () => (
+            <SortableHeaderLabel
+              label="SP"
+              sortKey="sellingPrice"
+              activeSortKey={queryParams.sortBy}
+              sortOrder={queryParams.sortOrder}
+              onSort={handleSort}
+            />
+          ),
+          cell: (info) => (
+            <span className="text-primary-green font-medium">
+              {formatINRCurrency(info.getValue())}
+            </span>
+          ),
+        }),
+      ),
+      toColumn(
+        columnHelper.accessor('originalPrice', {
+          header: () => (
+            <SortableHeaderLabel
+              label="MRP"
+              sortKey="originalPrice"
+              activeSortKey={queryParams.sortBy}
+              sortOrder={queryParams.sortOrder}
+              onSort={handleSort}
+            />
+          ),
+          cell: (info) => (
+            <span className="text-primary-red font-medium">
+              {formatINRCurrency(info.getValue())}
+            </span>
+          ),
+        }),
+      ),
+      toColumn(
+        columnHelper.accessor('status', {
+          header: () => 'Status',
+          cell: (info) => info.getValue(),
+        }),
+      ),
+      toColumn(
+        columnHelper.display({
+          id: 'stock',
+          header: () => 'Stock',
+          cell: (info) => {
+            const product = info.row.original;
+            return !product.hasVariants
+              ? product.stock
+              : product.variants.reduce((acc, variant) => acc + variant.stock, 0);
+          },
+        }),
+      ),
+      toColumn(
+        columnHelper.accessor('createdAt', {
+          header: () => (
+            <SortableHeaderLabel
+              label="Created At"
+              sortKey="createdAt"
+              activeSortKey={queryParams.sortBy}
+              sortOrder={queryParams.sortOrder}
+              onSort={handleSort}
+            />
+          ),
+          cell: (info) => formatDate(info.getValue(), { month: '2-digit' }),
+        }),
+      ),
+      toColumn(
+        columnHelper.accessor('updatedAt', {
+          header: () => (
+            <SortableHeaderLabel
+              label="Updated At"
+              sortKey="updatedAt"
+              activeSortKey={queryParams.sortBy}
+              sortOrder={queryParams.sortOrder}
+              onSort={handleSort}
+            />
+          ),
+          cell: (info) => formatDate(info.getValue(), { month: '2-digit' }),
+        }),
+      ),
+      toColumn(
+        columnHelper.display({
+          id: 'tryOn',
+          header: () => 'Try-On',
+          cell: (info) => {
+            const product = info.row.original;
+            return product.tryOn.configured && product.tryOn.enabled
+              ? `${product.tryOn.category} - ${product.tryOn.subCategory}`
+              : 'N/A';
+          },
+        }),
+      ),
+      toColumn(
+        columnHelper.display({
+          id: 'variants',
+          header: () => 'Variants',
+          cell: (info) => {
+            const product = info.row.original;
+            return product.hasVariants ? product.variants.length : 'N/A';
+          },
+        }),
+      ),
+      toColumn(
+        columnHelper.accessor('sku', { header: () => 'Sku', cell: (info) => info.getValue() }),
+      ),
+      toColumn(
+        columnHelper.accessor('slug', { header: () => 'Slug', cell: (info) => info.getValue() }),
+      ),
+      toColumn(
+        columnHelper.accessor('soldCount', {
+          header: () => (
+            <SortableHeaderLabel
+              label="Sold"
+              sortKey="soldCount"
+              activeSortKey={queryParams.sortBy}
+              sortOrder={queryParams.sortOrder}
+              onSort={handleSort}
+            />
+          ),
+          cell: (info) => info.getValue(),
+        }),
+      ),
+      toColumn(
+        columnHelper.accessor('returnCount', {
+          header: () => 'Returned',
+          cell: (info) => info.getValue(),
+        }),
+      ),
+      toColumn(
+        columnHelper.accessor('averageRating', {
+          header: () => 'Avg. Rating',
+          cell: (info) => info.getValue(),
+        }),
+      ),
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleSort closes over queryParams/setParams, re-created each render anyway
+    [queryParams.sortBy, queryParams.sortOrder],
+  );
+
+  const table = useTable({
+    features: APP_TABLE_FEATURES,
+    data: data?.products ?? EMPTY_ARRAY,
+    columns,
+    getRowId: (row) => row._id,
+  });
+
+  const rows = table.getRowModel().rows;
 
   useEffect(() => {
     if (inView && hasNextPage) {
@@ -202,105 +450,38 @@ const Products = () => {
       }}
     >
       <div className="border-primary/10 bg-secondary-invert overflow-hidden rounded-xl border">
-        {!!data?.products.length && (
+        {!!rows.length && (
           <ScrollableGradientContainer
             direction="horizontal"
             gradientClassNames={{ left: 'from-secondary-invert', right: 'from-secondary-invert' }}
           >
             <Table className="relative text-xs">
               <TableHead>
-                <TableRow>
-                  {PRODUCTS_TABLE_TITLES.map(({ label, sortKey }, index) => (
-                    <TableHeadCell
-                      key={`th-${String(index)}`}
-                      className={`${sortKey ? 'hover:text-primary/90 cursor-pointer select-none' : ''} `}
-                      onClick={() => {
-                        if (sortKey) handleSort(sortKey);
-                      }}
-                    >
-                      <div className="flex items-center justify-center gap-1">
-                        {label}
-                        {sortKey && (
-                          <Icon
-                            icon={
-                              queryParams.sortBy === sortKey
-                                ? queryParams.sortOrder === SORT_MAP.asc
-                                  ? 'solar:alt-arrow-up-linear'
-                                  : 'solar:alt-arrow-down-linear'
-                                : 'solar:sort-linear'
-                            }
-                            className="size-3.5 shrink-0"
-                          />
-                        )}
-                      </div>
-                    </TableHeadCell>
-                  ))}
-                </TableRow>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHeadCell key={header.id}>
+                        {header.isPlaceholder ? null : <table.FlexRender header={header} />}
+                      </TableHeadCell>
+                    ))}
+                  </TableRow>
+                ))}
               </TableHead>
               <TableBody>
-                {data.products.map((product, index) => {
-                  return (
-                    <TableRow
-                      key={`${product._id}-${String(index)}`}
-                      tabIndex={0}
-                      className="border-y-primary/5 odd:bg-primary/5 even:bg-primary/2.5 border-y first:border-t-0 last:border-b-0 [&>td]:px-3 [&>td]:py-2 [&>td]:text-xs"
-                      ref={index === data.products.length - 4 ? ref : undefined}
-                    >
-                      <TableRowCell>{index + 1}</TableRowCell>
-                      <TableRowCell>
-                        <Link className="mx-auto block size-4.5 shrink-0" to={product.slug}>
-                          <Icon
-                            icon="material-symbols:eye-tracking-outline"
-                            className="text-primary hover:text-blue-crayola-c mx-auto size-full"
-                          />
-                        </Link>
+                {rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    tabIndex={0}
+                    className="border-y-primary/5 odd:bg-primary/5 even:bg-primary/2.5 border-y first:border-t-0 last:border-b-0 [&>td]:px-3 [&>td]:py-2 [&>td]:text-xs"
+                    ref={row.index === rows.length - 4 ? ref : undefined}
+                  >
+                    {row.getAllCells().map((cell) => (
+                      <TableRowCell key={cell.id}>
+                        <table.FlexRender cell={cell} />
                       </TableRowCell>
-                      <TableRowCell className="grid place-items-center">
-                        <img
-                          src={product.thumbnail}
-                          alt={product.title}
-                          loading="lazy"
-                          className="border-tertiary/20 aspect-square size-10 rounded-lg border object-cover"
-                        />
-                      </TableRowCell>
-                      <TableRowCell>
-                        <p className="max-w-sm truncate text-left">{product.title}</p>
-                      </TableRowCell>
-                      <TableRowCell>{product.brand}</TableRowCell>
-                      <TableRowCell className="text-primary-green font-medium">
-                        {formatINRCurrency(product.sellingPrice)}
-                      </TableRowCell>
-                      <TableRowCell className="text-primary-red font-medium">
-                        {formatINRCurrency(product.originalPrice)}
-                      </TableRowCell>
-                      <TableRowCell>{product.status}</TableRowCell>
-                      <TableRowCell>
-                        {!product.hasVariants
-                          ? product.stock
-                          : product.variants.reduce((acc, variant) => acc + variant.stock, 0)}
-                      </TableRowCell>
-                      <TableRowCell>
-                        {formatDate(product.createdAt, { month: '2-digit' })}
-                      </TableRowCell>
-                      <TableRowCell>
-                        {formatDate(product.updatedAt, { month: '2-digit' })}
-                      </TableRowCell>
-                      <TableRowCell>
-                        {product.tryOn.configured && product.tryOn.enabled
-                          ? `${product.tryOn.category} - ${product.tryOn.subCategory}`
-                          : 'N/A'}
-                      </TableRowCell>
-                      <TableRowCell>
-                        {product.hasVariants ? product.variants.length : 'N/A'}
-                      </TableRowCell>
-                      <TableRowCell>{product.sku}</TableRowCell>
-                      <TableRowCell>{product.slug}</TableRowCell>
-                      <TableRowCell>{product.soldCount}</TableRowCell>
-                      <TableRowCell>{product.returnCount}</TableRowCell>
-                      <TableRowCell>{product.averageRating}</TableRowCell>
-                    </TableRow>
-                  );
-                })}
+                    ))}
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </ScrollableGradientContainer>
@@ -313,7 +494,7 @@ const Products = () => {
           // falsy for this react-query hook shape, even though tsc confirms it's a real boolean.
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           isFetchNextPageError ||
-          data?.products.length === 0) && (
+          rows.length === 0) && (
           <div
             className={`flex items-center justify-center ${!isFetchingNextPage ? 'min-h-[40dvh]' : ''}`}
           >

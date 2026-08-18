@@ -1,14 +1,8 @@
 import { CATEGORY_LEVELS_MAP, SORT_MAP } from '@beautinique/frontend-constants';
 import type { TSort } from '@beautinique/frontend-types';
 import { Icon } from '@iconify/react';
-import {
-  type ComponentProps,
-  Fragment,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createColumnHelper, useTable } from '@tanstack/react-table';
+import { Fragment, useDeferredValue, useEffect, useMemo, useState } from 'react';
 
 import ApiStatus from '@/components/layout/ApiStatus';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
@@ -25,6 +19,7 @@ import {
 } from '@/components/layout/table';
 import Badge from '@/components/ui/Badge';
 import { EMPTY_ARRAY, QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
+import { APP_TABLE_FEATURES, type TAppTableFeatures, toColumn } from '@/constants/table.constants';
 import useQueryParams from '@/hooks/useQueryParams';
 import {
   useDeleteCategory,
@@ -39,9 +34,9 @@ import CategoryInfo from './children/CategoryInfo';
 import CategoryModal from './children/CategoryModal';
 import CategoryTableTopInfo from './children/CategoryTableTopInfo';
 
-const TH_TITLES = ['Category', 'Level', 'Parent', 'Actions'] as const;
-
 const q_cat_keys = QUERY_PARAMS_KEY_MAP.category;
+
+const columnHelper = createColumnHelper<TAppTableFeatures, TCategory>();
 
 const ApiStatusRow = (
   props: Record<'haveLength' | 'isError' | 'isLoading', boolean> & Pick<TCategory, 'level'>,
@@ -78,80 +73,106 @@ const ApiStatusRow = (
   );
 };
 
-const CategoryHead = ({ level }: { level: TCategory['level'] }) => {
-  const { queryParams, removeParams, setParams } = useQueryParams();
+/**
+ * Column defs shared by the L1/L2/L3 category tables - each level renders its
+ * own <Table> (see L1Table/L2Table/L3Table below) since expanding a row
+ * inlines a nested table for the next level, rather than nesting rows within
+ * one table. Sorting itself stays exactly as before: it's applied to the raw
+ * `categories` array per level (via `getFilteredAndSortedCats`, keyed by
+ * `sort_<level>` query params) before the data ever reaches the table -
+ * tanstack/react-table here is only responsible for the column/header/row model.
+ */
+const useCategoryColumns = ({
+  level,
+  mainCatId,
+  onDelete,
+  onEdit,
+}: {
+  level: TCategory['level'];
+  mainCatId?: string;
+  onDelete: (categoryId: string) => void;
+  onEdit: (data: ICatModal) => void;
+}) => {
+  const { queryParams, setParams, removeParams } = useQueryParams();
   const sortKey =
     `sort_${String(level)}` as (typeof q_cat_keys.level)[keyof typeof q_cat_keys.level]['sort'];
+  const sortValue = queryParams[sortKey];
 
   const handleSort = () => {
-    if (queryParams[sortKey] === SORT_MAP.asc) {
+    if (sortValue === SORT_MAP.asc) {
       setParams({ [sortKey]: SORT_MAP.desc });
-    } else if (queryParams[sortKey] === SORT_MAP.desc) {
+    } else if (sortValue === SORT_MAP.desc) {
       removeParams([sortKey]);
     } else {
       setParams({ [sortKey]: SORT_MAP.asc });
     }
   };
-  return (
-    <TableHead>
-      <TableRow>
-        {TH_TITLES.map((title) => (
-          <TableHeadCell className="first:text-left last:text-right" key={title}>
-            {title === 'Category' ? (
-              <button
-                type="button"
-                onClick={handleSort}
-                className="hover:text-primary/80 group flex cursor-pointer items-center gap-2"
-              >
-                {title}
-                <Icon
-                  icon={
-                    queryParams[sortKey] === SORT_MAP.asc
-                      ? 'solar:arrow-up-linear'
-                      : queryParams[sortKey] === SORT_MAP.desc
-                        ? 'solar:arrow-down-linear'
-                        : 'solar:sort-linear'
-                  }
-                  className="group-hover:text-primary/80 size-4"
-                />
-              </button>
-            ) : (
-              title
-            )}
-          </TableHeadCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-};
 
-const CategoryRow = (props: TCatTable & ComponentProps<'tr'>) => {
-  const { category, mainCatId, onDelete, onEdit, className = '', ...trProps } = props;
-
-  return (
-    <TableRow
-      tabIndex={0}
-      {...trProps}
-      className={`border-y-primary/5 border-y first:border-t-0 last:border-b-0 ${className}`}
-    >
-      <TableRowCell className="text-left">
-        <CategoryInfo category={category} />
-      </TableRowCell>
-      <TableRowCell>
-        <Badge content={`Level ${String(category.level)}`} />
-      </TableRowCell>
-      <TableRowCell className="text-primary/65 uppercase">
-        {'parent' in category ? category.parent : 'N/A'}
-      </TableRowCell>
-      <TableRowCell className="text-right">
-        <CategoryActions
-          category={category}
-          mainCatId={mainCatId}
-          onDelete={onDelete}
-          onEdit={onEdit}
-        />
-      </TableRowCell>
-    </TableRow>
+  return useMemo(
+    () => [
+      toColumn(
+        columnHelper.display({
+          id: 'category',
+          header: () => (
+            <button
+              type="button"
+              onClick={handleSort}
+              className="hover:text-primary/80 group flex cursor-pointer items-center gap-2"
+            >
+              Category
+              <Icon
+                icon={
+                  sortValue === SORT_MAP.asc
+                    ? 'solar:arrow-up-linear'
+                    : sortValue === SORT_MAP.desc
+                      ? 'solar:arrow-down-linear'
+                      : 'solar:sort-linear'
+                }
+                className="group-hover:text-primary/80 size-4"
+              />
+            </button>
+          ),
+          cell: (info) => <CategoryInfo category={info.row.original} />,
+        }),
+      ),
+      toColumn(
+        columnHelper.display({
+          id: 'level',
+          header: () => 'Level',
+          cell: (info) => <Badge content={`Level ${String(info.row.original.level)}`} />,
+        }),
+      ),
+      toColumn(
+        columnHelper.display({
+          id: 'parent',
+          header: () => 'Parent',
+          cell: (info) => {
+            const category = info.row.original;
+            return (
+              <span className="text-primary/65 uppercase">
+                {'parent' in category ? category.parent : 'N/A'}
+              </span>
+            );
+          },
+        }),
+      ),
+      toColumn(
+        columnHelper.display({
+          id: 'actions',
+          header: () => 'Actions',
+          cell: (info) => (
+            <CategoryActions
+              category={info.row.original}
+              mainCatId={mainCatId}
+              onDelete={onDelete}
+              onEdit={onEdit}
+            />
+          ),
+        }),
+      ),
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleSort closes over stable setParams/removeParams; sortValue is the real trigger
+    [sortValue, mainCatId, onDelete, onEdit],
   );
 };
 
@@ -173,6 +194,20 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
     [categories, search, sort],
   );
 
+  const columns = useCategoryColumns({
+    level: CATEGORY_LEVELS_MAP.L3,
+    mainCatId,
+    onDelete,
+    onEdit,
+  });
+  const table = useTable({
+    features: APP_TABLE_FEATURES,
+    data: filteredCats,
+    columns,
+    getRowId: (row) => row._id,
+  });
+  const rows = table.getRowModel().rows;
+
   return (
     <div className="border-primary/10 bg-primary/2 rounded-xl border">
       <CategoryTableTopInfo
@@ -181,18 +216,31 @@ const L3Table = ({ category: parentCat, mainCatId, onDelete, onEdit }: TCatTable
         name={parentCat.name}
       />
       <Table>
-        <CategoryHead level={CATEGORY_LEVELS_MAP.L3} />
+        <TableHead>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHeadCell className="first:text-left last:text-right" key={header.id}>
+                  {header.isPlaceholder ? null : <table.FlexRender header={header} />}
+                </TableHeadCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableHead>
         <TableBody>
-          {filteredCats.length ? (
-            filteredCats.map((category) => (
-              <CategoryRow
-                key={category._id}
-                category={category}
-                mainCatId={mainCatId}
-                onDelete={onDelete}
-                onEdit={onEdit}
-                className="hover:bg-primary/1"
-              />
+          {rows.length ? (
+            rows.map((row) => (
+              <TableRow
+                key={row.id}
+                tabIndex={0}
+                className="border-y-primary/5 hover:bg-primary/1 border-y first:border-t-0 last:border-b-0"
+              >
+                {row.getAllCells().map((cell) => (
+                  <TableRowCell className="first:text-left last:text-right" key={cell.id}>
+                    <table.FlexRender cell={cell} />
+                  </TableRowCell>
+                ))}
+              </TableRow>
             ))
           ) : (
             <ApiStatusRow
@@ -233,6 +281,15 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
     [categories, search, sort],
   );
 
+  const columns = useCategoryColumns({ level: CATEGORY_LEVELS_MAP.L2, onDelete, onEdit });
+  const table = useTable({
+    features: APP_TABLE_FEATURES,
+    data: filteredCats,
+    columns,
+    getRowId: (row) => row._id,
+  });
+  const rows = table.getRowModel().rows;
+
   return (
     <div className="border-primary/10 bg-primary/2 rounded-xl border">
       <CategoryTableTopInfo
@@ -241,33 +298,51 @@ const L2Table = ({ category: parentCat, onDelete, onEdit }: TCatTable) => {
         name={parentCat.name}
       />
       <Table>
-        <CategoryHead level={CATEGORY_LEVELS_MAP.L2} />
+        <TableHead>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHeadCell className="first:text-left last:text-right" key={header.id}>
+                  {header.isPlaceholder ? null : <table.FlexRender header={header} />}
+                </TableHeadCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableHead>
         <TableBody>
-          {filteredCats.length ? (
-            filteredCats.map((category) => (
-              <Fragment key={category._id}>
-                <CategoryRow
-                  category={category}
+          {rows.length ? (
+            rows.map((row) => (
+              <Fragment key={row.id}>
+                <TableRow
+                  tabIndex={0}
                   onClick={() => {
-                    setSelectedId((prevId) => (prevId === category._id ? '' : category._id));
+                    setSelectedId((prevId) =>
+                      prevId === row.original._id ? '' : row.original._id,
+                    );
                   }}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
-                      setSelectedId((prevId) => (prevId === category._id ? '' : category._id));
+                      setSelectedId((prevId) =>
+                        prevId === row.original._id ? '' : row.original._id,
+                      );
                     }
                   }}
-                  className={`cursor-pointer ${selectedId === category._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
-                  onDelete={onDelete}
-                  onEdit={onEdit}
-                />
-                {selectedId === category._id && (
+                  className={`border-y-primary/5 cursor-pointer border-y first:border-t-0 last:border-b-0 ${selectedId === row.original._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
+                >
+                  {row.getAllCells().map((cell) => (
+                    <TableRowCell className="first:text-left last:text-right" key={cell.id}>
+                      <table.FlexRender cell={cell} />
+                    </TableRowCell>
+                  ))}
+                </TableRow>
+                {selectedId === row.original._id && (
                   <TableRow>
                     <TableRowCell colSpan={4} className="border-b-0 px-0!">
                       <L3Table
                         onDelete={onDelete}
                         onEdit={onEdit}
-                        category={category}
+                        category={row.original}
                         mainCatId={parentCat._id}
                       />
                     </TableRowCell>
@@ -330,6 +405,21 @@ const L1Table = () => {
     [categories, search, sort],
   );
 
+  const columns = useCategoryColumns({
+    level: CATEGORY_LEVELS_MAP.L1,
+    onDelete: (categoryId) => {
+      setDeleteId(categoryId);
+    },
+    onEdit: handleEdit,
+  });
+  const table = useTable({
+    features: APP_TABLE_FEATURES,
+    data: filteredCats,
+    columns,
+    getRowId: (row) => row._id,
+  });
+  const rows = table.getRowModel().rows;
+
   /**
    * Intentionally runs once on mount only, to clear a stray leftover `?mode=` param left over from
    * a previous session/reload - re-running this on every query-param change would close the
@@ -353,29 +443,45 @@ const L1Table = () => {
         gradientClassNames={{ left: 'from-secondary-invert', right: 'from-secondary-invert' }}
       >
         <Table>
-          <CategoryHead level={CATEGORY_LEVELS_MAP.L1} />
+          <TableHead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHeadCell className="first:text-left last:text-right" key={header.id}>
+                    {header.isPlaceholder ? null : <table.FlexRender header={header} />}
+                  </TableHeadCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableHead>
           <TableBody>
-            {filteredCats.length ? (
-              filteredCats.map((category) => (
-                <Fragment key={category._id}>
-                  <CategoryRow
-                    category={category}
+            {rows.length ? (
+              rows.map((row) => (
+                <Fragment key={row.id}>
+                  <TableRow
+                    tabIndex={0}
                     onClick={() => {
-                      setSelectedId((prevId) => (prevId === category._id ? '' : category._id));
+                      setSelectedId((prevId) =>
+                        prevId === row.original._id ? '' : row.original._id,
+                      );
                     }}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' || event.key === ' ') {
                         event.preventDefault();
-                        setSelectedId((prevId) => (prevId === category._id ? '' : category._id));
+                        setSelectedId((prevId) =>
+                          prevId === row.original._id ? '' : row.original._id,
+                        );
                       }
                     }}
-                    className={`cursor-pointer ${selectedId === category._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
-                    onDelete={(categoryId) => {
-                      setDeleteId(categoryId);
-                    }}
-                    onEdit={handleEdit}
-                  />
-                  {selectedId === category._id && (
+                    className={`border-y-primary/5 cursor-pointer border-y first:border-t-0 last:border-b-0 ${selectedId === row.original._id ? 'bg-primary/5' : 'hover:bg-primary/1'}`}
+                  >
+                    {row.getAllCells().map((cell) => (
+                      <TableRowCell className="first:text-left last:text-right" key={cell.id}>
+                        <table.FlexRender cell={cell} />
+                      </TableRowCell>
+                    ))}
+                  </TableRow>
+                  {selectedId === row.original._id && (
                     <TableRow>
                       <TableRowCell colSpan={4} className="border-b-0 px-0!">
                         <L2Table
@@ -383,7 +489,7 @@ const L1Table = () => {
                             setDeleteId(categoryId);
                           }}
                           onEdit={handleEdit}
-                          category={category}
+                          category={row.original}
                         />
                       </TableRowCell>
                     </TableRow>
