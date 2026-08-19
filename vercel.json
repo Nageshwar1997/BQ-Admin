@@ -1,5 +1,5 @@
 {
   "version": 2,
-  "name": "bq-client",
+  "name": "bq-admin",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
