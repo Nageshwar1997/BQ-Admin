@@ -86,8 +86,10 @@ export const ROUTES = {
   PROFILE: {
     BASE: 'profile',
     UPDATE_PASSWORD: 'update-password',
+    MY_STATUS: 'my-status',
   },
   ENQUIRIES: 'enquiries',
+  SELLER_QUEUE: 'seller-queue',
 } as const;
 
 export const TOOLTIP_GAP = 15 as const;
@@ -122,6 +124,18 @@ export const SIDEBAR_DATA = [
     title: 'Enquiries',
     icon: 'solar:mailbox-linear',
     path: `/${ROUTES.ENQUIRIES}`,
+    handler: null,
+  },
+  {
+    title: 'My Queue',
+    icon: 'solar:clipboard-list-linear',
+    path: `/${ROUTES.SELLER_QUEUE}`,
+    handler: null,
+  },
+  {
+    title: 'My Status',
+    icon: 'solar:user-check-linear',
+    path: `/${ROUTES.PROFILE.MY_STATUS}`,
     handler: null,
   },
   {

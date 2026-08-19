@@ -1,5 +1,6 @@
 import type {
   ICreateHeaders,
+  TAdminStatus,
   TApiMethod,
   TAuthProvider,
   TCategoryLevel,
@@ -7,6 +8,8 @@ import type {
   TCategoryZodSchema,
   TContactQueryStatus,
   TCreateContactQueryZodSchema,
+  TFieldErrors,
+  TGlobalErrors,
   TProductBasicInfoZodSchema,
   TProductDescriptionAndContentZodSchema,
   TProductMediaAndGalleryZodSchema,
@@ -14,17 +17,22 @@ import type {
   TProductWithoutVariantsZodSchema,
   TProductWithVariantsZodSchema,
   TRegisterZodSchema,
+  TSellerApprovalStatus,
+  TSellerType,
   TSort,
+  TStateOrUT,
+  TTerritoryAssignmentReason,
+  TTerritoryStatusChangeReason,
   TTryOnSelection,
+  TUpdateAdminStatusZodSchema,
+  TUpdateSellerApprovalStatusZodSchema,
   TUserRole,
 } from '@beautinique/frontend-types';
-
-export type TFieldErrors = Record<string, string[]>;
 
 export interface IErrorResponse {
   message?: string;
   fieldErrors?: TFieldErrors;
-  globalErrors?: string[];
+  globalErrors?: TGlobalErrors;
 }
 
 export interface IId {
@@ -261,4 +269,84 @@ export interface IContactQueriesListResponse {
 export interface IUpdateContactQueryStatus {
   ticketId: string;
   status: TContactQueryStatus;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              ADMIN TERRITORY                               */
+/* -------------------------------------------------------------------------- */
+
+export interface IAdminStatusHistoryEntry {
+  status: TAdminStatus;
+  reason: TTerritoryStatusChangeReason;
+  note?: string;
+  changedAt: string;
+  changedBy: string;
+  until?: string;
+  coveredBy?: string;
+}
+
+export interface IAdmin extends IId, ITimeStamp {
+  user: string;
+  assignedStates: TStateOrUT[];
+  priority: number;
+  backupAdmin?: string | null;
+  status: TAdminStatus;
+  statusReason?: string;
+  statusUpdatedAt?: string;
+  statusUpdatedBy?: string;
+  leaveUntil?: string | null;
+  statusHistory: IAdminStatusHistoryEntry[];
+  currentPendingLoad: number;
+}
+
+export interface IUpdateAdminStatus {
+  adminId: string;
+  data: TUpdateAdminStatusZodSchema;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                   SELLER                                   */
+/* -------------------------------------------------------------------------- */
+
+export interface ISellerAssignedAdminHistoryEntry {
+  admin: string;
+  assignedAt: string;
+  reason: TTerritoryAssignmentReason;
+}
+
+export interface ISeller extends IId, ITimeStamp {
+  user: string;
+  businessDetails: {
+    name: string;
+    type: TSellerType;
+    email: string;
+    phoneNumber: string;
+    gstin: string;
+    pan: string;
+  };
+  address: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state: TStateOrUT;
+    pincode: string;
+    country: string;
+  };
+  approvalStatus: TSellerApprovalStatus;
+  assignedAdmin?: string | null;
+  assignedAdminHistory: ISellerAssignedAdminHistoryEntry[];
+  assignedViaSuperAdminPool: boolean;
+  history?: {
+    rejectReason?: string | null;
+  };
+}
+
+export interface ISellerQueueQuery {
+  status?: TSellerApprovalStatus;
+  filter?: 'mine' | 'all' | 'unassigned';
+}
+
+export interface IUpdateSellerApprovalStatus {
+  sellerId: string;
+  data: TUpdateSellerApprovalStatusZodSchema;
 }

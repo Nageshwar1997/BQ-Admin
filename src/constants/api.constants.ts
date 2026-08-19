@@ -74,6 +74,16 @@ export const METHODS_AND_PATHS = {
         set: { method: PATCH, path: '/set' },
       },
     },
+    admin: {
+      base: '/admin',
+      territory: {
+        base: '/territory',
+        // Self - own Admin profile (states/status/load), shown before toggling.
+        me: { method: GET, path: '/me' },
+        // Self (ACTIVE/ON_LEAVE) - Suspended is view-only here, MASTER-only to set.
+        status: { method: PATCH, path: '/:adminId/status' },
+      },
+    },
   },
   media_service: {
     base: `/${SERVICE_NAMES_MAP.media}`,
@@ -125,6 +135,12 @@ export const METHODS_AND_PATHS = {
       create: { method: POST, path: '/' },
       list: { method: GET, path: '/' },
       updateStatus: { method: PATCH, path: '/:ticketId' },
+    },
+    seller: {
+      base: '/seller',
+      // "My Queue" - ?status=PENDING (default) & ?filter=mine (default here)
+      queue: { method: GET, path: '/queue' },
+      updateApprovalStatus: { method: PATCH, path: '/approval-status/:sellerId' },
     },
   },
 } as const;

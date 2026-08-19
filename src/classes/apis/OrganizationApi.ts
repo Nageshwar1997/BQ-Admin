@@ -1,7 +1,13 @@
 import type { IListContactQueriesQuery } from '@beautinique/frontend-types';
 
 import { API_METHODS_AND_URLS } from '@/constants/api.constants';
-import type { IContactQueriesListResponse, IUpdateContactQueryStatus } from '@/types/api.type';
+import type {
+  IContactQueriesListResponse,
+  ISeller,
+  ISellerQueueQuery,
+  IUpdateContactQueryStatus,
+  IUpdateSellerApprovalStatus,
+} from '@/types/api.type';
 
 import { ApiRequest } from '../ApiRequest';
 
@@ -21,5 +27,20 @@ export class ContactApi extends ApiRequest {
       url: url({ ticketId }),
       params: { status },
     });
+  };
+}
+
+export class SellerApi extends ApiRequest {
+  private routes = API_METHODS_AND_URLS.organization_service.seller;
+
+  /* ================== GET SELLER QUEUE ("My Queue") ================== */
+  public getSellerQueue = (params: ISellerQueueQuery) => {
+    return this.request<ISeller[]>({ ...this.routes.queue, params });
+  };
+
+  /* ================== UPDATE SELLER APPROVAL STATUS ================== */
+  public updateSellerApprovalStatus = ({ sellerId, data }: IUpdateSellerApprovalStatus) => {
+    const { method, url } = this.routes.updateApprovalStatus;
+    return this.request<ISeller>({ method, url: url({ sellerId }), data });
   };
 }
