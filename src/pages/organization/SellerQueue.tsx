@@ -125,7 +125,7 @@ const SellerQueue = () => {
       ),
       toColumn(
         columnHelper.accessor((row) => row.businessDetails.name, {
-          id: 'businessName',
+          id: 'name',
           header: () => 'Business',
           cell: (info) => (
             <div className="flex flex-col gap-1 text-left">

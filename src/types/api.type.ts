@@ -17,8 +17,9 @@ import type {
   TProductWithoutVariantsZodSchema,
   TProductWithVariantsZodSchema,
   TRegisterZodSchema,
+  TSellerAddressZodSchema,
   TSellerApprovalStatus,
-  TSellerType,
+  TSellerBusinessDetailsZodSchema,
   TSort,
   TStateOrUT,
   TTerritoryAssignmentReason,
@@ -316,29 +317,13 @@ export interface ISellerAssignedAdminHistoryEntry {
 
 export interface ISeller extends IId, ITimeStamp {
   user: string;
-  businessDetails: {
-    name: string;
-    type: TSellerType;
-    email: string;
-    phoneNumber: string;
-    gstin: string;
-    pan: string;
-  };
-  address: {
-    line1: string;
-    line2?: string;
-    city: string;
-    state: TStateOrUT;
-    pincode: string;
-    country: string;
-  };
+  businessDetails: Pick<TSellerBusinessDetailsZodSchema, 'step'>;
+  address: Omit<TSellerAddressZodSchema, 'step'>;
   approvalStatus: TSellerApprovalStatus;
   assignedAdmin?: string | null;
   assignedAdminHistory: ISellerAssignedAdminHistoryEntry[];
   assignedViaSuperAdminPool: boolean;
-  history?: {
-    rejectReason?: string | null;
-  };
+  history?: { rejectReason?: string | null };
 }
 
 export interface ISellerQueueQuery {
