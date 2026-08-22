@@ -90,6 +90,7 @@ export const ROUTES = {
   },
   ENQUIRIES: 'enquiries',
   SELLER_QUEUE: 'seller-queue',
+  PRODUCT_QUEUE: 'product-queue',
 } as const;
 
 export const TOOLTIP_GAP = 15 as const;

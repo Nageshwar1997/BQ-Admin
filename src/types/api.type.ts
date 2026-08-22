@@ -26,6 +26,7 @@ import type {
   TTerritoryStatusChangeReason,
   TTryOnSelection,
   TUpdateAdminStatusZodSchema,
+  TUpdateProductApprovalStatusZodSchema,
   TUpdateSellerApprovalStatusZodSchema,
   TUserRole,
 } from '@beautinique/frontend-types';
@@ -193,6 +194,7 @@ export type TApiProductBase = IId &
   TRemoveFileType<Omit<TProductMediaAndGalleryZodSchema, 'step'>> & {
     tryOn: TApiTryOn;
     seller: string;
+    assignedAdminId?: string | null;
     sku: string;
     slug: string;
     discount: number;
@@ -256,6 +258,16 @@ export interface IDashboardProductsResponse {
   counts: Record<TProductStatus | 'ALL', number>;
 }
 
+export interface IProductQueueQuery {
+  status?: TProductStatus;
+  filter?: 'mine' | 'all' | 'unassigned';
+}
+
+export interface IUpdateProductApprovalStatus {
+  productId: string;
+  data: TUpdateProductApprovalStatusZodSchema;
+}
+
 export interface IContactQuery
   extends IId, Pick<ITimeStamp, 'createdAt'>, TCreateContactQueryZodSchema {
   status: TContactQueryStatus;
@@ -317,7 +329,7 @@ export interface ISellerAssignedAdminHistoryEntry {
 
 export interface ISeller extends IId, ITimeStamp {
   user: string;
-  businessDetails: Pick<TSellerBusinessDetailsZodSchema, 'step'>;
+  businessDetails: Omit<TSellerBusinessDetailsZodSchema, 'step'>;
   address: Omit<TSellerAddressZodSchema, 'step'>;
   approvalStatus: TSellerApprovalStatus;
   assignedAdmin?: string | null;

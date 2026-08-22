@@ -8,6 +8,9 @@ import type {
   IDashboardProductsResponse,
   IGetDashboardProductsQuery,
   IId,
+  IProductQueueQuery,
+  IUpdateProductApprovalStatus,
+  TApiProduct,
   TApiProductPopulated,
   TCategory,
   TCategoryHierarchy,
@@ -72,12 +75,23 @@ export class ProductApi extends ApiRequest {
     return this.request(this.routes.draft.publish);
   };
 
+  /* ================== UPDATE PRODUCT APPROVAL STATUS ================== */
+  public updateProductApprovalStatus = ({ productId, data }: IUpdateProductApprovalStatus) => {
+    const { method, url } = this.routes.updateApprovalStatus;
+    return this.request<TApiProduct>({ method, url: url({ productId }), data });
+  };
+
   /* ===================== DELETE API ===================== */
 
   /* ===================== GET API ===================== */
 
   public getDraftProduct = () => {
     return this.request<Partial<TDraftProductDetailsZodSchema>>(this.routes.draft.get);
+  };
+
+  /* ================== GET PRODUCT QUEUE ("My Queue") ================== */
+  public getProductQueue = (params: IProductQueueQuery) => {
+    return this.request<TApiProduct[]>({ ...this.routes.queue, params });
   };
 
   public getDashboardProducts = (params: IGetDashboardProductsQuery) => {

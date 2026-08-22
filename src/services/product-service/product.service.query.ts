@@ -2,11 +2,11 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 
 import { productApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
-import type { IGetDashboardProductsQuery } from '@/types/api.type';
+import type { IGetDashboardProductsQuery, IProductQueueQuery } from '@/types/api.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
 import { toaster } from '@/utils/common.util';
 
-const { draft, get } = API_QUERY_KEYS.product_service.product;
+const { draft, get, queue, updateApprovalStatus } = API_QUERY_KEYS.product_service.product;
 
 export const useSaveDraftProduct = () => {
   const queryClient = useQueryClient();
@@ -108,5 +108,49 @@ export const useGetDashboardProductBySlug = (slug: string) => {
     queryFn: () => productApi.getDashboardProductBySlug(slug),
     enabled: !!slug,
     select: (data) => data.data,
+  });
+};
+
+/* ================== PRODUCT QUEUE ("My Queue") ================== */
+
+export const useGetProductQueue = (params: IProductQueueQuery) => {
+  return useQuery({
+    queryKey: [...queue, params.status, params.filter] as const,
+    queryFn: () => productApi.getProductQueue(params),
+
+    staleTime: 2 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+
+    select: (data) => data.data ?? [],
+  });
+};
+
+export const useUpdateProductApprovalStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: updateApprovalStatus({ productId: '' }),
+    mutationFn: productApi.updateProductApprovalStatus,
+    onMutate: () => {
+      const toastId = toaster.loading({
+        title: 'Please wait...',
+        description: 'Updating product status...',
+      });
+      return { toastId };
+    },
+    onSuccess: async ({ message }) => {
+      await queryClient.invalidateQueries({ queryKey: queue });
+      handleApiSuccessToaster(message);
+    },
+    onError: (error) => {
+      handleApiErrorToaster(error);
+    },
+    onSettled: (_data, _error, _variables, context) => {
+      if (context?.toastId) toaster.remove(context.toastId);
+    },
   });
 };

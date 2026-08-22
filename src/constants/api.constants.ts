@@ -116,6 +116,9 @@ export const METHODS_AND_PATHS = {
         update: { method: PATCH, path: '/' }, // For already published product and seller again made some changes
       },
       publish: { method: PATCH, path: '/publish' }, // For publish existing Product
+      // "My Queue" - ?status=PENDING (default) & ?filter=mine (default here)
+      queue: { method: GET, path: '/queue' },
+      updateApprovalStatus: { method: PATCH, path: '/approval-status/:productId' },
       get: {
         dashboard: {
           base: '/dashboard',

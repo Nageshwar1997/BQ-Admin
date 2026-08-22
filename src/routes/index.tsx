@@ -6,7 +6,8 @@ import { ROUTES } from '@/constants/common.constants';
 import { authenticate, guestOnly } from '@/middlewares';
 import ErrorBoundary from '@/pages/error/ErrorBoundary';
 
-const { AUTH, CATEGORIES, DASHBOARD, PRODUCTS, PROFILE, ENQUIRIES, SELLER_QUEUE } = ROUTES;
+const { AUTH, CATEGORIES, DASHBOARD, PRODUCTS, PROFILE, ENQUIRIES, SELLER_QUEUE, PRODUCT_QUEUE } =
+  ROUTES;
 
 // Wraps a page's dynamic import into the function react-router's `lazy` route property expects.
 // The import itself must stay a literal `() => import('@/path')` callback (not a variable path)
@@ -84,6 +85,12 @@ const routes: RouteObject[] = [
       {
         path: SELLER_QUEUE,
         lazy: loadPage(() => import('@/pages/organization/SellerQueue')),
+      },
+
+      /* ========== PRODUCT QUEUE ========== */
+      {
+        path: PRODUCT_QUEUE,
+        lazy: loadPage(() => import('@/pages/product/ProductQueue')),
       },
     ],
   },
