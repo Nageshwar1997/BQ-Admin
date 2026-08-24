@@ -127,14 +127,28 @@ const SellerQueue = () => {
         columnHelper.accessor((row) => row.businessDetails.name, {
           id: 'name',
           header: () => 'Business',
-          cell: (info) => (
-            <div className="flex flex-col gap-1 text-left">
-              <span className="text-primary font-medium">{info.getValue()}</span>
-              <span className="text-tertiary text-[11px] capitalize">
-                {info.row.original.businessDetails.type.toLowerCase()}
-              </span>
-            </div>
-          ),
+          cell: (info) => {
+            const coveringFor = info.row.original.coveringFor;
+
+            return (
+              <div className="flex flex-col gap-1 text-left">
+                <span className="text-primary font-medium">{info.getValue()}</span>
+                <span className="text-tertiary text-[11px] capitalize">
+                  {info.row.original.businessDetails.type.toLowerCase()}
+                </span>
+                {/* Only ever set on `filter=mine` items that belong to an
+                    on-leave admin's queue, not the requester's own - makes
+                    that distinction visible instead of silently mixing them
+                    in (assignment plan doc, section 7.1). */}
+                {coveringFor && (
+                  <Badge
+                    content={`Covering: ${coveringFor.adminName}`}
+                    className="border-primary-yellow/30 bg-primary-yellow/5 text-primary-yellow w-fit"
+                  />
+                )}
+              </div>
+            );
+          },
         }),
       ),
       toColumn(

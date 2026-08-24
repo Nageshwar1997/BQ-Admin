@@ -199,7 +199,9 @@ const LoginForm = () => {
                 content={
                   <>
                     Login as{' '}
-                    <span className="capitalize">{loginRole.toLowerCase().replaceAll('_', ' ')}</span>
+                    <span className="capitalize">
+                      {loginRole.toLowerCase().replaceAll('_', ' ')}
+                    </span>
                   </>
                 }
               />

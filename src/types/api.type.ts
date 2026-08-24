@@ -336,6 +336,11 @@ export interface ISeller extends IId, ITimeStamp {
   assignedAdminHistory: ISellerAssignedAdminHistoryEntry[];
   assignedViaSuperAdminPool: boolean;
   history?: { rejectReason?: string | null };
+  // Not a persisted field - `GET /seller/queue` (`filter=mine`) attaches this
+  // per item: non-null when the item actually belongs to an on-leave admin
+  // the requester is covering for, `null` for the requester's own items
+  // (direct assignment or a SUPER_ADMIN pool item).
+  coveringFor?: { adminId: string; adminName: string } | null;
 }
 
 export interface ISellerQueueQuery {
