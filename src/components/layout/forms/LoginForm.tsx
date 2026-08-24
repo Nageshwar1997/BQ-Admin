@@ -1,4 +1,5 @@
-import type { TLoginZodSchema } from '@beautinique/frontend-types';
+import { USER_ROLE_MAP } from '@beautinique/frontend-constants';
+import type { TLoginZodSchema, TUserRole } from '@beautinique/frontend-types';
 import { loginZodSchema } from '@beautinique/frontend-zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
@@ -8,6 +9,7 @@ import { Link } from 'react-router-dom';
 import AuthBottomInstructions from '@/components/ui/AuthBottomInstructions';
 import Button from '@/components/ui/Button';
 import GradientText from '@/components/ui/GradientText';
+import Checkbox from '@/components/ui/inputs/Checkbox';
 import Input from '@/components/ui/inputs/Input';
 import Radio from '@/components/ui/inputs/Radio';
 import { ROUTES } from '@/constants/common.constants';
@@ -21,7 +23,14 @@ import { setErrorToForm } from '@/utils/form.util';
 
 import BorderGradient from '../containers/BorderGradient';
 
+// type TLoginExtendedZodSchema = TLoginZodSchema;
+// const loginExtendedZodSchema = loginZodSchema.and({
+//   loginRole: enum_z(USER_ROLES),
+// });
+
 const LoginForm = () => {
+  const [loginRole, setLoginRole] = useState<TUserRole>(USER_ROLE_MAP.ADMIN);
+
   /* ================= 1. External / Store Hooks ================= */
   const setUser = useUserStore((s) => s.setUser);
   const { queryParams, removeParams } = useQueryParams();
@@ -52,7 +61,8 @@ const LoginForm = () => {
 
   // -------- Handle Login Submit --------
   const handleLogin = async (data: TLoginZodSchema) => {
-    await mutateAsync(data, {
+    const finalData = { data, loginRole };
+    await mutateAsync(finalData, {
       onSuccess: async ({ data: user }) => {
         setUser(user ?? null);
 
@@ -177,14 +187,37 @@ const LoginForm = () => {
             );
           })}
 
-          <p className="inline-flex w-full justify-end pr-2">
-            <GradientText
-              text="Forgot Password?"
-              type="accent"
-              path={`/${ROUTES.AUTH.BASE}/${ROUTES.AUTH.FORGOT_PASSWORD}`}
-              className="text-xs font-semibold whitespace-nowrap hover:underline"
-            />
-          </p>
+          <div className="flex flex-col gap-1.5">
+            <div className="flex w-full items-center justify-between gap-2">
+              <Checkbox
+                checkboxProps={{
+                  checked: loginRole === USER_ROLE_MAP.SUPER_ADMIN,
+                  onChange: ({ target: { checked } }) => {
+                    setLoginRole(checked ? USER_ROLE_MAP.SUPER_ADMIN : USER_ROLE_MAP.ADMIN);
+                  },
+                }}
+                content={
+                  <>
+                    Login as{' '}
+                    <span className="capitalize">{loginRole.toLowerCase().replaceAll('_', ' ')}</span>
+                  </>
+                }
+              />
+              <GradientText
+                text="Forgot Password?"
+                type="accent"
+                path={`/${ROUTES.AUTH.BASE}/${ROUTES.AUTH.FORGOT_PASSWORD}`}
+                className="text-xs font-semibold hover:underline"
+              />
+            </div>
+            {/* Not just a hover tooltip - a Super Admin who misses this and
+                submits as "Admin" gets a plain 403 with no hint why, so the
+                nudge needs to be visible up front, not discovered after a
+                failed login. */}
+            <p className="text-tertiary text-xs">
+              Logging in as a Super Admin? Check the box above first.
+            </p>
+          </div>
 
           {/* ================= ACTION BUTTONS ================= */}
           <div className="flex gap-4 sm:col-span-2">
