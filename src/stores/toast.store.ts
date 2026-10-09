@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import { create } from 'zustand';
 
+import { TOAST_TYPE } from '@/constants/common.constants';
 import type { IToastStore } from '@/types/store.type';
 
 const useToastStore = create<IToastStore>((set) => ({
@@ -18,6 +19,21 @@ const useToastStore = create<IToastStore>((set) => ({
     progress: (id, progress) => {
       set((state) => ({
         toasts: state.toasts.map((toast) => (toast.id === id ? { ...toast, progress } : toast)),
+      }));
+    },
+
+    uploadItem: (id, itemId, patch) => {
+      set((state) => ({
+        toasts: state.toasts.map((toast) =>
+          toast.id === id && toast.type === TOAST_TYPE.uploads
+            ? {
+                ...toast,
+                items: toast.items.map((item) =>
+                  item.id === itemId ? { ...item, ...patch } : item,
+                ),
+              }
+            : toast,
+        ),
       }));
     },
   },

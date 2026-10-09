@@ -16,6 +16,7 @@ import type {
   UseFormSetValue,
 } from 'react-hook-form';
 
+import type { IUploadItemHandle } from './common.type';
 import type {
   IClassName,
   IContainerClassName,
@@ -184,4 +185,6 @@ export interface IProcessQuillContent<T extends FieldValues> {
   field: FieldPath<T>;
   folder: string;
   toasterInfo?: Partial<ITitleDescription>;
+  /** This field's row in a toast that follows several uploads together (see createUploadsToast). */
+  progress?: IUploadItemHandle;
 }

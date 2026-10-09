@@ -5,6 +5,7 @@ import { useUploadMultipleMedia } from '@/services/media-service/media.service.q
 import type { IProcessQuillContent } from '@/types/input.type';
 import { toaster } from '@/utils/common.util';
 import { sanitizeQuillHtml } from '@/utils/input.util';
+import { getQuillImageFiles } from '@/utils/upload.util';
 
 const getQuillContent = (value: string) => {
   if (!value || value === '<p><br></p>') return undefined;
@@ -30,6 +31,7 @@ export const useProcessQuillContent = <T extends FieldValues>() => {
         title: 'Please wait...',
         description: 'Uploading content files...',
       },
+      progress,
     }: IProcessQuillContent<T>) => {
       if (!quillRef.current) return '';
 
@@ -37,7 +39,7 @@ export const useProcessQuillContent = <T extends FieldValues>() => {
       let content = quill.root.innerHTML;
 
       const images = imagesRef.current;
-      const files = images.map(({ file }) => file).filter((file): file is File => Boolean(file));
+      const files = getQuillImageFiles(images);
 
       if (!files.length) {
         const finalContent = getQuillContent(content);
@@ -54,7 +56,7 @@ export const useProcessQuillContent = <T extends FieldValues>() => {
 
       formData.append('folder', folder);
 
-      const { data } = await mutateAsync({ data: formData, toasterInfo });
+      const { data } = await mutateAsync({ data: formData, toasterInfo, progress });
 
       const urls: string[] = data?.filter(Boolean) ?? [];
 

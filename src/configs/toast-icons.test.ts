@@ -10,6 +10,7 @@ describe('bundled toast icons', () => {
       'lucide:x',
       'quill:loading-spin',
       'solar:check-circle-linear',
+      'solar:clock-circle-linear',
       'solar:danger-triangle-linear',
       'solar:info-circle-outline',
     ]);

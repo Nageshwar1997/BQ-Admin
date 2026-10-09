@@ -20,7 +20,23 @@ export type TProductQuillRefs = Record<TProductContentFields, RefObject<Quill | 
 
 export type TProductQuillImageRefs = Record<TProductContentFields, RefObject<IQuillImageRef[]>>;
 
+export type TUploadProgressHandler = (event: AxiosProgressEvent) => void;
+
 export interface TFormDataProgress {
   data: FormData;
-  onUploadProgress?: (event: AxiosProgressEvent) => void;
+  onUploadProgress?: TUploadProgressHandler;
+}
+
+export interface IUploadItemHandle {
+  /**
+   * Runs the upload: shows it as uploading, follows its progress, shows it as done or failed, and
+   * gives back what the request gave back (or throws what it threw).
+   */
+  run: <T>(request: (onProgress: TUploadProgressHandler) => Promise<T>) => Promise<T>;
+}
+
+export interface IUploadGroup {
+  item: (id: string) => IUploadItemHandle;
+  /** Call when the uploads are over: an upload that never ran (or never finished) shows as failed. */
+  end: () => void;
 }

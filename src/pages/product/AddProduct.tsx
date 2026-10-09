@@ -49,6 +49,7 @@ import type {
 } from '@/types/common.type';
 import type { IQuillImageRef } from '@/types/component.type';
 import { isDeepEqual, toaster } from '@/utils/common.util';
+import { getQuillImageFiles, runUploadsInToast } from '@/utils/upload.util';
 
 import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
 import AddProductConfirmFieldAndReview from './children/AddProductConfirmFieldAndReview';
@@ -57,8 +58,16 @@ import AddProductMediaAndGalleryFields from './children/AddProductMediaAndGaller
 import AddProductStockAndVariantsFields from './children/AddProductStockAndVariantsFields';
 import AddProductTryOnConfigurationFields from './children/AddProductTryOnConfigurationFields';
 
+// The editors of the "description and content" step, in the order their uploads are listed.
+const CONTENT_UPLOAD_FIELDS: { field: keyof TProductQuillImageRefs; label: string }[] = [
+  { field: 'description', label: 'Description' },
+  { field: 'additional', label: 'Additional info' },
+  { field: 'ingredients', label: 'Ingredients' },
+  { field: 'instructions', label: 'Instructions' },
+];
+
 const AddProduct = () => {
-  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(0);
+  const [activeStep, setActiveStep] = useState<TAddProductStepNumber>(2);
   const { processQuillContent, isPending: isContentUploadPending } =
     useProcessQuillContent<TProductDescriptionAndContentZodSchema>();
 
@@ -302,61 +311,34 @@ const AddProduct = () => {
   const onDescriptionAndContentSubmit = async (data: TProductDescriptionAndContentZodSchema) => {
     if (isContentUploadPending) return;
 
-    const [descriptionResponse, additionalResponse, ingredientsResponse, instructionsResponse] =
-      await Promise.all([
+    // One toast follows the uploads of every field that has images: the overall progress on the
+    // left, and a row (pending, uploading, done or failed) for each of those fields underneath.
+    const contents = await runUploadsInToast({
+      title: 'Please wait...',
+      description: 'Uploading content images...',
+      uploads: CONTENT_UPLOAD_FIELDS.map(({ field, label }) => ({
+        id: field,
+        label,
+        files: getQuillImageFiles(imageRefs[field].current),
+      })),
+      run: (field, progress) =>
         processQuillContent({
-          field: 'description',
+          field,
           folder: title,
-          imagesRef: imageRefs.description,
-          quillRef: quillRefs.description,
+          imagesRef: imageRefs[field],
+          quillRef: quillRefs[field],
           setValue: descriptionAndContentForm.setValue,
-          toasterInfo: {
-            title: 'Please wait...',
-            description: 'Uploading description images...',
-          },
+          progress,
         }),
-        processQuillContent({
-          field: 'additional',
-          folder: title,
-          imagesRef: imageRefs.additional,
-          quillRef: quillRefs.additional,
-          setValue: descriptionAndContentForm.setValue,
-          toasterInfo: {
-            title: 'Please wait...',
-            description: 'Uploading additional info images...',
-          },
-        }),
-        processQuillContent({
-          field: 'ingredients',
-          folder: title,
-          imagesRef: imageRefs.ingredients,
-          quillRef: quillRefs.ingredients,
-          setValue: descriptionAndContentForm.setValue,
-          toasterInfo: {
-            title: 'Please wait...',
-            description: 'Uploading ingredients images...',
-          },
-        }),
-        processQuillContent({
-          field: 'instructions',
-          folder: title,
-          imagesRef: imageRefs.instructions,
-          quillRef: quillRefs.instructions,
-          setValue: descriptionAndContentForm.setValue,
-          toasterInfo: {
-            title: 'Please wait...',
-            description: 'Uploading instructions images...',
-          },
-        }),
-      ]);
+    });
 
     const payload: TProductDescriptionAndContentZodSchema = {
       step: 'descriptionAndContent',
       shortDescription: data.shortDescription,
-      description: descriptionResponse ?? '',
-      instructions: instructionsResponse,
-      ingredients: ingredientsResponse,
-      additional: additionalResponse,
+      description: contents.description ?? '',
+      instructions: contents.instructions,
+      ingredients: contents.ingredients,
+      additional: contents.additional,
     };
 
     await saveStepIfChanged(payload, draftProduct?.descriptionAndContent);

@@ -19,6 +19,22 @@ const toastOfType = (type: TToastItem['type']): TToastItem => {
   switch (type) {
     case 'progress':
       return { id: 'toast', type, title: 'Uploading', progress: 40 };
+    case 'uploads':
+      return {
+        id: 'toast',
+        type,
+        title: 'Uploading',
+        items: [
+          {
+            id: 'files',
+            label: 'Files',
+            status: 'uploading',
+            loaded: 5,
+            total: 10,
+            fileSizes: [10],
+          },
+        ],
+      };
     case 'custom':
       return { id: 'toast', type, children: 'Custom' };
     case 'loading':

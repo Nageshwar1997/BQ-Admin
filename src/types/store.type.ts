@@ -44,14 +44,45 @@ export interface IProgressToast extends Omit<ILoadingToast, 'type'> {
   progress: number;
 }
 
-export type TToast = IDefaultToast | ICustomToast | ILoadingToast | IProgressToast;
+export type TUploadItemStatus = 'pending' | 'uploading' | 'success' | 'error';
+
+/** One upload (a request) of an uploads toast, e.g. "Description" with the images of that field. */
+export interface IUploadItem {
+  id: string;
+  label: string;
+  status: TUploadItemStatus;
+  /** Bytes the browser has sent so far, and the bytes to send (the sum of the file sizes until known). */
+  loaded: number;
+  total: number;
+  /** The size of every file of this upload, in the order they are sent. */
+  fileSizes: number[];
+}
+
+/**
+ * One toast for one or more uploads running together: the overall progress on the left, how many
+ * files are through underneath and, when there is more than one upload, a row for each of them.
+ */
+export interface IUploadsToast extends IBaseToast {
+  type: typeof TOAST_TYPE.uploads;
+  title: string;
+  description?: string;
+  items: IUploadItem[];
+  isClosable?: never;
+  autoClose?: never;
+  closeTimer?: never;
+}
+
+export type TToast = IDefaultToast | ICustomToast | ILoadingToast | IProgressToast | IUploadsToast;
 
 export type TToastItem = TToast & { id: string };
 
 export interface IToastStore {
   toasts: TToastItem[];
   add: (toast: TToast) => string;
-  update: { progress: (id: string, progress: number) => void };
+  update: {
+    progress: (id: string, progress: number) => void;
+    uploadItem: (id: string, itemId: string, patch: Partial<Omit<IUploadItem, 'id'>>) => void;
+  };
   remove: (id: string) => void;
 }
 

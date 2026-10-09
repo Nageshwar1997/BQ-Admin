@@ -220,6 +220,7 @@ export const TOAST_TYPES = [
   'error',
   'warning',
   'progress',
+  'uploads',
   'loading',
   'default',
   'custom',

@@ -9,6 +9,8 @@ import type {
   IDefaultToast,
   ILoadingToast,
   IProgressToast,
+  IUploadItem,
+  IUploadsToast,
   TProgressToastOptions,
 } from '@/types/store.type';
 
@@ -92,6 +94,12 @@ export const toaster = {
     },
     end: (toastId: string) => {
       remove(toastId);
+    },
+  },
+  uploads: {
+    start: (data: Omit<IUploadsToast, 'type'>) => add({ ...data, type: TOAST_TYPE.uploads }),
+    update: (toastId: string, itemId: string, patch: Partial<Omit<IUploadItem, 'id'>>) => {
+      update.uploadItem(toastId, itemId, patch);
     },
   },
   remove: (toastId: string) => {
