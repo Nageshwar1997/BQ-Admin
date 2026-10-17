@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import type { IUploadItemHandle } from '@beautinique/frontend-stores';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { AxiosProgressEvent } from 'axios';
 import { act, useLayoutEffect } from 'react';
@@ -7,7 +8,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mediaApi } from '@/classes/apis';
 import useToastStore from '@/stores/toast.store';
 import { mount, unmountAll } from '@/test-utils/react';
-import type { IUploadItemHandle } from '@/types/common.type';
 
 import { useUploadMultipleMedia, useUploadSingleMedia } from './media.service.query';
 

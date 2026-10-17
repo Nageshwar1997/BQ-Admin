@@ -7,8 +7,7 @@ import type {
   TParams,
   TRouteNode,
 } from '@/types/api.type';
-
-import { toaster } from './common.util';
+import { toaster } from '@/utils/toaster';
 
 export const handleApiErrorToaster = ({ message, globalErrors }: ApiError, title = 'Error') => {
   if (globalErrors?.length) {

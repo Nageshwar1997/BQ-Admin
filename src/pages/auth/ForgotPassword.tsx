@@ -1,3 +1,5 @@
+import { BorderGradient, Button, GradientText, Input } from '@beautinique/frontend-components';
+import { Resend } from '@beautinique/frontend-components/resend';
 import { usePathParams } from '@beautinique/frontend-hooks';
 import type {
   TEmailZodSchema,
@@ -9,12 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import BorderGradient from '@/components/layout/containers/BorderGradient';
 import AuthBottomInstructions from '@/components/ui/AuthBottomInstructions';
-import Button from '@/components/ui/Button';
-import GradientText from '@/components/ui/GradientText';
-import Input from '@/components/ui/inputs/Input';
-import Resend from '@/components/ui/Resend';
 import { FORM_DEFAULT_VALUES } from '@/constants/form.constants';
 import {
   EMAIL_INPUT_DATA,
@@ -28,8 +25,8 @@ import {
   useForgotPasswordVerifyOtp,
 } from '@/services/user-service/auth.service.query';
 import useUserStore from '@/stores/user.store';
-import { toaster } from '@/utils/common.util';
 import { setErrorToForm } from '@/utils/form.util';
+import { toaster } from '@/utils/toaster';
 
 const ForgotPassword = () => {
   /* ================= 1. Store Hooks ================= */
@@ -231,6 +228,7 @@ const ForgotPassword = () => {
                   icons={{
                     right: {
                       icon: showPasswords[input.name] ? 'lucide:eye-off' : 'lucide:eye',
+                      label: showPasswords[input.name] ? 'Hide password' : 'Show password',
                       onClick: () => {
                         togglePasswordVisibility(input.name);
                       },

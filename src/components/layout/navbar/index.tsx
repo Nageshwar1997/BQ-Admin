@@ -1,14 +1,17 @@
+import { Button, Theme } from '@beautinique/frontend-components';
+import { Breadcrumb, getBreadcrumbItems } from '@beautinique/frontend-components/breadcrumb';
+import { usePathParams } from '@beautinique/frontend-hooks';
 import { Icon } from '@iconify/react';
 import { Fragment } from 'react';
 
-import Breadcrumb from '@/components/ui/Breadcrumb';
-import Button from '@/components/ui/Button';
-import Theme from '@/components/ui/Theme';
+import { ROUTES } from '@/constants/common.constants';
+import useThemeStore from '@/stores/theme.store';
 import useUserStore from '@/stores/user.store';
 import type { INavbar } from '@/types/component.type';
 
 const Navbar = ({ buttons, children, components, className = '' }: INavbar) => {
   const user = useUserStore((s) => s.user);
+  const { pathname, navigate } = usePathParams();
 
   return (
     <div
@@ -29,7 +32,7 @@ const Navbar = ({ buttons, children, components, className = '' }: INavbar) => {
               <Icon icon="solar:user-circle-linear" className="text-tertiary size-full" />
             )}
           </div>
-          <Theme className="size-6 md:size-8" />
+          <Theme store={useThemeStore} className="size-6 md:size-8" />
         </div>
         {(!!components || !!buttons) && (
           <div className="base:gap-3 flex flex-1 items-center justify-end gap-2 md:gap-4">
@@ -56,7 +59,13 @@ const Navbar = ({ buttons, children, components, className = '' }: INavbar) => {
           </div>
         )}
       </div>
-      <Breadcrumb className="p-4" />
+      <Breadcrumb
+        className="p-4"
+        items={getBreadcrumbItems(pathname, { homeLabel: 'Dashboard', homeHref: ROUTES.DASHBOARD })}
+        onNavigate={(href) => {
+          void navigate(href);
+        }}
+      />
       {children && <div className="border-t-silver/30 border-t p-4">{children}</div>}
     </div>
   );

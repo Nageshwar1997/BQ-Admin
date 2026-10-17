@@ -1,3 +1,6 @@
+import { Button, Checkbox, Input, Radio } from '@beautinique/frontend-components';
+import { ColorInput } from '@beautinique/frontend-components/color-input';
+import { FileInput } from '@beautinique/frontend-components/file-input';
 import { VARIANT_TYPES_MAP } from '@beautinique/frontend-constants';
 import type {
   TProductBasicInfoZodSchema,
@@ -13,16 +16,10 @@ import {
   useWatch,
 } from 'react-hook-form';
 
-import Button from '@/components/ui/Button';
-import Checkbox from '@/components/ui/inputs/Checkbox';
-import ColorInput from '@/components/ui/inputs/colorInput';
-import FileInput from '@/components/ui/inputs/FileInput';
-import Input from '@/components/ui/inputs/Input';
-import Radio from '@/components/ui/inputs/Radio';
 import { PRODUCT_VARIANT_ACTIONS } from '@/constants/common.constants';
 import { PRODUCT_VARIANT_INPUT_MAP_DATA, STOCKS_INPUT_MAP_DATA } from '@/constants/input.constants';
-import { toaster } from '@/utils/common.util';
 import { toErrorMessageArray } from '@/utils/form.util';
+import { toaster } from '@/utils/toaster';
 
 interface Props {
   form: UseFormReturn<TProductStockAndVariantsZodSchema>;

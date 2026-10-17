@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
+import type { QuillImageRef } from '@beautinique/frontend-quill/editor';
+import type { IUploadItemHandle } from '@beautinique/frontend-stores';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import useToastStore from '@/stores/toast.store';
 import { renderHook, unmountAll } from '@/test-utils/react';
-import type { IUploadItemHandle } from '@/types/common.type';
-import type { IQuillImageRef } from '@/types/component.type';
 
 import { useProcessQuillContent } from './useProcessQuillContent';
 
@@ -15,22 +15,30 @@ vi.mock('@/services/media-service/media.service.query', () => ({
   useUploadMultipleMedia: () => ({ mutateAsync, isPending: false }),
 }));
 
-// The sanitizer is tested on its own; here it must not get in the way of what is being checked.
-vi.mock('@/utils/input.util', () => ({ sanitizeQuillHtml: (html: string) => html }));
-
 interface IForm {
   description?: string;
 }
 
 const file = (name: string) => new File(['x'], name);
 
+/**
+ * The part of a Quill editor the content processing reads and tells: the element of its text, and the two
+ * things it asks of Quill after it has put the uploaded addresses in. (Quill itself is tested in its own package.)
+ */
 const quillWith = (html: string) => {
-  const root = { innerHTML: html };
+  const root = document.createElement('div');
 
-  return { ref: { current: { root } } as never, root };
+  root.innerHTML = html;
+
+  return {
+    ref: { current: { root, update: vi.fn(), history: { clear: vi.fn() } } } as never,
+    root,
+  };
 };
 
-const imagesOf = (...images: IQuillImageRef[]) => ({ current: images });
+const image = (id: string, src: string) => `<img src="${src}" data-image-id="${id}">`;
+
+const imagesOf = (...images: QuillImageRef[]) => ({ current: images });
 
 const run = () => {
   const setValue = vi.fn();
@@ -102,7 +110,7 @@ describe('useProcessQuillContent', () => {
 
     const first = file('a.png');
     const second = file('b.png');
-    const quill = quillWith('<p><img src="blob:a"><img src="blob:b"></p>');
+    const quill = quillWith(`<p>${image('1', 'blob:a')}${image('2', 'blob:b')}</p>`);
     const imagesRef = imagesOf(
       { id: '1', file: first, blobUrl: 'blob:a' },
       { id: '2', file: second, blobUrl: 'blob:b' },
@@ -128,7 +136,9 @@ describe('useProcessQuillContent', () => {
     expect(payload.data.get('folder')).toBe('Lipstick');
     expect(payload.progress).toBe(progress);
 
-    expect(content).toBe('<p><img src="https://cdn/a.png"><img src="https://cdn/b.png"></p>');
+    expect(content).toBe(
+      `<p>${image('1', 'https://cdn/a.png')}${image('2', 'https://cdn/b.png')}</p>`,
+    );
     expect(setValue).toHaveBeenCalledWith('description', content);
     expect(quill.root.innerHTML).toBe(content);
     expect(imagesRef.current).toEqual([]);
@@ -143,7 +153,7 @@ describe('useProcessQuillContent', () => {
 
     await expect(
       process({
-        quillRef: quillWith('<p><img src="blob:a"><img src="blob:b"></p>').ref,
+        quillRef: quillWith(`<p>${image('1', 'blob:a')}${image('2', 'blob:b')}</p>`).ref,
         imagesRef: imagesOf(
           { id: '1', file: file('a.png'), blobUrl: 'blob:a' },
           { id: '2', file: file('b.png'), blobUrl: 'blob:b' },

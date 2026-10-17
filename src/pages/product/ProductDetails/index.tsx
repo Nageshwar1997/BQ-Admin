@@ -1,19 +1,28 @@
+import {
+  ApiStatus,
+  Button,
+  Dropdown,
+  ScrollableGradientContainer,
+  Select,
+} from '@beautinique/frontend-components';
+import {
+  MediaCarouselWithParentMedia,
+  type TMediaOption,
+} from '@beautinique/frontend-components/media';
 import { usePathParams, useQueryParams } from '@beautinique/frontend-hooks';
+import { QuillContent } from '@beautinique/frontend-quill';
 import { Icon } from '@iconify/react';
 import { useMemo } from 'react';
 
-import ApiStatus from '@/components/layout/ApiStatus';
-import { MediaCarouselWithParentMedia } from '@/components/layout/carousels/MediaCarouselWithParentMedia';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
-import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
-import Dropdown from '@/components/layout/dropdown';
-import Button from '@/components/ui/Button';
-import Select from '@/components/ui/inputs/Select';
-import { QuillContent } from '@/components/ui/QuillContent';
 import { PRODUCT_STATUS_TRANSITIONS } from '@/constants/api.constants';
 import { useGetDashboardProductBySlug } from '@/services/product-service/product.service.query';
-import type { TMediaOption } from '@/types/component.type';
-import { formatDate, formatINRCurrency, isNullOrUndefined } from '@/utils/common.util';
+import {
+  formatDate,
+  formatINRCurrency,
+  isNullOrUndefined,
+  VIDEO_PLAYER_PROPS,
+} from '@/utils/common.util';
 
 const ProductDetails = () => {
   const { pathParams } = usePathParams();
@@ -118,6 +127,7 @@ const ProductDetails = () => {
             {/* LEFT SECTION */}
             <div className="relative w-full">
               <MediaCarouselWithParentMedia
+                playerProps={VIDEO_PLAYER_PROPS}
                 media={media}
                 needButtonControls={false}
                 selected={selectedMediaIndex}

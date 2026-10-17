@@ -1,3 +1,17 @@
+import {
+  ApiStatus,
+  Badge,
+  ConfirmModal,
+  Input,
+  LoadingText,
+  ScrollableGradientContainer,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+  TableRowCell,
+} from '@beautinique/frontend-components';
 import { EMPTY_ARRAY, SORT_MAP } from '@beautinique/frontend-constants';
 import { useIsSmallScreen, useQueryParamInput, useQueryParams } from '@beautinique/frontend-hooks';
 import { Icon } from '@iconify/react';
@@ -5,21 +19,7 @@ import type { ExpandedState, HeaderContext, SortingState } from '@tanstack/react
 import { useTable } from '@tanstack/react-table';
 import { Fragment, useCallback, useDeferredValue, useMemo, useState } from 'react';
 
-import ApiStatus from '@/components/layout/ApiStatus';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
-import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
-import LoadingText from '@/components/layout/loaders/LoadingText';
-import ConfirmModal from '@/components/layout/modals/ConfirmModal';
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeadCell,
-  TableRow,
-  TableRowCell,
-} from '@/components/layout/table';
-import Badge from '@/components/ui/Badge';
-import Input from '@/components/ui/inputs/Input';
 import { QUERY_PARAMS_KEY_MAP } from '@/constants/common.constants';
 import {
   CATEGORY_TABLE_FEATURES,

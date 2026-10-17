@@ -1,22 +1,36 @@
+import type { ITitleDescription } from '@beautinique/frontend-components';
+import {
+  processQuillContent as processContent,
+  type QuillImageRef,
+  QuillUploadCountError,
+} from '@beautinique/frontend-quill/editor';
+import type { IUploadItemHandle } from '@beautinique/frontend-stores';
+import type Quill from 'quill';
+import type { RefObject } from 'react';
 import { useCallback } from 'react';
-import type { FieldPathValue, FieldValues } from 'react-hook-form';
+import type { FieldPath, FieldPathValue, FieldValues, UseFormSetValue } from 'react-hook-form';
 
 import { useUploadMultipleMedia } from '@/services/media-service/media.service.query';
-import type { IProcessQuillContent } from '@/types/input.type';
-import { toaster } from '@/utils/common.util';
-import { sanitizeQuillHtml } from '@/utils/input.util';
-import { getQuillImageFiles } from '@/utils/upload.util';
+import { toaster } from '@/utils/toaster';
 
-const getQuillContent = (value: string) => {
-  if (!value || value === '<p><br></p>') return undefined;
+interface IProcessQuillContent<T extends FieldValues> {
+  quillRef: RefObject<Quill | null>;
+  /** The images the editor holds (the `imagesRef` it was given). */
+  imagesRef: RefObject<QuillImageRef[]>;
+  setValue: UseFormSetValue<T>;
+  field: FieldPath<T>;
+  folder: string;
+  toasterInfo?: Partial<ITitleDescription>;
+  /** This field's row in a toast that follows several uploads together (see `runUploadsInToast`). */
+  progress?: IUploadItemHandle;
+}
 
-  // Sanitize once more right before this becomes the value persisted to the backend (and, for
-  // whichever field editor this is, whatever other client eventually renders it) - see
-  // `sanitizeQuillHtml`'s own comment for why this isn't redundant with `QuillContent`/
-  // `QuillInput`'s own sanitization.
-  return sanitizeQuillHtml(value);
-};
-
+/**
+ * Makes the content of a Quill editor ready to be saved: uploads the images that were picked in it (one
+ * request, with a toast that follows it), puts their addresses in the text, and sets the field of the
+ * form to the cleaned HTML. The work on the content is the quill package's `processQuillContent`; this
+ * hook gives it this app's upload.
+ */
 export const useProcessQuillContent = <T extends FieldValues>() => {
   const { mutateAsync, isPending } = useUploadMultipleMedia();
 
@@ -35,58 +49,40 @@ export const useProcessQuillContent = <T extends FieldValues>() => {
     }: IProcessQuillContent<T>) => {
       if (!quillRef.current) return '';
 
-      const quill = quillRef.current;
-      let content = quill.root.innerHTML;
+      try {
+        const content = await processContent({
+          quill: quillRef.current,
+          imagesRef,
+          upload: async (files) => {
+            const formData = new FormData();
 
-      const images = imagesRef.current;
-      const files = getQuillImageFiles(images);
+            files.forEach((file) => {
+              formData.append('files', file);
+            });
 
-      if (!files.length) {
-        const finalContent = getQuillContent(content);
+            formData.append('folder', folder);
 
-        setValue(field, finalContent as FieldPathValue<T, typeof field>);
-        return finalContent;
-      }
+            const { data } = await mutateAsync({ data: formData, toasterInfo, progress });
 
-      const formData = new FormData();
-
-      files.forEach((file) => {
-        formData.append('files', file);
-      });
-
-      formData.append('folder', folder);
-
-      const { data } = await mutateAsync({ data: formData, toasterInfo, progress });
-
-      const urls: string[] = data?.filter(Boolean) ?? [];
-
-      if (urls.length !== files.length) {
-        toaster.error({
-          title: 'Upload failed',
-          description: 'Some files could not be uploaded.',
+            return data ?? [];
+          },
         });
 
-        throw new Error('File upload count mismatch');
+        setValue(field, content as FieldPathValue<T, typeof field>);
+
+        return content;
+      } catch (error) {
+        if (error instanceof QuillUploadCountError) {
+          toaster.error({
+            title: 'Upload failed',
+            description: 'Some files could not be uploaded.',
+          });
+
+          throw new Error('File upload count mismatch', { cause: error });
+        }
+
+        throw error;
       }
-
-      images.forEach(({ blobUrl }, index) => {
-        content = content.split(blobUrl).join(urls[index]);
-      });
-
-      quill.root.innerHTML = content;
-
-      // Cleanup uploaded blobs
-      images.forEach(({ blobUrl }) => {
-        URL.revokeObjectURL(blobUrl);
-      });
-
-      imagesRef.current = [];
-
-      const finalContent = getQuillContent(content);
-
-      setValue(field, finalContent as FieldPathValue<T, typeof field>);
-
-      return finalContent;
     },
     [mutateAsync],
   );

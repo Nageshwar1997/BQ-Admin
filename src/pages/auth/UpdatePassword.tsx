@@ -1,3 +1,11 @@
+import {
+  BorderGradient,
+  Button,
+  Divider,
+  GradientText,
+  Input,
+  ScrollableGradientContainer,
+} from '@beautinique/frontend-components';
 import { AUTH_PROVIDER_MAP } from '@beautinique/frontend-constants';
 import { usePathParams } from '@beautinique/frontend-hooks';
 import type { TChangePasswordZodSchema } from '@beautinique/frontend-types';
@@ -7,14 +15,8 @@ import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import BorderGradient from '@/components/layout/containers/BorderGradient';
 import BrandShowcasePanel from '@/components/layout/containers/BrandShowcasePanel';
-import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
 import AuthBottomInstructions from '@/components/ui/AuthBottomInstructions';
-import Button from '@/components/ui/Button';
-import Divider from '@/components/ui/Divider';
-import GradientText from '@/components/ui/GradientText';
-import Input from '@/components/ui/inputs/Input';
 import {
   BASE_PASSWORDS_VISIBILITY,
   CHANGE_PASSWORD_INPUT_MAP_DATA,
@@ -131,6 +133,7 @@ const UpdatePassword = () => {
                       },
                       right: {
                         icon: showPasswords.change[input.name] ? 'lucide:eye-off' : 'lucide:eye',
+                        label: showPasswords.change[input.name] ? 'Hide password' : 'Show password',
                         onClick: () => {
                           setShowPasswords((prev) => ({
                             ...prev,

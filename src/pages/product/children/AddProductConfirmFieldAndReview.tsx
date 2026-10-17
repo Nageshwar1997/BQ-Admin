@@ -1,3 +1,6 @@
+import { Button, Checkbox, type IClassName } from '@beautinique/frontend-components';
+import { MediaCarouselWithModal } from '@beautinique/frontend-components/media';
+import { QuillContent } from '@beautinique/frontend-quill';
 import type {
   TConfirmDetailsZodSchema,
   TDraftProductDetailsZodSchema,
@@ -6,13 +9,8 @@ import { Icon } from '@iconify/react';
 import type { ReactNode } from 'react';
 import { type UseFormReturn } from 'react-hook-form';
 
-import MediaCarouselWithModal from '@/components/layout/carousels/MediaCarouselWithModal';
-import Button from '@/components/ui/Button';
-import Checkbox from '@/components/ui/inputs/Checkbox';
-import { QuillContent } from '@/components/ui/QuillContent';
 import type { TAddProductStepNumber } from '@/types/common.type';
-import type { IClassName } from '@/types/component.type';
-import { formatINRCurrency } from '@/utils/common.util';
+import { formatINRCurrency, VIDEO_PLAYER_PROPS } from '@/utils/common.util';
 
 interface Props {
   form: UseFormReturn<TConfirmDetailsZodSchema>;
@@ -118,6 +116,7 @@ const MediaAndGallery = ({
           label="Thumbnail"
           value={
             <MediaCarouselWithModal
+              playerProps={VIDEO_PLAYER_PROPS}
               media={[{ type: 'image', url: data.thumbnail as string }]}
               gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
             />
@@ -127,6 +126,7 @@ const MediaAndGallery = ({
           label={data.images.length > 1 ? 'Images' : 'Image'}
           value={
             <MediaCarouselWithModal
+              playerProps={VIDEO_PLAYER_PROPS}
               media={data.images.map((image) => ({ type: 'image', url: image as string }))}
               gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
             />
@@ -137,6 +137,7 @@ const MediaAndGallery = ({
             label="Video"
             value={
               <MediaCarouselWithModal
+                playerProps={VIDEO_PLAYER_PROPS}
                 media={[{ type: 'video', url: data.video as string }]}
                 gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
               />
@@ -179,6 +180,7 @@ const StockAndVariants = ({
               label="Thumbnail"
               value={
                 <MediaCarouselWithModal
+                  playerProps={VIDEO_PLAYER_PROPS}
                   media={[{ type: 'image', url: variant.thumbnail as string }]}
                   gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
                 />
@@ -189,6 +191,7 @@ const StockAndVariants = ({
             label={variant.images.length > 1 ? 'Images' : 'Image'}
             value={
               <MediaCarouselWithModal
+                playerProps={VIDEO_PLAYER_PROPS}
                 media={variant.images.map((image) => ({ type: 'image', url: image as string }))}
                 gradientClassNames={{ left: 'from-smoke-eerie', right: 'from-smoke-eerie' }}
               />

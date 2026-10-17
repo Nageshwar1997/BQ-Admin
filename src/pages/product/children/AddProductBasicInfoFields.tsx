@@ -1,8 +1,7 @@
+import { Input, Select } from '@beautinique/frontend-components';
 import type { TProductBasicInfoZodSchema } from '@beautinique/frontend-types';
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form';
 
-import Input from '@/components/ui/inputs/Input';
-import Select from '@/components/ui/inputs/Select';
 import {
   PRODUCT_BASIC_INFO_INPUT_MAP_DATA,
   PRODUCT_CATEGORIES_SELECT_MAP_DATA,

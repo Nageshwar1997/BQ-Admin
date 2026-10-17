@@ -1,14 +1,11 @@
+import { Divider, ScrollableGradientContainer, Tooltip } from '@beautinique/frontend-components';
 import { useIsSmallScreen, usePathParams } from '@beautinique/frontend-hooks';
 import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import Divider from '@/components/ui/Divider';
-import Tooltip from '@/components/ui/Tooltip';
 import { ROUTES, SIDEBAR_DATA } from '@/constants/common.constants';
 import { useLogout } from '@/services/user-service/auth.service.query';
-
-import ScrollableGradientContainer from '../containers/ScrollableGradientContainer';
 
 const SidebarItem = ({
   isSameRoute,

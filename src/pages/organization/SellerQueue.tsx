@@ -1,22 +1,22 @@
-import type { TSellerApprovalStatus } from '@beautinique/frontend-types';
-import { useTable } from '@tanstack/react-table';
-import { useMemo, useState } from 'react';
-
-import ApiStatus from '@/components/layout/ApiStatus';
-import PageWrapper from '@/components/layout/containers/PageWrapper';
-import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
-import { ModalWrapper } from '@/components/layout/modals/ModalWrapper';
 import {
+  ApiStatus,
+  Badge,
+  Button,
+  ModalWrapper,
+  ScrollableGradientContainer,
   Table,
   TableBody,
   TableHead,
   TableHeadCell,
   TableRow,
   TableRowCell,
-} from '@/components/layout/table';
-import Badge from '@/components/ui/Badge';
-import Button from '@/components/ui/Button';
-import Textarea from '@/components/ui/inputs/Textarea';
+  Textarea,
+} from '@beautinique/frontend-components';
+import type { TSellerApprovalStatus } from '@beautinique/frontend-types';
+import { useTable } from '@tanstack/react-table';
+import { useMemo, useState } from 'react';
+
+import PageWrapper from '@/components/layout/containers/PageWrapper';
 import { APP_TABLE_FEATURES, createAppColumnHelper, toColumn } from '@/constants/table.constants';
 import {
   useGetSellerQueue,

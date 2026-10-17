@@ -1,12 +1,12 @@
+import { getFormDataFiles, type ITitleDescription } from '@beautinique/frontend-components';
+import type { IUploadItemHandle } from '@beautinique/frontend-stores';
 import { useMutation } from '@tanstack/react-query';
 
 import { mediaApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
-import type { IUploadItemHandle, TFormDataProgress } from '@/types/common.type';
-import type { ITitleDescription } from '@/types/component.type';
+import type { TFormDataProgress } from '@/types/common.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
-import { withProgressToast } from '@/utils/common.util';
-import { getFormDataFiles, withUploadsToast } from '@/utils/upload.util';
+import { withProgressToast, withUploadsToast } from '@/utils/toaster';
 
 const { upload } = API_QUERY_KEYS.media_service;
 

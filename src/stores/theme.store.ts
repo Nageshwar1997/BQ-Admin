@@ -1,21 +1,6 @@
-import { create } from 'zustand';
+import { createThemeStore } from '@beautinique/frontend-stores';
 
-import type { IThemeStore, TTheme } from '@/types/store.type';
-
-const useThemeStore = create<IThemeStore>((set) => {
-  const currentTheme = localStorage.getItem('theme') ?? 'dark';
-  const isValidTheme = ['dark', 'light'].includes(currentTheme);
-
-  return {
-    theme: isValidTheme ? (currentTheme as TTheme) : 'dark',
-    toggleTheme: () => {
-      set((state) => {
-        const newTheme = state.theme === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('theme', newTheme);
-        return { theme: newTheme };
-      });
-    },
-  };
-});
+// The type of the theme (dark | light) is the stores package's: no type of its own here.
+const useThemeStore = createThemeStore();
 
 export default useThemeStore;

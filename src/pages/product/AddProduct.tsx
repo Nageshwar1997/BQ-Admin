@@ -1,9 +1,18 @@
+import { Button } from '@beautinique/frontend-components';
+import { Stepper } from '@beautinique/frontend-components/stepper';
 import {
   CATEGORY_LEVELS_MAP,
   DRAFT_PRODUCT_STEP_MAP,
   EMPTY_ARRAY,
+  VARIANT_TYPES_MAP,
 } from '@beautinique/frontend-constants';
 import { usePathParams } from '@beautinique/frontend-hooks';
+import {
+  getQuillImageFiles,
+  getQuillImagesInText,
+  type QuillImageRef,
+} from '@beautinique/frontend-quill/editor';
+import type { IShade } from '@beautinique/frontend-tryon';
 import type {
   TConfirmDetailsZodSchema,
   TDraftProductStepBodyZodSchema,
@@ -23,12 +32,10 @@ import {
 } from '@beautinique/frontend-zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type Quill from 'quill';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import PageWrapper from '@/components/layout/containers/PageWrapper';
-import Button from '@/components/ui/Button';
-import Stepper from '@/components/ui/Stepper';
 import { ADD_PRODUCT_STEPS, ROUTES } from '@/constants/common.constants';
 import { ADD_PRODUCT_FORM_ID_MAP } from '@/constants/form.constants';
 import { useProcessQuillContent } from '@/hooks/useProcessQuillContent';
@@ -47,9 +54,8 @@ import type {
   TProductQuillImageRefs,
   TProductQuillRefs,
 } from '@/types/common.type';
-import type { IQuillImageRef } from '@/types/component.type';
-import { isDeepEqual, toaster } from '@/utils/common.util';
-import { getQuillImageFiles, runUploadsInToast } from '@/utils/upload.util';
+import { isDeepEqual } from '@/utils/common.util';
+import { runUploadsInToast, toaster } from '@/utils/toaster';
 
 import AddProductBasicInfoFields from './children/AddProductBasicInfoFields';
 import AddProductConfirmFieldAndReview from './children/AddProductConfirmFieldAndReview';
@@ -91,10 +97,10 @@ const AddProduct = () => {
   };
 
   const imageRefs: TProductQuillImageRefs = {
-    description: useRef<IQuillImageRef[]>([]),
-    ingredients: useRef<IQuillImageRef[]>([]),
-    instructions: useRef<IQuillImageRef[]>([]),
-    additional: useRef<IQuillImageRef[]>([]),
+    description: useRef<QuillImageRef[]>([]),
+    ingredients: useRef<QuillImageRef[]>([]),
+    instructions: useRef<QuillImageRef[]>([]),
+    additional: useRef<QuillImageRef[]>([]),
   };
 
   const basicInfoForm = useForm<TProductBasicInfoZodSchema>({
@@ -121,6 +127,20 @@ const AddProduct = () => {
     resolver: zodResolver(productStockAndVariantsZodSchema),
     defaultValues: { step: DRAFT_PRODUCT_STEP_MAP[3] },
   });
+
+  // The colour variants of step 4 are the shades the try-on of step 5 tries (never invented with a picker)
+  const variants = useWatch({
+    control: stockAndVariantsForm.control,
+    name: 'variants',
+    defaultValue: [],
+  });
+  const tryOnShades = useMemo(
+    (): IShade[] =>
+      variants
+        .filter((variant) => variant.type === VARIANT_TYPES_MAP.Color)
+        .map((variant) => ({ name: variant.label, hexColor: variant.value })),
+    [variants],
+  );
 
   const tryOnConfigurationForm = useForm<TProductTryOnConfigurationZodSchema>({
     resolver: zodResolver(productTryOnConfigurationZodSchema),
@@ -319,7 +339,12 @@ const AddProduct = () => {
       uploads: CONTENT_UPLOAD_FIELDS.map(({ field, label }) => ({
         id: field,
         label,
-        files: getQuillImageFiles(imageRefs[field].current),
+        // only the images that are in the text now are uploaded (one that was deleted from it is not)
+        files: quillRefs[field].current
+          ? getQuillImageFiles(
+              getQuillImagesInText(quillRefs[field].current, imageRefs[field].current),
+            )
+          : [],
       })),
       run: (field, progress) =>
         processQuillContent({
@@ -509,7 +534,7 @@ const AddProduct = () => {
       id={ADD_PRODUCT_FORM_ID_MAP[activeStep]}
       onSubmit={tryOnConfigurationForm.handleSubmit(onTryOnConfigurationSubmit)}
     >
-      <AddProductTryOnConfigurationFields form={tryOnConfigurationForm} />
+      <AddProductTryOnConfigurationFields form={tryOnConfigurationForm} shades={tryOnShades} />
     </form>,
     <form
       key="reviewAndConfirm"

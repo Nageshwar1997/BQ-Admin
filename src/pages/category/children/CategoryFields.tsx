@@ -1,3 +1,4 @@
+import { Input, Select, Tooltip } from '@beautinique/frontend-components';
 import { CATEGORY_LEVELS_MAP, EMPTY_ARRAY } from '@beautinique/frontend-constants';
 import type {
   TCategoryZodSchema,
@@ -13,9 +14,6 @@ import {
   type UseFormResetField,
 } from 'react-hook-form';
 
-import Input from '@/components/ui/inputs/Input';
-import Select from '@/components/ui/inputs/Select';
-import Tooltip from '@/components/ui/Tooltip';
 import type { TCategory } from '@/types/api.type';
 
 interface TCommonFields {
@@ -62,6 +60,7 @@ const CommonFields = ({
         control={control}
         render={({ field: { onChange, value } }) => (
           <Select
+            optionsClassName="z-110"
             label="Category level"
             options={['Main', 'Sub', 'Product'].map((name, i) => ({
               value: i + CATEGORY_LEVELS_MAP.L1,
@@ -144,6 +143,7 @@ export const Level2Fields = ({
         control={control}
         render={({ field: { onChange } }) => (
           <Select
+            optionsClassName="z-110"
             label="Main category"
             options={level1Cats.map((cat: TCategory) => ({ label: cat.name, value: cat._id }))}
             error={'mainCategory' in errors ? errors.mainCategory?.message : undefined}
@@ -192,6 +192,7 @@ export const Level3Fields = ({
         control={control}
         render={({ field: { onChange } }) => (
           <Select
+            optionsClassName="z-110"
             label="Main category"
             options={level1Cats.map((cat: TCategory) => ({ label: cat.name, value: cat._id }))}
             error={'mainCategory' in errors ? errors.mainCategory?.message : undefined}
@@ -214,6 +215,7 @@ export const Level3Fields = ({
         control={control}
         render={({ field: { onChange } }) => (
           <Select
+            optionsClassName="z-110"
             label="Sub-category"
             options={level2Cats.map((cat) => ({ label: cat.name, value: cat._id }))}
             error={'subCategory' in errors ? errors.subCategory?.message : undefined}

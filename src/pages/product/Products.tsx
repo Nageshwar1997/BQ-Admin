@@ -1,3 +1,20 @@
+import {
+  ApiStatus,
+  Input,
+  LoadingText,
+  ScrollableGradientContainer,
+  Select,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+  TableRowCell,
+} from '@beautinique/frontend-components';
+import {
+  HierarchySelect,
+  type IHierarchySelectOption,
+} from '@beautinique/frontend-components/hierarchy-select';
 import { EMPTY_ARRAY, SORT_MAP } from '@beautinique/frontend-constants';
 import {
   useIsSmallScreen,
@@ -13,21 +30,7 @@ import { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 
-import ApiStatus from '@/components/layout/ApiStatus';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
-import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
-import LoadingText from '@/components/layout/loaders/LoadingText';
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeadCell,
-  TableRow,
-  TableRowCell,
-} from '@/components/layout/table';
-import HierarchySelect from '@/components/ui/inputs/HierarchySelect';
-import Input from '@/components/ui/inputs/Input';
-import Select from '@/components/ui/inputs/Select';
 import { ROUTES } from '@/constants/common.constants';
 import {
   APP_TABLE_FEATURES,
@@ -42,7 +45,6 @@ import type {
   TCategoryHierarchyNode,
   TProductSortBy,
 } from '@/types/api.type';
-import type { IHierarchySelectOption } from '@/types/input.type';
 import { formatDate, formatINRCurrency } from '@/utils/common.util';
 
 const SearchAndSort = () => {
@@ -103,6 +105,7 @@ const SearchAndSort = () => {
           ...(queryParams.category && {
             right: {
               icon: 'lucide:x',
+              label: 'Clear the category filter',
               className: 'cursor-pointer size-4',
               onClick: () => {
                 removeParams(['category']);

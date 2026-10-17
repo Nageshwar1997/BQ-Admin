@@ -1,8 +1,7 @@
+import { Divider, GradientText } from '@beautinique/frontend-components';
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 
-import Divider from '@/components/ui/Divider';
-import GradientText from '@/components/ui/GradientText';
 import { ROUTES } from '@/constants/common.constants';
 import { APP_VERSION, FOOTER_LINKS } from '@/constants/footer.constants';
 import envs from '@/envs';

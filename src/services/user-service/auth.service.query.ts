@@ -6,7 +6,7 @@ import { API_QUERY_KEYS } from '@/constants/api.constants';
 import { ROUTES } from '@/constants/common.constants';
 import useUserStore from '@/stores/user.store';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
-import { toaster } from '@/utils/common.util';
+import { toaster } from '@/utils/toaster';
 
 const { login, logout, password } = API_QUERY_KEYS.user_service.auth;
 

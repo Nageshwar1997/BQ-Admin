@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { userApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
-import { toaster } from '@/utils/common.util';
+import { toaster } from '@/utils/toaster';
 
 const { password } = API_QUERY_KEYS.user_service.user;
 

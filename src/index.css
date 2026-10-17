@@ -3,5 +3,15 @@
 /* Shared theme, base styles and utilities (Tailwind + typography plugin included). */
 @import '@beautinique/frontend-styles';
 
+/* Tells Tailwind where the classes of @beautinique/frontend-components are (it does not look in
+   node_modules): without it the Button comes out unstyled. After the styles, before app.css. */
+@import '@beautinique/frontend-components/source.css';
+
+/* The same for @beautinique/frontend-quill (the editor and the viewer of the saved content). */
+@import '@beautinique/frontend-quill/source.css';
+
+/* The same for @beautinique/frontend-tryon (the Try-On modal): without it the modal is unstyled. */
+@import '@beautinique/frontend-tryon/source.css';
+
 /* BQ-Admin's own css - keep AFTER the package so it can add to / override it. */
 @import './app.css';

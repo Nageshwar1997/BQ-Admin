@@ -1,46 +1,10 @@
-import { nanoid } from 'nanoid';
-import { create } from 'zustand';
+import type { TToast } from '@beautinique/frontend-components';
+import { createToastStore } from '@beautinique/frontend-stores';
 
-import { TOAST_TYPE } from '@/constants/common.constants';
-import type { IToastStore } from '@/types/store.type';
-
-const useToastStore = create<IToastStore>((set) => ({
-  toasts: [],
-
-  add: (toast) => {
-    const id = nanoid();
-
-    set((state) => ({ toasts: [...state.toasts, { ...toast, id }] }));
-
-    return id; // return the id of the toast for removal
-  },
-
-  update: {
-    progress: (id, progress) => {
-      set((state) => ({
-        toasts: state.toasts.map((toast) => (toast.id === id ? { ...toast, progress } : toast)),
-      }));
-    },
-
-    uploadItem: (id, itemId, patch) => {
-      set((state) => ({
-        toasts: state.toasts.map((toast) =>
-          toast.id === id && toast.type === TOAST_TYPE.uploads
-            ? {
-                ...toast,
-                items: toast.items.map((item) =>
-                  item.id === itemId ? { ...item, ...patch } : item,
-                ),
-              }
-            : toast,
-        ),
-      }));
-    },
-  },
-
-  remove: (id) => {
-    set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
-  },
-}));
+/*
+ * The one toast store of the app: the `toaster` (utils/toaster.ts) adds to it and the
+ * `ToastContainer` (App.tsx) draws it, so both are given this very store.
+ */
+const useToastStore = createToastStore<TToast>();
 
 export default useToastStore;

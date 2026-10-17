@@ -1,13 +1,15 @@
+import {
+  ApiStatus,
+  Badge,
+  Button,
+  GradientText,
+  Input,
+  Radio,
+  Textarea,
+} from '@beautinique/frontend-components';
 import { useState } from 'react';
 
-import ApiStatus from '@/components/layout/ApiStatus';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
-import Badge from '@/components/ui/Badge';
-import Button from '@/components/ui/Button';
-import GradientText from '@/components/ui/GradientText';
-import Input from '@/components/ui/inputs/Input';
-import Radio from '@/components/ui/inputs/Radio';
-import Textarea from '@/components/ui/inputs/Textarea';
 import { useGetMyAdmin, useUpdateAdminStatus } from '@/services/user-service/admin.service.query';
 import { formatDate } from '@/utils/common.util';
 

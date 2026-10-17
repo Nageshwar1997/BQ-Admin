@@ -1,3 +1,8 @@
+import { Button, Checkbox, ModalWrapper } from '@beautinique/frontend-components';
+import {
+  type IStepperStep as StepperStep,
+  Stepper,
+} from '@beautinique/frontend-components/stepper';
 import { CATEGORY_LEVELS_MAP, EMPTY_ARRAY } from '@beautinique/frontend-constants';
 import { useQueryParams } from '@beautinique/frontend-hooks';
 import type { TCategoryZodSchema, TConfirmDetailsZodSchema } from '@beautinique/frontend-types';
@@ -7,10 +12,6 @@ import { Icon } from '@iconify/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
-import { ModalWrapper } from '@/components/layout/modals/ModalWrapper';
-import Button from '@/components/ui/Button';
-import Checkbox from '@/components/ui/inputs/Checkbox';
-import Stepper, { type StepperStep } from '@/components/ui/Stepper';
 import {
   CATEGORY_MODAL_STEPS,
   CATEGORY_STEPPER_STEP_COUNT_MAP,
@@ -24,8 +25,9 @@ import {
 import type { TCategory } from '@/types/api.type';
 import type { ICatModal } from '@/types/component.type';
 import type { TCategory_Stepper_Step } from '@/types/form.types';
-import { isDeepEqual, toaster } from '@/utils/common.util';
+import { isDeepEqual } from '@/utils/common.util';
 import { setErrorToForm } from '@/utils/form.util';
+import { toaster } from '@/utils/toaster';
 
 import { Level1Fields, Level2Fields, Level3Fields } from './CategoryFields';
 

@@ -1,4 +1,5 @@
-import Button from '@/components/ui/Button';
+import { Button } from '@beautinique/frontend-components';
+
 import type { TCatTable } from '@/types/component.type';
 
 const CategoryActions = ({ onDelete, onEdit, ...data }: TCatTable) => (
@@ -7,6 +8,7 @@ const CategoryActions = ({ onDelete, onEdit, ...data }: TCatTable) => (
       content={{ icon: 'solar:pen-linear', className: 'size-4.5' }}
       pattern="outline"
       buttonProps={{
+        'aria-label': `Edit ${data.category.name}`,
         onClick: (event) => {
           event.stopPropagation();
           onEdit(data);
@@ -18,6 +20,7 @@ const CategoryActions = ({ onDelete, onEdit, ...data }: TCatTable) => (
       content={{ icon: 'solar:trash-bin-trash-linear', className: 'size-4.5' }}
       pattern="outline"
       buttonProps={{
+        'aria-label': `Delete ${data.category.name}`,
         onClick: (event) => {
           event.stopPropagation();
           onDelete(data.category._id);

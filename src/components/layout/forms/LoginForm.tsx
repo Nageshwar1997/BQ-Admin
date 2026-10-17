@@ -1,3 +1,11 @@
+import {
+  BorderGradient,
+  Button,
+  Checkbox,
+  GradientText,
+  Input,
+  Radio,
+} from '@beautinique/frontend-components';
 import { USER_ROLE_MAP } from '@beautinique/frontend-constants';
 import { usePathParams, useQueryParams } from '@beautinique/frontend-hooks';
 import type { TLoginZodSchema, TUserRole } from '@beautinique/frontend-types';
@@ -8,19 +16,12 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
 import AuthBottomInstructions from '@/components/ui/AuthBottomInstructions';
-import Button from '@/components/ui/Button';
-import GradientText from '@/components/ui/GradientText';
-import Checkbox from '@/components/ui/inputs/Checkbox';
-import Input from '@/components/ui/inputs/Input';
-import Radio from '@/components/ui/inputs/Radio';
 import { ROUTES } from '@/constants/common.constants';
 import { BASE_PASSWORD_KEYS, LOGIN_INPUT_MAP_DATA } from '@/constants/input.constants';
 import { useLogin } from '@/services/user-service/auth.service.query';
 import useActionsStore from '@/stores/action.store';
 import useUserStore from '@/stores/user.store';
 import { setErrorToForm } from '@/utils/form.util';
-
-import BorderGradient from '../containers/BorderGradient';
 
 // type TLoginExtendedZodSchema = TLoginZodSchema;
 // const loginExtendedZodSchema = loginZodSchema.and({
@@ -174,6 +175,7 @@ const LoginForm = () => {
                       ? {
                           right: {
                             icon: showPassword ? 'lucide:eye-off' : 'lucide:eye',
+                            label: showPassword ? 'Hide password' : 'Show password',
                             onClick: togglePasswordVisibility,
                             className: 'cursor-pointer',
                           },
@@ -207,7 +209,8 @@ const LoginForm = () => {
               <GradientText
                 text="Forgot Password?"
                 type="accent"
-                path={`/${ROUTES.AUTH.BASE}/${ROUTES.AUTH.FORGOT_PASSWORD}`}
+                as={Link}
+                to={`/${ROUTES.AUTH.BASE}/${ROUTES.AUTH.FORGOT_PASSWORD}`}
                 className="text-xs font-semibold hover:underline"
               />
             </div>

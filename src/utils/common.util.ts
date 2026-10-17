@@ -1,111 +1,6 @@
-import type { IconProps } from '@iconify/react';
-import type { CSSProperties } from 'react';
+import type { TPlayerProps } from '@beautinique/frontend-components/media';
 
-import { TOAST_TYPE, TOOLTIP_GAP, VIDEO_PLACEHOLDER } from '@/constants/common.constants';
-import useToastStore from '@/stores/toast.store';
-import type { IButton, ITooltip } from '@/types/component.type';
-import type {
-  ICustomToast,
-  IDefaultToast,
-  ILoadingToast,
-  IProgressToast,
-  IUploadItem,
-  IUploadsToast,
-  TProgressToastOptions,
-} from '@/types/store.type';
-
-export const getButtonCss = (pattern: IButton['pattern']) => {
-  switch (pattern) {
-    case 'primary':
-      return 'text-white bg-sky-blue-burst shadow-primary-btn hover:shadow-primary-btn-hover';
-    case 'secondary':
-      return 'text-secondary-invert bg-secondary shadow-secondary-btn hover:shadow-secondary-btn-hover';
-    case 'tertiary':
-      return 'text-tertiary-invert bg-tertiary shadow-tertiary-btn hover:shadow-tertiary-btn-hover';
-    case 'outline':
-      return 'text-primary border border-primary shadow-outline-btn hover:shadow-outline-btn-hover';
-    case 'transparent':
-    default:
-      return 'shadow-inner shadow-primary/20 hover:shadow-primary/30 bg-transparent border border-primary/30 text-secondary rotate-180 [&>span]:-rotate-180';
-  }
-};
-
-export const getTooltipPosition = (
-  rect: DOMRect,
-  placement: NonNullable<ITooltip['placement']>,
-): CSSProperties => {
-  switch (placement) {
-    case 'bottom':
-      return { top: rect.bottom, left: rect.left + rect.width / 2 };
-    case 'right':
-      return { top: rect.top + rect.height / 2, left: rect.right };
-    case 'left':
-      return { top: rect.top + rect.height / 2, left: rect.left };
-    case 'top':
-    default:
-      return { top: rect.top, left: rect.left + rect.width / 2 };
-  }
-};
-
-export const getTooltipTransform = (
-  placement: NonNullable<ITooltip['placement']>,
-  isVisible: boolean,
-) => {
-  const gap = String(isVisible ? TOOLTIP_GAP : 0);
-
-  switch (placement) {
-    case 'bottom':
-      return `translate(-50%, ${gap}px)`;
-    case 'right':
-      return `translate(${gap}px, -50%)`;
-    case 'left':
-      return `translate(calc(-100% - ${gap}px), -50%)`;
-    case 'top':
-    default:
-      return `translate(-50%, calc(-100% - ${gap}px))`;
-  }
-};
-
-export const getTooltipArrowCss = (placement: NonNullable<ITooltip['placement']>) => {
-  switch (placement) {
-    case 'bottom':
-      return 'after:bottom-full after:left-1/2 after:-translate-x-1/2 after:border-b-silver-jet-2';
-    case 'right':
-      return 'after:top-1/2 after:right-full after:-translate-y-1/2 after:border-r-silver-jet-2';
-    case 'left':
-      return 'after:top-1/2 after:left-full after:-translate-y-1/2 after:border-l-silver-jet-2';
-    case 'top':
-    default:
-      return 'after:top-full after:left-1/2 after:-translate-x-1/2 after:border-t-silver-jet-2';
-  }
-};
-
-const { add, update, remove } = useToastStore.getState();
-export const toaster = {
-  success: (data: Omit<IDefaultToast, 'type'>) => add({ ...data, type: TOAST_TYPE.success }),
-  error: (data: Omit<IDefaultToast, 'type'>) => add({ ...data, type: TOAST_TYPE.error }),
-  warning: (data: Omit<IDefaultToast, 'type'>) => add({ ...data, type: TOAST_TYPE.warning }),
-  loading: (data: Omit<ILoadingToast, 'type'>) => add({ ...data, type: TOAST_TYPE.loading }),
-  custom: (data: ICustomToast) => add(data),
-  progress: {
-    start: (data: Omit<IProgressToast, 'type'>) => add({ ...data, type: TOAST_TYPE.progress }),
-    update: (toastId: string, progress: number) => {
-      update.progress(toastId, progress);
-    },
-    end: (toastId: string) => {
-      remove(toastId);
-    },
-  },
-  uploads: {
-    start: (data: Omit<IUploadsToast, 'type'>) => add({ ...data, type: TOAST_TYPE.uploads }),
-    update: (toastId: string, itemId: string, patch: Partial<Omit<IUploadItem, 'id'>>) => {
-      update.uploadItem(toastId, itemId, patch);
-    },
-  },
-  remove: (toastId: string) => {
-    remove(toastId);
-  },
-};
+import { VIDEO_PLACEHOLDER } from '@/constants/common.constants';
 
 export const isDeepEqual = <T>(
   obj1: T,
@@ -281,6 +176,12 @@ export function convertVideoToPoster(videoUrl: string): Promise<string> {
   });
 }
 
+/** What the video players of the shared components get: the posters of this app and its placeholder. */
+export const VIDEO_PLAYER_PROPS: TPlayerProps = {
+  getPoster: (src) => convertVideoToPoster(src),
+  placeholder: VIDEO_PLACEHOLDER,
+};
+
 export const formatINRCurrency = (amount: number): string =>
   new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -289,28 +190,6 @@ export const formatINRCurrency = (amount: number): string =>
     maximumFractionDigits: 2,
   }).format(amount);
 
-export const withProgressToast = async <T>({
-  title,
-  description,
-  request,
-}: TProgressToastOptions<T>): Promise<T> => {
-  const toastId = toaster.progress.start({ title, description, progress: 0 });
-
-  try {
-    const response = await request((event) => {
-      if (!event.total) return;
-
-      toaster.progress.update(toastId, Math.round((event.loaded * 100) / event.total));
-    });
-
-    toaster.progress.update(toastId, 100);
-
-    return response;
-  } finally {
-    toaster.progress.end(toastId);
-  }
-};
-
 export const formatDate = (date: Date | string | number, options?: Intl.DateTimeFormatOptions) => {
   return new Intl.DateTimeFormat('en-IN', {
     day: '2-digit',
@@ -318,10 +197,6 @@ export const formatDate = (date: Date | string | number, options?: Intl.DateTime
     year: 'numeric',
     ...options,
   }).format(new Date(date));
-};
-
-export const isIconProps = (value: unknown): value is IconProps => {
-  return typeof value === 'object' && value !== null && 'icon' in value;
 };
 
 /* ========== NULL CHECK FUNCTION ========== */

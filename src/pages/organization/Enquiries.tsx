@@ -1,4 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
+import {
+  ApiStatus,
+  LoadingText,
+  ScrollableGradientContainer,
+  Select,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+  TableRowCell,
+} from '@beautinique/frontend-components';
 import { CONTACT_QUERY_STATUS, CONTACT_QUERY_TYPES } from '@beautinique/frontend-constants';
 import { useQueryParams } from '@beautinique/frontend-hooks';
 import type { IListContactQueriesQuery, TContactQueryStatus } from '@beautinique/frontend-types';
@@ -9,19 +21,7 @@ import { Fragment, useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 
-import ApiStatus from '@/components/layout/ApiStatus';
 import PageWrapper from '@/components/layout/containers/PageWrapper';
-import ScrollableGradientContainer from '@/components/layout/containers/ScrollableGradientContainer';
-import LoadingText from '@/components/layout/loaders/LoadingText';
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeadCell,
-  TableRow,
-  TableRowCell,
-} from '@/components/layout/table';
-import Select from '@/components/ui/inputs/Select';
 import { APP_TABLE_FEATURES, createAppColumnHelper, toColumn } from '@/constants/table.constants';
 import {
   useGetContactQueries,

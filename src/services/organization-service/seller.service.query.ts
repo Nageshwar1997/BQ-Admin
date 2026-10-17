@@ -4,7 +4,7 @@ import { sellerApi } from '@/classes/apis';
 import { API_QUERY_KEYS } from '@/constants/api.constants';
 import type { ISellerQueueQuery } from '@/types/api.type';
 import { handleApiErrorToaster, handleApiSuccessToaster } from '@/utils/api.util';
-import { toaster } from '@/utils/common.util';
+import { toaster } from '@/utils/toaster';
 
 const { queue, updateApprovalStatus } = API_QUERY_KEYS.organization_service.seller;
 

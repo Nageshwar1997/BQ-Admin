@@ -1,17 +1,29 @@
+import { Button, Checkbox, Select } from '@beautinique/frontend-components';
 import { TRY_ON_CATEGORIES, TRY_ON_MAP } from '@beautinique/frontend-constants';
-import type { TProductTryOnConfigurationZodSchema } from '@beautinique/frontend-types';
-import { useMemo } from 'react';
+import type { IShade } from '@beautinique/frontend-tryon';
+import type {
+  TProductTryOnConfigurationZodSchema,
+  TTryOnSelection,
+} from '@beautinique/frontend-types';
+import { useMemo, useState } from 'react';
 import { Controller, type UseFormReturn, useWatch } from 'react-hook-form';
 
-import Checkbox from '@/components/ui/inputs/Checkbox';
-import Select from '@/components/ui/inputs/Select';
+import TryOnModal from '@/components/layout/tryons';
 import { PRODUCT_TRYON_INPUT_MAP_DATA } from '@/constants/input.constants';
 
 interface Props {
   form: UseFormReturn<TProductTryOnConfigurationZodSchema>;
+  /** The colour variants of the product (step 4): the shades the try-on tries. May be empty. */
+  shades: IShade[];
 }
 
-const AddProductTryOnConfigurationFields = ({ form }: Props) => {
+/** Both selects are filled (while a person chooses, the form can hold a category without its subcategory). */
+const isComplete = (
+  selection: Partial<TTryOnSelection> | undefined,
+): selection is TTryOnSelection => Boolean(selection?.category && selection.subCategory);
+
+const AddProductTryOnConfigurationFields = ({ form, shades }: Props) => {
+  const [isTryOnOpen, setIsTryOnOpen] = useState(false);
   const {
     control,
     formState: { errors },
@@ -75,6 +87,41 @@ const AddProductTryOnConfigurationFields = ({ form }: Props) => {
           />
         );
       })}
+      {enabled && (
+        <>
+          <Button
+            content="Try it on"
+            pattern="secondary"
+            className="col-span-2"
+            leftIcon={{ icon: 'solar:magic-stick-3-linear' }}
+            buttonProps={{
+              onClick: () => {
+                setIsTryOnOpen(true);
+              },
+            }}
+          />
+          {/* The modal where the category and the subcategory are tried on and chosen: Apply fills the two fields above */}
+          <TryOnModal
+            selectable
+            isOpen={isTryOnOpen}
+            onClose={() => {
+              setIsTryOnOpen(false);
+            }}
+            tryOn={isComplete(tryOn) ? tryOn : undefined}
+            shades={shades}
+            onApply={(selection) => {
+              form.setValue('tryOn.category', selection.category, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+              form.setValue('tryOn.subCategory', selection.subCategory, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+            }}
+          />
+        </>
+      )}
     </div>
   );
 };

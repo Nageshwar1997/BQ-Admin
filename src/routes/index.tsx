@@ -1,7 +1,7 @@
+import { LoadingScreen } from '@beautinique/frontend-components/loading-screen';
 import { type ComponentType } from 'react';
 import { Outlet, type RouteObject } from 'react-router-dom';
 
-import LoadingScreen from '@/components/layout/loaders/LoadingScreen';
 import { ROUTES } from '@/constants/common.constants';
 import { authenticate, guestOnly } from '@/middlewares';
 import ErrorBoundary from '@/pages/error/ErrorBoundary';
